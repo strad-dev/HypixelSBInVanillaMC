@@ -1,5 +1,6 @@
 package listeners;
 
+import misc.Plugin;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -8,7 +9,6 @@ import org.bukkit.entity.WitherSkull;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
-import misc.Plugin;
 
 import java.util.Objects;
 import java.util.Random;

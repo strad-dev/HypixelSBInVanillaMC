@@ -2,7 +2,6 @@ package misc;
 
 import commands.*;
 import listeners.*;
-import misc.*;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -36,6 +35,7 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new CustomDamage(), this);
 		getServer().addRecipe(AddRecipes.addScyllaRecipe(this));
 		getServer().addRecipe(AddRecipes.addTermRecipe(this));
+		getServer().addRecipe(AddRecipes.addAOTVRecipe(this));
 		getLogger().info("Started SkyBlock in Vanilla!");
 	}
 	@Override

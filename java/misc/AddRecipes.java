@@ -294,4 +294,68 @@ public class AddRecipes {
 
 		return termRecipe;
 	}
+
+	@SuppressWarnings("ExtractMethodRecommender")
+	public static Recipe addAOTVRecipe(Plugin plugin) {
+		ItemStack aotv = new ItemStack(Material.NETHERITE_SHOVEL);
+
+		ItemMeta data = aotv.getItemMeta();
+		assert data != null;
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Warped Aspect of the Void " + ChatColor.RED + "✪✪✪✪✪");
+		AttributeModifier attackDamage = new AttributeModifier("AOTVModifier", 0, AttributeModifier.Operation.ADD_NUMBER);
+		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, attackDamage);
+		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+		List<String> lore = new ArrayList<>();
+
+		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
+		lore.add(ChatColor.GRAY + "Intelligence: " + ChatColor.GREEN + "+569.6" + ChatColor.BLUE + " (+65)" + ChatColor.LIGHT_PURPLE + " (+24)");
+		lore.add(ChatColor.GOLD + "[" + ChatColor.AQUA + "✎" + ChatColor.GOLD + "]");
+		lore.add("");
+		lore.add(ChatColor.GOLD + "Ability: Instant Transmission " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
+		lore.add(ChatColor.GRAY + "Teleport " + ChatColor.GREEN + "8 blocks" + ChatColor.GRAY + " ahead of you.");
+		lore.add(ChatColor.DARK_GRAY + "Mana Cost: 0");
+		lore.add("");
+		lore.add(ChatColor.GOLD + "Ability: Ether Transmission " + ChatColor.GREEN + ChatColor.BOLD + "SNEAK RIGHT CLICK");
+		lore.add(ChatColor.GRAY + "Teleport to your targetted block");
+		lore.add(ChatColor.GRAY + "up to " + ChatColor.GREEN + "61 blocks" + ChatColor.GRAY + " blocks away.");
+		lore.add(ChatColor.DARK_GRAY + "Soulflow Cost: " + ChatColor.DARK_AQUA + "0⸎");
+		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "0");
+		lore.add("");
+		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " LEGENDARY DUNGEON SHOVEL " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		aotv.setItemMeta(data);
+
+		NamespacedKey aotvKey = new NamespacedKey(plugin, "aotv");
+
+		ShapelessRecipe aotvRecipe = new ShapelessRecipe(aotvKey, aotv);
+
+		ItemStack tessellated = new ItemStack(Material.ENDER_PEARL);
+		data = tessellated.getItemMeta();
+		assert data != null;
+		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Tessellated Ender Pearl");
+		lore = new ArrayList<>();
+		lore.add(ChatColor.RESET + String.valueOf(ChatColor.GRAY) + "An Ender Pearl so dense that even");
+		lore.add(ChatColor.RESET + String.valueOf(ChatColor.GRAY) + "the most knowledgeable players");
+		lore.add(ChatColor.RESET + String.valueOf(ChatColor.GRAY) + "are mystified by it.");
+		lore.add("");
+		lore.add(ChatColor.RESET + String.valueOf(ChatColor.GRAY) + "Use 2 of this to craft the Terminator!");
+		data.setLore(lore);
+		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+		tessellated.setItemMeta(data);
+		tessellated.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		aotvRecipe.addIngredient(Material.NETHERITE_SHOVEL);
+		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
+		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
+		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
+		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
+		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
+		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
+		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
+		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
+
+		return aotvRecipe;
+	}
 }

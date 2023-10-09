@@ -8,14 +8,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.*;
 
-@SuppressWarnings("DataFlowIssue")
 public class CustomMobs implements Listener {
 	static Random random = new Random();
 
@@ -93,10 +91,9 @@ public class CustomMobs implements Listener {
 				enderman.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, -1, 4));
 				teleportToPlayer(enderman);
 				Objects.requireNonNull(Plugin.getNearestPlayer(e.getEntity())).sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "A MUTANT ENDERMAN has spawned nearby!  It seems to be a little more agitated than it's friends...");
-
+				enderman.setTarget(Plugin.getNearestPlayer(enderman));
+				enderman.setCustomNameVisible(true);
 			}
-			enderman.setTarget(Plugin.getNearestPlayer(enderman));
-			enderman.setCustomNameVisible(true);
 			// NULL GOLEM
 		} else if(e.getEntity() instanceof IronGolem golem) {
 			golem.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));

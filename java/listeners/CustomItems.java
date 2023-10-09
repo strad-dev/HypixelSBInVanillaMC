@@ -10,6 +10,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -25,7 +26,7 @@ public class CustomItems implements Listener {
 		Block b = e.getPlayer().getWorld().getBlockAt(newLocation);
 		return b.getType().isSolid();
 	}
-	
+
 	@SuppressWarnings("ConstantConditions")
 	public boolean isWitherImpactSword(ItemStack item) {
 		boolean hasWitherImpact = false;
@@ -43,35 +44,35 @@ public class CustomItems implements Listener {
 		}
 		return item.getType().equals(new ItemStack(Material.NETHERITE_SWORD).getType()) && hasWitherImpact;
 	}
-	
+
 	@SuppressWarnings("ConstantConditions")
 	public boolean isTerminator(ItemStack item) {
 		boolean isTerm = false;
 		if(!item.hasItemMeta()) {
 			return false;
 		}
-		
+
 		if(item.getItemMeta().getDisplayName().contains("Terminator")) {
 			isTerm = true;
 		}
-		
+
 		return item.getType().equals(new ItemStack(Material.BOW).getType()) && isTerm;
 	}
-	
+
 	@SuppressWarnings("ConstantConditions")
 	public boolean isAOTV(ItemStack item) {
 		boolean isAOTV = false;
 		if(!item.hasItemMeta()) {
 			return false;
 		}
-		
+
 		if(item.getItemMeta().getDisplayName().contains("Aspect of the Void")) {
 			isAOTV = true;
 		}
-		
+
 		return item.getType().equals(new ItemStack(Material.NETHERITE_SHOVEL).getType()) && isAOTV;
 	}
-	
+
 	public List<EntityType> createList() {
 		List<EntityType> doNotKill = new ArrayList<>();
 		doNotKill.add(EntityType.BOAT);
@@ -119,7 +120,7 @@ public class CustomItems implements Listener {
 		doNotKill.add(EntityType.WITHER_SKULL);
 		return doNotKill;
 	}
-	
+
 	public void witherImpact(Player p, PlayerInteractEvent e) {
 		Vector unitVector = p.getLocation().getDirection();
 		double smallX = unitVector.getX() / 10;
@@ -140,10 +141,10 @@ public class CustomItems implements Listener {
 			unitVector.setZ(unitVector.getZ() + smallZ);
 			i++;
 		}
-		
+
 		Location newLocation = p.getLocation().add(unitVector);
 		newLocation.setY(Math.floor(newLocation.getY() + 1.62));
-		
+
 		// implosion
 		p.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, newLocation, 20);
 		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(newLocation, 10, 10, 10);
@@ -162,9 +163,17 @@ public class CustomItems implements Listener {
 		} catch(Exception exception) {
 			sharpnessBonus = 0;
 		}
+
+		int strengthBonus;
+		try {
+			strengthBonus = Objects.requireNonNull(p.getPotionEffect(PotionEffectType.INCREASE_DAMAGE)).getAmplifier();
+		} catch(Exception exception) {
+			strengthBonus = 0;
+		}
+
+		int add = random.nextInt(3) + sharpnessBonus + strengthBonus;
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1) {
-				int add = random.nextInt(3) + sharpnessBonus;
 				entity1.damage(4 + add, p);
 				damaged += 1;
 				damage += 4 + add;
@@ -175,7 +184,7 @@ public class CustomItems implements Listener {
 		if(damaged > 0) {
 			p.sendMessage(ChatColor.RED + "Your Implosion hit " + damaged + " enemies for " + damage + " damage.");
 		}
-		
+
 		// wither shield
 		List<PotionEffect> temp = p.getActivePotionEffects().stream().toList();
 		List<PotionEffectType> effects = new ArrayList<>();
@@ -188,7 +197,7 @@ public class CustomItems implements Listener {
 		}
 		if(absorptionLevel != 2) {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 2));
-			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1, 1);
+			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1, 2.0F);
 		}
 		if(!effects.contains(PotionEffectType.DAMAGE_RESISTANCE)) {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 0));
@@ -196,37 +205,37 @@ public class CustomItems implements Listener {
 		if(!effects.contains(PotionEffectType.REGENERATION)) {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 100, 1));
 		}
-		
+
 		// finish shadow warp
 		p.setFallDistance(0);
 		p.teleport(newLocation);
-		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
+		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 0.9F, 1);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 	}
-	
+
 	public void terminator(Player p, PlayerInteractEvent e) {
 		// you don't need arrows
 		p.getInventory().remove(Material.ARROW);
 		p.getInventory().remove(Material.TIPPED_ARROW);
 		p.getInventory().remove(Material.SPECTRAL_ARROW);
-		
+
 		// setting the three arrows
 		Vector v = p.getLocation().getDirection();
 		Location lLeft = p.getLocation();
 		lLeft.add(v);
 		lLeft.setYaw(lLeft.getYaw() - 5);
 		lLeft.setY(lLeft.getY() + 1.62);
-		
+
 		Location l = p.getLocation();
 		l.add(v);
 		l.setY(l.getY() + 1.62);
-		
+
 		Location lRight = p.getLocation();
 		lRight.add(v);
 		lRight.setYaw(lRight.getYaw() + 5);
 		lRight.setY(lRight.getY() + 1.62);
 
-		// calculate power bonus
+		// calculate power and strength bonus
 		int powerBonus;
 		try {
 			int power = Objects.requireNonNull(Objects.requireNonNull(p.getInventory().getItem(e.getPlayer().getInventory().getHeldItemSlot())).getItemMeta()).getEnchants().get(Enchantment.ARROW_DAMAGE);
@@ -239,32 +248,39 @@ public class CustomItems implements Listener {
 			powerBonus = 0;
 		}
 
+		int strengthBonus;
+		try {
+			strengthBonus = Objects.requireNonNull(p.getPotionEffect(PotionEffectType.INCREASE_DAMAGE)).getAmplifier();
+		} catch(Exception exception) {
+			strengthBonus = 0;
+		}
+
 		// shoot the three arrows
 		Random random = new Random();
-		int add = random.nextInt(2) + powerBonus;
+		int add = random.nextInt(2) + powerBonus + strengthBonus;
 		Arrow left = p.getWorld().spawnArrow(l, lLeft.getDirection(), 3, 0.1F);
 		Arrow middle = p.getWorld().spawnArrow(l, l.getDirection(), 3, 0.1F);
 		Arrow right = p.getWorld().spawnArrow(l, lRight.getDirection(), 3, 0.1F);
-		
+
 		left.setDamage(3 + add);
 		left.setPierceLevel(4);
 		left.setBounce(true);
 		left.setShooter(p);
-		
+
 		middle.setDamage(3 + add);
 		middle.setPierceLevel(4);
 		middle.setBounce(true);
 		middle.setShooter(p);
-		
+
 		right.setDamage(3 + add);
 		right.setPierceLevel(4);
 		right.setBounce(true);
 		right.setShooter(p);
-		
+
 		e.setCancelled(true);
 		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
 	}
-	
+
 	public void instantTransmission(Player p, PlayerInteractEvent e) {
 		Vector unitVector = p.getLocation().getDirection();
 		double smallX = unitVector.getX() / 10;
@@ -285,7 +301,7 @@ public class CustomItems implements Listener {
 			unitVector.setZ(unitVector.getZ() + smallZ);
 			i++;
 		}
-		
+
 		Location newLocation = p.getLocation().add(unitVector);
 		newLocation.setY(Math.floor(newLocation.getY() + 1.62));
 		p.teleport(newLocation);
@@ -293,7 +309,7 @@ public class CustomItems implements Listener {
 		e.setCancelled(true);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 	}
-	
+
 	public void etherTransmission(Player p, PlayerInteractEvent e) {
 		Vector unitVector = p.getLocation().getDirection();
 		double smallX = unitVector.getX() / 10;
@@ -316,7 +332,7 @@ public class CustomItems implements Listener {
 			unitVector.setZ(unitVector.getZ() + smallZ);
 			i++;
 		}
-		
+
 		if(canTP) {
 			Location newLocation = p.getLocation().add(unitVector).add(unitVector);
 			newLocation.setY(Math.floor(newLocation.getY() + 2.62));
@@ -324,8 +340,9 @@ public class CustomItems implements Listener {
 			p.setFallDistance(0);
 		}
 		e.setCancelled(true);
+		p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.45F);
 	}
-	
+
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();

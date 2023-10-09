@@ -1,5 +1,6 @@
 package listeners;
 
+import misc.Plugin;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -9,9 +10,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import misc.Plugin;
 import org.bukkit.loot.LootContext;
-import org.bukkit.loot.LootTable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -28,7 +27,7 @@ public class CustomDrops implements Listener {
 		try {
 			if(e.getEntity() instanceof Wither wither) {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=wither_skull]");
-				boolean drop = random.nextDouble() > 0.98;
+				boolean drop = random.nextDouble() > 0.95;
 
 				// SHADOW WARP
 				if(Objects.requireNonNull(wither.getCustomName()).contains("Maxor")) {
@@ -151,7 +150,7 @@ public class CustomDrops implements Listener {
 
 				// JUDGEMENT CORE
 			} else if(e.getEntity() instanceof Enderman enderman) {
-				if(Objects.requireNonNull(enderman.getCustomName()).contains("Voidgloom Seraph") && random.nextDouble() > 0.875) {
+				if(Objects.requireNonNull(enderman.getCustomName()).contains("Voidgloom Seraph") && random.nextDouble() > 0.85) {
 					ItemStack core = new ItemStack(Material.CHISELED_QUARTZ_BLOCK);
 					ItemMeta data = core.getItemMeta();
 					assert data != null;
