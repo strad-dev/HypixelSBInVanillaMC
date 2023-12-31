@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Criteria;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import java.util.Objects;
 
 @SuppressWarnings({"unused"})
 public class Plugin extends JavaPlugin {
+	private static Plugin instance;
+
 	@Override
 	public void onEnable() {
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
@@ -23,9 +26,6 @@ public class Plugin extends JavaPlugin {
 		Objects.requireNonNull(this.getCommand("getopeffects")).setExecutor(new GetOPEffects());
 		Objects.requireNonNull(this.getCommand("w")).setExecutor((new Tell()));
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
-		getServer().getPluginManager().registerEvents(new ChatListener(), this);
-		getServer().getPluginManager().registerEvents(new DeathListener(), this);
-		getServer().getPluginManager().registerEvents(new CommandUsageCheck(), this);
 		getServer().getPluginManager().registerEvents(new NoArrows(), this);
 		getServer().getPluginManager().registerEvents(new ArrowSounds(), this);
 		getServer().getPluginManager().registerEvents(new NoArrowsOnGround(), this);
@@ -33,25 +33,28 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new CustomDrops(), this);
 		getServer().getPluginManager().registerEvents(new EditSkull(), this);
 		getServer().getPluginManager().registerEvents(new CustomDamage(), this);
+		getServer().getPluginManager().registerEvents(new OldRegen(), this);
+		getServer().getPluginManager().registerEvents(new ChatListener(), this);
+		getServer().getPluginManager().registerEvents(new CustomItemUses(), this);
 		getServer().addRecipe(AddRecipes.addScyllaRecipe(this));
 		getServer().addRecipe(AddRecipes.addTermRecipe(this));
 		getServer().addRecipe(AddRecipes.addAOTVRecipe(this));
 		getLogger().info("Started SkyBlock in Vanilla!");
+		instance = this;
+
+		try {
+			Objects.requireNonNull(getServer().getScoreboardManager()).getMainScoreboard().registerNewObjective("Intelligence", Criteria.DUMMY, "Intelligence");
+			getLogger().info("Could not find Intelligence.  Adding to Scoreboard.");
+		} catch(Exception exception) {
+			getLogger().info("Deteced Intelligence.");
+		}
 	}
+
 	@Override
 	public void onDisable() {
 		getLogger().info("Stopped SkyBlock in Vanilla!");
 	}
 
-	public Plugin getPlugin() {
-		return this;
-	}
-
-	/**
-	 * Returns the nearest player to another player, or null if there is no other player in this world
-	 * @param e Entity to check
-	 * @return Nearest other player, or null if there is no other player in this world
-	 */
 	public static @Nullable Player getNearestPlayer(Entity e) {
 		World world = e.getWorld();
 		Location location = e.getLocation();
@@ -59,5 +62,9 @@ public class Plugin extends JavaPlugin {
 		if(playersInWorld.isEmpty()) return null;
 		playersInWorld.sort(Comparator.comparingDouble(o -> o.getLocation().distanceSquared(location)));
 		return playersInWorld.get(0);
+	}
+
+	public static Plugin getInstance() {
+		return instance;
 	}
 }

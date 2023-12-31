@@ -1,5 +1,9 @@
 package listeners;
 
+import misc.Plugin;
+import misc.SimilarData;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -10,9 +14,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.Potion;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -21,6 +25,8 @@ import java.util.Objects;
 import java.util.Random;
 
 public class CustomItems implements Listener {
+	private Score score;
+
 	public boolean isBlocked(PlayerInteractEvent e, Vector constant, Location oldLocation) {
 		Location newLocation = oldLocation.add(constant);
 		Block b = e.getPlayer().getWorld().getBlockAt(newLocation);
@@ -68,9 +74,24 @@ public class CustomItems implements Listener {
 
 		if(item.getItemMeta().getDisplayName().contains("Aspect of the Void")) {
 			isAOTV = true;
+
 		}
 
 		return item.getType().equals(new ItemStack(Material.NETHERITE_SHOVEL).getType()) && isAOTV;
+	}
+
+	@SuppressWarnings("ConstantConditions")
+	public boolean isIceSprayWand(ItemStack item) {
+		boolean isWand = false;
+		if(!item.hasItemMeta()) {
+			return false;
+		}
+
+		if(item.getItemMeta().getDisplayName().contains("Ice Spray Wand")) {
+			isWand = true;
+		}
+
+		return item.getType().equals(new ItemStack(Material.STICK).getType()) && isWand;
 	}
 
 	public List<EntityType> createList() {
@@ -197,7 +218,7 @@ public class CustomItems implements Listener {
 		}
 		if(absorptionLevel != 2) {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 2));
-			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1, 2.0F);
+			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 0.65F);
 		}
 		if(!effects.contains(PotionEffectType.DAMAGE_RESISTANCE)) {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 100, 0));
@@ -211,6 +232,9 @@ public class CustomItems implements Listener {
 		p.teleport(newLocation);
 		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 0.9F, 1);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
+			score.setScore(score.getScore() - 8);
+		}
 	}
 
 	public void terminator(Player p, PlayerInteractEvent e) {
@@ -264,17 +288,14 @@ public class CustomItems implements Listener {
 
 		left.setDamage(3 + add);
 		left.setPierceLevel(4);
-		left.setBounce(true);
 		left.setShooter(p);
 
 		middle.setDamage(3 + add);
 		middle.setPierceLevel(4);
-		middle.setBounce(true);
 		middle.setShooter(p);
 
 		right.setDamage(3 + add);
 		right.setPierceLevel(4);
-		right.setBounce(true);
 		right.setShooter(p);
 
 		e.setCancelled(true);
@@ -338,27 +359,128 @@ public class CustomItems implements Listener {
 			newLocation.setY(Math.floor(newLocation.getY() + 2.62));
 			p.teleport(newLocation);
 			p.setFallDistance(0);
+			p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
 		}
 		e.setCancelled(true);
-		p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.45F);
 	}
 
+	public void iceSprayWand(Player p) {
+		p.getWorld().spawnParticle(Particle.SNOWFLAKE, p.getLocation(), 1000);
+		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(p.getLocation(), 5, 5, 5);
+		List<EntityType> doNotKill = createList();
+		int damage = 0;
+		for(Entity entity : entities) {
+			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1) {
+				damage += 1;
+				entity1.damage(1);
+				((LivingEntity) entity).setNoDamageTicks(0);
+				entity.setVelocity(new Vector(0, 0, 0));
+				((LivingEntity) entity).addPotionEffect(PotionEffectType.WEAKNESS.createEffect(100, 255));
+				((LivingEntity) entity).addPotionEffect(PotionEffectType.SLOW.createEffect(100, 255));
+			}
+		}
+		if(damage > 0) {
+			p.sendMessage(ChatColor.RED + "Your Ice Spray debuffed " + damage + " enemies.");
+		}
+		p.playSound(p, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.0F);
+		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
+			score.setScore(score.getScore() - 2);
+		}
+	}
+
+	@SuppressWarnings("DataFlowIssue")
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
-		ItemStack itemInUse = p.getInventory().getItem(e.getPlayer().getInventory().getHeldItemSlot());
-		if(itemInUse != null && Objects.equals(e.getHand(), EquipmentSlot.HAND)) {
-			if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && isWitherImpactSword(itemInUse) || e.getAction().equals(Action.RIGHT_CLICK_AIR) && isWitherImpactSword(itemInUse)) {
-				witherImpact(p, e);
-			} else if(!e.getAction().equals(Action.PHYSICAL) && isTerminator(itemInUse)) {
-				terminator(p, e);
-			} else if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) && isAOTV(itemInUse) || e.getAction().equals(Action.RIGHT_CLICK_AIR) && isAOTV(itemInUse)) {
-				if(!p.isSneaking()) {
-					instantTransmission(p, e);
+		ItemStack itemInUse = p.getInventory().getItemInMainHand();
+		try {
+			score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
+		} catch(Exception exception) {
+			Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+			Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+			return;
+		}
+
+		// JUDGEMENT CORE
+		ItemStack core = new ItemStack(Material.CHISELED_QUARTZ_BLOCK);
+		core.setItemMeta(SimilarData.coreMeta(core.getItemMeta()));
+		core.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		// TESSELLATED ENDER PEARL
+		ItemStack tessellated = new ItemStack(Material.ENDER_PEARL);
+		tessellated.setItemMeta(SimilarData.tessellatedPearlMeta(tessellated.getItemMeta()));
+		tessellated.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		// NULL BLADE
+		ItemStack nullBlade = new ItemStack(Material.SHEARS);
+		nullBlade.setItemMeta(SimilarData.nullBladeBeta(nullBlade.getItemMeta()));
+		nullBlade.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		// TARANTULA SILK
+		ItemStack taraSilk = new ItemStack(Material.COBWEB);
+		taraSilk.setItemMeta(SimilarData.taraSilkMeta(taraSilk.getItemMeta()));
+		taraSilk.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		// CORRUPTED PEARL
+		ItemStack corruptPearl = new ItemStack(Material.ENDER_EYE);
+		corruptPearl.setItemMeta(SimilarData.corruptedPearlMeta(corruptPearl.getItemMeta()));
+		corruptPearl.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		// ANTIMATTER
+		ItemStack antimatter = new ItemStack(Material.WARPED_FUNGUS);
+		antimatter.setItemMeta(SimilarData.antimatterMeta(antimatter.getItemMeta()));
+		antimatter.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		// OMEGA EGG
+		ItemStack omegaEgg = new ItemStack(Material.EGG);
+		omegaEgg.setItemMeta(SimilarData.omegaEggMeta(omegaEgg.getItemMeta()));
+		omegaEgg.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		List<ItemStack> items = new ArrayList<>();
+		items.add(core);
+		items.add(tessellated);
+		items.add(nullBlade);
+		items.add(taraSilk);
+		items.add(corruptPearl);
+		items.add(antimatter);
+		items.add(omegaEgg);
+
+		if(e.getHand().equals(EquipmentSlot.HAND)) {
+			if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+				if(isWitherImpactSword(itemInUse)) {
+					if(score.getScore() < 8 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 8");
+						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+					} else {
+						witherImpact(p, e);
+					}
+				} else if(isAOTV(itemInUse)) {
+					if(!p.isSneaking()) {
+						instantTransmission(p, e);
+					} else {
+						etherTransmission(p, e);
+					}
+				} else if(isIceSprayWand(itemInUse)) {
+					if(score.getScore() < 2 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 2");
+						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+					} else {
+						iceSprayWand(p);
+					}
+				} else if(isTerminator(itemInUse)) {
+					terminator(p, e);
 				} else {
-					etherTransmission(p, e);
+					for(ItemStack item : items) {
+						if(item.isSimilar(itemInUse)) {
+							e.setCancelled(true);
+							break;
+						}
+					}
 				}
+			} else if(!e.getAction().equals(Action.PHYSICAL) &&isTerminator(itemInUse)) {
+				terminator(p, e);
 			}
+			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/1000", ChatColor.AQUA.asBungee()));
 		}
 	}
 }
