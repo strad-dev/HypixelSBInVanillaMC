@@ -26,6 +26,7 @@ public class Plugin extends JavaPlugin {
 		Objects.requireNonNull(this.getCommand("getopeffects")).setExecutor(new GetOPEffects());
 		Objects.requireNonNull(this.getCommand("w")).setExecutor((new Tell()));
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
+		getServer().getPluginManager().registerEvents(new FireIsNotBald(), this);
 		getServer().getPluginManager().registerEvents(new NoArrows(), this);
 		getServer().getPluginManager().registerEvents(new ArrowSounds(), this);
 		getServer().getPluginManager().registerEvents(new NoArrowsOnGround(), this);

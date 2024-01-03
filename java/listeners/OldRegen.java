@@ -9,8 +9,10 @@ package listeners;
 
 import misc.Plugin;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -27,7 +29,20 @@ public class OldRegen implements Listener {
 
 	@EventHandler
 	public void onEntityRegainHealth(EntityRegainHealthEvent e) {
-		if(e.getEntityType() != EntityType.PLAYER || e.getRegainReason() != EntityRegainHealthEvent.RegainReason.SATIATED) {
+		if(e.getEntityType() != EntityType.PLAYER) {
+			if(e.getEntity() instanceof LivingEntity entity) {
+				String[] oldName = Objects.requireNonNull(entity.getCustomName()).split(" ");
+				int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
+				int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+				oldName[oldName.length - 1] = ChatColor.YELLOW + "" + health + "/" + maxHealth;
+				StringBuilder newName = new StringBuilder(oldName[0]);
+				for(int i = 1; i < oldName.length; i++) {
+					newName.append(" ").append(oldName[i]);
+				}
+				entity.setCustomName(newName.toString());
+			}
+			return;
+		} else if(e.getRegainReason() != EntityRegainHealthEvent.RegainReason.SATIATED) {
 			return;
 		}
 
@@ -39,7 +54,7 @@ public class OldRegen implements Listener {
 		boolean hasLastHealTime = healTimes.containsKey(playerId);
 		long lastHealTime = healTimes.computeIfAbsent(playerId, id -> currentTime);
 
-		if (hasLastHealTime && currentTime - lastHealTime <= 3990) {
+		if(hasLastHealTime && currentTime - lastHealTime <= 3990) {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.setExhaustion(previousExhaustion), 1L);
 			return;
 		}
@@ -47,7 +62,7 @@ public class OldRegen implements Listener {
 		final double maxHealth = Objects.requireNonNull(p.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
 		final double playerHealth = p.getHealth();
 
-		if (playerHealth < maxHealth) {
+		if(playerHealth < maxHealth) {
 			p.setHealth(clamp(playerHealth + 1, 0.0, maxHealth));
 			healTimes.put(playerId, currentTime);
 		}
@@ -69,9 +84,9 @@ public class OldRegen implements Listener {
 		double realMin = Math.min(min, max);
 		double realMax = Math.max(min, max);
 
-		if (value < realMin) value = realMin;
+		if(value < realMin) value = realMin;
 
-		if (value > realMax) value = realMax;
+		if(value > realMax) value = realMax;
 
 		return value;
 	}

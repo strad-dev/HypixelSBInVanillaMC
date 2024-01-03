@@ -20,9 +20,19 @@ import java.util.Random;
 public class CustomDrops implements Listener {
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent e) {
+		LivingEntity entity;
+		try {
+			entity = e.getEntity();
+		} catch(Exception exception) {
+			return;
+		}
+		Player p = entity.getKiller();
+		if(p == null) {
+			p = Plugin.getNearestPlayer(entity);
+		}
 		Random random = new Random();
 		try {
-			if(e.getEntity() instanceof Wither wither) {
+			if(entity instanceof Wither wither) {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=wither_skull]");
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=lightning_bolt]");
 				boolean drop = random.nextDouble() < 0.05;
@@ -35,8 +45,6 @@ public class CustomDrops implements Listener {
 						item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 						wither.getWorld().dropItem(wither.getLocation(), item);
 
-						Player p = Plugin.getNearestPlayer(wither);
-						assert p != null;
 						p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Shadow Warp");
 						p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 					}
@@ -50,8 +58,6 @@ public class CustomDrops implements Listener {
 						item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 						wither.getWorld().dropItem(wither.getLocation(), item);
 
-						Player p = Plugin.getNearestPlayer(wither);
-						assert p != null;
 						p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Implosion");
 						p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 					}
@@ -64,8 +70,6 @@ public class CustomDrops implements Listener {
 						item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 						wither.getWorld().dropItem(wither.getLocation(), item);
 
-						Player p = Plugin.getNearestPlayer(wither);
-						assert p != null;
 						p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Wither Shield");
 						p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 					}
@@ -78,8 +82,6 @@ public class CustomDrops implements Listener {
 						item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 						wither.getWorld().dropItem(wither.getLocation(), item);
 
-						Player p = Plugin.getNearestPlayer(wither);
-						assert p != null;
 						p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Necron's Handle");
 						p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 					}
@@ -87,29 +89,25 @@ public class CustomDrops implements Listener {
 
 
 				// SPAWN A VOIDGLOOM SERAPH
-			} else if(e.getEntity() instanceof EnderDragon dragon) {
+			} else if(entity instanceof EnderDragon dragon) {
 				if(Objects.requireNonNull(dragon.getCustomName()).contains("Superior Dragon")) {
 					ItemStack item = new ItemStack(Material.QUARTZ);
 					item.setItemMeta(SimilarData.supRemnantMeta(item.getItemMeta()));
 					item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 					dragon.getWorld().dropItem(dragon.getLocation(), item);
 
-					Player p = Plugin.getNearestPlayer(dragon);
-					assert p != null;
 					p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Remnant of the Superior Dragon");
 					p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 				}
 
 				// JUDGEMENT CORE
-			} else if(e.getEntity() instanceof Enderman enderman) {
+			} else if(entity instanceof Enderman enderman) {
 				if(Objects.requireNonNull(enderman.getCustomName()).contains("Voidgloom Seraph") && random.nextDouble() < 0.1) {
 					ItemStack item = new ItemStack(Material.CHISELED_QUARTZ_BLOCK);
 					item.setItemMeta(SimilarData.coreMeta(item.getItemMeta()));
 					item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 					enderman.getWorld().dropItem(enderman.getLocation(), item);
 
-					Player p = Plugin.getNearestPlayer(enderman);
-					assert p != null;
 					p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Judgement Core");
 					p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 
@@ -120,34 +118,28 @@ public class CustomDrops implements Listener {
 					item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 					enderman.getWorld().dropItem(enderman.getLocation(), item);
 
-					Player p = Plugin.getNearestPlayer(enderman);
-					assert p != null;
 					p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Tessellated Ender Pearl");
 					p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 				} else {
-					if(e.getEntity().getWorld().getEnvironment().equals(World.Environment.THE_END) && random.nextDouble() < 0.005 || random.nextDouble() < 0.03) {
+					if(entity.getWorld().getEnvironment().equals(World.Environment.THE_END) && random.nextDouble() < 0.005 || random.nextDouble() < 0.03) {
 						ItemStack item = new ItemStack(Material.ENDER_EYE);
 						item.setItemMeta(SimilarData.corruptedPearlMeta(item.getItemMeta()));
 						item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 						enderman.getWorld().dropItem(enderman.getLocation(), item);
 
-						Player p = Plugin.getNearestPlayer(enderman);
-						assert p != null;
 						p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Corrupted Pearl");
 						p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 					}
 				}
 
 				// NULL BLADE
-			} else if(e.getEntity() instanceof IronGolem golem) {
+			} else if(entity instanceof IronGolem golem) {
 				if(Objects.requireNonNull(golem.getCustomName()).contains("meloG norI") && random.nextDouble() < 0.1) {
 					ItemStack item = new ItemStack(Material.SHEARS);
 					item.setItemMeta(SimilarData.nullBladeBeta(item.getItemMeta()));
 					item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 					golem.getWorld().dropItem(golem.getLocation(), item);
 
-					Player p = Plugin.getNearestPlayer(golem);
-					assert p != null;
 					p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Null Blade");
 					p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 				} else if(random.nextDouble() < 0.02) {
@@ -156,22 +148,18 @@ public class CustomDrops implements Listener {
 					item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 					golem.getWorld().dropItem(golem.getLocation(), item);
 
-					Player p = Plugin.getNearestPlayer(golem);
-					assert p != null;
 					p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Antimatter");
 					p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 				}
 
 				// BRAIDED FEATHER
-			} else if(e.getEntity() instanceof Chicken chicken) {
+			} else if(entity instanceof Chicken chicken) {
 				if(Objects.requireNonNull(chicken.getCustomName()).contains("Chickzilla") && random.nextDouble() < 0.1) {
 					ItemStack item = new ItemStack(Material.FEATHER);
 					item.setItemMeta(SimilarData.braidedFeatherMeta(item.getItemMeta()));
 					item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 					chicken.getWorld().dropItem(chicken.getLocation(), item);
 
-					Player p = Plugin.getNearestPlayer(chicken);
-					assert p != null;
 					p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Braided Feather");
 					p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 				} else if(random.nextDouble() < 0.02) {
@@ -180,22 +168,18 @@ public class CustomDrops implements Listener {
 					item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 					chicken.getWorld().dropItem(chicken.getLocation(), item);
 
-					Player p = Plugin.getNearestPlayer(chicken);
-					assert p != null;
 					p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Omega Egg");
 					p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 				}
 
 				// TARANTULA SILK
-			} else if(e.getEntity() instanceof Spider spider) {
+			} else if(entity instanceof Spider spider) {
 				if(Objects.requireNonNull(spider.getCustomName()).contains("Tarantula Broodfather") && random.nextDouble() < 0.1) {
 					ItemStack item = new ItemStack(Material.COBWEB);
 					item.setItemMeta(SimilarData.taraSilkMeta(item.getItemMeta()));
 					item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 					spider.getWorld().dropItem(spider.getLocation(), item);
 
-					Player p = Plugin.getNearestPlayer(spider);
-					assert p != null;
 					p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Tarantula Silk");
 					p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 				} else if(random.nextDouble() < 0.03) {
@@ -204,20 +188,16 @@ public class CustomDrops implements Listener {
 					item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 					spider.getWorld().dropItem(spider.getLocation(), item);
 
-					Player p = Plugin.getNearestPlayer(spider);
-					assert p != null;
 					p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Spider Relic");
 					p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 				}
 				// SPAWN HIGHLY INFURIATED WITHER SKELETON
-			} else if(e.getEntity() instanceof WitherSkeleton skeleton) {
+			} else if(entity instanceof WitherSkeleton skeleton) {
 				try {
 					if(Objects.requireNonNull(skeleton.getCustomName()).contains("Highly Infuriated Wither Skeleton")) {
 						ItemStack item = new ItemStack(Material.WITHER_SKELETON_SKULL);
 						skeleton.getWorld().dropItem(skeleton.getLocation(), item);
 
-						Player p = Plugin.getNearestPlayer(skeleton);
-						assert p != null;
 						p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Wither Skeleton Skull");
 						p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 					}
@@ -227,15 +207,13 @@ public class CustomDrops implements Listener {
 						spawnInfuriation(skeleton);
 					}
 				}
-			} else if(e.getEntity() instanceof Stray stray) {
+			} else if(entity instanceof Stray stray) {
 				if(random.nextDouble() < 0.01) {
 					ItemStack item = new ItemStack(Material.STICK);
 					item.setItemMeta(SimilarData.iceSprayMeta(item.getItemMeta()));
 					item.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 					stray.getWorld().dropItem(stray.getLocation(), item);
 
-					Player p = Plugin.getNearestPlayer(stray);
-					assert p != null;
 					p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + "Ice Spray Wand");
 					p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
 				}

@@ -3,14 +3,32 @@ package misc;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("ExtractMethodRecommender")
 public class SimilarData {
+	public static void changeName(LivingEntity entity) {
+		if(!(entity instanceof Player)) {
+			String[] oldName = Objects.requireNonNull(entity.getCustomName()).split(" ");
+			int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
+			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+			oldName[oldName.length - 1] = ChatColor.YELLOW + "" + health + "/" + maxHealth;
+			StringBuilder newName = new StringBuilder(oldName[0]);
+			for(int i = 1; i < oldName.length; i++) {
+				newName.append(" ").append(oldName[i]);
+			}
+			entity.setCustomName(newName.toString());
+		}
+	}
+
 	public static ItemMeta AOTVMeta(ItemMeta data) {
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Aspect of the Void");
@@ -76,7 +94,7 @@ public class SimilarData {
 
 		List<String> lore = new ArrayList<>();
 		lore.add("");
-		lore.add(ChatColor.GRAY + "Base Damage: " + ChatColor.RED + "3-4");
+		lore.add(ChatColor.GRAY + "Base Damage: " + ChatColor.RED + "2");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Shortbow: Instantly Shoots!");
 		lore.add(ChatColor.GRAY + "Shoots " + ChatColor.AQUA + "3" + ChatColor.GRAY + " arrows at once.");

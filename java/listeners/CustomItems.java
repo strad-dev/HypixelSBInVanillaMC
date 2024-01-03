@@ -172,30 +172,26 @@ public class CustomItems implements Listener {
 		List<EntityType> doNotKill = createList();
 		Random random = new Random();
 		int damaged = 0;
-		int damage = 0;
-		int sharpnessBonus;
+		double damage = 0;
+		double sharpnessBonus;
 		try {
 			int sharpness = Objects.requireNonNull(Objects.requireNonNull(p.getInventory().getItem(e.getPlayer().getInventory().getHeldItemSlot())).getItemMeta()).getEnchants().get(Enchantment.DAMAGE_ALL);
-			if(sharpness <= 4) {
-				sharpnessBonus = 1;
-			} else {
-				sharpnessBonus = sharpness - 3;
-			}
+			sharpnessBonus = sharpness * 0.4;
 		} catch(Exception exception) {
 			sharpnessBonus = 0;
 		}
 
-		int strengthBonus;
+		double strengthBonus;
 		try {
 			strengthBonus = Objects.requireNonNull(p.getPotionEffect(PotionEffectType.INCREASE_DAMAGE)).getAmplifier();
 		} catch(Exception exception) {
 			strengthBonus = 0;
 		}
 
-		int add = random.nextInt(3) + sharpnessBonus + strengthBonus;
+		double add = random.nextInt(3) + sharpnessBonus + strengthBonus;
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1) {
-				entity1.damage(4 + add, p);
+				CustomDamage.dealWithCustomMobs(entity1, p, 4 + add, CustomDamage.calculateFinalDamage(entity1, 4 + add), false);
 				damaged += 1;
 				damage += 4 + add;
 				((LivingEntity) entity).setNoDamageTicks(0);
@@ -203,7 +199,7 @@ public class CustomItems implements Listener {
 			}
 		}
 		if(damaged > 0) {
-			p.sendMessage(ChatColor.RED + "Your Implosion hit " + damaged + " enemies for " + damage + " damage.");
+			p.sendMessage(ChatColor.RED + "Your Implosion hit " + damaged + " enemies for " + ((int) damage) + " damage.");
 		}
 
 		// wither shield
@@ -260,41 +256,36 @@ public class CustomItems implements Listener {
 		lRight.setY(lRight.getY() + 1.62);
 
 		// calculate power and strength bonus
-		int powerBonus;
+		double powerBonus;
 		try {
 			int power = Objects.requireNonNull(Objects.requireNonNull(p.getInventory().getItem(e.getPlayer().getInventory().getHeldItemSlot())).getItemMeta()).getEnchants().get(Enchantment.ARROW_DAMAGE);
-			if(power <= 4) {
-				powerBonus = 1;
-			} else {
-				powerBonus = power - 3;
-			}
+			 powerBonus = power * 0.2;
 		} catch(Exception exception) {
 			powerBonus = 0;
 		}
 
-		int strengthBonus;
+		double strengthBonus;
 		try {
-			strengthBonus = Objects.requireNonNull(p.getPotionEffect(PotionEffectType.INCREASE_DAMAGE)).getAmplifier();
+			strengthBonus = 0.5 * Objects.requireNonNull(p.getPotionEffect(PotionEffectType.INCREASE_DAMAGE)).getAmplifier();
 		} catch(Exception exception) {
 			strengthBonus = 0;
 		}
 
 		// shoot the three arrows
-		Random random = new Random();
-		int add = random.nextInt(2) + powerBonus + strengthBonus;
+		double add = powerBonus + strengthBonus;
 		Arrow left = p.getWorld().spawnArrow(l, lLeft.getDirection(), 3, 0.1F);
 		Arrow middle = p.getWorld().spawnArrow(l, l.getDirection(), 3, 0.1F);
 		Arrow right = p.getWorld().spawnArrow(l, lRight.getDirection(), 3, 0.1F);
 
-		left.setDamage(3 + add);
+		left.setDamage(2 + add);
 		left.setPierceLevel(4);
 		left.setShooter(p);
 
-		middle.setDamage(3 + add);
+		middle.setDamage(2 + add);
 		middle.setPierceLevel(4);
 		middle.setShooter(p);
 
-		right.setDamage(3 + add);
+		right.setDamage(2 + add);
 		right.setPierceLevel(4);
 		right.setShooter(p);
 
@@ -372,7 +363,7 @@ public class CustomItems implements Listener {
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1) {
 				damage += 1;
-				entity1.damage(1);
+				CustomDamage.dealWithCustomMobs(entity1, p, 1, CustomDamage.calculateFinalDamage(entity1, 1), false);
 				((LivingEntity) entity).setNoDamageTicks(0);
 				entity.setVelocity(new Vector(0, 0, 0));
 				((LivingEntity) entity).addPotionEffect(PotionEffectType.WEAKNESS.createEffect(100, 255));
@@ -477,8 +468,6 @@ public class CustomItems implements Listener {
 						}
 					}
 				}
-			} else if(!e.getAction().equals(Action.PHYSICAL) &&isTerminator(itemInUse)) {
-				terminator(p, e);
 			}
 			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/1000", ChatColor.AQUA.asBungee()));
 		}
