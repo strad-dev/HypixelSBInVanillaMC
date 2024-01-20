@@ -31,13 +31,24 @@ public class OldRegen implements Listener {
 	public void onEntityRegainHealth(EntityRegainHealthEvent e) {
 		if(e.getEntityType() != EntityType.PLAYER) {
 			if(e.getEntity() instanceof LivingEntity entity) {
-				String[] oldName = Objects.requireNonNull(entity.getCustomName()).split(" ");
-				int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
-				int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
-				oldName[oldName.length - 1] = ChatColor.YELLOW + "" + health + "/" + maxHealth;
-				StringBuilder newName = new StringBuilder(oldName[0]);
-				for(int i = 1; i < oldName.length; i++) {
-					newName.append(" ").append(oldName[i]);
+				StringBuilder newName;
+				try {
+					String[] oldName = Objects.requireNonNull(entity.getCustomName()).split(" ");
+					int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
+					int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+					oldName[oldName.length - 1] = ChatColor.YELLOW + "" + health + "/" + maxHealth;
+					newName = new StringBuilder(oldName[0]);
+					for(int i = 1; i < oldName.length; i++) {
+						newName.append(" ").append(oldName[i]);
+					}
+				} catch(Exception exception) {
+					// add health to the entity name
+					int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
+					int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+					newName = new StringBuilder(String.valueOf(ChatColor.AQUA)).append(entity.getName()).append(" ").append(ChatColor.RED).append("❤ ").append(ChatColor.YELLOW).append(health).append("/").append(maxHealth);
+					// " ♥ 20/20";
+					entity.setCustomName(newName.toString());
+					entity.setCustomNameVisible(true);
 				}
 				entity.setCustomName(newName.toString());
 			}

@@ -25,6 +25,7 @@ public class Plugin extends JavaPlugin {
 		Objects.requireNonNull(this.getCommand("god")).setExecutor(new GOD());
 		Objects.requireNonNull(this.getCommand("getopeffects")).setExecutor(new GetOPEffects());
 		Objects.requireNonNull(this.getCommand("w")).setExecutor((new Tell()));
+
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
 		getServer().getPluginManager().registerEvents(new FireIsNotBald(), this);
 		getServer().getPluginManager().registerEvents(new NoArrows(), this);
@@ -37,9 +38,17 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new OldRegen(), this);
 		getServer().getPluginManager().registerEvents(new ChatListener(), this);
 		getServer().getPluginManager().registerEvents(new CustomItemUses(), this);
+		getServer().getPluginManager().registerEvents(new StopBossesTeleporting(), this);
+		getServer().getPluginManager().registerEvents(new SomeTNTDoNoDamage(), this);
+		getServer().getPluginManager().registerEvents(new GivePlayersRecipes(), this);
+
 		getServer().addRecipe(AddRecipes.addScyllaRecipe(this));
 		getServer().addRecipe(AddRecipes.addTermRecipe(this));
 		getServer().addRecipe(AddRecipes.addAOTVRecipe(this));
+		getServer().addRecipe(AddRecipes.addWardenHelmetRecipe(this));
+		getServer().addRecipe(AddRecipes.addMaxorBootsRecipe(this));
+		getServer().addRecipe(AddRecipes.addGodAppleRecipe(this));
+
 		getLogger().info("Started SkyBlock in Vanilla!");
 		instance = this;
 

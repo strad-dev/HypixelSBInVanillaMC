@@ -2,115 +2,119 @@ package misc;
 
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.RecipeChoice;
-import org.bukkit.inventory.ShapelessRecipe;
+import org.bukkit.inventory.*;
 import org.bukkit.plugin.Plugin;
 
-@SuppressWarnings("DataFlowIssue")
+import java.util.HashSet;
+import java.util.Set;
+
 public class AddRecipes {
+	public static Set<NamespacedKey> returnRecipes(Plugin plugin) {
+		Set<NamespacedKey> allRecipes = new HashSet<>();
+		allRecipes.add(new NamespacedKey(plugin, "scylla"));
+		allRecipes.add(new NamespacedKey(plugin, "aotv"));
+		allRecipes.add(new NamespacedKey(plugin, "term"));
+		allRecipes.add(new NamespacedKey(plugin, "enchanted_golden_apple"));
+		allRecipes.add(new NamespacedKey(plugin, "wardenHelmet"));
+		allRecipes.add(new NamespacedKey(plugin, "maxorBoots"));
+		return allRecipes;
+	}
+
 	public static Recipe addScyllaRecipe(Plugin plugin) {
-		ItemStack scylla = new ItemStack(Material.NETHERITE_SWORD);
-		scylla.setItemMeta(SimilarData.scyllaMeta(scylla.getItemMeta()));
-
-		ItemStack shadowWarp = new ItemStack(Material.ENCHANTED_BOOK);
-		shadowWarp.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-		shadowWarp.setItemMeta(SimilarData.shadowWarpMeta(shadowWarp.getItemMeta()));
-
-		ItemStack implosion = new ItemStack(Material.ENCHANTED_BOOK);
-		implosion.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-		implosion.setItemMeta(SimilarData.implosionMeta(implosion.getItemMeta()));
-
-		ItemStack witherShield = new ItemStack(Material.ENCHANTED_BOOK);
-		witherShield.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-		witherShield.setItemMeta(SimilarData.witherShieldMeta(witherShield.getItemMeta()));
-
-		ItemStack handle = new ItemStack(Material.STICK);
-		handle.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-		handle.setItemMeta(SimilarData.necronHandleMeta(handle.getItemMeta()));
+		ItemStack scylla = SimilarData.scylla();
+		ItemStack shadowWarp = SimilarData.shadowWarp();
+		ItemStack implosion = SimilarData.implosion();
+		ItemStack witherShield = SimilarData.witherShield();
+		ItemStack handle = SimilarData.handle();
 
 		NamespacedKey scyllaKey = new NamespacedKey(plugin, "scylla");
+		ShapedRecipe scyllaRecipe = new ShapedRecipe(scyllaKey, scylla);
 
-		ShapelessRecipe scyllaRecipe = new ShapelessRecipe(scyllaKey, scylla);
-		scyllaRecipe.addIngredient(Material.NETHER_STAR);
-		scyllaRecipe.addIngredient(Material.NETHER_STAR);
-		scyllaRecipe.addIngredient(Material.NETHER_STAR);
-		scyllaRecipe.addIngredient(Material.NETHER_STAR);
-		scyllaRecipe.addIngredient(Material.NETHERITE_SWORD);
-
-		scyllaRecipe.addIngredient(new RecipeChoice.ExactChoice(handle));
-		scyllaRecipe.addIngredient(new RecipeChoice.ExactChoice(witherShield));
-		scyllaRecipe.addIngredient(new RecipeChoice.ExactChoice(shadowWarp));
-		scyllaRecipe.addIngredient(new RecipeChoice.ExactChoice(implosion));
-
+		scyllaRecipe.shape("WIS", "NDN", "NHN");
+		scyllaRecipe.setIngredient('W', new RecipeChoice.ExactChoice(shadowWarp));
+		scyllaRecipe.setIngredient('I', new RecipeChoice.ExactChoice(implosion));
+		scyllaRecipe.setIngredient('S', new RecipeChoice.ExactChoice(witherShield));
+		scyllaRecipe.setIngredient('N', Material.NETHER_STAR);
+		scyllaRecipe.setIngredient('D', Material.NETHERITE_SWORD);
+		scyllaRecipe.setIngredient('H', new RecipeChoice.ExactChoice(handle));
+		
 		return scyllaRecipe;
 	}
 
 	public static Recipe addTermRecipe(Plugin plugin) {
-		ItemStack term = new ItemStack(Material.BOW);
-		term.setItemMeta(SimilarData.termMeta(term.getItemMeta()));
-
-		ItemStack core = new ItemStack(Material.CHISELED_QUARTZ_BLOCK);
-		core.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-		core.setItemMeta(SimilarData.coreMeta(core.getItemMeta()));
-
-		ItemStack tessellated = new ItemStack(Material.ENDER_PEARL);
-		tessellated.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-		tessellated.setItemMeta(SimilarData.tessellatedPearlMeta(tessellated.getItemMeta()));
-
-		ItemStack nullBlade = new ItemStack(Material.SHEARS);
-		nullBlade.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-		nullBlade.setItemMeta(SimilarData.nullBladeBeta(nullBlade.getItemMeta()));
-
-		ItemStack braidedFeather = new ItemStack(Material.FEATHER);
-		braidedFeather.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-		braidedFeather.setItemMeta(SimilarData.braidedFeatherMeta(braidedFeather.getItemMeta()));
-
-		ItemStack taraSilk = new ItemStack(Material.COBWEB);
-		taraSilk.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-		taraSilk.setItemMeta(SimilarData.taraSilkMeta(taraSilk.getItemMeta()));
+		ItemStack term = SimilarData.term();
+		ItemStack core = SimilarData.core();
+		ItemStack tessellated = SimilarData.tessellatedPearl();
+		ItemStack nullBlade = SimilarData.nullBlade();
+		ItemStack braidedFeather = SimilarData.braidedFeather();
+		ItemStack taraSilk = SimilarData.taraSilk();
 
 		NamespacedKey termKey = new NamespacedKey(plugin, "term");
+		ShapedRecipe termRecipe = new ShapedRecipe(termKey, term);
 
-		ShapelessRecipe termRecipe = new ShapelessRecipe(termKey, term);
-
-		termRecipe.addIngredient(new RecipeChoice.ExactChoice(core));
-		termRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
-		termRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
-		termRecipe.addIngredient(new RecipeChoice.ExactChoice(nullBlade));
-		termRecipe.addIngredient(new RecipeChoice.ExactChoice(nullBlade));
-		termRecipe.addIngredient(new RecipeChoice.ExactChoice(nullBlade));
-		termRecipe.addIngredient(new RecipeChoice.ExactChoice(braidedFeather));
-		termRecipe.addIngredient(new RecipeChoice.ExactChoice(taraSilk));
-		termRecipe.addIngredient(new RecipeChoice.ExactChoice(taraSilk));
+		termRecipe.shape("TNS", "NCF", "TNS");
+		termRecipe.setIngredient('T', new RecipeChoice.ExactChoice(tessellated));
+		termRecipe.setIngredient('N', new RecipeChoice.ExactChoice(nullBlade));
+		termRecipe.setIngredient('S', new RecipeChoice.ExactChoice(taraSilk));
+		termRecipe.setIngredient('C', new RecipeChoice.ExactChoice(core));
+		termRecipe.setIngredient('F', new RecipeChoice.ExactChoice(braidedFeather));
 
 		return termRecipe;
 	}
 
 	public static Recipe addAOTVRecipe(Plugin plugin) {
-		ItemStack aotv = new ItemStack(Material.NETHERITE_SHOVEL);
-		aotv.setItemMeta(SimilarData.AOTVMeta(aotv.getItemMeta()));
+		ItemStack aotv = SimilarData.AOTV();
+		ItemStack tessellated = SimilarData.tessellatedPearl();
 
 		NamespacedKey aotvKey = new NamespacedKey(plugin, "aotv");
+		ShapedRecipe aotvRecipe = new ShapedRecipe(aotvKey, aotv);
 
-		ShapelessRecipe aotvRecipe = new ShapelessRecipe(aotvKey, aotv);
-
-		ItemStack tessellated = new ItemStack(Material.ENDER_PEARL);
-		tessellated.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-		tessellated.setItemMeta(SimilarData.tessellatedPearlMeta(tessellated.getItemMeta()));
-
-		aotvRecipe.addIngredient(Material.NETHERITE_SHOVEL);
-		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
-		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
-		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
-		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
-		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
-		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
-		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
-		aotvRecipe.addIngredient(new RecipeChoice.ExactChoice(tessellated));
+		aotvRecipe.shape("TTT", "TST", "TTT");
+		aotvRecipe.setIngredient('T', new RecipeChoice.ExactChoice(tessellated));
+		aotvRecipe.setIngredient('S', Material.NETHERITE_SHOVEL);
 
 		return aotvRecipe;
+	}
+
+	public static Recipe addWardenHelmetRecipe(Plugin plugin) {
+		ItemStack wardenHelmet = SimilarData.wardenHelmet();
+		ItemStack wardenHeart = SimilarData.wardenHeart();
+		ItemStack viscera = SimilarData.viscera();
+
+		NamespacedKey wardenKey = new NamespacedKey(plugin, "wardenHelmet");
+		ShapedRecipe wardenRecipe = new ShapedRecipe(wardenKey, wardenHelmet);
+
+		wardenRecipe.shape("VVV", "VHV", "VWV");
+		wardenRecipe.setIngredient('V', new RecipeChoice.ExactChoice(viscera));
+		wardenRecipe.setIngredient('H', Material.NETHERITE_HELMET);
+		wardenRecipe.setIngredient('W', new RecipeChoice.ExactChoice(wardenHeart));
+
+		return wardenRecipe;
+	}
+
+	public static Recipe addMaxorBootsRecipe(Plugin plugin) {
+		ItemStack maxorBoots = SimilarData.maxorBoots();
+		ItemStack maxorSecrets = SimilarData.maxorSecrets();
+
+		NamespacedKey maxorKey = new NamespacedKey(plugin, "maxorBoots");
+		ShapedRecipe maxorRecipe = new ShapedRecipe(maxorKey, maxorBoots);
+
+		maxorRecipe.shape("NNN", "NBN", "NSN");
+		maxorRecipe.setIngredient('N', Material.NETHER_STAR);
+		maxorRecipe.setIngredient('B', Material.NETHERITE_BOOTS);
+		maxorRecipe.setIngredient('S', new RecipeChoice.ExactChoice(maxorSecrets));
+
+		return maxorRecipe;
+	}
+
+	public static Recipe addGodAppleRecipe(Plugin plugin) {
+		NamespacedKey godAppleKey = new NamespacedKey(plugin, "enchanted_golden_apple");
+		ShapedRecipe godAppleRecipe = new ShapedRecipe(godAppleKey, new ItemStack(Material.ENCHANTED_GOLDEN_APPLE));
+
+		godAppleRecipe.shape("GGG", "GAG", "GGG");
+		godAppleRecipe.setIngredient('G', Material.GOLD_BLOCK);
+		godAppleRecipe.setIngredient('A', Material.APPLE);
+
+		return godAppleRecipe;
 	}
 }

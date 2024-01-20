@@ -1,7 +1,6 @@
 package listeners;
 
 import misc.Plugin;
-import misc.SimilarData;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
@@ -366,8 +365,8 @@ public class CustomItems implements Listener {
 				CustomDamage.dealWithCustomMobs(entity1, p, 1, CustomDamage.calculateFinalDamage(entity1, 1), false);
 				((LivingEntity) entity).setNoDamageTicks(0);
 				entity.setVelocity(new Vector(0, 0, 0));
-				((LivingEntity) entity).addPotionEffect(PotionEffectType.WEAKNESS.createEffect(100, 255));
-				((LivingEntity) entity).addPotionEffect(PotionEffectType.SLOW.createEffect(100, 255));
+				((LivingEntity) entity).addPotionEffect(PotionEffectType.UNLUCK.createEffect(100, 255));
+				((LivingEntity) entity).addPotionEffect(PotionEffectType.SLOW.createEffect(100, 3));
 			}
 		}
 		if(damage > 0) {
@@ -391,50 +390,6 @@ public class CustomItems implements Listener {
 			Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
 			return;
 		}
-
-		// JUDGEMENT CORE
-		ItemStack core = new ItemStack(Material.CHISELED_QUARTZ_BLOCK);
-		core.setItemMeta(SimilarData.coreMeta(core.getItemMeta()));
-		core.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
-		// TESSELLATED ENDER PEARL
-		ItemStack tessellated = new ItemStack(Material.ENDER_PEARL);
-		tessellated.setItemMeta(SimilarData.tessellatedPearlMeta(tessellated.getItemMeta()));
-		tessellated.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
-		// NULL BLADE
-		ItemStack nullBlade = new ItemStack(Material.SHEARS);
-		nullBlade.setItemMeta(SimilarData.nullBladeBeta(nullBlade.getItemMeta()));
-		nullBlade.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
-		// TARANTULA SILK
-		ItemStack taraSilk = new ItemStack(Material.COBWEB);
-		taraSilk.setItemMeta(SimilarData.taraSilkMeta(taraSilk.getItemMeta()));
-		taraSilk.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
-		// CORRUPTED PEARL
-		ItemStack corruptPearl = new ItemStack(Material.ENDER_EYE);
-		corruptPearl.setItemMeta(SimilarData.corruptedPearlMeta(corruptPearl.getItemMeta()));
-		corruptPearl.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
-		// ANTIMATTER
-		ItemStack antimatter = new ItemStack(Material.WARPED_FUNGUS);
-		antimatter.setItemMeta(SimilarData.antimatterMeta(antimatter.getItemMeta()));
-		antimatter.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
-		// OMEGA EGG
-		ItemStack omegaEgg = new ItemStack(Material.EGG);
-		omegaEgg.setItemMeta(SimilarData.omegaEggMeta(omegaEgg.getItemMeta()));
-		omegaEgg.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
-		List<ItemStack> items = new ArrayList<>();
-		items.add(core);
-		items.add(tessellated);
-		items.add(nullBlade);
-		items.add(taraSilk);
-		items.add(corruptPearl);
-		items.add(antimatter);
-		items.add(omegaEgg);
 
 		if(e.getHand().equals(EquipmentSlot.HAND)) {
 			if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
@@ -461,11 +416,14 @@ public class CustomItems implements Listener {
 				} else if(isTerminator(itemInUse)) {
 					terminator(p, e);
 				} else {
-					for(ItemStack item : items) {
-						if(item.isSimilar(itemInUse)) {
-							e.setCancelled(true);
-							break;
-						}
+					boolean unbreakable = false;
+					try {
+						unbreakable = itemInUse.getItemMeta().isUnbreakable();
+					} catch(Exception exception) {
+						// nothing here
+					}
+					if(unbreakable) {
+						e.setCancelled(true);
 					}
 				}
 			}

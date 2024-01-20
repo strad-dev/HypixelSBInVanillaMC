@@ -1,14 +1,13 @@
 package listeners;
 
-import misc.Plugin;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.DragonFireball;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.WitherSkull;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
+import org.bukkit.util.Vector;
 
 import java.util.Objects;
 import java.util.Random;
@@ -16,19 +15,24 @@ import java.util.Random;
 public class EditSkull implements Listener {
 	@EventHandler
 	public void onProjectileLaunch(ProjectileLaunchEvent e) {
+		Random random = new Random();
 		if(e.getEntity() instanceof WitherSkull skull) {
-			String name = ((Wither) Objects.requireNonNull(skull.getShooter())).getName();
-			Random random = new Random();
+			String name = ((Wither) Objects.requireNonNull(skull.getShooter())).getCustomName();
+			assert name != null;
 			if(name.contains("Maxor")) {
-				Location l = Objects.requireNonNull(Plugin.getNearestPlayer((Entity) skull.getShooter())).getLocation();
-				l.add(skull.getDirection().multiply(-1));
-				skull.teleport(l);
-			} else if(name.contains("Storm")) {
-				if(random.nextDouble() > 0.9) {
-					skull.getWorld().spawnEntity(Objects.requireNonNull(Plugin.getNearestPlayer((Entity) skull.getShooter())).getLocation(), EntityType.LIGHTNING);
-				}
-			} else if(name.contains("Necron")) {
-				Objects.requireNonNull(Plugin.getNearestPlayer((Entity) skull.getShooter())).damage(3);
+				Vector zoooooooooooom = skull.getDirection();
+				zoooooooooooom = zoooooooooooom.add(zoooooooooooom).add(zoooooooooooom);
+				skull.setVelocity(zoooooooooooom);
+			} else if(name.contains("Storm") && random.nextDouble() < 0.1) {
+				CustomMobs.spawnLightning(skull);
+			}
+		} else if(e.getEntity() instanceof DragonFireball fireball) {
+			String name = ((EnderDragon) Objects.requireNonNull(fireball.getShooter())).getCustomName();
+			assert name != null;
+			if(name.contains("Unstable Dragon")) {
+				CustomMobs.spawnLightning(fireball);
+			} else if(name.contains("Superior Dragon") && random.nextBoolean()) {
+				CustomMobs.spawnLightning(fireball);
 			}
 		}
 	}

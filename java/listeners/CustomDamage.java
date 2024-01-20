@@ -25,7 +25,7 @@ import java.util.Random;
 public class CustomDamage implements Listener {
 
 	public static double calculateFinalDamage(LivingEntity entity, double originalDamage) {
-		if(entity.hasPotionEffect(PotionEffectType.WEAKNESS)) {
+		if(entity.hasPotionEffect(PotionEffectType.UNLUCK)) {
 			originalDamage++;
 		}
 
@@ -98,7 +98,7 @@ public class CustomDamage implements Listener {
 				double antiKB = Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).getValue();
 				double rawYaw = damager.getLocation().getYaw();
 				double yaw = Math.toRadians(rawYaw);
-				double factor = 0.5 * Math.max(0.5, 1 - antiKB);
+				double factor = 0.4 * Math.max(0.5, 1 - antiKB);
 				if(damager instanceof Arrow) {
 					factor *= 0.25;
 				}
@@ -132,6 +132,14 @@ public class CustomDamage implements Listener {
 	}
 
 	public static void dealWithCustomMobs(LivingEntity entity, Entity damager, double originalDamage, double finalDamage, boolean kb) {
+		// ice spray logic
+		if(damager instanceof LivingEntity entity1) {
+			if(entity1.hasPotionEffect(PotionEffectType.UNLUCK)) {
+				finalDamage *= 0.8;
+			}
+		}
+
+		Random random = new Random();
 		try {
 			// melog noris
 			if(entity instanceof IronGolem golem && Objects.requireNonNull(entity.getCustomName()).contains("meloG norI")) {
@@ -153,7 +161,6 @@ public class CustomDamage implements Listener {
 
 				// tarantula broodfathers
 			} else if(entity instanceof Spider spider && Objects.requireNonNull(entity.getCustomName()).contains("Tarantula Broodfather")) {
-				Random random = new Random();
 				dealDamage(entity, damager, 2.0, kb);
 				Location l = spider.getLocation();
 				Location l2 = spider.getLocation();
@@ -192,7 +199,40 @@ public class CustomDamage implements Listener {
 						dealDamage(entity, damager, finalDamage, kb); // damage the chicken
 					}
 				}
-
+				// deal with wither skeleton skull custom damage
+			} else if(damager instanceof WitherSkull skull) {
+				String shooter = ((Wither) Objects.requireNonNull(skull.getShooter())).getCustomName();
+				assert shooter != null;
+				if(shooter.contains("Storm")) {
+					skull.getWorld().spawnEntity(entity.getLocation(), EntityType.LIGHTNING);
+					dealDamage(entity, damager, finalDamage, kb);
+				} else if(shooter.contains("Necron")) {
+					dealDamage(entity, damager, calculateFinalDamage(entity, originalDamage + 4), kb);
+				} else {
+					dealDamage(entity, damager, finalDamage, kb);
+				}
+				// deal with dragon fireball custom damage
+			} else if(damager instanceof DragonFireball fireball) {
+				String shooter = ((Wither) Objects.requireNonNull(fireball.getShooter())).getCustomName();
+				assert shooter != null;
+				if(shooter.contains("Strong Dragon")) {
+					dealDamage(entity, damager, calculateFinalDamage(entity, originalDamage + 6), kb);
+				} else if(shooter.contains("Superior Dragon") && random.nextBoolean()) {
+					dealDamage(entity, damager, calculateFinalDamage(entity, originalDamage + 3), kb);
+				} else {
+					dealDamage(entity, damager, finalDamage, kb);
+				}
+				// atoned horrors
+			} else if(damager instanceof Zombie zombie && Objects.requireNonNull(damager.getCustomName()).contains("Atoned Horror")) {
+				TNTPrimed tnt = (TNTPrimed) zombie.getWorld().spawnEntity(entity.getLocation(), EntityType.PRIMED_TNT);
+				tnt.addScoreboardTag("AtonedHorror");
+				tnt.setFuseTicks(10);
+				dealDamage(entity, damager, finalDamage, kb);
+				// deal with atoned horror tnt
+			} else if(damager instanceof TNTPrimed tnt && tnt.getScoreboardTags().contains("AtonedHorror")) {
+				if(entity instanceof Player) {
+					dealDamage(entity, damager, finalDamage * 0.5, kb);
+				}
 				// apply general damage
 			} else {
 				dealDamage(entity, damager, finalDamage, kb);
