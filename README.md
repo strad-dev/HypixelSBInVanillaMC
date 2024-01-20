@@ -7,4 +7,4 @@ This plugin is a fan project by a SkyBlock sweat and is not affiliated with or e
 
 
 # Documentation
-https://docs.google.com/document/d/18VAr3NmjqYIJUIkCyG3t5w9aYtsR4iLUaRAuSyZFoSw/edit
+https://docs.google.com/document/d/1UX1amfhHxzVG-SChIbLrAEgsXr6ITOVU-xCh23qaguM/edit
