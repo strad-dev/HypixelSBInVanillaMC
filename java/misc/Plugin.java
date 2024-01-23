@@ -41,13 +41,16 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new StopBossesTeleporting(), this);
 		getServer().getPluginManager().registerEvents(new SomeTNTDoNoDamage(), this);
 		getServer().getPluginManager().registerEvents(new GivePlayersRecipes(), this);
+		getServer().getPluginManager().registerEvents(new AllMobsHaveNames(), this);
 
 		getServer().addRecipe(AddRecipes.addScyllaRecipe(this));
 		getServer().addRecipe(AddRecipes.addTermRecipe(this));
 		getServer().addRecipe(AddRecipes.addAOTVRecipe(this));
 		getServer().addRecipe(AddRecipes.addWardenHelmetRecipe(this));
+		getServer().addRecipe(AddRecipes.addNecronElytraRecipe(this));
 		getServer().addRecipe(AddRecipes.addMaxorBootsRecipe(this));
 		getServer().addRecipe(AddRecipes.addGodAppleRecipe(this));
+		getServer().addRecipe(AddRecipes.addWandOfAtonementRecipe(this));
 
 		getLogger().info("Started SkyBlock in Vanilla!");
 		instance = this;

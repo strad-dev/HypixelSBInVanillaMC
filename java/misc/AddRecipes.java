@@ -16,7 +16,9 @@ public class AddRecipes {
 		allRecipes.add(new NamespacedKey(plugin, "term"));
 		allRecipes.add(new NamespacedKey(plugin, "enchanted_golden_apple"));
 		allRecipes.add(new NamespacedKey(plugin, "wardenHelmet"));
+		allRecipes.add(new NamespacedKey(plugin, "necronElytra"));
 		allRecipes.add(new NamespacedKey(plugin, "maxorBoots"));
+		allRecipes.add(new NamespacedKey(plugin, "wandOfAtonement"));
 		return allRecipes;
 	}
 
@@ -76,6 +78,20 @@ public class AddRecipes {
 		return aotvRecipe;
 	}
 
+	public static Recipe addWandOfAtonementRecipe(Plugin plugin) {
+		ItemStack wand = SimilarData.wandOfAtonement();
+
+		NamespacedKey atonementKey = new NamespacedKey(plugin, "wandOfAtonement");
+		ShapedRecipe atonementRecipe = new ShapedRecipe(atonementKey, wand);
+
+		atonementRecipe.shape("III", "IFI", "ISI");
+		atonementRecipe.setIngredient('I', Material.IRON_INGOT);
+		atonementRecipe.setIngredient('F', Material.ROTTEN_FLESH);
+		atonementRecipe.setIngredient('S', Material.STICK);
+
+		return atonementRecipe;
+	}
+
 	public static Recipe addWardenHelmetRecipe(Plugin plugin) {
 		ItemStack wardenHelmet = SimilarData.wardenHelmet();
 		ItemStack wardenHeart = SimilarData.wardenHeart();
@@ -90,6 +106,22 @@ public class AddRecipes {
 		wardenRecipe.setIngredient('W', new RecipeChoice.ExactChoice(wardenHeart));
 
 		return wardenRecipe;
+	}
+
+	public static Recipe addNecronElytraRecipe(Plugin plugin) {
+		ItemStack necronElytra = SimilarData.necronElytra();
+		ItemStack necronSecrets = SimilarData.necronSecrets();
+
+		NamespacedKey elytraKey = new NamespacedKey(plugin, "necronElytra");
+		ShapedRecipe elytraRecipe = new ShapedRecipe(elytraKey, necronElytra);
+
+		elytraRecipe.shape("NSN", "NCN", "NEN");
+		elytraRecipe.setIngredient('C', new RecipeChoice.ExactChoice(necronSecrets));
+		elytraRecipe.setIngredient('S', Material.NETHERITE_CHESTPLATE);
+		elytraRecipe.setIngredient('N', Material.NETHER_STAR);
+		elytraRecipe.setIngredient('E', Material.ELYTRA);
+
+		return elytraRecipe;
 	}
 
 	public static Recipe addMaxorBootsRecipe(Plugin plugin) {

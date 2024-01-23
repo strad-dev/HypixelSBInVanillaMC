@@ -72,16 +72,16 @@ public class CustomMobs implements Listener {
 					wither.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 					wither.setTarget(Plugin.getNearestPlayer(wither));
 				} else if(entity instanceof EnderDragon dragon) {
-					Objects.requireNonNull(dragon.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).setBaseValue(0.9);
+					Objects.requireNonNull(dragon.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).setBaseValue(1.0);
 
 					// SUPERIOR DRAGON
 					if(random.nextDouble() < 0.04) {
 						name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Superior Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 						Objects.requireNonNull(dragon.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(300.0);
 						dragon.setHealth(300.0);
-						Objects.requireNonNull(dragon.getAttribute(Attribute.GENERIC_ARMOR)).setBaseValue(7.5);
+						Objects.requireNonNull(dragon.getAttribute(Attribute.GENERIC_ARMOR)).setBaseValue(6.25);
 						Objects.requireNonNull(dragon.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.875);
-						dragon.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 1));
+						dragon.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
 						Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The SUPERIOR DRAGON has arrived to utterly destroy you!");
 					} else {
 						int pick = random.nextInt(7);
@@ -98,12 +98,12 @@ public class CustomMobs implements Listener {
 							}
 							case 2 -> {
 								name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Holy Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-								dragon.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 2));
+								dragon.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 1));
 								Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The HOLY DRAGON has arrived to carry out Strad's bidding!");
 							}
 							case 3 -> {
 								name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Protector Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-								Objects.requireNonNull(dragon.getAttribute(Attribute.GENERIC_ARMOR)).setBaseValue(15.0);
+								Objects.requireNonNull(dragon.getAttribute(Attribute.GENERIC_ARMOR)).setBaseValue(12.5);
 								Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The PROTECTOR DRAGON has arrived to protect the End from Nons!");
 							}
 							case 4 -> {

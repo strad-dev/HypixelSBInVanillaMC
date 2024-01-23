@@ -45,10 +45,11 @@ public class CustomDrops implements Listener {
 		if(entity instanceof Player || entity instanceof ArmorStand || entity instanceof AbstractHorse) {
 			return;
 		}
+		drops.clear();
 
 		int lootingLevel = 0;
 		try {
-			lootingLevel = Math.max(3, p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS));
+			lootingLevel = Math.min(3, p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_MOBS));
 		} catch(Exception exception) {
 			// do nothing
 		}
@@ -83,9 +84,10 @@ public class CustomDrops implements Listener {
 			item.setAmount(random.nextInt(3 + lootingLevel));
 			drops.add(item);
 
-			item = new ItemStack(Material.STRING);
-			item.setAmount((int) (random.nextInt(4 + lootingLevel) * 0.5));
-			drops.add(item);
+			if(random.nextDouble() < 0.4 * rngLootingBonus) {
+				item = new ItemStack(Material.SPIDER_EYE);
+				drops.add(item);
+			}
 		} else if(entity instanceof Chicken chicken) {
 			item = new ItemStack(Material.FEATHER);
 			item.setAmount(random.nextInt(3 + lootingLevel));
@@ -469,7 +471,7 @@ public class CustomDrops implements Listener {
 			item.setAmount(random.nextInt(2 + lootingLevel) + 1);
 			drops.add(item);
 		} else if(entity instanceof Shulker) {
-			item = new ItemStack(Material.WHITE_WOOL);
+			item = new ItemStack(Material.SHULKER_SHELL);
 			item.setAmount(random.nextInt(2 + lootingLevel));
 			drops.add(item);
 		} else if(entity instanceof Silverfish) {
@@ -620,11 +622,11 @@ public class CustomDrops implements Listener {
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=lightning_bolt]");
 
 			if(Objects.requireNonNull(wither.getCustomName()).contains("Maxor")) {
-				if(random.nextDouble() < 0.06 * rngLootingBonus) {
+				if(random.nextDouble() < 0.01 * rngLootingBonus) {
 					item = SimilarData.maxorSecrets();
 					drops.add(item);
 					sendRareDropMessage("Maxor's Secrets");
-				} else if(random.nextDouble() < 0.05 * rngLootingBonus) {
+				} else if(random.nextDouble() < 0.06 * rngLootingBonus) {
 					item = SimilarData.shadowWarp();
 					drops.add(item);
 					sendRareDropMessage("Shadow Warp");
@@ -643,7 +645,11 @@ public class CustomDrops implements Listener {
 					sendRareDropMessage("Wither Shield");
 				}
 			} else if(Objects.requireNonNull(wither.getCustomName()).contains("Necron")) {
-				if(random.nextDouble() < 0.05 * rngLootingBonus) {
+				if(random.nextDouble() < 0.01 * rngLootingBonus) {
+					item = SimilarData.necronSecrets();
+					drops.add(item);
+					sendRareDropMessage("Necron's Secrets");
+				} else if(random.nextDouble() < 0.06 * rngLootingBonus) {
 					item = SimilarData.handle();
 					drops.add(item);
 					sendRareDropMessage("Necron's Handle");

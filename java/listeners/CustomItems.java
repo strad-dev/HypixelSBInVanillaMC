@@ -42,7 +42,7 @@ public class CustomItems implements Listener {
 			return false;
 		}
 		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
-			if(string.contains("Wither Impact")) {
+			if(string.contains("Ability: Wither Impact")) {
 				hasWitherImpact = true;
 				break;
 			}
@@ -56,11 +56,15 @@ public class CustomItems implements Listener {
 		if(!item.hasItemMeta()) {
 			return false;
 		}
-
-		if(item.getItemMeta().getDisplayName().contains("Terminator")) {
-			isTerm = true;
+		if(!item.getItemMeta().hasLore()) {
+			return false;
 		}
-
+		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
+			if(string.contains("Ability: Salvation")) {
+				isTerm = true;
+				break;
+			}
+		}
 		return item.getType().equals(new ItemStack(Material.BOW).getType()) && isTerm;
 	}
 
@@ -70,12 +74,15 @@ public class CustomItems implements Listener {
 		if(!item.hasItemMeta()) {
 			return false;
 		}
-
-		if(item.getItemMeta().getDisplayName().contains("Aspect of the Void")) {
-			isAOTV = true;
-
+		if(!item.getItemMeta().hasLore()) {
+			return false;
 		}
-
+		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
+			if(string.contains("Ability: Instant Transmission")) {
+				isAOTV = true;
+				break;
+			}
+		}
 		return item.getType().equals(new ItemStack(Material.NETHERITE_SHOVEL).getType()) && isAOTV;
 	}
 
@@ -85,11 +92,33 @@ public class CustomItems implements Listener {
 		if(!item.hasItemMeta()) {
 			return false;
 		}
-
-		if(item.getItemMeta().getDisplayName().contains("Ice Spray Wand")) {
-			isWand = true;
+		if(!item.getItemMeta().hasLore()) {
+			return false;
 		}
+		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
+			if(string.contains("Ability: Ice Spray")) {
+				isWand = true;
+				break;
+			}
+		}
+		return item.getType().equals(new ItemStack(Material.STICK).getType()) && isWand;
+	}
 
+	@SuppressWarnings("ConstantConditions")
+	public boolean isWandOfAtonement(ItemStack item) {
+		boolean isWand = false;
+		if(!item.hasItemMeta()) {
+			return false;
+		}
+		if(!item.getItemMeta().hasLore()) {
+			return false;
+		}
+		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
+			if(string.contains("Ability: Heal")) {
+				isWand = true;
+				break;
+			}
+		}
 		return item.getType().equals(new ItemStack(Material.STICK).getType()) && isWand;
 	}
 
@@ -190,7 +219,7 @@ public class CustomItems implements Listener {
 		double add = random.nextInt(3) + sharpnessBonus + strengthBonus;
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1) {
-				CustomDamage.dealWithCustomMobs(entity1, p, 4 + add, CustomDamage.calculateFinalDamage(entity1, 4 + add), false);
+				CustomDamage.dealWithCustomMobs(entity1, p, 4 + add, CustomDamage.calculateFinalDamage(entity1, 4 + add), false, false);
 				damaged += 1;
 				damage += 4 + add;
 				((LivingEntity) entity).setNoDamageTicks(0);
@@ -349,9 +378,9 @@ public class CustomItems implements Listener {
 			newLocation.setY(Math.floor(newLocation.getY() + 2.62));
 			p.teleport(newLocation);
 			p.setFallDistance(0);
+			e.setCancelled(true);
 			p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
 		}
-		e.setCancelled(true);
 	}
 
 	public void iceSprayWand(Player p) {
@@ -359,18 +388,26 @@ public class CustomItems implements Listener {
 		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(p.getLocation(), 5, 5, 5);
 		List<EntityType> doNotKill = createList();
 		int damage = 0;
+		int alreadyDebuffed = 0;
 		for(Entity entity : entities) {
-			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1) {
-				damage += 1;
-				CustomDamage.dealWithCustomMobs(entity1, p, 1, CustomDamage.calculateFinalDamage(entity1, 1), false);
-				((LivingEntity) entity).setNoDamageTicks(0);
-				entity.setVelocity(new Vector(0, 0, 0));
-				((LivingEntity) entity).addPotionEffect(PotionEffectType.UNLUCK.createEffect(100, 255));
-				((LivingEntity) entity).addPotionEffect(PotionEffectType.SLOW.createEffect(100, 3));
+			if(!doNotKill.contains(entity.getType()) && entity instanceof LivingEntity entity1 && !entity.equals(p)) {
+				if(entity1.hasPotionEffect(PotionEffectType.UNLUCK)) {
+					alreadyDebuffed ++;
+				} else {
+					damage += 1;
+					CustomDamage.dealWithCustomMobs(entity1, p, 1, CustomDamage.calculateFinalDamage(entity1, 1), false, false);
+					((LivingEntity) entity).setNoDamageTicks(0);
+					entity.setVelocity(new Vector(0, 0, 0));
+					((LivingEntity) entity).addPotionEffect(PotionEffectType.UNLUCK.createEffect(100, 255));
+					((LivingEntity) entity).addPotionEffect(PotionEffectType.SLOW.createEffect(100, 3));
+				}
 			}
 		}
 		if(damage > 0) {
 			p.sendMessage(ChatColor.RED + "Your Ice Spray debuffed " + damage + " enemies.");
+		}
+		if(alreadyDebuffed > 0) {
+			p.sendMessage(ChatColor.RED + String.valueOf(alreadyDebuffed) + " enemies have already been debuffed.");
 		}
 		p.playSound(p, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.0F);
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
@@ -378,7 +415,14 @@ public class CustomItems implements Listener {
 		}
 	}
 
-	@SuppressWarnings("DataFlowIssue")
+	public void wandOfAtonement(Player p) {
+		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 100, 0));
+		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);
+		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
+			score.setScore(score.getScore() - 4);
+		}
+	}
+
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
@@ -391,7 +435,7 @@ public class CustomItems implements Listener {
 			return;
 		}
 
-		if(e.getHand().equals(EquipmentSlot.HAND)) {
+		if(Objects.equals(e.getHand(), EquipmentSlot.HAND)) {
 			if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
 				if(isWitherImpactSword(itemInUse)) {
 					if(score.getScore() < 8 && !p.getGameMode().equals(GameMode.CREATIVE)) {
@@ -415,9 +459,20 @@ public class CustomItems implements Listener {
 					}
 				} else if(isTerminator(itemInUse)) {
 					terminator(p, e);
+				} else if(isWandOfAtonement(itemInUse)) {
+					if(score.getScore() < 4 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 4");
+						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+					} else if(p.hasPotionEffect(PotionEffectType.REGENERATION)) {
+						p.sendMessage(ChatColor.RED + "You cannot use this item while you are already Regenerating!");
+						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+					} else {
+						wandOfAtonement(p);
+					}
 				} else {
 					boolean unbreakable = false;
 					try {
+						//noinspection DataFlowIssue
 						unbreakable = itemInUse.getItemMeta().isUnbreakable();
 					} catch(Exception exception) {
 						// nothing here

@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
@@ -23,6 +24,7 @@ import java.util.Objects;
 import java.util.Random;
 
 public class CustomDamage implements Listener {
+	private static EntityDamageByEntityEvent e;
 
 	public static double calculateFinalDamage(LivingEntity entity, double originalDamage) {
 		if(entity.hasPotionEffect(PotionEffectType.UNLUCK)) {
@@ -72,7 +74,7 @@ public class CustomDamage implements Listener {
 	}
 
 	@SuppressWarnings("DuplicateExpressions")
-	public static void dealDamage(LivingEntity entity, Entity damager, double finalDamage, boolean kb) {
+	public static void dealDamage(LivingEntity entity, Entity damager, double finalDamage, boolean kb, boolean fromMelee) {
 		double absorption = entity.getAbsorptionAmount();
 		if(finalDamage > absorption) {
 			entity.setAbsorptionAmount(0.0);
@@ -83,7 +85,12 @@ public class CustomDamage implements Listener {
 		}
 		double newHealth = entity.getHealth() - finalDamage;
 		if(newHealth < 0.0) {
-			entity.setHealth(0.0);
+			if(fromMelee) {
+				e.setCancelled(false);
+				e.setDamage(2147483647);
+			} else {
+				entity.setHealth(0.0);
+			}
 		} else if(finalDamage > 0) {
 			entity.setHealth(entity.getHealth() - finalDamage);
 			entity.playHurtAnimation(0.0F);
@@ -131,7 +138,7 @@ public class CustomDamage implements Listener {
 		}
 	}
 
-	public static void dealWithCustomMobs(LivingEntity entity, Entity damager, double originalDamage, double finalDamage, boolean kb) {
+	public static void dealWithCustomMobs(LivingEntity entity, Entity damager, double originalDamage, double finalDamage, boolean kb, boolean fromMelee) {
 		// ice spray logic
 		if(damager instanceof LivingEntity entity1) {
 			if(entity1.hasPotionEffect(PotionEffectType.UNLUCK)) {
@@ -148,20 +155,20 @@ public class CustomDamage implements Listener {
 						golem.setTarget(entity1);
 						if(golem.getHealth() + (originalDamage - 5.0) > 200) {
 							golem.setHealth(200);
-							dealDamage(entity1, entity, calculateFinalDamage(entity, originalDamage / 2), false); // damager takes 50% of their original damage
+							dealDamage(entity1, entity, calculateFinalDamage(entity, originalDamage / 2), false, fromMelee); // damager takes 50% of their original damage
 							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The meloG norI is at full health and has REFLECTED " + originalDamage / 2 + " + Damage back to you!");
 						} else {
 							golem.setHealth(golem.getHealth() + (originalDamage - 5.0));
 							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!  It has HEALED ITSELF!");
 						}
 					} else {
-						dealDamage(entity, damager, finalDamage, kb);
+						dealDamage(entity, damager, finalDamage, kb, fromMelee);
 					}
 				}
 
 				// tarantula broodfathers
 			} else if(entity instanceof Spider spider && Objects.requireNonNull(entity.getCustomName()).contains("Tarantula Broodfather")) {
-				dealDamage(entity, damager, 2.0, kb);
+				dealDamage(entity, damager, 2.0, kb, fromMelee);
 				Location l = spider.getLocation();
 				Location l2 = spider.getLocation();
 				Vector added = new Vector(random.nextInt(17) - 8, 0, random.nextInt(17) - 8);
@@ -190,60 +197,82 @@ public class CustomDamage implements Listener {
 				String message = ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Chickzilla has REFLECTED " + originalDamage / 2 + " + Damage back to you!";
 				if(damager instanceof LivingEntity damager1) {
 					damager.sendMessage(message);
-					dealDamage(damager1, entity, calculateFinalDamage(damager1, originalDamage / 2), false); // damager takes 50% of their original damage
-					dealDamage(entity, damager, finalDamage, kb); // damage the chicken
+					dealDamage(damager1, entity, calculateFinalDamage(damager1, originalDamage / 2), false, fromMelee); // damager takes 50% of their original damage
+					dealDamage(entity, damager, finalDamage, kb, fromMelee); // damage the chicken
 				} else if(damager instanceof Arrow arrow) {
 					if(arrow.getShooter() instanceof Player p) {
 						p.sendMessage(message);
-						dealDamage(p, entity, calculateFinalDamage(p, originalDamage / 2), false); // damager takes 50% of their original damage
-						dealDamage(entity, damager, finalDamage, kb); // damage the chicken
+						dealDamage(p, entity, calculateFinalDamage(p, originalDamage / 2), false, fromMelee); // damager takes 50% of their original damage
+						dealDamage(entity, damager, finalDamage, kb, fromMelee); // damage the chicken
 					}
 				}
 				// deal with wither skeleton skull custom damage
 			} else if(damager instanceof WitherSkull skull) {
+				entity.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 200, 1));
 				String shooter = ((Wither) Objects.requireNonNull(skull.getShooter())).getCustomName();
 				assert shooter != null;
 				if(shooter.contains("Storm")) {
 					skull.getWorld().spawnEntity(entity.getLocation(), EntityType.LIGHTNING);
-					dealDamage(entity, damager, finalDamage, kb);
+					dealDamage(entity, damager, finalDamage, kb, fromMelee);
 				} else if(shooter.contains("Necron")) {
-					dealDamage(entity, damager, calculateFinalDamage(entity, originalDamage + 4), kb);
+					dealDamage(entity, damager, calculateFinalDamage(entity, originalDamage + 4), kb, fromMelee);
 				} else {
-					dealDamage(entity, damager, finalDamage, kb);
+					dealDamage(entity, damager, finalDamage, kb, fromMelee);
 				}
 				// deal with dragon fireball custom damage
 			} else if(damager instanceof DragonFireball fireball) {
 				String shooter = ((Wither) Objects.requireNonNull(fireball.getShooter())).getCustomName();
 				assert shooter != null;
 				if(shooter.contains("Strong Dragon")) {
-					dealDamage(entity, damager, calculateFinalDamage(entity, originalDamage + 6), kb);
+					dealDamage(entity, damager, calculateFinalDamage(entity, originalDamage + 6), kb, fromMelee);
 				} else if(shooter.contains("Superior Dragon") && random.nextBoolean()) {
-					dealDamage(entity, damager, calculateFinalDamage(entity, originalDamage + 3), kb);
+					dealDamage(entity, damager, calculateFinalDamage(entity, originalDamage + 3), kb, fromMelee);
 				} else {
-					dealDamage(entity, damager, finalDamage, kb);
+					dealDamage(entity, damager, finalDamage, kb, fromMelee);
 				}
 				// atoned horrors
 			} else if(damager instanceof Zombie zombie && Objects.requireNonNull(damager.getCustomName()).contains("Atoned Horror")) {
 				TNTPrimed tnt = (TNTPrimed) zombie.getWorld().spawnEntity(entity.getLocation(), EntityType.PRIMED_TNT);
 				tnt.addScoreboardTag("AtonedHorror");
 				tnt.setFuseTicks(10);
-				dealDamage(entity, damager, finalDamage, kb);
+				dealDamage(entity, damager, finalDamage, kb, fromMelee);
 				// deal with atoned horror tnt
 			} else if(damager instanceof TNTPrimed tnt && tnt.getScoreboardTags().contains("AtonedHorror")) {
 				if(entity instanceof Player) {
-					dealDamage(entity, damager, finalDamage * 0.5, kb);
+					dealDamage(entity, damager, finalDamage * 0.5, kb, fromMelee);
 				}
+				// not allowed to damage withers in spawning animation
+			} else if(entity instanceof Wither) {
+				if(((Wither) entity).getInvulnerabilityTicks() == 0) {
+					dealDamage(entity, damager, finalDamage, kb, fromMelee);
+				}
+
+				// deal with vanilla mobs
+			} else if(damager instanceof CaveSpider) {
+				entity.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 300, 0));
+				dealDamage(entity, damager, finalDamage, kb, fromMelee);
+			} else if(damager instanceof WitherSkeleton) {
+				entity.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 200, 0));
+				dealDamage(entity, damager, finalDamage, kb, fromMelee);
+			} else if(damager instanceof Husk) {
+				entity.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 200, 0));
+				dealDamage(entity, damager, finalDamage, kb, fromMelee);
+			} else if(damager instanceof ShulkerBullet) {
+				entity.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 200, 0));
+				dealDamage(entity, damager, finalDamage, kb, fromMelee);
+
 				// apply general damage
 			} else {
-				dealDamage(entity, damager, finalDamage, kb);
+				dealDamage(entity, damager, finalDamage, kb, fromMelee);
 			}
 		} catch(NullPointerException exception) {
-			dealDamage(entity, damager, finalDamage, kb);
+			dealDamage(entity, damager, finalDamage, kb, fromMelee);
 		}
 	}
 
 	@EventHandler
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
+		CustomDamage.e = e;
 		// make armor less unintuitive
 		if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
@@ -270,7 +299,7 @@ public class CustomDamage implements Listener {
 
 				Entity damager = e.getDamager();
 				// apply custom damage to special mobs before going through with general damage
-				dealWithCustomMobs(entity, damager, originalDamage, finalDamage, true);
+				dealWithCustomMobs(entity, damager, originalDamage, finalDamage, true, true);
 			}
 		}
 	}

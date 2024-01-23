@@ -38,20 +38,20 @@ public class GetOPItems implements CommandExecutor {
 				switch(itemSet) {
 					case "combat" -> {
 						// WARDEN HELMET
-						ItemStack helmet = SimilarData.wardenHelmet();
-						helmet.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-						helmet.addEnchantment(Enchantment.DURABILITY, 3);
-						helmet.addEnchantment(Enchantment.MENDING, 1);
-						helmet.addEnchantment(Enchantment.THORNS, 3);
-						helmet.addEnchantment(Enchantment.OXYGEN, 3);
-						helmet.addEnchantment(Enchantment.WATER_WORKER, 1);
+						ItemStack wardenHelmet = SimilarData.wardenHelmet();
+						wardenHelmet.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
+						wardenHelmet.addEnchantment(Enchantment.DURABILITY, 3);
+						wardenHelmet.addEnchantment(Enchantment.MENDING, 1);
+						wardenHelmet.addEnchantment(Enchantment.THORNS, 3);
+						wardenHelmet.addEnchantment(Enchantment.OXYGEN, 3);
+						wardenHelmet.addEnchantment(Enchantment.WATER_WORKER, 1);
 
-						// CHESTPLATE
-						ItemStack chestplate = new ItemStack(Material.NETHERITE_CHESTPLATE);
-						chestplate.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-						chestplate.addEnchantment(Enchantment.DURABILITY, 3);
-						chestplate.addEnchantment(Enchantment.MENDING, 1);
-						chestplate.addEnchantment(Enchantment.THORNS, 3);
+						// NECRON'S ELYTRA
+						ItemStack necronElytra = SimilarData.necronElytra()	;
+						necronElytra.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
+						necronElytra.addUnsafeEnchantment(Enchantment.DURABILITY, 3);
+						necronElytra.addUnsafeEnchantment(Enchantment.MENDING, 1);
+						necronElytra.addUnsafeEnchantment(Enchantment.THORNS, 3);
 
 						// LEGGINGS
 						ItemStack leggings = new ItemStack(Material.NETHERITE_LEGGINGS);
@@ -70,11 +70,6 @@ public class GetOPItems implements CommandExecutor {
 						maxorBoots.addEnchantment(Enchantment.DEPTH_STRIDER, 3);
 						maxorBoots.addEnchantment(Enchantment.SOUL_SPEED, 3);
 						maxorBoots.addEnchantment(Enchantment.PROTECTION_FALL, 4);
-
-						// ELYTRA
-						ItemStack elytra = new ItemStack(Material.ELYTRA);
-						elytra.addEnchantment(Enchantment.DURABILITY, 3);
-						elytra.addEnchantment(Enchantment.MENDING, 1);
 
 						// SCYLLA
 						ItemStack scylla = SimilarData.scylla();
@@ -101,6 +96,9 @@ public class GetOPItems implements CommandExecutor {
 						// ICE SPRAY
 						ItemStack iceSpray = SimilarData.iceSpray();
 
+						// WAND OF ATONEMENT
+						ItemStack wandOfAtonement = SimilarData.wandOfAtonement();
+
 						// CLAYMORE
 						ItemStack claymore = SimilarData.claymore();
 						claymore.addEnchantment(Enchantment.DAMAGE_ALL, 5);
@@ -109,7 +107,7 @@ public class GetOPItems implements CommandExecutor {
 						claymore.addEnchantment(Enchantment.FIRE_ASPECT, 2);
 						claymore.addEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
 
-						player.getInventory().addItem(scylla, aotv, iceSpray, claymore, term, helmet, chestplate, leggings, maxorBoots, elytra);
+						player.getInventory().addItem(scylla, aotv, iceSpray, claymore, term, wandOfAtonement, wardenHelmet, necronElytra, leggings, maxorBoots);
 						commandSender.sendMessage("Successfully gave " + player.getName() + " Combat Items");
 						return true;
 					}
@@ -119,6 +117,7 @@ public class GetOPItems implements CommandExecutor {
 								SimilarData.witherShield(),
 								SimilarData.handle(),
 								SimilarData.maxorSecrets(),
+								SimilarData.necronSecrets(),
 								SimilarData.wardenHeart(),
 								SimilarData.core(),
 								SimilarData.tessellatedPearl(),

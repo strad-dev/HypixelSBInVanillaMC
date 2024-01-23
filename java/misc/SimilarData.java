@@ -132,6 +132,7 @@ public class SimilarData {
 		lore.add(ChatColor.GRAY + "to " + ChatColor.YELLOW + "5" + ChatColor.GRAY + " foes and dealing " + ChatColor.RED + "2x");
 		lore.add(ChatColor.GRAY + "the damage an arrow would.");
 		lore.add(ChatColor.GRAY + "The beam always crits.");
+		lore.add(ChatColor.GRAY + "This ability does not exist zzz.");
 		lore.add("");
 		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC BOW " + ChatColor.MAGIC + "a");
 
@@ -170,6 +171,31 @@ public class SimilarData {
 		return iceSpray;
 	}
 
+	public static ItemStack wandOfAtonement() {
+		ItemStack wandOfAtonement = new ItemStack(Material.STICK);
+		wandOfAtonement.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		ItemMeta data = wandOfAtonement.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.GOLD + "Wand of Atonement");
+		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+
+		List<String> lore = new ArrayList<>();
+		lore.add("");
+		lore.add(ChatColor.GOLD + "Ability: Heal " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
+		lore.add(ChatColor.GRAY + "Gain Regeration I for");
+		lore.add(ChatColor.GREEN + "5" + ChatColor.GRAY + " seconds!");
+		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "4");
+		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + "5s");
+		lore.add("");
+		lore.add(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " LEGENDARY WAND " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		wandOfAtonement.setItemMeta(data);
+
+		return wandOfAtonement;
+	}
+
 	public static ItemStack claymore() {
 		ItemStack claymore = new ItemStack(Material.STONE_SWORD);
 
@@ -185,6 +211,7 @@ public class SimilarData {
 		List<String> lore = new ArrayList<>();
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+9");
+		lore.add(ChatColor.GRAY + "Swing Range: " + ChatColor.RED + "+2");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "That thing was too big to be");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "called a sword, it was more like");
@@ -198,50 +225,17 @@ public class SimilarData {
 		return claymore;
 	}
 
-	public static ItemStack maxorBoots() {
-		ItemStack maxorBoots = new ItemStack(Material.NETHERITE_BOOTS);
-
-		ItemMeta data = maxorBoots.getItemMeta();
-		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Maxor's Boots");
-		AttributeModifier speed = new AttributeModifier("maxorBootsSpeed", 3, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
-		AttributeModifier damage = new AttributeModifier("maxorBootsDamage", 1, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier armor = new AttributeModifier("maxorBootsArmor", 3, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier toughness = new AttributeModifier("maxorBootsToughness", 3, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier antiKB = new AttributeModifier("maxorBootsAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER);
-		data.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, speed);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
-		data.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, antiKB);
-		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
-
-		List<String> lore = new ArrayList<>();
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x4");
-		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+1");
-		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Zoooooooooooooooooooooooooooooom");
-		lore.add("");
-		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC BOOTS " + ChatColor.MAGIC + "a");
-
-		data.setLore(lore);
-		maxorBoots.setItemMeta(data);
-
-		return maxorBoots;
-	}
-
 	public static ItemStack wardenHelmet() {
 		ItemStack wardenHelmet = new ItemStack(Material.NETHERITE_HELMET);
 
 		ItemMeta data = wardenHelmet.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Warden Helmet");
-		AttributeModifier speed = new AttributeModifier("wardenHelmetSpeed", -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
 		AttributeModifier damage = new AttributeModifier("wardenHelmetDamage", 2, AttributeModifier.Operation.ADD_NUMBER);
 		AttributeModifier armor = new AttributeModifier("wardenHelmetArmor", 3, AttributeModifier.Operation.ADD_NUMBER);
 		AttributeModifier toughness = new AttributeModifier("wardenHelmetToughness", 3, AttributeModifier.Operation.ADD_NUMBER);
 		AttributeModifier antiKB = new AttributeModifier("wardenHelmetAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier speed = new AttributeModifier("wardenHelmetSpeed", -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
 		data.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, speed);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
@@ -251,8 +245,11 @@ public class SimilarData {
 
 		List<String> lore = new ArrayList<>();
 		lore.add("");
-		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x0.5");
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+2");
+		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
+		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+1");
+		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x0.5");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "The brute force of the Warden");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "packed into a single helmet.");
@@ -266,6 +263,79 @@ public class SimilarData {
 
 		return wardenHelmet;
 	}
+
+	public static ItemStack necronElytra() {
+		ItemStack necronElytra = new ItemStack(Material.ELYTRA);
+		necronElytra.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
+		necronElytra.addUnsafeEnchantment(Enchantment.THORNS, 3);
+
+		ItemMeta data = necronElytra.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Necron's Elytra");
+		AttributeModifier damage = new AttributeModifier("necronElytraDamage", 1, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier armor = new AttributeModifier("necronElytraArmor", 8, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier toughness = new AttributeModifier("necronElytraToughness", 3, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier antiKB = new AttributeModifier("necronElytraAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER);
+		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
+		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
+		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
+		data.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, antiKB);
+		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+
+		List<String> lore = new ArrayList<>();
+		lore.add("");
+		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+1");
+		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+8");
+		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+1");
+		lore.add("");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "This Elytra has the stats of a Netherite");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Chestplate, while still allowing you to fly!");
+		lore.add("");
+		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC CHESTPLATE " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		necronElytra.setItemMeta(data);
+
+		return necronElytra;
+	}
+
+	public static ItemStack maxorBoots() {
+		ItemStack maxorBoots = new ItemStack(Material.NETHERITE_BOOTS);
+
+		ItemMeta data = maxorBoots.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Maxor's Boots");
+		AttributeModifier damage = new AttributeModifier("maxorBootsDamage", 1, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier armor = new AttributeModifier("maxorBootsArmor", 3, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier toughness = new AttributeModifier("maxorBootsToughness", 3, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier antiKB = new AttributeModifier("maxorBootsAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier speed = new AttributeModifier("maxorBootsSpeed", 3, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
+		data.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, speed);
+		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
+		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
+		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
+		data.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, antiKB);
+		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+
+		List<String> lore = new ArrayList<>();
+		lore.add("");
+		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+1");
+		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
+		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+1");
+		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x4");
+		lore.add("");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Zoooooooooooooooooooooooooooooom");
+		lore.add("");
+		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC BOOTS " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		maxorBoots.setItemMeta(data);
+
+		return maxorBoots;
+	}
+
 
 	/*
 	 *  ██████╗██████╗  █████╗ ███████╗████████╗██╗███╗   ██╗ ██████╗
@@ -405,6 +475,30 @@ public class SimilarData {
 		maxorSecrets.setItemMeta(data);
 
 		return maxorSecrets;
+	}
+
+	public static ItemStack necronSecrets() {
+		ItemStack necronSecrets = new ItemStack(Material.PAPER);
+		necronSecrets.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		ItemMeta data = necronSecrets.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Necron's Secrets");
+		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+
+		List<String> lore = new ArrayList<>();
+		lore.add(ChatColor.GRAY + "Being the right-hand man of the");
+		lore.add(ChatColor.GRAY + "Wither King, Necron knows some tricks");
+		lore.add(ChatColor.GRAY + "about being able to fly with lots of armor.");
+		lore.add(ChatColor.GRAY + "This paper, which he dropped behind him,");
+		lore.add(ChatColor.GRAY + "contains all of those secrets.");
+		lore.add("");
+		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		necronSecrets.setItemMeta(data);
+
+		return necronSecrets;
 	}
 
 	public static ItemStack wardenHeart() {
