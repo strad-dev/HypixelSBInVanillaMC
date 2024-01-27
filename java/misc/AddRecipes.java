@@ -18,7 +18,9 @@ public class AddRecipes {
 		allRecipes.add(new NamespacedKey(plugin, "wardenHelmet"));
 		allRecipes.add(new NamespacedKey(plugin, "necronElytra"));
 		allRecipes.add(new NamespacedKey(plugin, "maxorBoots"));
+		allRecipes.add(new NamespacedKey(plugin, "wandOfRestoration"));
 		allRecipes.add(new NamespacedKey(plugin, "wandOfAtonement"));
+		allRecipes.add(new NamespacedKey(plugin, "holyIce"));
 		return allRecipes;
 	}
 
@@ -78,18 +80,47 @@ public class AddRecipes {
 		return aotvRecipe;
 	}
 
+	public static Recipe addWandOfRestorationRecipe(Plugin plugin) {
+		ItemStack wand = SimilarData.wandOfRestoration();
+
+		NamespacedKey restorationKey = new NamespacedKey(plugin, "wandOfRestoration");
+		ShapedRecipe wandRecipe = new ShapedRecipe(restorationKey, wand);
+
+		wandRecipe.shape("III", "IFI", "ISI");
+		wandRecipe.setIngredient('I', Material.IRON_INGOT);
+		wandRecipe.setIngredient('F', Material.ROTTEN_FLESH);
+		wandRecipe.setIngredient('S', Material.STICK);
+
+		return wandRecipe;
+	}
+
 	public static Recipe addWandOfAtonementRecipe(Plugin plugin) {
+		ItemStack oldWand = SimilarData.wandOfRestoration();
 		ItemStack wand = SimilarData.wandOfAtonement();
+		ItemStack viscera = SimilarData.viscera();
 
 		NamespacedKey atonementKey = new NamespacedKey(plugin, "wandOfAtonement");
-		ShapedRecipe atonementRecipe = new ShapedRecipe(atonementKey, wand);
+		ShapedRecipe wandRecipe = new ShapedRecipe(atonementKey, wand);
 
-		atonementRecipe.shape("III", "IFI", "ISI");
-		atonementRecipe.setIngredient('I', Material.IRON_INGOT);
-		atonementRecipe.setIngredient('F', Material.ROTTEN_FLESH);
-		atonementRecipe.setIngredient('S', Material.STICK);
+		wandRecipe.shape("DDD", "DWD", "DVD");
+		wandRecipe.setIngredient('W', new RecipeChoice.ExactChoice(oldWand));
+		wandRecipe.setIngredient('V', new RecipeChoice.ExactChoice(viscera));
+		wandRecipe.setIngredient('D', Material.DIAMOND);
 
-		return atonementRecipe;
+		return wandRecipe;
+	}
+
+	public static Recipe addHolyIceRecipe(Plugin plugin) {
+		ItemStack ice = SimilarData.holyIce();
+
+		NamespacedKey iceKey = new NamespacedKey(plugin, "holyIce");
+		ShapedRecipe iceRecipe = new ShapedRecipe(iceKey, ice);
+
+		iceRecipe.shape("III", "IDI", "III");
+		iceRecipe.setIngredient('I', Material.PACKED_ICE);
+		iceRecipe.setIngredient('D', Material.DIAMOND);
+
+		return iceRecipe;
 	}
 
 	public static Recipe addWardenHelmetRecipe(Plugin plugin) {

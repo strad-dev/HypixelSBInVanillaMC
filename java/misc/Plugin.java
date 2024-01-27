@@ -50,7 +50,9 @@ public class Plugin extends JavaPlugin {
 		getServer().addRecipe(AddRecipes.addNecronElytraRecipe(this));
 		getServer().addRecipe(AddRecipes.addMaxorBootsRecipe(this));
 		getServer().addRecipe(AddRecipes.addGodAppleRecipe(this));
+		getServer().addRecipe(AddRecipes.addWandOfRestorationRecipe(this));
 		getServer().addRecipe(AddRecipes.addWandOfAtonementRecipe(this));
+		getServer().addRecipe(AddRecipes.addHolyIceRecipe(this));
 
 		getLogger().info("Started SkyBlock in Vanilla!");
 		instance = this;

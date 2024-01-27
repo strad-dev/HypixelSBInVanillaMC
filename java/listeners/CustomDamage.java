@@ -155,10 +155,11 @@ public class CustomDamage implements Listener {
 						golem.setTarget(entity1);
 						if(golem.getHealth() + (originalDamage - 5.0) > 200) {
 							golem.setHealth(200);
-							dealDamage(entity1, entity, calculateFinalDamage(entity, originalDamage / 2), false, fromMelee); // damager takes 50% of their original damage
+							dealDamage(entity1, entity, calculateFinalDamage(entity1, originalDamage / 2), false, false); // damager takes 50% of their original damage
 							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The meloG norI is at full health and has REFLECTED " + originalDamage / 2 + " + Damage back to you!");
 						} else {
 							golem.setHealth(golem.getHealth() + (originalDamage - 5.0));
+							SimilarData.changeName(golem);
 							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!  It has HEALED ITSELF!");
 						}
 					} else {
@@ -282,18 +283,20 @@ public class CustomDamage implements Listener {
 
 				// apply intelligence to players
 				if(e.getDamager() instanceof Player p) {
-					try {
-						Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
-						if(score.getScore() < 1000) {
-							score.setScore(score.getScore() + 1);
-							p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/1000", ChatColor.AQUA.asBungee()));
-						} else {
-							p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/1000 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE", ChatColor.AQUA.asBungee()));
+					if(e.getEntity() instanceof Monster || e.getEntity() instanceof Player) {
+						try {
+							Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
+							if(score.getScore() < 1000) {
+								score.setScore(score.getScore() + 1);
+								p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/1000", ChatColor.AQUA.asBungee()));
+							} else {
+								p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/1000 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE", ChatColor.AQUA.asBungee()));
+							}
+						} catch(Exception exception) {
+							Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+							Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+							return;
 						}
-					} catch(Exception exception) {
-						Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
-						Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
-						return;
 					}
 				}
 

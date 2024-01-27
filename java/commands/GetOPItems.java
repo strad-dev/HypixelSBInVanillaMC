@@ -99,6 +99,9 @@ public class GetOPItems implements CommandExecutor {
 						// WAND OF ATONEMENT
 						ItemStack wandOfAtonement = SimilarData.wandOfAtonement();
 
+						// HOLY ICE
+						ItemStack holyIce = SimilarData.holyIce();
+
 						// CLAYMORE
 						ItemStack claymore = SimilarData.claymore();
 						claymore.addEnchantment(Enchantment.DAMAGE_ALL, 5);
@@ -107,7 +110,7 @@ public class GetOPItems implements CommandExecutor {
 						claymore.addEnchantment(Enchantment.FIRE_ASPECT, 2);
 						claymore.addEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
 
-						player.getInventory().addItem(scylla, aotv, iceSpray, claymore, term, wandOfAtonement, wardenHelmet, necronElytra, leggings, maxorBoots);
+						player.getInventory().addItem(scylla, aotv, iceSpray, claymore, term, wandOfAtonement, holyIce, wardenHelmet, necronElytra, leggings, maxorBoots);
 						commandSender.sendMessage("Successfully gave " + player.getName() + " Combat Items");
 						return true;
 					}

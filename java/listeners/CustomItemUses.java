@@ -3,6 +3,7 @@ package listeners;
 import misc.Plugin;
 import misc.SimilarData;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -40,40 +41,38 @@ public class CustomItemUses implements Listener {
 			if(entity instanceof Enderman enderman && !entityName.contains("Voidgloom Seraph") && !entityName.contains("Mutant Enderman")) {
 				if(item.isSimilar(SimilarData.supRemnant())) {
 					spawnVoidgloomSeraph(enderman);
-					item.setAmount(item.getAmount() - 1);
 					changeName = true;
 				} else if(item.isSimilar(SimilarData.corruptedPearl())) {
 					spawnMutantEnderman(enderman);
-					item.setAmount(item.getAmount() - 1);
 					changeName = true;
 				}
 			} else if(entity instanceof IronGolem golem && !entityName.contains("meloG norI")) {
 				if(item.isSimilar(SimilarData.antimatter())) {
 					spawnmeloGnorI(golem);
-					item.setAmount(item.getAmount() - 1);
 					changeName = true;
 				}
 			} else if(entity instanceof Chicken chicken && !entityName.contains("Chickzilla")) {
 				if(item.isSimilar(SimilarData.omegaEgg())) {
 					spawnChickzilla(chicken);
-					item.setAmount(item.getAmount() - 1);
 					changeName = true;
 				}
 			} else if(entity instanceof Spider spider && !entityName.contains("Tarantula Broodfather")) {
 				if(item.isSimilar(SimilarData.spiderRelic())) {
 					spawnTarantulaBroodfather(spider);
-					item.setAmount(item.getAmount() - 1);
 					changeName = true;
 				}
 			} else if(entity instanceof Zombie zombie && !entityName.contains("Atoned Horror")) {
 				if(item.isSimilar(SimilarData.atonedFlesh())) {
 					spawnAtonedHorror(zombie);
-					item.setAmount(item.getAmount() - 1);
 					changeName = true;
 				}
+			} else if(item.getType().equals(Material.NAME_TAG)) {
+				e.setCancelled(true);
+				newName = item.getItemMeta().getDisplayName();
+				changeName = true;
 			}
 
-			// add health to the entity name
+			// add health to the entity name and remove item
 			if(changeName) {
 				int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
 				int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
@@ -81,6 +80,10 @@ public class CustomItemUses implements Listener {
 				// " ♥ 20/20";
 				entity.setCustomName(newName);
 				entity.setCustomNameVisible(true);
+
+				if(!p.getGameMode().equals(GameMode.CREATIVE)) {
+					item.setAmount(item.getAmount() - 1);
+				}
 			}
 		}
 	}

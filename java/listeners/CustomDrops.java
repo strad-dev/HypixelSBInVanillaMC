@@ -261,7 +261,6 @@ public class CustomDrops implements Listener {
 		} else if(entity instanceof Evoker) {
 			item = new ItemStack(Material.TOTEM_OF_UNDYING);
 			drops.add(item);
-			sendRareDropMessage("Totem of Undying");
 
 			item = new ItemStack(Material.EMERALD);
 			item.setAmount(random.nextInt(2 + lootingLevel));

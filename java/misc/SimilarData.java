@@ -171,6 +171,31 @@ public class SimilarData {
 		return iceSpray;
 	}
 
+	public static ItemStack wandOfRestoration() {
+		ItemStack wand = new ItemStack(Material.STICK);
+		wand.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		ItemMeta data = wand.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.DARK_PURPLE + "Wand of Restoration");
+		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+
+		List<String> lore = new ArrayList<>();
+		lore.add("");
+		lore.add(ChatColor.GOLD + "Ability: Heal " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
+		lore.add(ChatColor.GRAY + "Gain Regeration I for");
+		lore.add(ChatColor.GREEN + "5" + ChatColor.GRAY + " seconds!");
+		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "4");
+		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + "5s");
+		lore.add("");
+		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC WAND " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		wand.setItemMeta(data);
+
+		return wand;
+	}
+
 	public static ItemStack wandOfAtonement() {
 		ItemStack wandOfAtonement = new ItemStack(Material.STICK);
 		wandOfAtonement.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
@@ -182,8 +207,8 @@ public class SimilarData {
 
 		List<String> lore = new ArrayList<>();
 		lore.add("");
-		lore.add(ChatColor.GOLD + "Ability: Heal " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Gain Regeration I for");
+		lore.add(ChatColor.GOLD + "Ability: Big Heal " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
+		lore.add(ChatColor.GRAY + "Gain Regeration II for");
 		lore.add(ChatColor.GREEN + "5" + ChatColor.GRAY + " seconds!");
 		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "4");
 		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + "5s");
@@ -194,6 +219,31 @@ public class SimilarData {
 		wandOfAtonement.setItemMeta(data);
 
 		return wandOfAtonement;
+	}
+
+	public static ItemStack holyIce() {
+		ItemStack holyIce = new ItemStack(Material.DIAMOND);
+		holyIce.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		ItemMeta data = holyIce.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.BLUE + "Holy Ice");
+		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+
+		List<String> lore = new ArrayList<>();
+		lore.add("");
+		lore.add(ChatColor.GOLD + "Ability: Splash Yo Face " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
+		lore.add(ChatColor.GRAY + "Gain Resistance IV for");
+		lore.add(ChatColor.GREEN + "1.5" + ChatColor.GRAY + " seconds!");
+		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "20");
+		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + "4s");
+		lore.add("");
+		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		holyIce.setItemMeta(data);
+
+		return holyIce;
 	}
 
 	public static ItemStack claymore() {
