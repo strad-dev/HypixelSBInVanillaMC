@@ -27,7 +27,8 @@ public class FireIsNotBald implements Listener {
 					double newHealth = entity.getHealth() - finalDamage;
 					if(newHealth < 0.0) {
 						e.setCancelled(false);
-						e.setDamage(2147483647);
+						entity.setHealth(0.1);
+						e.setDamage(10);
 					} else if(finalDamage > 0) {
 						entity.setHealth(entity.getHealth() - finalDamage);
 						entity.playHurtAnimation(0.0F);

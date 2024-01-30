@@ -4,6 +4,7 @@ import misc.Plugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -21,7 +22,6 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class CustomItems implements Listener {
 	private Score score;
@@ -244,30 +244,21 @@ public class CustomItems implements Listener {
 		p.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, newLocation, 20);
 		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(newLocation, 10, 10, 10);
 		List<EntityType> doNotKill = createList();
-		Random random = new Random();
+		double targetDamage = Objects.requireNonNull(p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)).getValue();
 		int damaged = 0;
 		double damage = 0;
-		double sharpnessBonus;
 		try {
 			int sharpness = Objects.requireNonNull(Objects.requireNonNull(p.getInventory().getItem(e.getPlayer().getInventory().getHeldItemSlot())).getItemMeta()).getEnchants().get(Enchantment.DAMAGE_ALL);
-			sharpnessBonus = sharpness * 0.4;
+			targetDamage += sharpness * 0.5 + 0.5;
 		} catch(Exception exception) {
-			sharpnessBonus = 0;
+			// nothing
 		}
-
-		double strengthBonus;
-		try {
-			strengthBonus = Objects.requireNonNull(p.getPotionEffect(PotionEffectType.INCREASE_DAMAGE)).getAmplifier();
-		} catch(Exception exception) {
-			strengthBonus = 0;
-		}
-
-		double add = random.nextInt(3) + sharpnessBonus + strengthBonus;
+		targetDamage = Math.ceil(targetDamage * 0.51);
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1) {
-				CustomDamage.dealWithCustomMobs(entity1, p, 4 + add, CustomDamage.calculateFinalDamage(entity1, 4 + add), false, false);
+				CustomDamage.dealWithCustomMobs(entity1, p, targetDamage, CustomDamage.calculateFinalDamage(entity1, targetDamage), false, false);
 				damaged += 1;
-				damage += 4 + add;
+				damage += targetDamage;
 				((LivingEntity) entity).setNoDamageTicks(0);
 				entity.setVelocity(new Vector(0, 0, 0));
 			}
@@ -302,6 +293,7 @@ public class CustomItems implements Listener {
 		p.teleport(newLocation);
 		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 0.9F, 1);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 8);
 		}
@@ -365,6 +357,7 @@ public class CustomItems implements Listener {
 
 		e.setCancelled(true);
 		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
+		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 	}
 
 	public void instantTransmission(Player p, PlayerInteractEvent e) {
@@ -394,6 +387,7 @@ public class CustomItems implements Listener {
 		p.setFallDistance(0);
 		e.setCancelled(true);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 	}
 
 	public void etherTransmission(Player p, PlayerInteractEvent e) {
@@ -426,11 +420,13 @@ public class CustomItems implements Listener {
 			p.setFallDistance(0);
 			e.setCancelled(true);
 			p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
+			p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 		}
 	}
 
 	public void iceSprayWand(Player p) {
 		p.getWorld().spawnParticle(Particle.SNOWFLAKE, p.getLocation(), 1000);
+		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(p.getLocation(), 5, 5, 5);
 		List<EntityType> doNotKill = createList();
 		int damage = 0;
@@ -463,6 +459,7 @@ public class CustomItems implements Listener {
 
 	public void wandOfRestoration(Player p) {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 101, 0));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 4);
@@ -471,6 +468,7 @@ public class CustomItems implements Listener {
 
 	public void wandOfAtonement(Player p) {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 101, 1));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 4);
@@ -479,6 +477,8 @@ public class CustomItems implements Listener {
 
 	public void holyIce(Player p) {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 31, 3));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
+		p.getWorld().spawnParticle(Particle.WATER_WAKE, p.getLocation(), 1000);
 		p.playSound(p, Sound.ENTITY_PLAYER_SPLASH_HIGH_SPEED, 1.0F, 1.0F);
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 20);
@@ -497,7 +497,7 @@ public class CustomItems implements Listener {
 			return;
 		}
 
-		if(Objects.equals(e.getHand(), EquipmentSlot.HAND)) {
+		if(Objects.equals(e.getHand(), EquipmentSlot.HAND) && !p.hasPotionEffect(PotionEffectType.LUCK)) {
 			if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
 				if(isWitherImpactSword(itemInUse)) {
 					if(score.getScore() < 8 && !p.getGameMode().equals(GameMode.CREATIVE)) {
@@ -559,7 +559,7 @@ public class CustomItems implements Listener {
 					} catch(Exception exception) {
 						// nothing here
 					}
-					if(unbreakable) {
+					if(unbreakable && !itemInUse.getType().equals(Material.STONE_SWORD)) {
 						e.setCancelled(true);
 					}
 				}

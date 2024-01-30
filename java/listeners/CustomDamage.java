@@ -87,7 +87,8 @@ public class CustomDamage implements Listener {
 		if(newHealth < 0.0) {
 			if(fromMelee) {
 				e.setCancelled(false);
-				e.setDamage(2147483647);
+				entity.setHealth(0.1);
+				e.setDamage(10);
 			} else {
 				entity.setHealth(0.0);
 			}
