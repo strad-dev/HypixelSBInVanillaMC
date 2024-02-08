@@ -95,12 +95,12 @@ public class SimilarData {
 		lore.add(ChatColor.GOLD + "Ability: Wither Impact " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
 		lore.add(ChatColor.GRAY + "Teleport " + ChatColor.GREEN + "10 blocks" + ChatColor.GRAY + " ahead of");
 		lore.add(ChatColor.GRAY + "you.  Then implode, dealing");
-		lore.add(ChatColor.RED + "4-6" + ChatColor.GRAY + " damage to nearby");
-		lore.add(ChatColor.GRAY + "enemies.  Also applies the Wither");
-		lore.add(ChatColor.GRAY + "Shield Scroll Ability, reducing");
-		lore.add(ChatColor.GRAY + "damage taken and granting an");
-		lore.add(ChatColor.GRAY + "absorption shield for " + ChatColor.YELLOW + "5");
-		lore.add(ChatColor.GRAY + "seconds.");
+		lore.add(ChatColor.RED + "51%" + ChatColor.GRAY + " of your Melee Damage to");
+		lore.add(ChatColor.GRAY + "nearby enemies.  Also applies");
+		lore.add(ChatColor.GRAY + "the Wither Shield Scroll Ability,");
+		lore.add(ChatColor.GRAY + "reducing damage taken and");
+		lore.add(ChatColor.GRAY + "granting an absorption shield");
+		lore.add(ChatColor.GRAY + "for " + ChatColor.YELLOW + "5 seconds.");
 		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "8");
 		lore.add("");
 		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC SWORD " + ChatColor.MAGIC + "a");
@@ -298,7 +298,7 @@ public class SimilarData {
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+2");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+1");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-10%");
 		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x0.5");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "The brute force of the Warden");
@@ -337,7 +337,7 @@ public class SimilarData {
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+1");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+8");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+1");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-10%");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "This Elytra has the stats of a Netherite");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Chestplate, while still allowing you to fly!");
@@ -348,6 +348,41 @@ public class SimilarData {
 		necronElytra.setItemMeta(data);
 
 		return necronElytra;
+	}
+
+	public static ItemStack goldorLeggings() {
+		ItemStack goldorLeggings = new ItemStack(Material.NETHERITE_LEGGINGS);
+
+		ItemMeta data = goldorLeggings.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Goldor's Leggings");
+		AttributeModifier damage = new AttributeModifier("goldorLeggingsDamage", 1, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier armor = new AttributeModifier("goldorLeggingsArmor", 6, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier toughness = new AttributeModifier("goldorLeggingsToughness", 4, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier antiKB = new AttributeModifier("goldorLeggingsAntiKB", 0.2, AttributeModifier.Operation.ADD_NUMBER);
+		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
+		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
+		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
+		data.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, antiKB);
+		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+
+		List<String> lore = new ArrayList<>();
+		lore.add("");
+		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+1");
+		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+6");
+		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+4");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-20%");
+		lore.add("");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Goldor has spent centuries");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "researching how to make Netherite");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Leggings that are even tougher!");
+		lore.add("");
+		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC LEGGINGS " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		goldorLeggings.setItemMeta(data);
+
+		return goldorLeggings;
 	}
 
 	public static ItemStack maxorBoots() {
@@ -373,7 +408,7 @@ public class SimilarData {
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+1");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+1");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-10%");
 		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x4");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Zoooooooooooooooooooooooooooooom");
@@ -525,6 +560,31 @@ public class SimilarData {
 		maxorSecrets.setItemMeta(data);
 
 		return maxorSecrets;
+	}
+
+	public static ItemStack goldorSecrets() {
+		ItemStack goldorSecrets = new ItemStack(Material.PAPER);
+		goldorSecrets.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		ItemMeta data = goldorSecrets.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Goldor's Secrets");
+		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+
+		List<String> lore = new ArrayList<>();
+		lore.add(ChatColor.GRAY + "A piece of research that has over three");
+		lore.add(ChatColor.GRAY + "centuries of work, studying how to grant");
+		lore.add(ChatColor.GRAY + "just one more of a stat deemed to already");
+		lore.add(ChatColor.GRAY + "have been completely maxed out.  Unfortunately,");
+		lore.add(ChatColor.GRAY + "Goldor was a but flustered at being defeated,");
+		lore.add(ChatColor.GRAY + "and dropped this research behind him.");
+		lore.add("");
+		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		goldorSecrets.setItemMeta(data);
+
+		return goldorSecrets;
 	}
 
 	public static ItemStack necronSecrets() {

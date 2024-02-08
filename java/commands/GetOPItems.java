@@ -54,12 +54,12 @@ public class GetOPItems implements CommandExecutor {
 						necronElytra.addUnsafeEnchantment(Enchantment.THORNS, 3);
 
 						// LEGGINGS
-						ItemStack leggings = new ItemStack(Material.NETHERITE_LEGGINGS);
-						leggings.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-						leggings.addEnchantment(Enchantment.DURABILITY, 3);
-						leggings.addEnchantment(Enchantment.MENDING, 1);
-						leggings.addEnchantment(Enchantment.THORNS, 3);
-						leggings.addEnchantment(Enchantment.SWIFT_SNEAK, 3);
+						ItemStack goldorLeggings = SimilarData.goldorLeggings();
+						goldorLeggings.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
+						goldorLeggings.addEnchantment(Enchantment.DURABILITY, 3);
+						goldorLeggings.addEnchantment(Enchantment.MENDING, 1);
+						goldorLeggings.addEnchantment(Enchantment.THORNS, 3);
+						goldorLeggings.addEnchantment(Enchantment.SWIFT_SNEAK, 3);
 
 						// MAXOR BOOTS
 						ItemStack maxorBoots = SimilarData.maxorBoots();
@@ -110,7 +110,7 @@ public class GetOPItems implements CommandExecutor {
 						claymore.addEnchantment(Enchantment.FIRE_ASPECT, 2);
 						claymore.addEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
 
-						player.getInventory().addItem(scylla, aotv, iceSpray, claymore, term, wandOfAtonement, holyIce, wardenHelmet, necronElytra, leggings, maxorBoots);
+						player.getInventory().addItem(scylla, aotv, iceSpray, claymore, term, wandOfAtonement, holyIce, wardenHelmet, necronElytra, goldorLeggings, maxorBoots);
 						commandSender.sendMessage("Successfully gave " + player.getName() + " Combat Items");
 						return true;
 					}
@@ -120,6 +120,7 @@ public class GetOPItems implements CommandExecutor {
 								SimilarData.witherShield(),
 								SimilarData.handle(),
 								SimilarData.maxorSecrets(),
+								SimilarData.goldorSecrets(),
 								SimilarData.necronSecrets(),
 								SimilarData.wardenHeart(),
 								SimilarData.core(),

@@ -14,6 +14,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -85,6 +86,9 @@ public class CustomDamage implements Listener {
 		}
 		double newHealth = entity.getHealth() - finalDamage;
 		if(newHealth < 0.0) {
+			if(entity instanceof EnderDragon) {
+				entity.teleport(new Location(entity.getWorld(), 0.5, 70.0, 0.5));
+			}
 			if(fromMelee) {
 				e.setCancelled(false);
 				entity.setHealth(0.1);
@@ -136,6 +140,14 @@ public class CustomDamage implements Listener {
 
 			// change nametag health
 			SimilarData.changeName(entity);
+
+			// stop stupidly annoying arrows
+			if(damager instanceof Arrow arrow) {
+				Vector arrowSpeed = arrow.getVelocity();
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+					arrow.setVelocity(arrowSpeed);
+				}, 1L);
+			}
 		}
 	}
 
@@ -157,11 +169,11 @@ public class CustomDamage implements Listener {
 						if(golem.getHealth() + (originalDamage - 5.0) > 200) {
 							golem.setHealth(200);
 							dealDamage(entity1, entity, calculateFinalDamage(entity1, originalDamage / 2), false, false); // damager takes 50% of their original damage
-							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The meloG norI is at full health and has REFLECTED " + originalDamage / 2 + " + Damage back to you!");
+							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The meloG norI is at full health and has REFLECTED " + originalDamage / 2 + " Damage back to you!");
 						} else {
 							golem.setHealth(golem.getHealth() + (originalDamage - 5.0));
 							SimilarData.changeName(golem);
-							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!  It has HEALED ITSELF!");
+							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!  It has HEALED ITSELF by " + (originalDamage - 5.0) + " HP!");
 						}
 					} else {
 						dealDamage(entity, damager, finalDamage, kb, fromMelee);
@@ -196,7 +208,7 @@ public class CustomDamage implements Listener {
 
 				// chickzillas
 			} else if(entity instanceof Chicken && Objects.requireNonNull(entity.getCustomName()).contains("Chickzilla")) {
-				String message = ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Chickzilla has REFLECTED " + originalDamage / 2 + " + Damage back to you!";
+				String message = ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Chickzilla has REFLECTED " + originalDamage / 2 + " Damage back to you!";
 				if(damager instanceof LivingEntity damager1) {
 					damager.sendMessage(message);
 					dealDamage(damager1, entity, calculateFinalDamage(damager1, originalDamage / 2), false, fromMelee); // damager takes 50% of their original damage
@@ -278,9 +290,14 @@ public class CustomDamage implements Listener {
 		// make armor less unintuitive
 		if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
-			if(entity.getNoDamageTicks() == 0) {
-				double originalDamage = e.getDamage();
-				double finalDamage = calculateFinalDamage(entity, e.getDamage());
+			if(!e.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK) && entity.getNoDamageTicks() == 0 || e.getDamager() instanceof Arrow) {
+				double originalDamage;
+				if(e.getDamager() instanceof Arrow arrow) {
+					originalDamage = arrow.getDamage();
+				} else {
+					originalDamage = e.getDamage();
+				}
+				double finalDamage = calculateFinalDamage(entity, originalDamage);
 
 				// apply intelligence to players
 				if(e.getDamager() instanceof Player p) {

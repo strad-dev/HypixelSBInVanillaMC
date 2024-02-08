@@ -229,8 +229,6 @@ public class CustomDrops implements Listener {
 				drops.add(item);
 				sendRareDropMessage("Remnant of the Superior Dragon");
 			}
-
-			dragon.teleport(new Location(dragon.getWorld(), 0.5, 70.0, 0.5));
 		} else if(entity instanceof Enderman enderman) {
 			item = new ItemStack(Material.ENDER_PEARL);
 			item.setAmount(random.nextInt(2 + lootingLevel));
@@ -638,7 +636,11 @@ public class CustomDrops implements Listener {
 					sendRareDropMessage("Implosion");
 				}
 			} else if(Objects.requireNonNull(wither.getCustomName()).contains("Goldor")) {
-				if(random.nextDouble() < 0.05 * rngLootingBonus) {
+				if(random.nextDouble() < 0.01 * rngLootingBonus) {
+					item = SimilarData.goldorSecrets();
+					drops.add(item);
+					sendRareDropMessage("Goldor's Secrets");
+				} else if(random.nextDouble() < 0.06 * rngLootingBonus) {
 					item = SimilarData.witherShield();
 					drops.add(item);
 					sendRareDropMessage("Wither Shield");
@@ -760,7 +762,6 @@ public class CustomDrops implements Listener {
 		skeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		skeleton.setTarget(Plugin.getNearestPlayer(skeleton));
 		skeleton.setCustomNameVisible(true);
-		skeleton.teleport(Objects.requireNonNull(Plugin.getNearestPlayer(skeleton)));
 		Objects.requireNonNull(Plugin.getNearestPlayer(e)).sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "From the ashes of the Wither Skeleton rises its reincarnation: a HIGHLY INFURIATED Wither Skeleton");
 	}
 }

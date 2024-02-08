@@ -15,7 +15,7 @@ import java.util.Objects;
 public class GOD implements CommandExecutor {
 	public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
 		if(commandSender instanceof ConsoleCommandSender || commandSender instanceof Player) {
-			if(commandSender instanceof ConsoleCommandSender || Objects.requireNonNull(((Player) commandSender).getInventory().getHelmet()).isSimilar(new ItemStack(Material.TOTEM_OF_UNDYING))) {
+			if(commandSender instanceof ConsoleCommandSender || commandSender.getName().equals("Beethoven_") || Objects.requireNonNull(((Player) commandSender).getInventory().getHelmet()).isSimilar(new ItemStack(Material.TOTEM_OF_UNDYING))) {
 				StringBuilder string = new StringBuilder();
 				for(String value : strings) {
 					string.append(value.toUpperCase()).append(' ');

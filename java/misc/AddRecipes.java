@@ -17,6 +17,7 @@ public class AddRecipes {
 		allRecipes.add(new NamespacedKey(plugin, "enchanted_golden_apple"));
 		allRecipes.add(new NamespacedKey(plugin, "wardenHelmet"));
 		allRecipes.add(new NamespacedKey(plugin, "necronElytra"));
+		allRecipes.add(new NamespacedKey(plugin, "goldorLeggings"));
 		allRecipes.add(new NamespacedKey(plugin, "maxorBoots"));
 		allRecipes.add(new NamespacedKey(plugin, "wandOfRestoration"));
 		allRecipes.add(new NamespacedKey(plugin, "wandOfAtonement"));
@@ -153,6 +154,21 @@ public class AddRecipes {
 		elytraRecipe.setIngredient('E', Material.ELYTRA);
 
 		return elytraRecipe;
+	}
+
+	public static Recipe addGoldorLeggingsRecipe(Plugin plugin) {
+		ItemStack goldorLeggings = SimilarData.goldorLeggings();
+		ItemStack goldorSecrets = SimilarData.goldorSecrets();
+
+		NamespacedKey goldorKey = new NamespacedKey(plugin, "goldorLeggings");
+		ShapedRecipe goldorRecipe = new ShapedRecipe(goldorKey, goldorLeggings);
+
+		goldorRecipe.shape("NNN", "NLN", "NSN");
+		goldorRecipe.setIngredient('N', Material.NETHER_STAR);
+		goldorRecipe.setIngredient('L', Material.NETHERITE_LEGGINGS);
+		goldorRecipe.setIngredient('S', new RecipeChoice.ExactChoice(goldorSecrets));
+
+		return goldorRecipe;
 	}
 
 	public static Recipe addMaxorBootsRecipe(Plugin plugin) {
