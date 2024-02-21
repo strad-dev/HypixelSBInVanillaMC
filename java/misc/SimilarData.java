@@ -47,6 +47,7 @@ public class SimilarData {
 
 	public static ItemStack AOTV() {
 		ItemStack aotv = new ItemStack(Material.NETHERITE_SHOVEL);
+		aotv.addUnsafeEnchantment(Enchantment.DIG_SPEED, 5);
 
 		ItemMeta data = aotv.getItemMeta();
 		data.setUnbreakable(true);
@@ -56,17 +57,18 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/aspect_of_the_void");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "0");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Instant Transmission " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
 		lore.add(ChatColor.GRAY + "Teleport " + ChatColor.GREEN + "12 blocks" + ChatColor.GRAY + " ahead of you.");
-		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "0");
+		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + "0");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Ether Transmission " + ChatColor.GREEN + ChatColor.BOLD + "SNEAK RIGHT CLICK");
 		lore.add(ChatColor.GRAY + "Teleport to your targetted block");
 		lore.add(ChatColor.GRAY + "up to " + ChatColor.GREEN + "61 blocks" + ChatColor.GRAY + " blocks away.");
-		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "0");
+		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + "0");
 		lore.add("");
 		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC SHOVEL " + ChatColor.MAGIC + "a");
 
@@ -78,6 +80,9 @@ public class SimilarData {
 
 	public static ItemStack scylla() {
 		ItemStack scylla = new ItemStack(Material.NETHERITE_SWORD);
+		scylla.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 5);
+		scylla.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 2);
+		scylla.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
 
 		ItemMeta data = scylla.getItemMeta();
 		data.setUnbreakable(true);
@@ -89,6 +94,7 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/scylla");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+8");
 		lore.add("");
@@ -101,7 +107,7 @@ public class SimilarData {
 		lore.add(ChatColor.GRAY + "reducing damage taken and");
 		lore.add(ChatColor.GRAY + "granting an absorption shield");
 		lore.add(ChatColor.GRAY + "for " + ChatColor.YELLOW + "5 seconds.");
-		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "8");
+		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + "12");
 		lore.add("");
 		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC SWORD " + ChatColor.MAGIC + "a");
 
@@ -113,6 +119,9 @@ public class SimilarData {
 	
 	public static ItemStack term() {
 		ItemStack term = new ItemStack(Material.BOW);
+		term.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
+		term.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
+		term.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
 
 		ItemMeta data = term.getItemMeta();
 		data.setUnbreakable(true);
@@ -120,6 +129,7 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/terminator");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Ranged Damage: " + ChatColor.RED + "+2");
 		lore.add("");
@@ -152,6 +162,7 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/ice_spray_wand");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Ice Spray " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
 		lore.add(ChatColor.GRAY + "Produces a cone of ice in front");
@@ -160,8 +171,7 @@ public class SimilarData {
 		lore.add(ChatColor.GRAY + "freezes them in place for " + ChatColor.GREEN + "5");
 		lore.add(ChatColor.GRAY + "seconds!  Frozen mobs take");
 		lore.add(ChatColor.RED + "+1" + ChatColor.GRAY + " increased damage!");
-		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "2");
-		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + "5s");
+		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + "4");
 		lore.add("");
 		lore.add(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " LEGENDARY WAND " + ChatColor.MAGIC + "a");
 
@@ -181,12 +191,12 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/wand_of_restoration");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Heal " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
 		lore.add(ChatColor.GRAY + "Gain Regeration I for");
 		lore.add(ChatColor.GREEN + "5" + ChatColor.GRAY + " seconds!");
-		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "4");
-		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + "5s");
+		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + "6");
 		lore.add("");
 		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC WAND " + ChatColor.MAGIC + "a");
 
@@ -206,12 +216,12 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/wand_of_atonement");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Big Heal " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
 		lore.add(ChatColor.GRAY + "Gain Regeration II for");
 		lore.add(ChatColor.GREEN + "5" + ChatColor.GRAY + " seconds!");
-		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "4");
-		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + "5s");
+		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + "6");
 		lore.add("");
 		lore.add(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " LEGENDARY WAND " + ChatColor.MAGIC + "a");
 
@@ -231,12 +241,12 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/holy_ice");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Splash Yo Face " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
 		lore.add(ChatColor.GRAY + "Gain Resistance IV for");
 		lore.add(ChatColor.GREEN + "1.5" + ChatColor.GRAY + " seconds!");
-		lore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + "20");
-		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + "4s");
+		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + "25");
 		lore.add("");
 		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
 
@@ -248,6 +258,9 @@ public class SimilarData {
 
 	public static ItemStack claymore() {
 		ItemStack claymore = new ItemStack(Material.STONE_SWORD);
+		claymore.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 5);
+		claymore.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 2);
+		claymore.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
 
 		ItemMeta data = claymore.getItemMeta();
 		data.setUnbreakable(true);
@@ -259,6 +272,7 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/dark_claymore");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+9");
 		lore.add(ChatColor.GRAY + "Swing Range: " + ChatColor.RED + "+2");
@@ -277,6 +291,9 @@ public class SimilarData {
 
 	public static ItemStack wardenHelmet() {
 		ItemStack wardenHelmet = new ItemStack(Material.NETHERITE_HELMET);
+		wardenHelmet.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
+		wardenHelmet.addUnsafeEnchantment(Enchantment.OXYGEN, 3);
+		wardenHelmet.addUnsafeEnchantment(Enchantment.WATER_WORKER, 1);
 
 		ItemMeta data = wardenHelmet.getItemMeta();
 		data.setUnbreakable(true);
@@ -294,6 +311,7 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/warden_helmet");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+2");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
@@ -317,7 +335,6 @@ public class SimilarData {
 	public static ItemStack necronElytra() {
 		ItemStack necronElytra = new ItemStack(Material.ELYTRA);
 		necronElytra.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-		necronElytra.addUnsafeEnchantment(Enchantment.THORNS, 3);
 
 		ItemMeta data = necronElytra.getItemMeta();
 		data.setUnbreakable(true);
@@ -333,6 +350,7 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/necron_elytra");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+1");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+8");
@@ -352,6 +370,8 @@ public class SimilarData {
 
 	public static ItemStack goldorLeggings() {
 		ItemStack goldorLeggings = new ItemStack(Material.NETHERITE_LEGGINGS);
+		goldorLeggings.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
+		goldorLeggings.addUnsafeEnchantment(Enchantment.SWIFT_SNEAK, 3);
 
 		ItemMeta data = goldorLeggings.getItemMeta();
 		data.setUnbreakable(true);
@@ -367,6 +387,7 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/goldor_pants");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+1");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+6");
@@ -387,6 +408,10 @@ public class SimilarData {
 
 	public static ItemStack maxorBoots() {
 		ItemStack maxorBoots = new ItemStack(Material.NETHERITE_BOOTS);
+		maxorBoots.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
+		maxorBoots.addUnsafeEnchantment(Enchantment.SOUL_SPEED, 3);
+		maxorBoots.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 4);
+		maxorBoots.addUnsafeEnchantment(Enchantment.DEPTH_STRIDER, 3);
 
 		ItemMeta data = maxorBoots.getItemMeta();
 		data.setUnbreakable(true);
@@ -404,6 +429,7 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/combat/maxor_boots");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Melee Damage: " + ChatColor.RED + "+1");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
@@ -448,6 +474,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/shadow_warp");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "A rare Enchanted Book imbued");
 		lore.add(ChatColor.GRAY + "with the power of Maxor.");
 		lore.add(ChatColor.GRAY + "Grants the ability to teleport");
@@ -471,6 +499,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/implosion");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "A rare Enchanted Book imbued");
 		lore.add(ChatColor.GRAY + "with the power of Storm.");
 		lore.add(ChatColor.GRAY + "Grants the ability to implode");
@@ -495,6 +525,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/wither_shield");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "A rare Enchanted Book imbued");
 		lore.add(ChatColor.GRAY + "with the power of Goldor.");
 		lore.add(ChatColor.GRAY + "Grants the ability to summon");
@@ -520,6 +552,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/necron_handle");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "The hilt of the GREATEST sword");
 		lore.add(ChatColor.GRAY + "to ever exist, imbued with the");
 		lore.add(ChatColor.GRAY + "power of Necron.");
@@ -542,6 +576,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/maxor_secrets");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "Maxor has some secrets.  Being");
 		lore.add(ChatColor.GRAY + "the youngest Wither, he was always");
 		lore.add(ChatColor.GRAY + "able to snoop around and find");
@@ -572,6 +608,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/goldor_secrets");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "A piece of research that has over three");
 		lore.add(ChatColor.GRAY + "centuries of work, studying how to grant");
 		lore.add(ChatColor.GRAY + "just one more of a stat deemed to already");
@@ -597,6 +635,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/necron_secrets");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "Being the right-hand man of the");
 		lore.add(ChatColor.GRAY + "Wither King, Necron knows some tricks");
 		lore.add(ChatColor.GRAY + "about being able to fly with lots of armor.");
@@ -621,6 +661,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/warden_heart");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "The heart of a powerful creature,");
 		lore.add(ChatColor.GRAY + "dropped by the Warden.");
 		lore.add(ChatColor.GRAY + "(NOT the Atoned Horror)");
@@ -643,6 +685,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/judgement_core");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "A core so powerful that even");
 		lore.add(ChatColor.GRAY + "the most dedicated players");
 		lore.add(ChatColor.GRAY + "tremble at it's power.");
@@ -665,6 +709,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/tessellated_pearl");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "An Ender Pearl so dense that even");
 		lore.add(ChatColor.GRAY + "the most knowledgeable players");
 		lore.add(ChatColor.GRAY + "are mystified by it.");
@@ -687,6 +733,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/null_blade");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "A pair of Shears so null that even");
 		lore.add(ChatColor.GRAY + "the most intelligent players");
 		lore.add(ChatColor.GRAY + "are confused by it.");
@@ -709,6 +757,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/braided_feather");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "A Feather so sturdy that even");
 		lore.add(ChatColor.GRAY + "the most powerful players");
 		lore.add(ChatColor.GRAY + "cannot destroy it.");
@@ -731,6 +781,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/tarantula_silk");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "A Web so perfect that even");
 		lore.add(ChatColor.GRAY + "the most powerful players");
 		lore.add(ChatColor.GRAY + "cannot escape it.");
@@ -753,6 +805,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/revenant_viscera");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "The disgusting remains");
 		lore.add(ChatColor.GRAY + "of a horror that once");
 		lore.add(ChatColor.GRAY + "walked this world.");
@@ -791,6 +845,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/summon/superior_remnant");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "The remains of the strongest");
 		lore.add(ChatColor.GRAY + "Dragon to ever exist.");
 		lore.add("");
@@ -815,6 +871,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/summon/corrupt_pearl");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "An interesting mutation");
 		lore.add(ChatColor.GRAY + "of Ender Pearls.");
 		lore.add("");
@@ -839,6 +897,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/summon/antimatter");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "The consequence of storing such");
 		lore.add(ChatColor.GRAY + "massive amounts of Iron together.");
 		lore.add("");
@@ -863,6 +923,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/summon/omega_egg");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "A strange specimen used to");
 		lore.add(ChatColor.GRAY + "create the strongest Chickens.");
 		lore.add("");
@@ -887,6 +949,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/summon/spider_relic");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "An ancient artifact left");
 		lore.add(ChatColor.GRAY + "by the Broodfather itself.");
 		lore.add("");
@@ -911,6 +975,8 @@ public class SimilarData {
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/summon/atoned_flesh");
+		lore.add("");
 		lore.add(ChatColor.GRAY + "A suspicious piece of flesh");
 		lore.add(ChatColor.GRAY + "left behind by an unknown being.");
 		lore.add("");

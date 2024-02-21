@@ -98,7 +98,7 @@ public class CustomMobs implements Listener {
 							}
 							case 2 -> {
 								name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Holy Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-								dragon.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 1));
+								dragon.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
 								Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The HOLY DRAGON has arrived to carry out Strad's bidding!");
 							}
 							case 3 -> {
@@ -129,8 +129,8 @@ public class CustomMobs implements Listener {
 				} else if(entity instanceof Drowned drowned) {
 					EntityEquipment equipment = drowned.getEquipment();
 					assert equipment != null;
-					equipment.setItemInMainHand(new ItemStack(Material.TRIDENT));
-					equipment.setItemInOffHand(new ItemStack(Material.NAUTILUS_SHELL));
+					equipment.setItemInMainHand(new ItemStack(Material.AIR));
+					equipment.setItemInOffHand(new ItemStack(Material.AIR));
 					equipment.setItemInMainHandDropChance(0.0F);
 					equipment.setItemInOffHandDropChance(0.0F);
 				}
@@ -138,13 +138,15 @@ public class CustomMobs implements Listener {
 				// do nothing
 			}
 
-			// add health to the entity name
+			// add health to the entity name if it doesn't exist already
 			int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
 			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
 			if(name.isEmpty()) {
 				name = ChatColor.AQUA + entity.getName();
 			}
-			name += " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + maxHealth;
+			if(!name.contains("❤")) {
+				name += " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + maxHealth;
+			}
 			// " ♥ 20/20";
 			entity.setCustomName(name);
 			entity.setCustomNameVisible(true);

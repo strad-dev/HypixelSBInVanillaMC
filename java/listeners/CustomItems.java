@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static listeners.CustomDamage.customMobs;
+
 public class CustomItems implements Listener {
 	private Score score;
 
@@ -32,130 +34,13 @@ public class CustomItems implements Listener {
 		return b.getType().isSolid();
 	}
 
-	@SuppressWarnings("ConstantConditions")
-	public boolean isWitherImpactSword(ItemStack item) {
-		boolean hasWitherImpact = false;
-		if(!item.hasItemMeta()) {
-			return false;
-		}
-		if(!item.getItemMeta().hasLore()) {
-			return false;
-		}
-		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
-			if(string.contains("Ability: Wither Impact")) {
-				hasWitherImpact = true;
-				break;
-			}
-		}
-		return item.getType().equals(new ItemStack(Material.NETHERITE_SWORD).getType()) && hasWitherImpact;
-	}
-
-	@SuppressWarnings("ConstantConditions")
-	public boolean isTerminator(ItemStack item) {
-		boolean isTerm = false;
-		if(!item.hasItemMeta()) {
-			return false;
-		}
-		if(!item.getItemMeta().hasLore()) {
-			return false;
-		}
-		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
-			if(string.contains("Ability: Salvation")) {
-				isTerm = true;
-				break;
-			}
-		}
-		return item.getType().equals(new ItemStack(Material.BOW).getType()) && isTerm;
-	}
-
-	@SuppressWarnings("ConstantConditions")
-	public boolean isAOTV(ItemStack item) {
-		boolean isAOTV = false;
-		if(!item.hasItemMeta()) {
-			return false;
-		}
-		if(!item.getItemMeta().hasLore()) {
-			return false;
-		}
-		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
-			if(string.contains("Ability: Instant Transmission")) {
-				isAOTV = true;
-				break;
-			}
-		}
-		return item.getType().equals(new ItemStack(Material.NETHERITE_SHOVEL).getType()) && isAOTV;
-	}
-
-	@SuppressWarnings("ConstantConditions")
-	public boolean isIceSprayWand(ItemStack item) {
-		boolean isWand = false;
-		if(!item.hasItemMeta()) {
-			return false;
-		}
-		if(!item.getItemMeta().hasLore()) {
-			return false;
-		}
-		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
-			if(string.contains("Ability: Ice Spray")) {
-				isWand = true;
-				break;
-			}
-		}
-		return item.getType().equals(new ItemStack(Material.STICK).getType()) && isWand;
-	}
-
-	@SuppressWarnings("ConstantConditions")
-	public boolean isWandOfRestoration(ItemStack item) {
-		boolean isWand = false;
-		if(!item.hasItemMeta()) {
-			return false;
-		}
-		if(!item.getItemMeta().hasLore()) {
-			return false;
-		}
-		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
-			if(string.contains("Ability: Heal")) {
-				isWand = true;
-				break;
-			}
-		}
-		return item.getType().equals(new ItemStack(Material.STICK).getType()) && isWand;
-	}
-
 	@SuppressWarnings("DataFlowIssue")
-	public boolean isWandOfAtonement(ItemStack item) {
-		boolean isWand = false;
+	public boolean isItem(ItemStack item, String id) {
 		if(!item.hasItemMeta()) {
 			return false;
-		}
-		if(!item.getItemMeta().hasLore()) {
+		} else if(!item.getItemMeta().hasLore()) {
 			return false;
-		}
-		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
-			if(string.contains("Ability: Big Heal")) {
-				isWand = true;
-				break;
-			}
-		}
-		return item.getType().equals(new ItemStack(Material.STICK).getType()) && isWand;
-	}
-
-	@SuppressWarnings("DataFlowIssue")
-	public boolean isHolyIce(ItemStack item) {
-		boolean isIce = false;
-		if(!item.hasItemMeta()) {
-			return false;
-		}
-		if(!item.getItemMeta().hasLore()) {
-			return false;
-		}
-		for(String string : Objects.requireNonNull(Objects.requireNonNull(item.getItemMeta()).getLore())) {
-			if(string.contains("Ability: Splash Yo Face")) {
-				isIce = true;
-				break;
-			}
-		}
-		return item.getType().equals(new ItemStack(Material.DIAMOND).getType()) && isIce;
+		} else return item.getItemMeta().getLore().get(0).equals(id);
 	}
 
 	public List<EntityType> createList() {
@@ -240,6 +125,11 @@ public class CustomItems implements Listener {
 		Location newLocation = p.getLocation().add(unitVector);
 		newLocation.setY(Math.floor(newLocation.getY() + 1.62));
 
+		p.setFallDistance(0);
+		p.teleport(newLocation);
+		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 0.9F, 1);
+		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+
 		// implosion
 		p.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, newLocation, 20);
 		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(newLocation, 10, 10, 10);
@@ -256,11 +146,14 @@ public class CustomItems implements Listener {
 		targetDamage = Math.ceil(targetDamage * 0.51);
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1) {
-				CustomDamage.dealWithCustomMobs(entity1, p, targetDamage, CustomDamage.calculateFinalDamage(entity1, targetDamage), false, false);
+				if(entity instanceof Player target) {
+					if(target.getGameMode().equals(GameMode.CREATIVE) || target.getGameMode().equals(GameMode.SPECTATOR)) {
+						continue;
+					}
+				}
+				customMobs(entity1, p, targetDamage, DamageType.PLAYER_MAGIC);
 				damaged += 1;
 				damage += targetDamage;
-				((LivingEntity) entity).setNoDamageTicks(0);
-				entity.setVelocity(new Vector(0, 0, 0));
 			}
 		}
 		if(damaged > 0) {
@@ -288,15 +181,11 @@ public class CustomItems implements Listener {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 101, 1));
 		}
 
-		// finish shadow warp
-		p.setFallDistance(0);
-		p.teleport(newLocation);
-		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 0.9F, 1);
-		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
-			score.setScore(score.getScore() - 8);
+			score.setScore(score.getScore() - 12);
 		}
+		p.addScoreboardTag("AbilityCooldown");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	public void terminator(Player p, PlayerInteractEvent e) {
@@ -357,7 +246,8 @@ public class CustomItems implements Listener {
 
 		e.setCancelled(true);
 		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
-		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
+		p.addScoreboardTag("AbilityCooldown");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	public void instantTransmission(Player p, PlayerInteractEvent e) {
@@ -387,7 +277,8 @@ public class CustomItems implements Listener {
 		p.setFallDistance(0);
 		e.setCancelled(true);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
+		p.addScoreboardTag("AbilityCooldown");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	public void etherTransmission(Player p, PlayerInteractEvent e) {
@@ -420,28 +311,27 @@ public class CustomItems implements Listener {
 			p.setFallDistance(0);
 			e.setCancelled(true);
 			p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
-			p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
+			p.addScoreboardTag("AbilityCooldown");
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 		}
 	}
 
 	public void iceSprayWand(Player p) {
 		p.getWorld().spawnParticle(Particle.SNOWFLAKE, p.getLocation(), 1000);
-		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(p.getLocation(), 5, 5, 5);
 		List<EntityType> doNotKill = createList();
 		int damage = 0;
 		int alreadyDebuffed = 0;
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && entity instanceof LivingEntity entity1 && !entity.equals(p)) {
-				if(entity1.hasPotionEffect(PotionEffectType.UNLUCK)) {
+				if(entity1.getScoreboardTags().contains("IceSprayed")) {
 					alreadyDebuffed ++;
 				} else {
 					damage += 1;
-					CustomDamage.dealWithCustomMobs(entity1, p, 1, CustomDamage.calculateFinalDamage(entity1, 1), false, false);
-					((LivingEntity) entity).setNoDamageTicks(0);
-					entity.setVelocity(new Vector(0, 0, 0));
-					((LivingEntity) entity).addPotionEffect(PotionEffectType.UNLUCK.createEffect(101, 255));
-					((LivingEntity) entity).addPotionEffect(PotionEffectType.SLOW.createEffect(101, 3));
+					customMobs(entity1, p, 1, DamageType.PLAYER_MAGIC);
+					entity1.addPotionEffect(PotionEffectType.SLOW.createEffect(101, 3));
+					entity1.addScoreboardTag("IceSprayed");
+					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> entity1.removeScoreboardTag("IceSprayed"), 101L);
 				}
 			}
 		}
@@ -453,36 +343,41 @@ public class CustomItems implements Listener {
 		}
 		p.playSound(p, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.0F);
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
-			score.setScore(score.getScore() - 2);
+			score.setScore(score.getScore() - 4);
 		}
+		p.addScoreboardTag("AbilityCooldown");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	public void wandOfRestoration(Player p) {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 101, 0));
-		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
-			score.setScore(score.getScore() - 4);
+			score.setScore(score.getScore() - 6);
 		}
+		p.addScoreboardTag("AbilityCooldown");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	public void wandOfAtonement(Player p) {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 101, 1));
-		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
-			score.setScore(score.getScore() - 4);
+			score.setScore(score.getScore() - 6);
 		}
+		p.addScoreboardTag("AbilityCooldown");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	public void holyIce(Player p) {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 31, 3));
-		p.addPotionEffect(new PotionEffect(PotionEffectType.LUCK, 2, 255, false, false, false));
 		p.getWorld().spawnParticle(Particle.WATER_WAKE, p.getLocation(), 1000);
 		p.playSound(p, Sound.ENTITY_PLAYER_SPLASH_HIGH_SPEED, 1.0F, 1.0F);
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
-			score.setScore(score.getScore() - 20);
+			score.setScore(score.getScore() - 25);
 		}
+		p.addScoreboardTag("AbilityCooldown");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	@EventHandler
@@ -497,33 +392,33 @@ public class CustomItems implements Listener {
 			return;
 		}
 
-		if(Objects.equals(e.getHand(), EquipmentSlot.HAND) && !p.hasPotionEffect(PotionEffectType.LUCK)) {
+		if(Objects.equals(e.getHand(), EquipmentSlot.HAND) && !p.getScoreboardTags().contains("AbilityCooldown")) {
 			if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
-				if(isWitherImpactSword(itemInUse)) {
-					if(score.getScore() < 8 && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 8");
+				if(isItem(itemInUse, "skyblock/combat/scylla")) {
+					if(score.getScore() < 12 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 12");
 						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 					} else {
 						witherImpact(p, e);
 					}
-				} else if(isAOTV(itemInUse)) {
+				} else if(isItem(itemInUse, "skyblock/combat/aspect_of_the_void")) {
 					if(!p.isSneaking()) {
 						instantTransmission(p, e);
 					} else {
 						etherTransmission(p, e);
 					}
-				} else if(isIceSprayWand(itemInUse)) {
-					if(score.getScore() < 2 && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 2");
+				} else if(isItem(itemInUse, "skyblock/combat/ice_spray_wand")) {
+					if(score.getScore() < 4 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 4");
 						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 					} else {
 						iceSprayWand(p);
 					}
-				} else if(isTerminator(itemInUse)) {
+				} else if(isItem(itemInUse, "skyblock/combat/terminator")) {
 					terminator(p, e);
-				} else if(isWandOfRestoration(itemInUse)) {
-					if(score.getScore() < 4 && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 4");
+				} else if(isItem(itemInUse, "skyblock/combat/wand_of_restoration")) {
+					if(score.getScore() < 6 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 6");
 						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 					} else if(p.hasPotionEffect(PotionEffectType.REGENERATION)) {
 						p.sendMessage(ChatColor.RED + "You cannot use this item while you are already Regenerating!");
@@ -531,9 +426,9 @@ public class CustomItems implements Listener {
 					} else {
 						wandOfRestoration(p);
 					}
-				} else if(isWandOfAtonement(itemInUse)) {
-					if(score.getScore() < 4 && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 4");
+				} else if(isItem(itemInUse, "skyblock/combat/wand_of_atonement")) {
+					if(score.getScore() < 6 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 6");
 						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 					} else if(p.hasPotionEffect(PotionEffectType.REGENERATION)) {
 						p.sendMessage(ChatColor.RED + "You cannot use this item while you are already Regenerating!");
@@ -541,9 +436,9 @@ public class CustomItems implements Listener {
 					} else {
 						wandOfAtonement(p);
 					}
-				} else if(isHolyIce(itemInUse)) {
-					if(score.getScore() < 20 && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 20");
+				} else if(isItem(itemInUse, "skyblock/combat/holy_ice")) {
+					if(score.getScore() < 25 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 25");
 						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 					} else if(p.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
 						p.sendMessage(ChatColor.RED + "You cannot use this item while you already have Resistance!");
@@ -564,7 +459,7 @@ public class CustomItems implements Listener {
 					}
 				}
 			}
-			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/1000", ChatColor.AQUA.asBungee()));
+			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
 		}
 	}
 }

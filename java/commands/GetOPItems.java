@@ -2,7 +2,6 @@ package commands;
 
 import misc.SimilarData;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -37,78 +36,17 @@ public class GetOPItems implements CommandExecutor {
 
 				switch(itemSet) {
 					case "combat" -> {
-						// WARDEN HELMET
 						ItemStack wardenHelmet = SimilarData.wardenHelmet();
-						wardenHelmet.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-						wardenHelmet.addEnchantment(Enchantment.DURABILITY, 3);
-						wardenHelmet.addEnchantment(Enchantment.MENDING, 1);
-						wardenHelmet.addEnchantment(Enchantment.THORNS, 3);
-						wardenHelmet.addEnchantment(Enchantment.OXYGEN, 3);
-						wardenHelmet.addEnchantment(Enchantment.WATER_WORKER, 1);
-
-						// NECRON'S ELYTRA
-						ItemStack necronElytra = SimilarData.necronElytra()	;
-						necronElytra.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-						necronElytra.addUnsafeEnchantment(Enchantment.DURABILITY, 3);
-						necronElytra.addUnsafeEnchantment(Enchantment.MENDING, 1);
-						necronElytra.addUnsafeEnchantment(Enchantment.THORNS, 3);
-
-						// LEGGINGS
+						ItemStack necronElytra = SimilarData.necronElytra();
 						ItemStack goldorLeggings = SimilarData.goldorLeggings();
-						goldorLeggings.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-						goldorLeggings.addEnchantment(Enchantment.DURABILITY, 3);
-						goldorLeggings.addEnchantment(Enchantment.MENDING, 1);
-						goldorLeggings.addEnchantment(Enchantment.THORNS, 3);
-						goldorLeggings.addEnchantment(Enchantment.SWIFT_SNEAK, 3);
-
-						// MAXOR BOOTS
 						ItemStack maxorBoots = SimilarData.maxorBoots();
-						maxorBoots.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-						maxorBoots.addEnchantment(Enchantment.DURABILITY, 3);
-						maxorBoots.addEnchantment(Enchantment.MENDING, 1);
-						maxorBoots.addEnchantment(Enchantment.THORNS, 3);
-						maxorBoots.addEnchantment(Enchantment.DEPTH_STRIDER, 3);
-						maxorBoots.addEnchantment(Enchantment.SOUL_SPEED, 3);
-						maxorBoots.addEnchantment(Enchantment.PROTECTION_FALL, 4);
-
-						// SCYLLA
 						ItemStack scylla = SimilarData.scylla();
-						scylla.addEnchantment(Enchantment.DAMAGE_ALL, 5);
-						scylla.addEnchantment(Enchantment.DURABILITY, 3);
-						scylla.addEnchantment(Enchantment.MENDING, 1);
-						scylla.addEnchantment(Enchantment.FIRE_ASPECT, 2);
-						scylla.addEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
-
-						// TERMINATOR
 						ItemStack term = SimilarData.term();
-						term.addEnchantment(Enchantment.ARROW_DAMAGE, 5);
-						term.addEnchantment(Enchantment.DURABILITY, 3);
-						term.addEnchantment(Enchantment.MENDING, 1);
-						term.addEnchantment(Enchantment.ARROW_FIRE, 1);
-
-						// ASPECT OF THE VOID
 						ItemStack aotv = SimilarData.AOTV();
-						aotv.addEnchantment(Enchantment.DIG_SPEED, 5);
-						aotv.addEnchantment(Enchantment.DURABILITY, 3);
-						aotv.addEnchantment(Enchantment.MENDING, 1);
-						aotv.addEnchantment(Enchantment.SILK_TOUCH, 1);
-
-						// ICE SPRAY
 						ItemStack iceSpray = SimilarData.iceSpray();
-
-						// WAND OF ATONEMENT
 						ItemStack wandOfAtonement = SimilarData.wandOfAtonement();
-
-						// HOLY ICE
 						ItemStack holyIce = SimilarData.holyIce();
-
-						// CLAYMORE
 						ItemStack claymore = SimilarData.claymore();
-						claymore.addEnchantment(Enchantment.DAMAGE_ALL, 5);
-						claymore.addEnchantment(Enchantment.DURABILITY, 3);
-						claymore.addEnchantment(Enchantment.MENDING, 1);
-						claymore.addEnchantment(Enchantment.FIRE_ASPECT, 2);
-						claymore.addEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
 
 						player.getInventory().addItem(scylla, aotv, iceSpray, claymore, term, wandOfAtonement, holyIce, wardenHelmet, necronElytra, goldorLeggings, maxorBoots);
 						commandSender.sendMessage("Successfully gave " + player.getName() + " Combat Items");

@@ -136,6 +136,7 @@ public class CustomItemUses implements Listener {
 		chicken.setCustomNameVisible(true);
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Omega Egg hatches into the Chickzilla!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
+		chicken.setAdult();
 	}
 
 	public void spawnTarantulaBroodfather(Spider spider) {
@@ -172,5 +173,6 @@ public class CustomItemUses implements Listener {
 		zombie.setCustomNameVisible(true);
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Atoned Horror has risen from the depths!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
+		zombie.setAdult();
 	}
 }

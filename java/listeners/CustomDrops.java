@@ -263,7 +263,7 @@ public class CustomDrops implements Listener {
 			item = new ItemStack(Material.EMERALD);
 			item.setAmount(random.nextInt(2 + lootingLevel));
 			drops.add(item);
-		} else if(entity instanceof Fox fox) {
+		} else if(entity instanceof Fox) {
 			// TODO fox drop whatever they're holding
 		} else if(entity instanceof Frog) {
 			// no drops

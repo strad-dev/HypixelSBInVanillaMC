@@ -2,12 +2,17 @@ package misc;
 
 import commands.*;
 import listeners.*;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.Score;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -27,7 +32,7 @@ public class Plugin extends JavaPlugin {
 		Objects.requireNonNull(this.getCommand("w")).setExecutor((new Tell()));
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
-		getServer().getPluginManager().registerEvents(new FireIsNotBald(), this);
+		getServer().getPluginManager().registerEvents(new NonEntityDamage(), this);
 		getServer().getPluginManager().registerEvents(new NoArrows(), this);
 		getServer().getPluginManager().registerEvents(new ArrowSounds(), this);
 		getServer().getPluginManager().registerEvents(new NoArrowsOnGround(), this);
@@ -64,6 +69,27 @@ public class Plugin extends JavaPlugin {
 		} catch(Exception exception) {
 			getLogger().info("Deteced Intelligence.");
 		}
+
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 80L);
+	}
+
+	public void passiveIntel() {
+		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
+			try {
+				Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
+				if(score.getScore() < 2500) {
+					score.setScore(score.getScore() + 1);
+					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
+				} else {
+					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE", ChatColor.AQUA.asBungee()));
+				}
+			} catch(Exception exception) {
+				Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+				Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+				return;
+			}
+		}
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 80L);
 	}
 
 	@Override
