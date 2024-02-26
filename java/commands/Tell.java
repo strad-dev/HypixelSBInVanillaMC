@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import static org.bukkit.Bukkit.getServer;
 
 public class Tell implements CommandExecutor {
-	
+
 	@Override
 	public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
 		Player player;
@@ -28,7 +28,7 @@ public class Tell implements CommandExecutor {
 			return true;
 		}
 		StringBuilder string = new StringBuilder();
-		for(int i = 1; i < strings.length; i ++) {
+		for(int i = 1; i < strings.length; i++) {
 			string.append(strings[i]).append(' ');
 		}
 		string.deleteCharAt(string.length() - 1);

@@ -23,7 +23,7 @@ public class CustomDrops implements Listener {
 
 	public void sendRareDropMessage(String message) {
 		p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + message);
-		p.getWorld().playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 2.0F, 1.0F);
+		p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
 	}
 
 	@SuppressWarnings({"StatementWithEmptyBody", "ConstantValue"})

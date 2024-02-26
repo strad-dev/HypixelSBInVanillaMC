@@ -25,7 +25,8 @@ public class NonEntityDamage implements Listener {
 				case CONTACT, DROWNING, DRYOUT, FIRE, FIRE_TICK, FLY_INTO_WALL, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION, SUFFOCATION ->
 						type = DamageType.ENVIRONMENTAL;
 				case FALL -> type = DamageType.FALL;
-				case CRAMMING, CUSTOM, KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.ABSOLUTE;
+				case CRAMMING, KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.ABSOLUTE;
+				case CUSTOM -> type = DamageType.IFRAMEENVIRONMENTAL;
 				default -> {
 					return;
 				}
@@ -37,7 +38,7 @@ public class NonEntityDamage implements Listener {
 			boolean hasLastDamageTime = noDamageTimes.containsKey(entity);
 			long lastDamageTime = noDamageTimes.computeIfAbsent(entity, entity2 -> currentTime);
 
-			if(hasLastDamageTime && currentTime - lastDamageTime > 490) {
+			if(hasLastDamageTime && currentTime - lastDamageTime > 490 || type == DamageType.ABSOLUTE) {
 				customMobs(entity, null, e.getDamage(), type);
 				noDamageTimes.put(entity, currentTime);
 			}

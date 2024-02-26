@@ -13,6 +13,5 @@ public class NoArrowsOnGround implements Listener {
 				arrow.remove();
 			}
 		}
-
 	}
 }

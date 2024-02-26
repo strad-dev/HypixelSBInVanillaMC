@@ -28,7 +28,6 @@ public class Plugin extends JavaPlugin {
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
 		Objects.requireNonNull(this.getCommand("smite")).setExecutor(new Smite());
 		Objects.requireNonNull(this.getCommand("god")).setExecutor(new GOD());
-		Objects.requireNonNull(this.getCommand("getopeffects")).setExecutor(new GetOPEffects());
 		Objects.requireNonNull(this.getCommand("w")).setExecutor((new Tell()));
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);

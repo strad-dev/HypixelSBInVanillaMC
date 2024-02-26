@@ -116,7 +116,7 @@ public class SimilarData {
 
 		return scylla;
 	}
-	
+
 	public static ItemStack term() {
 		ItemStack term = new ItemStack(Material.BOW);
 		term.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
@@ -132,6 +132,7 @@ public class SimilarData {
 		lore.add("skyblock/combat/terminator");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Ranged Damage: " + ChatColor.RED + "+2");
+		lore.add(ChatColor.GRAY + "Shot Cooldown: " + ChatColor.GREEN + "0.35s");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Shortbow: Instantly Shoots!");
 		lore.add(ChatColor.GRAY + "Shoots " + ChatColor.AQUA + "3" + ChatColor.GRAY + " arrows at once.");
@@ -142,13 +143,14 @@ public class SimilarData {
 		lore.add(ChatColor.GRAY + "to " + ChatColor.YELLOW + "5" + ChatColor.GRAY + " foes and dealing " + ChatColor.RED + "2x");
 		lore.add(ChatColor.GRAY + "the damage an arrow would.");
 		lore.add(ChatColor.GRAY + "The beam always crits.");
-		lore.add(ChatColor.GRAY + "This ability does not exist zzz.");
+		lore.add(ChatColor.BOLD + "" + ChatColor.RED + "This ability does not exist.");
+		lore.add(ChatColor.DARK_GRAY + "lazy devs SMH");
 		lore.add("");
 		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC BOW " + ChatColor.MAGIC + "a");
 
 		data.setLore(lore);
 		term.setItemMeta(data);
-		
+
 		return term;
 	}
 
@@ -454,8 +456,8 @@ public class SimilarData {
 	 * ██║     ██████╔╝███████║█████╗     ██║   ██║██╔██╗ ██║██║  ███╗
 	 * ██║     ██╔══██╗██╔══██║██╔══╝     ██║   ██║██║╚██╗██║██║   ██║
 	 * ╚██████╗██║  ██║██║  ██║██║        ██║   ██║██║ ╚████║╚██████╔╝
- 	 * ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝
-     *
+	 * ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝   ╚═╝╚═╝  ╚═══╝ ╚═════╝
+	 *
 	 * ██╗███╗   ██╗ ██████╗ ██████╗ ███████╗██████╗ ██╗███████╗███╗   ██╗████████╗███████╗
 	 * ██║████╗  ██║██╔════╝ ██╔══██╗██╔════╝██╔══██╗██║██╔════╝████╗  ██║╚══██╔══╝██╔════╝
 	 * ██║██╔██╗ ██║██║  ███╗██████╔╝█████╗  ██║  ██║██║█████╗  ██╔██╗ ██║   ██║   ███████╗

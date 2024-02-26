@@ -10,15 +10,9 @@ commands:
   smite:
     description: Summons lightning on a player.  Electrifying!
     usage: /smite [player]
-  getopeffects:
-    description: Get insanely overpowered Potion Effects!
-    usage: /getopeffects [clearEffects] <player>
   w:
     description: Whisper messages to another player!
     usage: /w [player] [message]
-  donothing:
-    description: Does Nothing
-    usage: /donothing
   god:
     description: Act like you are GOD!
     usage: /god [message]

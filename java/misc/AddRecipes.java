@@ -45,7 +45,7 @@ public class AddRecipes {
 		scyllaRecipe.setIngredient('N', Material.NETHER_STAR);
 		scyllaRecipe.setIngredient('D', Material.NETHERITE_SWORD);
 		scyllaRecipe.setIngredient('H', new RecipeChoice.ExactChoice(handle));
-		
+
 		return scyllaRecipe;
 	}
 

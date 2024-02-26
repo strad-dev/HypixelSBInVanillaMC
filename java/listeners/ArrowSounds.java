@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-public class 	ArrowSounds implements Listener {
+public class ArrowSounds implements Listener {
 	@EventHandler
 	public void onArrowHitEntity(EntityDamageByEntityEvent e) {
 		if(e.getDamager() instanceof Arrow a) {

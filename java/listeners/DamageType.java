@@ -8,6 +8,7 @@ public enum DamageType {
 	 * Used for all damage via Melee Weapons and Non-Environmental Abilities (e.g. Atoned Horror TNT)
 	 * Affected by: Armor, Toughness, Protection, Resistance
 	 * Knockback: Normal
+	 * I-Frames: Normal
 	 */
 
 	RANGED,
@@ -18,6 +19,7 @@ public enum DamageType {
 	 * DOES NOT PROC INVULNERABILITY TICKS
 	 * Affected by: Armor, Toughness, Protection, Resistance
 	 * Knockback: Reduced
+	 * I-Frames: None
 	 */
 	MAGIC,
 	/*
@@ -26,15 +28,17 @@ public enum DamageType {
 	 * Used for all damage via Potions and Status Effects
 	 * Affected by: Toughness, Protection, Resistance
 	 * Knockback: None
+	 * I-Frames: None
 	 */
 
 	PLAYER_MAGIC,
 	/*
 	 * Player Magic Damage Type
 	 * ------------------
-	 * Used for all damage via Player Abilities (e.g. Wither Impact, Ice Spray) and Potion Effects
-	 * Affected by: Toughness, Protection, Resistance
+	 * Used for all damage via Player Abilities (e.g. Wither Impact, Ice Spray)
+	 * Affected by: Armor, Toughness, Protection, Resistance
 	 * Knockback: None
+	 * I-Frames: None
 	 */
 
 	ENVIRONMENTAL,
@@ -44,6 +48,17 @@ public enum DamageType {
 	 * Used for all damage via other methods (e.g. Fire)
 	 * Affected by: Armor, Toughness, Protection, Resistance
 	 * Knockback: None
+	 * I-Frames: None
+	 */
+
+	IFRAMEENVIRONMENTAL,
+	/*
+	 * I-Frame Environmental Damage Type
+	 * ------------------
+	 * Used for all environmental damage that should proc I-Frames
+	 * Affected by: Armor, Toughness, Protection, Resistance
+	 * Knockback: None
+	 * I-Frames: Normal
 	 */
 
 	FALL,
@@ -53,6 +68,7 @@ public enum DamageType {
 	 * Used for all damage via other methods (e.g. Fall, Fire)
 	 * Affected by: Feather Falling, Toughness, Protection, Resistance
 	 * Knockback: None
+	 * I-Frames: Normal
 	 */
 
 	ABSOLUTE
@@ -62,5 +78,6 @@ public enum DamageType {
 	 * Used for damage that will always deal full damage
 	 * Affected by: NOTHING
 	 * Knockback: None
+	 * I-Frames: None
 	 */
 }

@@ -31,7 +31,8 @@ public class CustomItems implements Listener {
 	public boolean isBlocked(PlayerInteractEvent e, Vector constant, Location oldLocation) {
 		Location newLocation = oldLocation.add(constant);
 		Block b = e.getPlayer().getWorld().getBlockAt(newLocation);
-		return b.getType().isSolid();
+		Block b1 = b.getRelative(0, 1, 0);
+		return b.getType().isSolid() || b1.getType().isSolid();
 	}
 
 	@SuppressWarnings("DataFlowIssue")
@@ -184,8 +185,8 @@ public class CustomItems implements Listener {
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 12);
 		}
-		p.addScoreboardTag("AbilityCooldown");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
+
+		e.setCancelled(true);
 	}
 
 	public void terminator(Player p, PlayerInteractEvent e) {
@@ -214,7 +215,7 @@ public class CustomItems implements Listener {
 		double powerBonus;
 		try {
 			int power = Objects.requireNonNull(Objects.requireNonNull(p.getInventory().getItem(e.getPlayer().getInventory().getHeldItemSlot())).getItemMeta()).getEnchants().get(Enchantment.ARROW_DAMAGE);
-			 powerBonus = power * 0.2;
+			powerBonus = power * 0.2;
 		} catch(Exception exception) {
 			powerBonus = 0;
 		}
@@ -235,19 +236,23 @@ public class CustomItems implements Listener {
 		left.setDamage(2 + add);
 		left.setPierceLevel(4);
 		left.setShooter(p);
+		left.addScoreboardTag("TerminatorArrow");
 
 		middle.setDamage(2 + add);
 		middle.setPierceLevel(4);
 		middle.setShooter(p);
+		middle.addScoreboardTag("TerminatorArrow");
 
 		right.setDamage(2 + add);
 		right.setPierceLevel(4);
 		right.setShooter(p);
+		right.addScoreboardTag("TerminatorArrow");
 
-		e.setCancelled(true);
 		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
 		p.addScoreboardTag("AbilityCooldown");
+		p.addScoreboardTag("TerminatorCooldown");
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("TerminatorCooldown"), 6L);
 	}
 
 	public void instantTransmission(Player p, PlayerInteractEvent e) {
@@ -277,8 +282,6 @@ public class CustomItems implements Listener {
 		p.setFallDistance(0);
 		e.setCancelled(true);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-		p.addScoreboardTag("AbilityCooldown");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	public void etherTransmission(Player p, PlayerInteractEvent e) {
@@ -325,7 +328,7 @@ public class CustomItems implements Listener {
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && entity instanceof LivingEntity entity1 && !entity.equals(p)) {
 				if(entity1.getScoreboardTags().contains("IceSprayed")) {
-					alreadyDebuffed ++;
+					alreadyDebuffed++;
 				} else {
 					damage += 1;
 					customMobs(entity1, p, 1, DamageType.PLAYER_MAGIC);
@@ -345,8 +348,6 @@ public class CustomItems implements Listener {
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 4);
 		}
-		p.addScoreboardTag("AbilityCooldown");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	public void wandOfRestoration(Player p) {
@@ -355,8 +356,6 @@ public class CustomItems implements Listener {
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 6);
 		}
-		p.addScoreboardTag("AbilityCooldown");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	public void wandOfAtonement(Player p) {
@@ -365,8 +364,6 @@ public class CustomItems implements Listener {
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 6);
 		}
-		p.addScoreboardTag("AbilityCooldown");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	public void holyIce(Player p) {
@@ -376,8 +373,6 @@ public class CustomItems implements Listener {
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 25);
 		}
-		p.addScoreboardTag("AbilityCooldown");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 	}
 
 	@EventHandler
@@ -415,7 +410,10 @@ public class CustomItems implements Listener {
 						iceSprayWand(p);
 					}
 				} else if(isItem(itemInUse, "skyblock/combat/terminator")) {
-					terminator(p, e);
+					if(!p.getScoreboardTags().contains("TerminatorCooldown")) {
+						terminator(p, e);
+					}
+					e.setCancelled(true);
 				} else if(isItem(itemInUse, "skyblock/combat/wand_of_restoration")) {
 					if(score.getScore() < 6 && !p.getGameMode().equals(GameMode.CREATIVE)) {
 						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 6");
@@ -446,18 +444,9 @@ public class CustomItems implements Listener {
 					} else {
 						holyIce(p);
 					}
-				} else {
-					boolean unbreakable = false;
-					try {
-						//noinspection DataFlowIssue
-						unbreakable = itemInUse.getItemMeta().isUnbreakable();
-					} catch(Exception exception) {
-						// nothing here
-					}
-					if(unbreakable && !itemInUse.getType().equals(Material.STONE_SWORD)) {
-						e.setCancelled(true);
-					}
 				}
+				p.addScoreboardTag("AbilityCooldown");
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 			}
 			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
 		}
