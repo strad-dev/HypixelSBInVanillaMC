@@ -9,7 +9,7 @@ public class NoArrowsOnGround implements Listener {
 	@EventHandler
 	public void onProjectileHit(ProjectileHitEvent e) {
 		if(!(e.getHitBlock() == null)) {
-			if(e.getEntity() instanceof Arrow arrow) {
+			if(e.getEntity() instanceof Arrow arrow && arrow.getScoreboardTags().contains("TerminatorArrow")) {
 				arrow.remove();
 			}
 		}

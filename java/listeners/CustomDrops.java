@@ -630,7 +630,11 @@ public class CustomDrops implements Listener {
 				}
 			} else if(Objects.requireNonNull(wither.getCustomName()).contains("Storm")) {
 				wither.getServer().dispatchCommand(Bukkit.getConsoleSender(), "weather clear");
-				if(random.nextDouble() < 0.05 * rngLootingBonus) {
+				if(random.nextDouble() < 0.01 * rngLootingBonus) {
+					item = SimilarData.stormSecrets();
+					drops.add(item);
+					sendRareDropMessage("Storm's Secrets");
+				} else if(random.nextDouble() < 0.06 * rngLootingBonus) {
 					item = SimilarData.implosion();
 					drops.add(item);
 					sendRareDropMessage("Implosion");
@@ -762,6 +766,7 @@ public class CustomDrops implements Listener {
 		skeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		skeleton.setTarget(Plugin.getNearestPlayer(skeleton));
 		skeleton.setCustomNameVisible(true);
+		skeleton.addScoreboardTag("SkyblockBoss");
 		Objects.requireNonNull(Plugin.getNearestPlayer(e)).sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "From the ashes of the Wither Skeleton rises its reincarnation: a HIGHLY INFURIATED Wither Skeleton");
 	}
 }

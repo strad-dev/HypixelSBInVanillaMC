@@ -131,20 +131,17 @@ public class SimilarData {
 		List<String> lore = new ArrayList<>();
 		lore.add("skyblock/combat/terminator");
 		lore.add("");
-		lore.add(ChatColor.GRAY + "Ranged Damage: " + ChatColor.RED + "+2");
-		lore.add(ChatColor.GRAY + "Shot Cooldown: " + ChatColor.GREEN + "0.35s");
+		lore.add(ChatColor.GRAY + "Ranged Damage: " + ChatColor.RED + "+1");
+		lore.add(ChatColor.GRAY + "Shot Cooldown: " + ChatColor.GREEN + "0.25s");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Shortbow: Instantly Shoots!");
 		lore.add(ChatColor.GRAY + "Shoots " + ChatColor.AQUA + "3" + ChatColor.GRAY + " arrows at once.");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Salvation " + ChatColor.GREEN + ChatColor.BOLD + "LEFT CLICK");
-		lore.add(ChatColor.GRAY + "Can be casted after landing " + ChatColor.GOLD + "3" + ChatColor.GRAY + " hits.");
-		lore.add(ChatColor.GRAY + "Shoot a beam, penetrating up");
-		lore.add(ChatColor.GRAY + "to " + ChatColor.YELLOW + "5" + ChatColor.GRAY + " foes and dealing " + ChatColor.RED + "2x");
-		lore.add(ChatColor.GRAY + "the damage an arrow would.");
-		lore.add(ChatColor.GRAY + "The beam always crits.");
-		lore.add(ChatColor.BOLD + "" + ChatColor.RED + "This ability does not exist.");
-		lore.add(ChatColor.DARK_GRAY + "lazy devs SMH");
+		lore.add(ChatColor.GRAY + "Shoot a beam, penetrating up to");
+		lore.add(ChatColor.YELLOW + "5" + ChatColor.GRAY + " foes and dealing " + ChatColor.RED + "2");
+		lore.add(ChatColor.GRAY + "damage to each enemy.");
+		lore.add(ChatColor.GRAY + "Cooldown: " + ChatColor.GREEN + "1s");
 		lore.add("");
 		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC BOW " + ChatColor.MAGIC + "a");
 
@@ -568,6 +565,30 @@ public class SimilarData {
 		return handle;
 	}
 
+	public static ItemStack giantSwordRemnant() {
+		ItemStack giantSwordRemnant = new ItemStack(Material.STICK);
+		giantSwordRemnant.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		ItemMeta data = giantSwordRemnant.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Remnant of the Giant's Sword");
+		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+
+		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/giant_sword_remnant");
+		lore.add("");
+		lore.add(ChatColor.GRAY + "A hilt with very strange properties.");
+		lore.add(ChatColor.GRAY + "Legend has it that it once belonged to");
+		lore.add(ChatColor.GRAY + "Sadan, but historians disagree on this.");
+		lore.add("");
+		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		giantSwordRemnant.setItemMeta(data);
+
+		return giantSwordRemnant;
+	}
+
 	public static ItemStack maxorSecrets() {
 		ItemStack maxorSecrets = new ItemStack(Material.PAPER);
 		maxorSecrets.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
@@ -598,6 +619,33 @@ public class SimilarData {
 		maxorSecrets.setItemMeta(data);
 
 		return maxorSecrets;
+	}
+
+	public static ItemStack stormSecrets() {
+		ItemStack stormSecrets = new ItemStack(Material.PAPER);
+		stormSecrets.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		ItemMeta data = stormSecrets.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Storm's Secrets");
+		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+
+		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/ingredient/storm_secrets");
+		lore.add("");
+		lore.add(ChatColor.GRAY + "Despite being acquainted with the");
+		lore.add(ChatColor.GRAY + "power of lightning, Storm is also");
+		lore.add(ChatColor.GRAY + "acquainted with attacking players");
+		lore.add(ChatColor.GRAY + "from much further than they are");
+		lore.add(ChatColor.GRAY + "supposed to.  This paper contains");
+		lore.add(ChatColor.GRAY + "the essence of the research.");
+		lore.add("");
+		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		stormSecrets.setItemMeta(data);
+
+		return stormSecrets;
 	}
 
 	public static ItemStack goldorSecrets() {

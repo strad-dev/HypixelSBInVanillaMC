@@ -98,6 +98,7 @@ public class CustomItemUses implements Listener {
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		enderman.setTarget(Plugin.getNearestPlayer(enderman));
 		enderman.setCustomNameVisible(true);
+		enderman.addScoreboardTag("SkyblockBoss");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The remains of the Superior Dragon has drawn the attention of the Voidgloom Seraph!  Defeat it before it's too late!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 	}
@@ -112,6 +113,7 @@ public class CustomItemUses implements Listener {
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		enderman.setTarget(Plugin.getNearestPlayer(enderman));
 		enderman.setCustomNameVisible(true);
+		enderman.addScoreboardTag("SkyblockBoss");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Pearl corrupts the Enderman.  It has become a Mutated Enderman!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 	}
@@ -123,6 +125,7 @@ public class CustomItemUses implements Listener {
 		golem.setTarget(Plugin.getNearestPlayer(golem));
 		golem.setHealth(200.0);
 		golem.setCustomNameVisible(true);
+		golem.addScoreboardTag("SkyblockBoss");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Antimatter has done strange things to this Iron Golem...");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 	}
@@ -134,6 +137,7 @@ public class CustomItemUses implements Listener {
 		chicken.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		chicken.setTarget(Plugin.getNearestPlayer(chicken));
 		chicken.setCustomNameVisible(true);
+		chicken.addScoreboardTag("SkyblockBoss");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Omega Egg hatches into the Chickzilla!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		chicken.setAdult();
@@ -146,6 +150,7 @@ public class CustomItemUses implements Listener {
 		spider.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		spider.setTarget(Plugin.getNearestPlayer(spider));
 		spider.setCustomNameVisible(true);
+		spider.addScoreboardTag("SkyblockBoss");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Spider Relic draws the attention of the Tarantula Broodfather!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 	}
@@ -171,6 +176,7 @@ public class CustomItemUses implements Listener {
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.setTarget(Plugin.getNearestPlayer(zombie));
 		zombie.setCustomNameVisible(true);
+		zombie.addScoreboardTag("SkyblockBoss");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Atoned Horror has risen from the depths!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		zombie.setAdult();

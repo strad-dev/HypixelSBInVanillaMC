@@ -56,8 +56,11 @@ public class GivePlayersRecipes implements Listener {
 							case "skyblock/ingredient/wither_shield" ->
 									inventory.setItem(i, SimilarData.witherShield());
 							case "skyblock/ingredient/necron_handle" -> inventory.setItem(i, SimilarData.handle());
+							case "skyblock/ingredient/giant_sword_remnant" -> inventory.setItem(i, SimilarData.giantSwordRemnant());
 							case "skyblock/ingredient/maxor_secrets" ->
 									inventory.setItem(i, SimilarData.maxorSecrets());
+							case "skyblock/ingredient/storm_secrets" ->
+									inventory.setItem(i, SimilarData.stormSecrets());
 							case "skyblock/ingredient/goldor_secrets" ->
 									inventory.setItem(i, SimilarData.goldorSecrets());
 							case "skyblock/ingredient/necron_secrets" ->

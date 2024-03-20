@@ -33,7 +33,7 @@ public class CustomDamage implements Listener {
 		try {
 			// melog noris
 			if(damagee instanceof IronGolem golem && Objects.requireNonNull(damagee.getCustomName()).contains("meloG norI")) {
-				if(type.equals(DamageType.MELEE)) {
+				if(type == DamageType.MELEE) {
 					if(damager instanceof LivingEntity entity1) {
 						if(originalDamage > 10.0) {
 							golem.setTarget(entity1);
@@ -66,28 +66,7 @@ public class CustomDamage implements Listener {
 
 				// tarantula broodfathers
 			} else if(damagee instanceof Spider spider && Objects.requireNonNull(damagee.getCustomName()).contains("Tarantula Broodfather")) {
-				Location l = spider.getLocation();
-				Location l2 = spider.getLocation();
-				Vector added = new Vector(random.nextInt(25) - 12, 0, random.nextInt(25) - 12);
-				l.add(added);
-				l2.add(added);
-				while(true) {
-					if(l.getY() > 319 || l2.getY() < -63) {
-						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Tarantula Broodfather could not find a spot to teleport to!");
-						break;
-					} else if(l.getBlock().isEmpty()) {
-						spider.teleport(l);
-						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Tarantula Broodfather has scurried away!");
-						break;
-					} else if(l2.getBlock().isEmpty()) {
-						spider.teleport(l2);
-						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Tarantula Broodfather has scurried away!");
-						break;
-					}
-					l.add(0, 1, 0);
-					l2.add(0, -1, 0);
-				}
-				spider.getWorld().playSound(spider.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
+				teleport(spider, damagee, 12);
 				calculateFinalDamage(damagee, damager, 2, DamageType.ABSOLUTE);
 				return;
 
@@ -132,22 +111,30 @@ public class CustomDamage implements Listener {
 				tnt.setFuseTicks(10);
 				// no magic damage to atoned horrors
 			} else if(damagee instanceof Zombie && Objects.requireNonNull(damagee.getCustomName()).contains("Atoned Horror") && !(damager instanceof TNTPrimed)) {
-				if(type.equals(DamageType.PLAYER_MAGIC)) {
+				if(type == DamageType.PLAYER_MAGIC) {
 					damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the Atoned Horror.");
+					return;
+				}
+				if(e.getCause().equals(EntityDamageEvent.DamageCause.BLOCK_EXPLOSION)) {
 					return;
 				}
 				// deal with atoned horror tnt
 			} else if(damager instanceof TNTPrimed tnt && tnt.getScoreboardTags().contains("AtonedHorror")) {
 				if(damagee instanceof Player) {
-					calculateFinalDamage(damagee, damager, originalDamage / 2, DamageType.MELEE);
+					calculateFinalDamage(damagee, damager, originalDamage / 4, DamageType.MELEE);
 				}
 				return;
 				// not allowed to damage withers in spawning animation
 			} else if(damagee instanceof Wither wither) {
-				if(wither.getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE) {
+				if(wither.getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 					return;
 				}
+				if(Objects.requireNonNull(wither.getCustomName()).contains("Maxor")) {
+					teleport(wither, damagee, 4);
+				}
 				// deal with vanilla mobs
+			} else if(damagee instanceof EnderDragon dragon && Objects.requireNonNull(dragon.getCustomName()).contains("Young Dragon")) {
+				teleport(dragon, damagee, 8);
 			} else if(damager instanceof CaveSpider) {
 				damagee.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 300, 0));
 			} else if(damager instanceof WitherSkeleton) {
@@ -156,6 +143,8 @@ public class CustomDamage implements Listener {
 				damagee.addPotionEffect(new PotionEffect(PotionEffectType.HUNGER, 200, 0));
 			} else if(damager instanceof ShulkerBullet) {
 				damagee.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 200, 0));
+			} else if(damager instanceof SpectralArrow) {
+				damagee.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 0));
 			}
 
 			// apply general damage
@@ -168,7 +157,7 @@ public class CustomDamage implements Listener {
 	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		double finalDamage = originalDamage;
 
-		if(!type.equals(DamageType.ABSOLUTE)) {
+		if(type != DamageType.ABSOLUTE) {
 			// ice spray logic
 			if(damagee.getScoreboardTags().contains("IceSprayed")) {
 				finalDamage++;
@@ -185,9 +174,9 @@ public class CustomDamage implements Listener {
 				finalDamage *= 0.5;
 			}
 
-			if(type.equals(DamageType.MELEE) || type.equals(DamageType.RANGED) || type.equals(DamageType.PLAYER_MAGIC) || type.equals(DamageType.ENVIRONMENTAL) || type.equals(DamageType.IFRAMEENVIRONMENTAL)) {
+			if(type == DamageType.MELEE || type == DamageType.RANGED || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.GENERIC_ARMOR)).getValue();
-				finalDamage *= Math.max(0.2, 1 - armor * 0.04);
+				finalDamage *= Math.max(0.25, 1 - armor * 0.0375);
 			}
 
 			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)).getValue() - 8, 0); // only toughness values of 9 or more will give damage reduction
@@ -228,9 +217,9 @@ public class CustomDamage implements Listener {
 			} catch(Exception exception) {
 				// continue
 			}
-			finalDamage *= Math.max(0.2, 1 - prots * 0.03125);
+			finalDamage *= Math.max(0.5, 1 - prots * 0.03125);
 
-			if(type.equals(DamageType.FALL)) {
+			if(type == DamageType.FALL) {
 				try {
 					double featherFalling = Objects.requireNonNull(eq.getBoots()).getEnchantmentLevel(Enchantment.PROTECTION_FALL);
 					finalDamage *= Math.max(0.5, 1 - featherFalling * 0.125);
@@ -245,111 +234,143 @@ public class CustomDamage implements Listener {
 
 	@SuppressWarnings("DuplicateExpressions")
 	public static void dealDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type) {
-		double absorption = damagee.getAbsorptionAmount();
-		if(finalDamage > absorption) {
-			damagee.setAbsorptionAmount(0.0);
-			finalDamage -= absorption;
-		} else {
-			damagee.setAbsorptionAmount(absorption - finalDamage);
-			finalDamage = 0.0;
-		}
-		double newHealth = damagee.getHealth() - finalDamage;
-		if(newHealth < 0.0) {
-			if(damagee instanceof EnderDragon) {
-				damagee.teleport(new Location(damagee.getWorld(), 0.5, 70.0, 0.5));
-			}
-			if(type.equals(DamageType.PLAYER_MAGIC) || damagee instanceof Player p && p.isBlocking()) {
-				damagee.setHealth(0.0);
-			} else {
-				e.setCancelled(false);
-				damagee.setHealth(0.1);
-				e.setDamage(10);
-			}
-		} else if(finalDamage > 0) {
-			damagee.setHealth(damagee.getHealth() - finalDamage);
+		if(finalDamage > 0) {
 			damagee.playHurtAnimation(0.0F);
 			damagee.getWorld().playSound(damagee, Objects.requireNonNull(damagee.getHurtSound()), 1.0F, 1.0F);
-			if(type.equals(DamageType.MELEE) || type.equals(DamageType.MAGIC) || type.equals(DamageType.IFRAMEENVIRONMENTAL) || type.equals(DamageType.FALL)) {
-				damagee.setNoDamageTicks(10);
-			}
-			if(damagee instanceof Mob && damager instanceof LivingEntity) {
-				((Mob) damagee).setTarget((LivingEntity) damager);
-			}
 
-			// apply knockback
-			if(type.equals(DamageType.MELEE) || type.equals(DamageType.RANGED)) {
-				double antiKB = Objects.requireNonNull(damagee.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).getValue();
-				double factor = 0.33 * (1 - antiKB);
-				Vector oldVelocity = damagee.getVelocity();
-				double x = oldVelocity.getX();
-				double y = oldVelocity.getY();
-				double z = oldVelocity.getZ();
-				if(type.equals(DamageType.RANGED)) {
-					factor *= 0.25;
+			double absorption = damagee.getAbsorptionAmount();
+			double oldHealth= damagee.getHealth();
+			boolean doesDie = finalDamage > oldHealth + absorption;
+
+			if(doesDie) {
+				if(damagee instanceof EnderDragon) {
+					damagee.teleport(new Location(damagee.getWorld(), 0.5, 70.0, 0.5));
 				}
-
-				if(damagee instanceof Player p && p.isBlocking()) {
-					factor *= 0.5;
-				}
-
-				if(damagee instanceof Player && !(damager instanceof Player)) {
-					double rawYaw = damagee.getLocation().getYaw();
-					double yaw = Math.toRadians(rawYaw);
-					if(rawYaw <= -90) {
-						x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-						y += 1.33 * factor;
-						z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
-					} else if(rawYaw >= 90) {
-						x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-						y += 1.33 * factor;
-						z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
-					} else if(rawYaw < 0) {
-						x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-						y += 1.33 * factor;
-						z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
-					} else if(rawYaw >= 0) {
-						x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-						y += 1.33 * factor;
-						z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
-					}
+				if(type == DamageType.PLAYER_MAGIC || damagee instanceof Player p && p.isBlocking()) {
+					damagee.setHealth(0.0);
 				} else {
-					double rawYaw = damager.getLocation().getYaw();
-					double yaw = Math.toRadians(rawYaw);
-					if(rawYaw <= -90) {
-						x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-						y += 1.33 * factor;
-						z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
-					} else if(rawYaw >= 90) {
-						x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-						y += 1.33 * factor;
-						z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
-					} else if(rawYaw < 0) {
-						x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-						y += 1.33 * factor;
-						z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
-					} else if(rawYaw >= 0) {
-						x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-						y += 1.33 * factor;
-						z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
-					}
+					e.setCancelled(false);
+					damagee.setHealth(0.1);
+					e.setDamage(10);
 				}
-				damagee.setVelocity(new Vector(x, y, z));
-			}
-
-			// change nametag health
-			SimilarData.changeName(damagee);
-
-			// stop stupidly annoying arrows
-			if(damager instanceof Arrow arrow) {
-				if(arrow.getPierceLevel() == 0) {
-					arrow.remove();
+			} else {
+				if(finalDamage > absorption) {
+					damagee.setAbsorptionAmount(0.0);
+					finalDamage -= absorption;
 				} else {
-					arrow.setPierceLevel(arrow.getPierceLevel() - 1);
-					Vector arrowSpeed = arrow.getVelocity();
-					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> arrow.setVelocity(arrowSpeed), 1L);
+					damagee.setAbsorptionAmount(absorption - finalDamage);
+					finalDamage = 0.0;
+				}
+
+				damagee.setHealth(oldHealth - finalDamage);
+				if(type == DamageType.MELEE || type == DamageType.IFRAME_ENVIRONMENTAL) {
+					damagee.setNoDamageTicks(9);
+				}
+				if(damagee instanceof Mob && damager instanceof LivingEntity) {
+					((Mob) damagee).setTarget((LivingEntity) damager);
+				}
+
+				// apply knockback
+				if((type == DamageType.MELEE || type == DamageType.RANGED) && damager != null) {
+					double antiKB = Objects.requireNonNull(damagee.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).getValue();
+					double factor = 0.33 * (1 - antiKB);
+					Vector oldVelocity = damagee.getVelocity();
+					double x = oldVelocity.getX();
+					double y = oldVelocity.getY();
+					double z = oldVelocity.getZ();
+					if(type == DamageType.RANGED) {
+						factor *= 0.25;
+					}
+
+					if(damagee instanceof Player p && p.isBlocking()) {
+						factor *= 0.5;
+					}
+
+					if(damagee instanceof Player && !(damager instanceof Player)) {
+						double rawYaw = damagee.getLocation().getYaw();
+						double yaw = Math.toRadians(rawYaw);
+						if(rawYaw <= -90) {
+							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
+							y += 1.33 * factor;
+							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
+						} else if(rawYaw >= 90) {
+							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
+							y += 1.33 * factor;
+							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
+						} else if(rawYaw < 0) {
+							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
+							y += 1.33 * factor;
+							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
+						} else if(rawYaw >= 0) {
+							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
+							y += 1.33 * factor;
+							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
+						}
+					} else {
+						double rawYaw = damager.getLocation().getYaw();
+						double yaw = Math.toRadians(rawYaw);
+						if(rawYaw <= -90) {
+							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
+							y += 1.33 * factor;
+							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
+						} else if(rawYaw >= 90) {
+							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
+							y += 1.33 * factor;
+							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
+						} else if(rawYaw < 0) {
+							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
+							y += 1.33 * factor;
+							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
+						} else if(rawYaw >= 0) {
+							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
+							y += 1.33 * factor;
+							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
+						}
+					}
+					damagee.setVelocity(new Vector(x, y, z));
+				}
+
+				// change nametag health
+				SimilarData.changeName(damagee);
+
+				// stop stupidly annoying arrows
+				if(damager instanceof Arrow arrow) {
+					if(arrow.getPierceLevel() == 0) {
+						arrow.remove();
+					} else {
+						arrow.setPierceLevel(arrow.getPierceLevel() - 1);
+						Vector arrowSpeed = arrow.getVelocity();
+						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> arrow.setVelocity(arrowSpeed), 1L);
+					}
 				}
 			}
 		}
+	}
+
+	public static void teleport(Entity e, Entity damager, int radius) {
+		Random random = new Random();
+		Location l = e.getLocation();
+		Location l2 = e.getLocation();
+		Vector added = new Vector(random.nextInt(radius * 2 + 1) - radius, 0, random.nextInt(radius * 2 + 1) - radius);
+		l.add(added);
+		l2.add(added);
+		while(true) {
+			if(l.getY() > 319 || l2.getY() < -63) {
+				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The " + e.getName() + " could not find a spot to teleport to!");
+				break;
+			} else if(l.getBlock().isEmpty()) {
+				e.teleport(l);
+				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The " + e.getName() + " has teleported away!");
+				break;
+			} else if(l2.getBlock().isEmpty()) {
+				e.teleport(l2);
+				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The " + e.getName() + " has teleported away!");
+				break;
+			}
+			l.add(0, 1, 0);
+			l2.add(0, -1, 0);
+		}
+		e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
 	}
 
 	public static void setEvent(EntityDamageEvent e) {
@@ -359,7 +380,6 @@ public class CustomDamage implements Listener {
 	@EventHandler
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
 		CustomDamage.e = e;
-		// make armor less unintuitive
 		if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
 
@@ -369,7 +389,7 @@ public class CustomDamage implements Listener {
 				case PROJECTILE, SONIC_BOOM -> type = DamageType.RANGED;
 				case DRAGON_BREATH, MAGIC -> type = DamageType.MAGIC;
 				case FALLING_BLOCK -> type = DamageType.ENVIRONMENTAL;
-				case LIGHTNING -> type = DamageType.IFRAMEENVIRONMENTAL;
+				case LIGHTNING -> type = DamageType.IFRAME_ENVIRONMENTAL;
 				default -> {
 					return;
 				}
@@ -385,7 +405,7 @@ public class CustomDamage implements Listener {
 
 				// apply intelligence to players
 				if(e.getDamager() instanceof Player p) {
-					if(e.getEntity() instanceof Monster || e.getEntity() instanceof Player) {
+					if(e.getEntity() instanceof Monster || e.getEntity().getScoreboardTags().contains("SkyblockBoss")) {
 						try {
 							Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
 							if(score.getScore() < 2500) {

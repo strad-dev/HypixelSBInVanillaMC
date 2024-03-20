@@ -28,13 +28,6 @@ import static listeners.CustomDamage.customMobs;
 public class CustomItems implements Listener {
 	private Score score;
 
-	public boolean isBlocked(PlayerInteractEvent e, Vector constant, Location oldLocation) {
-		Location newLocation = oldLocation.add(constant);
-		Block b = e.getPlayer().getWorld().getBlockAt(newLocation);
-		Block b1 = b.getRelative(0, 1, 0);
-		return b.getType().isSolid() || b1.getType().isSolid();
-	}
-
 	@SuppressWarnings("DataFlowIssue")
 	public boolean isItem(ItemStack item, String id) {
 		if(!item.hasItemMeta()) {
@@ -103,37 +96,40 @@ public class CustomItems implements Listener {
 	}
 
 	public void witherImpact(Player p, PlayerInteractEvent e) {
-		Vector unitVector = p.getLocation().getDirection();
-		double smallX = unitVector.getX() / 10;
-		double smallY = unitVector.getY() / 10;
-		double smallZ = unitVector.getZ() / 10;
-		Vector constant = new Vector(smallX, smallY, smallZ);
-		unitVector = new Vector(0, 0, 0);
-		int i = 0;
-		Location checkedLocation = p.getLocation();
-		checkedLocation.setY(p.getLocation().getY() + 1.62);
-		while(i < 100) {
-			if(isBlocked(e, constant, checkedLocation)) {
+		Location originalLocation = p.getLocation().clone();
+		Location l = p.getLocation().clone();
+		l.add(0, 1.62, 0);
+		Vector v = l.getDirection();
+		v.setX(v.getX() / 10);
+		v.setY(v.getY() / 10);
+		v.setZ(v.getZ() / 10);
+		for(int i = 0; i < 100; i++) {
+			l.add(v);
+			if(!l.getBlock().isEmpty()) {
+				l = l.subtract(v).getBlock().getLocation();
+				if(originalLocation.getPitch() > 0) {
+					l.add(0, 1.62, 0);
+				}
+				l.setYaw(originalLocation.getYaw());
+				l.setPitch(originalLocation.getPitch());
+				l.add(0.5, 0, 0.5);
 				break;
 			}
-			checkedLocation.add(constant);
-			unitVector.setX(unitVector.getX() + smallX);
-			unitVector.setY(unitVector.getY() + smallY);
-			unitVector.setZ(unitVector.getZ() + smallZ);
-			i++;
 		}
-
-		Location newLocation = p.getLocation().add(unitVector);
-		newLocation.setY(Math.floor(newLocation.getY() + 1.62));
-
+		l.subtract(0, 1.62, 0);
+		if(!l.getBlock().isEmpty()) {
+			l.add(0, 1, 0);
+		}
+		if(!l.getBlock().isEmpty()) {
+			l.add(0, 1, 0);
+		}
 		p.setFallDistance(0);
-		p.teleport(newLocation);
-		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 0.9F, 1);
+		p.teleport(l);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
 		// implosion
-		p.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, newLocation, 20);
-		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(newLocation, 10, 10, 10);
+		p.getWorld().spawnParticle(Particle.EXPLOSION_HUGE, l, 20);
+		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(l, 10, 10, 10);
 		List<EntityType> doNotKill = createList();
 		double targetDamage = Objects.requireNonNull(p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)).getValue();
 		int damaged = 0;
@@ -160,6 +156,7 @@ public class CustomItems implements Listener {
 		if(damaged > 0) {
 			p.sendMessage(ChatColor.RED + "Your Implosion hit " + damaged + " enemies for " + ((int) damage) + " damage.");
 		}
+		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		// wither shield
 		List<PotionEffect> temp = p.getActivePotionEffects().stream().toList();
@@ -171,15 +168,17 @@ public class CustomItems implements Listener {
 			}
 			effects.add(effect.getType());
 		}
-		if(absorptionLevel != 2) {
+		if(absorptionLevel != 2) { // absorption shield
 			p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 101, 2));
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 0.65F);
+			Location finalL = l;
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> { // convert to healing after 5 seconds
+				p.setHealth(Math.min(p.getHealth() + (p.getAbsorptionAmount() / 2), 20.0));
+				p.playSound(finalL, Sound.ENTITY_PLAYER_LEVELUP, 2.0F, 2.0F);
+			}, 101L);
 		}
-		if(!effects.contains(PotionEffectType.DAMAGE_RESISTANCE)) {
+		if(!effects.contains(PotionEffectType.DAMAGE_RESISTANCE)) { // reduced damage
 			p.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 101, 0));
-		}
-		if(!effects.contains(PotionEffectType.REGENERATION)) {
-			p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 101, 1));
 		}
 
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
@@ -215,14 +214,14 @@ public class CustomItems implements Listener {
 		double powerBonus;
 		try {
 			int power = Objects.requireNonNull(Objects.requireNonNull(p.getInventory().getItem(e.getPlayer().getInventory().getHeldItemSlot())).getItemMeta()).getEnchants().get(Enchantment.ARROW_DAMAGE);
-			powerBonus = power * 0.2;
+			powerBonus = power * 0.1;
 		} catch(Exception exception) {
 			powerBonus = 0;
 		}
 
 		double strengthBonus;
 		try {
-			strengthBonus = 0.5 * Objects.requireNonNull(p.getPotionEffect(PotionEffectType.INCREASE_DAMAGE)).getAmplifier();
+			strengthBonus = 0.25 * Objects.requireNonNull(p.getPotionEffect(PotionEffectType.INCREASE_DAMAGE)).getAmplifier();
 		} catch(Exception exception) {
 			strengthBonus = 0;
 		}
@@ -233,89 +232,80 @@ public class CustomItems implements Listener {
 		Arrow middle = p.getWorld().spawnArrow(l, l.getDirection(), 3, 0.1F);
 		Arrow right = p.getWorld().spawnArrow(l, lRight.getDirection(), 3, 0.1F);
 
-		left.setDamage(2 + add);
+		left.setDamage(1 + add);
 		left.setPierceLevel(4);
 		left.setShooter(p);
 		left.addScoreboardTag("TerminatorArrow");
 
-		middle.setDamage(2 + add);
+		middle.setDamage(1 + add);
 		middle.setPierceLevel(4);
 		middle.setShooter(p);
 		middle.addScoreboardTag("TerminatorArrow");
 
-		right.setDamage(2 + add);
+		right.setDamage(1 + add);
 		right.setPierceLevel(4);
 		right.setShooter(p);
 		right.addScoreboardTag("TerminatorArrow");
 
 		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
-		p.addScoreboardTag("AbilityCooldown");
 		p.addScoreboardTag("TerminatorCooldown");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("TerminatorCooldown"), 6L);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("TerminatorCooldown"), 4L);
 	}
 
-	public void instantTransmission(Player p, PlayerInteractEvent e) {
-		Vector unitVector = p.getLocation().getDirection();
-		double smallX = unitVector.getX() / 10;
-		double smallY = unitVector.getY() / 10;
-		double smallZ = unitVector.getZ() / 10;
-		Vector constant = new Vector(smallX, smallY, smallZ);
-		unitVector = new Vector(0, 0, 0);
-		int i = 0;
-		Location checkedLocation = p.getLocation();
-		checkedLocation.setY(p.getLocation().getY() + 1.62);
-		while(i < 120) {
-			if(isBlocked(e, constant, checkedLocation)) {
+	public void instantTransmission(Player p) {
+		Location originalLocation = p.getLocation().clone();
+		Location l = p.getLocation().clone();
+		l.add(0, 1.62, 0);
+		Vector v = l.getDirection();
+		v.setX(v.getX() / 10);
+		v.setY(v.getY() / 10);
+		v.setZ(v.getZ() / 10);
+		for(int i = 0; i < 120; i++) {
+			l.add(v);
+			if(!l.getBlock().isEmpty()) {
+				l = l.subtract(v).getBlock().getLocation();
+				if(originalLocation.getPitch() > 0) {
+					l.add(0, 1.62, 0);
+				}
+				l.setYaw(originalLocation.getYaw());
+				l.setPitch(originalLocation.getPitch());
+				l.add(0.5, 0, 0.5);
 				break;
 			}
-			checkedLocation.add(constant);
-			unitVector.setX(unitVector.getX() + smallX);
-			unitVector.setY(unitVector.getY() + smallY);
-			unitVector.setZ(unitVector.getZ() + smallZ);
-			i++;
 		}
-
-		Location newLocation = p.getLocation().add(unitVector);
-		newLocation.setY(Math.floor(newLocation.getY() + 1.62));
-		p.teleport(newLocation);
+		l.subtract(0, 1.62, 0);
+		if(!l.getBlock().isEmpty()) {
+			l.add(0, 1, 0);
+		}
+		if(!l.getBlock().isEmpty()) {
+			l.add(0, 1, 0);
+		}
 		p.setFallDistance(0);
-		e.setCancelled(true);
+		p.teleport(l);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 	}
 
-	public void etherTransmission(Player p, PlayerInteractEvent e) {
-		Vector unitVector = p.getLocation().getDirection();
-		double smallX = unitVector.getX() / 10;
-		double smallY = unitVector.getY() / 10;
-		double smallZ = unitVector.getZ() / 10;
-		Vector constant = new Vector(smallX, smallY, smallZ);
-		unitVector = new Vector(0, 0, 0);
-		int i = 0;
-		boolean canTP = false;
-		Location checkedLocation = p.getLocation();
-		checkedLocation.setY(p.getLocation().getY() + 1.62);
-		while(i < 610) {
-			if(isBlocked(e, constant, checkedLocation)) {
-				canTP = true;
+	public void etherTransmission(Player p) {
+		Location l = p.getLocation();
+		l.add(0, 1.32, 0);
+		Vector v = l.getDirection();
+		v.setX(v.getX() / 10);
+		v.setY(v.getY() / 10);
+		v.setZ(v.getZ() / 10);
+		for(int i = 0; i < 610; i++) {
+			l.add(v);
+			if(!l.getBlock().isEmpty()) {
+				Location newLocation = l.add(0, 1, 0).getBlock().getLocation();
+				if(l.getBlock().isEmpty() && l.add(0, 1, 0).getBlock().isEmpty()) {
+					newLocation.setYaw(l.getYaw());
+					newLocation.setPitch(l.getPitch());
+					newLocation.add(0.5, 0, 0.5);
+					p.setFallDistance(0);
+					p.teleport(newLocation);
+					p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
+				}
 				break;
 			}
-			checkedLocation.add(constant);
-			unitVector.setX(unitVector.getX() + smallX);
-			unitVector.setY(unitVector.getY() + smallY);
-			unitVector.setZ(unitVector.getZ() + smallZ);
-			i++;
-		}
-
-		if(canTP) {
-			Location newLocation = p.getLocation().add(unitVector).add(unitVector);
-			newLocation.setY(Math.floor(newLocation.getY() + 2.62));
-			p.teleport(newLocation);
-			p.setFallDistance(0);
-			e.setCancelled(true);
-			p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
-			p.addScoreboardTag("AbilityCooldown");
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 		}
 	}
 
@@ -348,22 +338,28 @@ public class CustomItems implements Listener {
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 4);
 		}
+		p.addScoreboardTag("IceSprayCooldown");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("IceSprayCooldown"), 100L);
 	}
 
 	public void wandOfRestoration(Player p) {
-		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 101, 0));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 26, 2));
 		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 6);
 		}
+		p.addScoreboardTag("WandCooldown");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("WandCooldown"), 80L);
 	}
 
 	public void wandOfAtonement(Player p) {
-		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 101, 1));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 51, 2));
 		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);
 		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 			score.setScore(score.getScore() - 6);
 		}
+		p.addScoreboardTag("WandCooldown");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("WandCooldown"), 80L);
 	}
 
 	public void holyIce(Player p) {
@@ -387,68 +383,82 @@ public class CustomItems implements Listener {
 			return;
 		}
 
-		if(Objects.equals(e.getHand(), EquipmentSlot.HAND) && !p.getScoreboardTags().contains("AbilityCooldown")) {
-			if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
-				if(isItem(itemInUse, "skyblock/combat/scylla")) {
-					if(score.getScore() < 12 && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 12");
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-					} else {
-						witherImpact(p, e);
+		if(Objects.equals(e.getHand(), EquipmentSlot.HAND)) {
+			if(!p.getScoreboardTags().contains("AbilityCooldown")) {
+				if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+					if(isItem(itemInUse, "skyblock/combat/scylla")) {
+						if(score.getScore() < 12 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 12");
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						} else {
+							witherImpact(p, e);
+						}
+					} else if(isItem(itemInUse, "skyblock/combat/aspect_of_the_void")) {
+						if(!p.isSneaking()) {
+							instantTransmission(p);
+						} else {
+							etherTransmission(p);
+						}
+						e.setCancelled(true);
+					} else if(isItem(itemInUse, "skyblock/combat/ice_spray_wand")) {
+						if(score.getScore() < 4 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 4");
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						} else if(p.getScoreboardTags().contains("IceSprayCooldown")) {
+							p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						} else {
+							iceSprayWand(p);
+						}
+					} else if(isItem(itemInUse, "skyblock/combat/terminator")) {
+						if(!p.getScoreboardTags().contains("TerminatorCooldown")) {
+							terminator(p, e);
+						}
+						e.setCancelled(true);
+					} else if(isItem(itemInUse, "skyblock/combat/wand_of_restoration")) {
+						if(score.getScore() < 6 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 6");
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						} else if(p.getScoreboardTags().contains("WandCooldown")) {
+							p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						} else {
+							wandOfRestoration(p);
+						}
+					} else if(isItem(itemInUse, "skyblock/combat/wand_of_atonement")) {
+						if(score.getScore() < 6 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 6");
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						} else if(p.getScoreboardTags().contains("WandCooldown")) {
+							p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						} else {
+							wandOfAtonement(p);
+						}
+					} else if(isItem(itemInUse, "skyblock/combat/holy_ice")) {
+						if(score.getScore() < 25 && !p.getGameMode().equals(GameMode.CREATIVE)) {
+							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 25");
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						} else {
+							holyIce(p);
+						}
 					}
-				} else if(isItem(itemInUse, "skyblock/combat/aspect_of_the_void")) {
-					if(!p.isSneaking()) {
-						instantTransmission(p, e);
-					} else {
-						etherTransmission(p, e);
-					}
-				} else if(isItem(itemInUse, "skyblock/combat/ice_spray_wand")) {
-					if(score.getScore() < 4 && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 4");
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-					} else {
-						iceSprayWand(p);
-					}
-				} else if(isItem(itemInUse, "skyblock/combat/terminator")) {
-					if(!p.getScoreboardTags().contains("TerminatorCooldown")) {
-						terminator(p, e);
+					p.addScoreboardTag("AbilityCooldown");
+					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
+				}
+				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
+			}
+			if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.PHYSICAL)) {
+				if(isItem(itemInUse, "skyblock/combat/terminator")) {
+					if(!p.getScoreboardTags().contains("SalvationCooldown")) {
+						NonEntityDamage.shootBeam(p, Color.RED, 64, 5, 2);
+						p.playSound(p.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
+						p.addScoreboardTag("SalvationCooldown");
+						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("SalvationCooldown"), 19L);
 					}
 					e.setCancelled(true);
-				} else if(isItem(itemInUse, "skyblock/combat/wand_of_restoration")) {
-					if(score.getScore() < 6 && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 6");
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-					} else if(p.hasPotionEffect(PotionEffectType.REGENERATION)) {
-						p.sendMessage(ChatColor.RED + "You cannot use this item while you are already Regenerating!");
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-					} else {
-						wandOfRestoration(p);
-					}
-				} else if(isItem(itemInUse, "skyblock/combat/wand_of_atonement")) {
-					if(score.getScore() < 6 && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 6");
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-					} else if(p.hasPotionEffect(PotionEffectType.REGENERATION)) {
-						p.sendMessage(ChatColor.RED + "You cannot use this item while you are already Regenerating!");
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-					} else {
-						wandOfAtonement(p);
-					}
-				} else if(isItem(itemInUse, "skyblock/combat/holy_ice")) {
-					if(score.getScore() < 25 && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: 25");
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-					} else if(p.hasPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)) {
-						p.sendMessage(ChatColor.RED + "You cannot use this item while you already have Resistance!");
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-					} else {
-						holyIce(p);
-					}
 				}
-				p.addScoreboardTag("AbilityCooldown");
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 			}
-			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
 		}
 	}
 }

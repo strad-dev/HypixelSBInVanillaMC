@@ -48,10 +48,10 @@ public enum DamageType {
 	 * Used for all damage via other methods (e.g. Fire)
 	 * Affected by: Armor, Toughness, Protection, Resistance
 	 * Knockback: None
-	 * I-Frames: None
+	 * I-Frames: Special
 	 */
 
-	IFRAMEENVIRONMENTAL,
+	IFRAME_ENVIRONMENTAL,
 	/*
 	 * I-Frame Environmental Damage Type
 	 * ------------------
