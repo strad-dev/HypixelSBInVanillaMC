@@ -547,7 +547,7 @@ public class CustomDrops implements Listener {
 				item = new ItemStack(Material.SCULK_CATALYST);
 				item.setAmount(random.nextInt(1 + lootingLevel) + 1);
 				drops.add(item);
-				if(random.nextDouble() < 0.01 * rngLootingBonus) {
+				if(random.nextDouble() < 0.02 * rngLootingBonus) {
 					item = SimilarData.wardenHeart();
 					drops.add(item);
 					sendRareDropMessage("Warden Heart");
@@ -709,11 +709,11 @@ public class CustomDrops implements Listener {
 						sendRareDropMessage("Remnant of the Giant's Sword");
 					}
 					Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).removePlayer(p);
-				} else if(random.nextDouble() < 0.01 * rngLootingBonus) {
+				} else if(random.nextDouble() < 0.005 * rngLootingBonus) {
 					item = SimilarData.giantZombieFlesh();
 					drops.add(item);
 					sendRareDropMessage("Giant Zombie Flesh");
-				} else if(random.nextDouble() < 0.005 * rngLootingBonus) {
+				} else if(random.nextDouble() < 0.01 * rngLootingBonus) {
 					item = SimilarData.atonedFlesh();
 					drops.add(item);
 					sendRareDropMessage("Atoned Flesh");
