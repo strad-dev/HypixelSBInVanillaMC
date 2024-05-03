@@ -1,13 +1,13 @@
 package misc;
 
-import commands.*;
+import commands.GetOPItems;
+import commands.Tell;
 import listeners.*;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,8 +26,6 @@ public class Plugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
-		Objects.requireNonNull(this.getCommand("smite")).setExecutor(new Smite());
-		Objects.requireNonNull(this.getCommand("god")).setExecutor(new GOD());
 		Objects.requireNonNull(this.getCommand("w")).setExecutor((new Tell()));
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
@@ -48,6 +46,7 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new AllMobsHaveNames(), this);
 
 		getServer().addRecipe(AddRecipes.addScyllaRecipe(this));
+		getServer().addRecipe(AddRecipes.addClaymoreRecipe(this));
 		getServer().addRecipe(AddRecipes.addTermRecipe(this));
 		getServer().addRecipe(AddRecipes.addAOTVRecipe(this));
 		getServer().addRecipe(AddRecipes.addWardenHelmetRecipe(this));
@@ -66,7 +65,16 @@ public class Plugin extends JavaPlugin {
 			Objects.requireNonNull(getServer().getScoreboardManager()).getMainScoreboard().registerNewObjective("Intelligence", Criteria.DUMMY, "Intelligence");
 			getLogger().info("Could not find Intelligence.  Adding to Scoreboard.");
 		} catch(Exception exception) {
+			Objects.requireNonNull(getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence");
 			getLogger().info("Deteced Intelligence.");
+		}
+
+		try {
+			Objects.requireNonNull(getServer().getBossBar(new NamespacedKey(this, "sadan"))).getPlayers().clear();
+			getLogger().info("Detected Sadan Bossbar");
+		} catch(Exception exception) {
+			getServer().createBossBar(new NamespacedKey(this, "sadan"), "Sadan", BarColor.RED, BarStyle.SOLID);
+			getLogger().info("Could not find Sadan Bossbar.  Adding to Bossbars.");
 		}
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 40L);

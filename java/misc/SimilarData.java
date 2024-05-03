@@ -7,6 +7,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @SuppressWarnings({"ExtractMethodRecommender", "DataFlowIssue"})
 public class SimilarData {
@@ -47,12 +49,11 @@ public class SimilarData {
 
 	public static ItemStack AOTV() {
 		ItemStack aotv = new ItemStack(Material.NETHERITE_SHOVEL);
-		aotv.addUnsafeEnchantment(Enchantment.DIG_SPEED, 5);
 
 		ItemMeta data = aotv.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Aspect of the Void");
-		AttributeModifier attackDamage = new AttributeModifier("AOTVModifier", -1000, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier attackDamage = new AttributeModifier(UUID.fromString("bccbe67e-2649-4c53-8664-b00916b69125"), "AOTVModifier", -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, attackDamage);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
@@ -80,15 +81,12 @@ public class SimilarData {
 
 	public static ItemStack scylla() {
 		ItemStack scylla = new ItemStack(Material.NETHERITE_SWORD);
-		scylla.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 5);
-		scylla.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 2);
-		scylla.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
 
 		ItemMeta data = scylla.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Hyperion");
-		AttributeModifier attackSpeed = new AttributeModifier("scyllaModifier", 100, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier attackDamage = new AttributeModifier("scyllaModifierDmg", 8, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier attackSpeed = new AttributeModifier(UUID.fromString("d818fcd7-a2f8-434a-bfc3-6a352185714b"), "scyllaModifier", 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
+		AttributeModifier attackDamage = new AttributeModifier(UUID.fromString("b1bda7a7-b3eb-43b3-9e91-2473e9004f79"), "scyllaModifierDmg", 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, attackDamage);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, attackSpeed);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
@@ -119,9 +117,6 @@ public class SimilarData {
 
 	public static ItemStack term() {
 		ItemStack term = new ItemStack(Material.BOW);
-		term.addUnsafeEnchantment(Enchantment.ARROW_DAMAGE, 5);
-		term.addUnsafeEnchantment(Enchantment.ARROW_FIRE, 1);
-		term.addUnsafeEnchantment(Enchantment.ARROW_INFINITE, 1);
 
 		ItemMeta data = term.getItemMeta();
 		data.setUnbreakable(true);
@@ -257,17 +252,16 @@ public class SimilarData {
 
 	public static ItemStack claymore() {
 		ItemStack claymore = new ItemStack(Material.STONE_SWORD);
-		claymore.addUnsafeEnchantment(Enchantment.DAMAGE_ALL, 5);
-		claymore.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 2);
-		claymore.addUnsafeEnchantment(Enchantment.LOOT_BONUS_MOBS, 3);
 
 		ItemMeta data = claymore.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Dark Claymore");
-		AttributeModifier attackSpeed = new AttributeModifier("claymoreModifier", 100, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier attackDamage = new AttributeModifier("claymoreModifierDmg", 9, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier attackSpeed = new AttributeModifier(UUID.fromString("e51c72e7-2b0d-4064-8d7f-89133cfd4b8b"), "claymoreModifier", 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
+		AttributeModifier attackDamage = new AttributeModifier(UUID.fromString("25cc1a90-327d-4115-a912-869e883862f4"), "claymoreModifierDmg", 9, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
+		AttributeModifier attackRange = new AttributeModifier(UUID.fromString("95037a43-49c4-4d9e-93a7-49c50c59e811"), "claymoreModifierRange", 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, attackDamage);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, attackSpeed);
+		data.addAttributeModifier(Attribute.PLAYER_ENTITY_INTERACTION_RANGE, attackRange);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();
@@ -290,18 +284,15 @@ public class SimilarData {
 
 	public static ItemStack wardenHelmet() {
 		ItemStack wardenHelmet = new ItemStack(Material.NETHERITE_HELMET);
-		wardenHelmet.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-		wardenHelmet.addUnsafeEnchantment(Enchantment.OXYGEN, 3);
-		wardenHelmet.addUnsafeEnchantment(Enchantment.WATER_WORKER, 1);
 
 		ItemMeta data = wardenHelmet.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Warden Helmet");
-		AttributeModifier damage = new AttributeModifier("wardenHelmetDamage", 2, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier armor = new AttributeModifier("wardenHelmetArmor", 3, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier toughness = new AttributeModifier("wardenHelmetToughness", 3, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier antiKB = new AttributeModifier("wardenHelmetAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier speed = new AttributeModifier("wardenHelmetSpeed", -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
+		AttributeModifier damage = new AttributeModifier(UUID.fromString("4b5a478b-3b58-42ab-917d-8194a1a6d679"), "wardenHelmetDamage", 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
+		AttributeModifier armor = new AttributeModifier(UUID.fromString("b9f30162-1921-4cc6-ad60-91cc43234ba3"), "wardenHelmetArmor", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
+		AttributeModifier toughness = new AttributeModifier(UUID.fromString("c1474682-574f-472c-a611-62da34f6e1f1"), "wardenHelmetToughness", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
+		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("4e16c033-3349-4fb7-a0c6-0fac98ef6c6a"), "wardenHelmetAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
+		AttributeModifier speed = new AttributeModifier(UUID.fromString("f15d0a37-e366-4c5a-982d-57995d036a6c"), "wardenHelmetSpeed", -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HEAD);
 		data.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, speed);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
@@ -333,15 +324,15 @@ public class SimilarData {
 
 	public static ItemStack necronElytra() {
 		ItemStack necronElytra = new ItemStack(Material.ELYTRA);
-		necronElytra.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
+		necronElytra.addUnsafeEnchantment(Enchantment.PROTECTION, 4);
 
 		ItemMeta data = necronElytra.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Necron's Elytra");
-		AttributeModifier damage = new AttributeModifier("necronElytraDamage", 1, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier armor = new AttributeModifier("necronElytraArmor", 8, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier toughness = new AttributeModifier("necronElytraToughness", 3, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier antiKB = new AttributeModifier("necronElytraAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier damage = new AttributeModifier(UUID.fromString("636ece54-f65c-4275-8ab7-916a1a1056ca"), "necronElytraDamage", 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
+		AttributeModifier armor = new AttributeModifier(UUID.fromString("92166a58-d64d-465b-9810-3f8966f33566"), "necronElytraArmor", 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
+		AttributeModifier toughness = new AttributeModifier(UUID.fromString("e0f20d73-639a-4530-937e-c7f298b268ec"), "necronElytraToughness", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
+		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("2855bb5e-6e64-4dea-a5c1-63725ec18c9a"), "necronElytraAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
 		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
@@ -369,16 +360,14 @@ public class SimilarData {
 
 	public static ItemStack goldorLeggings() {
 		ItemStack goldorLeggings = new ItemStack(Material.NETHERITE_LEGGINGS);
-		goldorLeggings.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-		goldorLeggings.addUnsafeEnchantment(Enchantment.SWIFT_SNEAK, 3);
 
 		ItemMeta data = goldorLeggings.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Goldor's Leggings");
-		AttributeModifier damage = new AttributeModifier("goldorLeggingsDamage", 1, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier armor = new AttributeModifier("goldorLeggingsArmor", 6, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier toughness = new AttributeModifier("goldorLeggingsToughness", 4, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier antiKB = new AttributeModifier("goldorLeggingsAntiKB", 0.2, AttributeModifier.Operation.ADD_NUMBER);
+		AttributeModifier damage = new AttributeModifier(UUID.fromString("dc60c4c3-18ee-4e60-a580-7e3604e720e9"), "goldorLeggingsDamage", 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
+		AttributeModifier armor = new AttributeModifier(UUID.fromString("80b8389f-f018-48c9-b3c0-c576bce5520a"), "goldorLeggingsArmor", 6, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
+		AttributeModifier toughness = new AttributeModifier(UUID.fromString("307e9660-858e-4ba3-9e60-2e0debf02345"), "goldorLeggingsToughness", 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
+		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("e4fd0260-7d71-4881-b47b-4c1bc68ac440"), "goldorLeggingsAntiKB", 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
 		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
@@ -407,19 +396,15 @@ public class SimilarData {
 
 	public static ItemStack maxorBoots() {
 		ItemStack maxorBoots = new ItemStack(Material.NETHERITE_BOOTS);
-		maxorBoots.addUnsafeEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 4);
-		maxorBoots.addUnsafeEnchantment(Enchantment.SOUL_SPEED, 3);
-		maxorBoots.addUnsafeEnchantment(Enchantment.PROTECTION_FALL, 4);
-		maxorBoots.addUnsafeEnchantment(Enchantment.DEPTH_STRIDER, 3);
 
 		ItemMeta data = maxorBoots.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Maxor's Boots");
-		AttributeModifier damage = new AttributeModifier("maxorBootsDamage", 1, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier armor = new AttributeModifier("maxorBootsArmor", 3, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier toughness = new AttributeModifier("maxorBootsToughness", 3, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier antiKB = new AttributeModifier("maxorBootsAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER);
-		AttributeModifier speed = new AttributeModifier("maxorBootsSpeed", 3, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
+		AttributeModifier damage = new AttributeModifier(UUID.fromString("c5be199a-6b3f-4860-b7b8-36e45fef60a3"), "maxorBootsDamage", 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
+		AttributeModifier armor = new AttributeModifier(UUID.fromString("d8fe7972-aa27-42b4-aa5a-9eac4fb3b608"), "maxorBootsArmor", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
+		AttributeModifier toughness = new AttributeModifier(UUID.fromString("f3058f46-630f-4cb5-8682-1141c5317e47"), "maxorBootsToughness", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
+		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("0c759c56-bd52-41a4-803f-f15275e61e4c"), "maxorBootsAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
+		AttributeModifier speed = new AttributeModifier(UUID.fromString("02307a42-a70a-4e55-a915-a71264f7455d"), "maxorBootsSpeed", 3, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.FEET);
 		data.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, speed);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
@@ -1039,5 +1024,32 @@ public class SimilarData {
 		atonedFlesh.setItemMeta(data);
 
 		return atonedFlesh;
+	}
+
+	public static ItemStack giantZombieFlesh() {
+		ItemStack giantZombieFlesh = new ItemStack(Material.ROTTEN_FLESH);
+		giantZombieFlesh.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
+
+		ItemMeta data = giantZombieFlesh.getItemMeta();
+		data.setUnbreakable(true);
+		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Giant Zombie Flesh");
+		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
+
+		List<String> lore = new ArrayList<>();
+		lore.add("skyblock/summon/giant_flesh");
+		lore.add("");
+		lore.add(ChatColor.GRAY + "This zombie dropped a larger");
+		lore.add(ChatColor.GRAY + "piece of flesh than normal.");
+		lore.add(ChatColor.GRAY + "Maybe it has useful properties?");
+		lore.add("");
+		lore.add(ChatColor.GRAY + "Use this on a Zombie");
+		lore.add(ChatColor.GRAY + "to summon Sadan!");
+		lore.add("");
+		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+
+		data.setLore(lore);
+		giantZombieFlesh.setItemMeta(data);
+
+		return giantZombieFlesh;
 	}
 }

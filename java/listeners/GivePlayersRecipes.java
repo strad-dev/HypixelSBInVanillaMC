@@ -4,6 +4,7 @@ import misc.AddRecipes;
 import misc.Plugin;
 import misc.SimilarData;
 import org.bukkit.ChatColor;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,8 +13,24 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class GivePlayersRecipes implements Listener {
+	private PlayerInventory inventory;
+
+	public void setItem(int i, ItemStack newItem) {
+		ItemStack oldItem = Objects.requireNonNull(inventory.getItem(i));
+		try {
+			Map<Enchantment, Integer> enchants = oldItem.getEnchantments();
+			newItem.addUnsafeEnchantments(enchants);
+		} catch(Exception exception) {
+			// nothing here lol
+		}
+		newItem.setAmount(oldItem.getAmount());
+		inventory.setItem(i, newItem);
+	}
+
 	@SuppressWarnings("DataFlowIssue")
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
@@ -28,8 +45,11 @@ public class GivePlayersRecipes implements Listener {
 		p.removeScoreboardTag("AbilityCooldown");
 		p.removeScoreboardTag("TerminatorCooldown");
 		p.removeScoreboardTag("IceSprayed");
+		p.removeScoreboardTag("SalvationCooldown");
+		p.removeScoreboardTag("WandCooldown");
+		p.removeScoreboardTag("IceSprayCooldown");
 
-		PlayerInventory inventory = p.getInventory();
+		this.inventory = p.getInventory();
 		for(int i = 0; i < inventory.getSize(); i++) {
 			ItemStack item = inventory.getItem(i);
 			try {
@@ -37,49 +57,51 @@ public class GivePlayersRecipes implements Listener {
 					if(item.getItemMeta().hasLore()) {
 						List<String> lore = item.getItemMeta().getLore();
 						switch(lore.get(0)) {
-							case "skyblock/combat/aspect_of_the_void" -> inventory.setItem(i, SimilarData.AOTV());
-							case "skyblock/combat/scylla" -> inventory.setItem(i, SimilarData.scylla());
-							case "skyblock/combat/terminator" -> inventory.setItem(i, SimilarData.term());
-							case "skyblock/combat/ice_spray_wand" -> inventory.setItem(i, SimilarData.iceSpray());
+							case "skyblock/combat/aspect_of_the_void" -> setItem(i, SimilarData.AOTV());
+							case "skyblock/combat/scylla" -> setItem(i, SimilarData.scylla());
+							case "skyblock/combat/terminator" -> setItem(i, SimilarData.term());
+							case "skyblock/combat/ice_spray_wand" -> setItem(i, SimilarData.iceSpray());
 							case "skyblock/combat/wand_of_restoration" ->
-									inventory.setItem(i, SimilarData.wandOfRestoration());
+									setItem(i, SimilarData.wandOfRestoration());
 							case "skyblock/combat/wand_of_atonement" ->
-									inventory.setItem(i, SimilarData.wandOfAtonement());
-							case "skyblock/combat/holy_ice" -> inventory.setItem(i, SimilarData.holyIce());
-							case "skyblock/combat/dark_claymore" -> inventory.setItem(i, SimilarData.claymore());
-							case "skyblock/combat/warden_helmet" -> inventory.setItem(i, SimilarData.wardenHelmet());
-							case "skyblock/combat/necron_elytra" -> inventory.setItem(i, SimilarData.necronElytra());
-							case "skyblock/combat/goldor_pants" -> inventory.setItem(i, SimilarData.goldorLeggings());
-							case "skyblock/combat/maxor_boots" -> inventory.setItem(i, SimilarData.maxorBoots());
-							case "skyblock/ingredient/shadow_warp" -> inventory.setItem(i, SimilarData.shadowWarp());
-							case "skyblock/ingredient/implosion" -> inventory.setItem(i, SimilarData.implosion());
+									setItem(i, SimilarData.wandOfAtonement());
+							case "skyblock/combat/holy_ice" -> setItem(i, SimilarData.holyIce());
+							case "skyblock/combat/dark_claymore" -> setItem(i, SimilarData.claymore());
+							case "skyblock/combat/warden_helmet" -> setItem(i, SimilarData.wardenHelmet());
+							case "skyblock/combat/necron_elytra" -> setItem(i, SimilarData.necronElytra());
+							case "skyblock/combat/goldor_pants" -> setItem(i, SimilarData.goldorLeggings());
+							case "skyblock/combat/maxor_boots" -> setItem(i, SimilarData.maxorBoots());
+							case "skyblock/ingredient/shadow_warp" -> setItem(i, SimilarData.shadowWarp());
+							case "skyblock/ingredient/implosion" -> setItem(i, SimilarData.implosion());
 							case "skyblock/ingredient/wither_shield" ->
-									inventory.setItem(i, SimilarData.witherShield());
-							case "skyblock/ingredient/necron_handle" -> inventory.setItem(i, SimilarData.handle());
-							case "skyblock/ingredient/giant_sword_remnant" -> inventory.setItem(i, SimilarData.giantSwordRemnant());
+									setItem(i, SimilarData.witherShield());
+							case "skyblock/ingredient/necron_handle" -> setItem(i, SimilarData.handle());
+							case "skyblock/ingredient/giant_sword_remnant" ->
+									setItem(i, SimilarData.giantSwordRemnant());
 							case "skyblock/ingredient/maxor_secrets" ->
-									inventory.setItem(i, SimilarData.maxorSecrets());
+									setItem(i, SimilarData.maxorSecrets());
 							case "skyblock/ingredient/storm_secrets" ->
-									inventory.setItem(i, SimilarData.stormSecrets());
+									setItem(i, SimilarData.stormSecrets());
 							case "skyblock/ingredient/goldor_secrets" ->
-									inventory.setItem(i, SimilarData.goldorSecrets());
+									setItem(i, SimilarData.goldorSecrets());
 							case "skyblock/ingredient/necron_secrets" ->
-									inventory.setItem(i, SimilarData.necronSecrets());
-							case "skyblock/ingredient/warden_heart" -> inventory.setItem(i, SimilarData.wardenHeart());
-							case "skyblock/ingredient/judgement_core" -> inventory.setItem(i, SimilarData.core());
+									setItem(i, SimilarData.necronSecrets());
+							case "skyblock/ingredient/warden_heart" -> setItem(i, SimilarData.wardenHeart());
+							case "skyblock/ingredient/judgement_core" -> setItem(i, SimilarData.core());
 							case "skyblock/ingredient/tessellated_pearl" ->
-									inventory.setItem(i, SimilarData.tessellatedPearl());
-							case "skyblock/ingredient/null_blade" -> inventory.setItem(i, SimilarData.nullBlade());
+									setItem(i, SimilarData.tessellatedPearl());
+							case "skyblock/ingredient/null_blade" -> setItem(i, SimilarData.nullBlade());
 							case "skyblock/ingredient/braided_feather" ->
-									inventory.setItem(i, SimilarData.braidedFeather());
-							case "skyblock/ingredient/tarantula_silk" -> inventory.setItem(i, SimilarData.taraSilk());
-							case "skyblock/ingredient/revenant_viscera" -> inventory.setItem(i, SimilarData.viscera());
-							case "skyblock/summon/superior_remnant" -> inventory.setItem(i, SimilarData.supRemnant());
-							case "skyblock/summon/corrupt_pearl" -> inventory.setItem(i, SimilarData.corruptedPearl());
-							case "skyblock/summon/antimatter" -> inventory.setItem(i, SimilarData.antimatter());
-							case "skyblock/summon/omega_egg" -> inventory.setItem(i, SimilarData.omegaEgg());
-							case "skyblock/summon/spider_relic" -> inventory.setItem(i, SimilarData.spiderRelic());
-							case "skyblock/summon/atoned_flesh" -> inventory.setItem(i, SimilarData.atonedFlesh());
+									setItem(i, SimilarData.braidedFeather());
+							case "skyblock/ingredient/tarantula_silk" -> setItem(i, SimilarData.taraSilk());
+							case "skyblock/ingredient/revenant_viscera" -> setItem(i, SimilarData.viscera());
+							case "skyblock/summon/superior_remnant" -> setItem(i, SimilarData.supRemnant());
+							case "skyblock/summon/corrupt_pearl" -> setItem(i, SimilarData.corruptedPearl());
+							case "skyblock/summon/antimatter" -> setItem(i, SimilarData.antimatter());
+							case "skyblock/summon/omega_egg" -> setItem(i, SimilarData.omegaEgg());
+							case "skyblock/summon/spider_relic" -> setItem(i, SimilarData.spiderRelic());
+							case "skyblock/summon/atoned_flesh" -> setItem(i, SimilarData.atonedFlesh());
+							case "skyblock/summon/giant_flesh" -> setItem(i, SimilarData.giantZombieFlesh());
 						}
 					}
 				}

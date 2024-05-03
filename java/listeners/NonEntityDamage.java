@@ -1,6 +1,7 @@
 package listeners;
 
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
@@ -52,10 +53,26 @@ public class NonEntityDamage implements Listener {
 		noDamageTimes.remove(e.getEntity());
 	}
 
-	public static void shootBeam(Entity origin, Color color, long distance, long pierce, double damage) {
+	public static void shootBeam(Entity origin, Entity destination, Color color, long distance, long pierce, double damage) {
 		Location l = origin.getLocation();
-		l.add(0, 1.62, 0);
-		Vector v = l.getDirection();
+		if(origin instanceof LivingEntity entity) {
+			try {
+				l.add(0, Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_SCALE)).getValue() * 1.62, 0);
+			} catch(Exception exception) {
+				l.add(0, 1.62, 0);
+			}
+		}
+		Vector v;
+		if(origin.equals(destination)) {
+			v = l.getDirection();
+		} else {
+
+			Location destinationLocation = destination.getLocation().add(0, destination.getHeight() / 2, 0);
+			double x = destinationLocation.getX() - l.getX();
+			double y = destinationLocation.getY() - l.getY();
+			double z = destinationLocation.getZ() - l.getZ();
+			v = new Vector(x, y, z);
+		}
 		v.setX(v.getX() / 5);
 		v.setY(v.getY() / 5);
 		v.setZ(v.getZ() / 5);
@@ -71,11 +88,11 @@ public class NonEntityDamage implements Listener {
 				if(entity instanceof LivingEntity temp && !damagedEntities.contains(entity)) {
 					damagedEntities.add(entity);
 					customMobs(temp, origin, damage, DamageType.RANGED);
-					pierce --;
+					pierce--;
 				}
 			}
-			Particle.DustOptions particle = new Particle.DustOptions(color, 1.0F) ;
-			world.spawnParticle(Particle.REDSTONE, l, 1, particle);
+			Particle.DustOptions particle = new Particle.DustOptions(color, 1.0F);
+			world.spawnParticle(Particle.DUST, l, 1, particle);
 			l.add(v);
 		}
 	}

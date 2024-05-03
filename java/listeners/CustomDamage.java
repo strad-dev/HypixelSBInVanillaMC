@@ -4,11 +4,9 @@ import misc.Plugin;
 import misc.SimilarData;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -18,6 +16,7 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
 
@@ -28,6 +27,12 @@ public class CustomDamage implements Listener {
 	private static EntityDamageEvent e;
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+		if(damager instanceof Arrow arrow) {
+			ProjectileSource temp = arrow.getShooter();
+			if(temp instanceof LivingEntity temp2) {
+				damager = temp2;
+			}
+		}
 		// apply custom damage to special mobs before going through with general damage
 		Random random = new Random();
 		try {
@@ -88,7 +93,7 @@ public class CustomDamage implements Listener {
 				String shooter = ((Wither) Objects.requireNonNull(skull.getShooter())).getCustomName();
 				assert shooter != null;
 				if(shooter.contains("Storm") && random.nextBoolean()) {
-					skull.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING);
+					skull.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
 				} else if(shooter.contains("Necron")) {
 					calculateFinalDamage(damagee, damager, originalDamage + 4, DamageType.RANGED);
 					return;
@@ -104,11 +109,45 @@ public class CustomDamage implements Listener {
 					calculateFinalDamage(damagee, damager, originalDamage + 3, DamageType.RANGED);
 					return;
 				}
+				// sadan immune to falling anvils
+			} else if(damagee instanceof Zombie && Objects.requireNonNull(damagee.getCustomName()).contains("Sadan") && damager instanceof FallingBlock) {
+				return;
+				// sadan
+			} else if(damagee instanceof Zombie zombie && Objects.requireNonNull(damagee.getCustomName()).contains("Sadan") && damager instanceof LivingEntity entity) {
+				if(random.nextDouble() < 0.5) {
+					switch(random.nextInt(4)) {
+						case 0 -> {
+							damager.teleport(damager.getLocation().subtract(0, 3, 0));
+							calculateFinalDamage(entity, zombie, 10, DamageType.MAGIC);
+							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan has stomped you into the ground!");
+							damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 0.5F);
+						}
+						case 1 -> {
+							NonEntityDamage.shootBeam(zombie, damager, Color.RED, 32, 1, 20);
+							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan has shot you with Laser Eyes!");
+							damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
+						}
+						case 2 -> {
+							zombie.swingMainHand();
+							calculateFinalDamage(entity, zombie, 20, DamageType.MELEE);
+							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan attacks you violently with his Diamond Sword!");
+							damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
+						}
+						case 3 -> {
+							Block b = damager.getLocation().add(0, 20, 0).getBlock();
+							if(b.getType().equals(Material.AIR)) {
+								b.setType(Material.DAMAGED_ANVIL);
+							}
+							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan rains boulders on top of your head!!");
+							damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F);
+						}
+					}
+				}
 				// atoned horror tnt
 			} else if(damager instanceof Zombie zombie && Objects.requireNonNull(damager.getCustomName()).contains("Atoned Horror")) {
-				TNTPrimed tnt = (TNTPrimed) zombie.getWorld().spawnEntity(damagee.getLocation(), EntityType.PRIMED_TNT);
+				TNTPrimed tnt = (TNTPrimed) zombie.getWorld().spawnEntity(damagee.getLocation(), EntityType.TNT);
 				tnt.addScoreboardTag("AtonedHorror");
-				tnt.setFuseTicks(10);
+				tnt.setFuseTicks(20);
 				// no magic damage to atoned horrors
 			} else if(damagee instanceof Zombie && Objects.requireNonNull(damagee.getCustomName()).contains("Atoned Horror") && !(damager instanceof TNTPrimed)) {
 				if(type == DamageType.PLAYER_MAGIC) {
@@ -129,12 +168,12 @@ public class CustomDamage implements Listener {
 				if(wither.getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 					return;
 				}
-				if(Objects.requireNonNull(wither.getCustomName()).contains("Maxor")) {
-					teleport(wither, damagee, 4);
+				if(Objects.requireNonNull(wither.getCustomName()).contains("Maxor") && random.nextDouble() < 0.1) {
+					teleport(wither, damagee, 8);
 				}
 				// deal with vanilla mobs
-			} else if(damagee instanceof EnderDragon dragon && Objects.requireNonNull(dragon.getCustomName()).contains("Young Dragon")) {
-				teleport(dragon, damagee, 8);
+			} else if(damagee instanceof EnderDragon dragon && Objects.requireNonNull(dragon.getCustomName()).contains("Young Dragon") && random.nextDouble() < 0.1) {
+				teleport(dragon, damagee, 32);
 			} else if(damager instanceof CaveSpider) {
 				damagee.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 300, 0));
 			} else if(damager instanceof WitherSkeleton) {
@@ -148,10 +187,13 @@ public class CustomDamage implements Listener {
 			}
 
 			// apply general damage
-		} catch(NullPointerException exception) {
+		} catch(
+				NullPointerException exception) {
 			calculateFinalDamage(damagee, damager, originalDamage, type);
 		}
+
 		calculateFinalDamage(damagee, damager, originalDamage, type);
+
 	}
 
 	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
@@ -184,7 +226,7 @@ public class CustomDamage implements Listener {
 
 			double resistance = 0;
 			try {
-				resistance = Objects.requireNonNull(damagee.getPotionEffect(PotionEffectType.DAMAGE_RESISTANCE)).getAmplifier() + 1;
+				resistance = Objects.requireNonNull(damagee.getPotionEffect(PotionEffectType.RESISTANCE)).getAmplifier() + 1;
 			} catch(Exception exception) {
 				// continue
 			}
@@ -195,25 +237,25 @@ public class CustomDamage implements Listener {
 			EntityEquipment eq = damagee.getEquipment();
 			assert eq != null;
 			try {
-				prots += Objects.requireNonNull(eq.getHelmet()).getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
+				prots += Objects.requireNonNull(eq.getHelmet()).getEnchantmentLevel(Enchantment.PROTECTION);
 			} catch(Exception exception) {
 				// continue
 			}
 
 			try {
-				prots += Objects.requireNonNull(eq.getChestplate()).getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
+				prots += Objects.requireNonNull(eq.getChestplate()).getEnchantmentLevel(Enchantment.PROTECTION);
 			} catch(Exception exception) {
 				// continue
 			}
 
 			try {
-				prots += Objects.requireNonNull(eq.getLeggings()).getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
+				prots += Objects.requireNonNull(eq.getLeggings()).getEnchantmentLevel(Enchantment.PROTECTION);
 			} catch(Exception exception) {
 				// continue
 			}
 
 			try {
-				prots += Objects.requireNonNull(eq.getBoots()).getEnchantmentLevel(Enchantment.PROTECTION_ENVIRONMENTAL);
+				prots += Objects.requireNonNull(eq.getBoots()).getEnchantmentLevel(Enchantment.PROTECTION);
 			} catch(Exception exception) {
 				// continue
 			}
@@ -221,7 +263,7 @@ public class CustomDamage implements Listener {
 
 			if(type == DamageType.FALL) {
 				try {
-					double featherFalling = Objects.requireNonNull(eq.getBoots()).getEnchantmentLevel(Enchantment.PROTECTION_FALL);
+					double featherFalling = Objects.requireNonNull(eq.getBoots()).getEnchantmentLevel(Enchantment.FEATHER_FALLING);
 					finalDamage *= Math.max(0.5, 1 - featherFalling * 0.125);
 				} catch(Exception exception) {
 					// continue
@@ -239,7 +281,7 @@ public class CustomDamage implements Listener {
 			damagee.getWorld().playSound(damagee, Objects.requireNonNull(damagee.getHurtSound()), 1.0F, 1.0F);
 
 			double absorption = damagee.getAbsorptionAmount();
-			double oldHealth= damagee.getHealth();
+			double oldHealth = damagee.getHealth();
 			boolean doesDie = finalDamage > oldHealth + absorption;
 
 			if(doesDie) {
@@ -332,6 +374,16 @@ public class CustomDamage implements Listener {
 
 				// change nametag health
 				SimilarData.changeName(damagee);
+
+				// update bossbar if applicable
+				try {
+					if(Objects.requireNonNull(damagee.getCustomName()).contains("Sadan")) {
+						Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setProgress(damagee.getHealth() / 600);
+						Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setTitle(damagee.getCustomName());
+					}
+				} catch(Exception exception) {
+					// nothing here lol
+				}
 
 				// stop stupidly annoying arrows
 				if(damager instanceof Arrow arrow) {

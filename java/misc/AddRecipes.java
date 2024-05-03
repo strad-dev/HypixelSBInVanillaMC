@@ -15,6 +15,7 @@ public class AddRecipes {
 	public static Set<NamespacedKey> returnRecipes(Plugin plugin) {
 		Set<NamespacedKey> allRecipes = new HashSet<>();
 		allRecipes.add(new NamespacedKey(plugin, "scylla"));
+		allRecipes.add(new NamespacedKey(plugin, "claymore"));
 		allRecipes.add(new NamespacedKey(plugin, "aotv"));
 		allRecipes.add(new NamespacedKey(plugin, "term"));
 		allRecipes.add(new NamespacedKey(plugin, "enchanted_golden_apple"));
@@ -47,6 +48,22 @@ public class AddRecipes {
 		scyllaRecipe.setIngredient('H', new RecipeChoice.ExactChoice(handle));
 
 		return scyllaRecipe;
+	}
+
+	public static Recipe addClaymoreRecipe(Plugin plugin) {
+		ItemStack claymore = SimilarData.claymore();
+		ItemStack stormSecrets = SimilarData.stormSecrets();
+		ItemStack gsRemnant = SimilarData.giantSwordRemnant();
+
+		NamespacedKey claymoreKey = new NamespacedKey(plugin, "claymore");
+		ShapedRecipe claymoreRecipe = new ShapedRecipe(claymoreKey, claymore);
+
+		claymoreRecipe.shape("NNN", "NSN", "NHN");
+		claymoreRecipe.setIngredient('S', new RecipeChoice.ExactChoice(stormSecrets));
+		claymoreRecipe.setIngredient('N', Material.NETHER_STAR);
+		claymoreRecipe.setIngredient('H', new RecipeChoice.ExactChoice(gsRemnant));
+
+		return claymoreRecipe;
 	}
 
 	public static Recipe addTermRecipe(Plugin plugin) {

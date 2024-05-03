@@ -1,18 +1,12 @@
 name: SkyBlockInVanilla
 version: 1.0.0
 main: misc.Plugin
-api-version: '1.20'
+api-version: '1.20.5'
 
 commands:
   getopitems:
-    description: Get insanely overpowered SkyBlock items!
+    description: Get insanely overpowered SkyBlock items!  Valid itemSets - combat, ingredient, summon
     usage: /getopitems [itemSet] <player>
-  smite:
-    description: Summons lightning on a player.  Electrifying!
-    usage: /smite [player]
   w:
     description: Whisper messages to another player!
     usage: /w [player] [message]
-  god:
-    description: Act like you are GOD!
-    usage: /god [message]
