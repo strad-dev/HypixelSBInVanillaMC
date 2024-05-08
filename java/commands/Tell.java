@@ -1,5 +1,6 @@
 package commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -34,6 +35,7 @@ public class Tell implements CommandExecutor {
 		string.deleteCharAt(string.length() - 1);
 		player.sendMessage(ChatColor.ITALIC + String.valueOf(ChatColor.GREEN) + commandSender.getName() + ChatColor.GRAY + ChatColor.ITALIC + " whispers to you: " + string);
 		commandSender.sendMessage(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "You whisper to " + ChatColor.GREEN + ChatColor.ITALIC + player.getName() + ChatColor.GRAY + ChatColor.ITALIC + ": " + string);
+		Bukkit.getLogger().info(commandSender.getName() + " whispers to " + player.getName() + ": " + string);
 		return true;
 	}
 }

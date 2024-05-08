@@ -10,3 +10,6 @@ commands:
   w:
     description: Whisper messages to another player!
     usage: /w [player] [message]
+  locateplayer:
+    description: Locate a player on the server!
+    usage: /locateplayer [player]

@@ -1,6 +1,7 @@
 package misc;
 
 import commands.GetOPItems;
+import commands.LocatePlayer;
 import commands.Tell;
 import listeners.*;
 import net.md_5.bungee.api.ChatMessageType;
@@ -26,6 +27,7 @@ public class Plugin extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
+		Objects.requireNonNull(this.getCommand("locateplayer")).setExecutor((new LocatePlayer()));
 		Objects.requireNonNull(this.getCommand("w")).setExecutor((new Tell()));
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);

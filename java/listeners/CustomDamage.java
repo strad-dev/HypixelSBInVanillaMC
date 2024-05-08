@@ -295,6 +295,7 @@ public class CustomDamage implements Listener {
 					damagee.setHealth(0.1);
 					e.setDamage(10);
 				}
+				CustomDrops.loot(damagee, damager);
 			} else {
 				if(finalDamage > absorption) {
 					damagee.setAbsorptionAmount(0.0);
