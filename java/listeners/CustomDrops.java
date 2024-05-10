@@ -43,7 +43,6 @@ public class CustomDrops implements Listener {
 				p = null;
 			}
 		}
-
 		double rngLootingBonus = 1.0;
 		switch(lootingLevel) {
 			case 1 -> rngLootingBonus = 1.167;
@@ -54,7 +53,6 @@ public class CustomDrops implements Listener {
 		World world = died.getWorld();
 		Location l = died.getLocation();
 		boolean onFire = died.getFireTicks() > 0;
-
 		ItemStack item;
 		switch(died) {
 			case Blaze ignored -> {

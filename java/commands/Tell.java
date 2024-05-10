@@ -32,7 +32,9 @@ public class Tell implements CommandExecutor {
 		for(int i = 1; i < strings.length; i++) {
 			string.append(strings[i]).append(' ');
 		}
-		string.deleteCharAt(string.length() - 1);
+		if(!string.isEmpty()) {
+			string.deleteCharAt(string.length() - 1);
+		}
 		player.sendMessage(ChatColor.ITALIC + String.valueOf(ChatColor.GREEN) + commandSender.getName() + ChatColor.GRAY + ChatColor.ITALIC + " whispers to you: " + string);
 		commandSender.sendMessage(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "You whisper to " + ChatColor.GREEN + ChatColor.ITALIC + player.getName() + ChatColor.GRAY + ChatColor.ITALIC + ": " + string);
 		Bukkit.getLogger().info(commandSender.getName() + " whispers to " + player.getName() + ": " + string);

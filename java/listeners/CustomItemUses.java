@@ -181,7 +181,7 @@ public class CustomItemUses implements Listener {
 		zombie.setHealth(100.0);
 		Objects.requireNonNull(zombie.getAttribute(Attribute.GENERIC_ARMOR)).setBaseValue(12.5);
 		Objects.requireNonNull(zombie.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)).setBaseValue(0.0);
-		Objects.requireNonNull(zombie.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)).setBaseValue(9.0);
+		Objects.requireNonNull(zombie.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)).setBaseValue(1.0);
 		Objects.requireNonNull(zombie.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.5);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.setTarget(Plugin.getNearestPlayer(zombie));

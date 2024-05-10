@@ -55,18 +55,7 @@ public class CustomDamage implements Listener {
 						}
 					}
 				} else {
-					if(damager instanceof Arrow a) {
-						Entity shooter = (Entity) a.getShooter();
-						try {
-							assert shooter != null;
-							shooter.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the meloG norI.");
-						} catch(Exception exception) {
-							damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the meloG norI.");
-						}
-					} else {
-						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the meloG norI.");
-					}
-					return;
+					damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the meloG norI.");
 				}
 
 				// tarantula broodfathers
@@ -282,7 +271,7 @@ public class CustomDamage implements Listener {
 
 			double absorption = damagee.getAbsorptionAmount();
 			double oldHealth = damagee.getHealth();
-			boolean doesDie = finalDamage > oldHealth + absorption;
+			boolean doesDie = finalDamage >= oldHealth + absorption;
 
 			if(doesDie) {
 				if(damagee instanceof EnderDragon) {
