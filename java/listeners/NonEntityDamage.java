@@ -20,10 +20,9 @@ public class NonEntityDamage implements Listener {
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent e) {
 		if(e.getEntity() instanceof LivingEntity entity) {
-			e.setCancelled(true);
 			DamageType type;
 			switch(e.getCause()) {
-				case BLOCK_EXPLOSION, THORNS -> type = DamageType.MELEE;
+				case THORNS -> type = DamageType.MELEE;
 				case POISON, WITHER -> type = DamageType.MAGIC;
 				case CONTACT, DROWNING, DRYOUT, FIRE, FIRE_TICK, FLY_INTO_WALL, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION, SUFFOCATION ->
 						type = DamageType.ENVIRONMENTAL;

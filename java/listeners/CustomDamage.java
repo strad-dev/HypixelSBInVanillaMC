@@ -20,6 +20,7 @@ import org.bukkit.projectiles.ProjectileSource;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -136,23 +137,23 @@ public class CustomDamage implements Listener {
 			} else if(damager instanceof Zombie zombie && Objects.requireNonNull(damager.getCustomName()).contains("Atoned Horror")) {
 				TNTPrimed tnt = (TNTPrimed) zombie.getWorld().spawnEntity(damagee.getLocation(), EntityType.TNT);
 				tnt.addScoreboardTag("AtonedHorror");
-				tnt.setFuseTicks(20);
+				tnt.setFuseTicks(60);
+
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+					List<Entity> entities = zombie.getNearbyEntities(5, 5, 5);
+					for(Entity entity : entities) {
+						if(entity instanceof LivingEntity entity1 && !entity.equals(zombie)) {
+							customMobs(entity1, tnt, 20, DamageType.PLAYER_MAGIC);
+						}
+					}
+					tnt.remove();
+				}, 40L);
 				// no magic damage to atoned horrors
-			} else if(damagee instanceof Zombie && Objects.requireNonNull(damagee.getCustomName()).contains("Atoned Horror") && !(damager instanceof TNTPrimed)) {
+			} else if(damagee instanceof Zombie && Objects.requireNonNull(damagee.getCustomName()).contains("Atoned Horror")) {
 				if(type == DamageType.PLAYER_MAGIC) {
 					damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the Atoned Horror.");
 					return;
 				}
-				if(e.getCause().equals(EntityDamageEvent.DamageCause.BLOCK_EXPLOSION)) {
-					return;
-				}
-				// deal with atoned horror tnt
-			} else if(damager instanceof TNTPrimed tnt && tnt.getScoreboardTags().contains("AtonedHorror")) {
-				if(damagee instanceof Player) {
-					calculateFinalDamage(damagee, damager, originalDamage / 4, DamageType.MELEE);
-				}
-				return;
-				// not allowed to damage withers in spawning animation
 			} else if(damagee instanceof Wither wither) {
 				if(wither.getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 					return;
@@ -176,8 +177,7 @@ public class CustomDamage implements Listener {
 			}
 
 			// apply general damage
-		} catch(
-				NullPointerException exception) {
+		} catch(NullPointerException exception) {
 			calculateFinalDamage(damagee, damager, originalDamage, type);
 		}
 
@@ -185,9 +185,7 @@ public class CustomDamage implements Listener {
 
 	}
 
-	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		double finalDamage = originalDamage;
-
+	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type) {
 		if(type != DamageType.ABSOLUTE) {
 			// ice spray logic
 			if(damagee.getScoreboardTags().contains("IceSprayed")) {
@@ -211,7 +209,7 @@ public class CustomDamage implements Listener {
 			}
 
 			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)).getValue() - 8, 0); // only toughness values of 9 or more will give damage reduction
-			finalDamage *= Math.max(0.2, 1 - toughness * 0.08);
+			finalDamage *= Math.max(0.2, 1 - toughness * 0.1);
 
 			double resistance = 0;
 			try {
@@ -259,7 +257,6 @@ public class CustomDamage implements Listener {
 				}
 			}
 		}
-
 		dealDamage(damagee, damager, finalDamage, type);
 	}
 
@@ -424,48 +421,49 @@ public class CustomDamage implements Listener {
 		CustomDamage.e = e;
 		if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
-
-			DamageType type;
-			switch(e.getCause()) {
-				case ENTITY_ATTACK, ENTITY_EXPLOSION, THORNS -> type = DamageType.MELEE;
-				case PROJECTILE, SONIC_BOOM -> type = DamageType.RANGED;
-				case DRAGON_BREATH, MAGIC -> type = DamageType.MAGIC;
-				case FALLING_BLOCK -> type = DamageType.ENVIRONMENTAL;
-				case LIGHTNING -> type = DamageType.IFRAME_ENVIRONMENTAL;
-				default -> {
-					return;
-				}
-			}
-
-			if(entity.getNoDamageTicks() == 0 || e.getDamager() instanceof Arrow) {
-				double originalDamage;
-				if(e.getDamager() instanceof Arrow arrow && arrow.getScoreboardTags().contains("TerminatorArrow")) {
-					originalDamage = arrow.getDamage();
-				} else {
-					originalDamage = e.getDamage();
-				}
-
-				// apply intelligence to players
-				if(e.getDamager() instanceof Player p) {
-					if(e.getEntity() instanceof Monster || e.getEntity().getScoreboardTags().contains("SkyblockBoss")) {
-						try {
-							Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
-							if(score.getScore() < 2500) {
-								score.setScore(score.getScore() + 1);
-								p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
-							} else {
-								p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE", ChatColor.AQUA.asBungee()));
-							}
-						} catch(Exception exception) {
-							Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
-							Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
-							return;
-						}
+			if(entity.getHealth() > 0) {
+				DamageType type;
+				switch(e.getCause()) {
+					case BLOCK_EXPLOSION, ENTITY_ATTACK, ENTITY_EXPLOSION, THORNS -> type = DamageType.MELEE;
+					case PROJECTILE, SONIC_BOOM -> type = DamageType.RANGED;
+					case DRAGON_BREATH, MAGIC -> type = DamageType.MAGIC;
+					case FALLING_BLOCK -> type = DamageType.ENVIRONMENTAL;
+					case LIGHTNING -> type = DamageType.IFRAME_ENVIRONMENTAL;
+					default -> {
+						return;
 					}
 				}
 
-				Entity damager = e.getDamager();
-				customMobs(entity, damager, originalDamage, type);
+				if(entity.getNoDamageTicks() == 0 || e.getDamager() instanceof Arrow) {
+					double originalDamage;
+					if(e.getDamager() instanceof Arrow arrow && arrow.getScoreboardTags().contains("TerminatorArrow")) {
+						originalDamage = arrow.getDamage();
+					} else {
+						originalDamage = e.getDamage();
+					}
+
+					// apply intelligence to players
+					if(e.getDamager() instanceof Player p) {
+						if(e.getEntity() instanceof Monster || e.getEntity().getScoreboardTags().contains("SkyblockBoss")) {
+							try {
+								Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
+								if(score.getScore() < 2500) {
+									score.setScore(score.getScore() + 1);
+									p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
+								} else {
+									p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE", ChatColor.AQUA.asBungee()));
+								}
+							} catch(Exception exception) {
+								Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+								Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+								return;
+							}
+						}
+					}
+
+					Entity damager = e.getDamager();
+					customMobs(entity, damager, originalDamage, type);
+				}
 			}
 		}
 	}

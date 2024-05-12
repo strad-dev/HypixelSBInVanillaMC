@@ -126,7 +126,7 @@ public class CustomItems implements Listener {
 
 		// implosion
 		p.getWorld().spawnParticle(Particle.EXPLOSION, l, 20);
-		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(l, 10, 10, 10);
+		List<Entity> entities = p.getNearbyEntities(10, 10, 10);
 		List<EntityType> doNotKill = createList();
 		double targetDamage = Objects.requireNonNull(p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)).getValue();
 		int damaged = 0;
@@ -139,11 +139,9 @@ public class CustomItems implements Listener {
 		}
 		targetDamage = Math.ceil(targetDamage * 0.51);
 		for(Entity entity : entities) {
-			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1) {
-				if(entity instanceof Player target) {
-					if(target.getGameMode().equals(GameMode.CREATIVE) || target.getGameMode().equals(GameMode.SPECTATOR)) {
-						continue;
-					}
+			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
+				if(entity instanceof Player target && (target.getGameMode().equals(GameMode.CREATIVE) || target.getGameMode().equals(GameMode.SPECTATOR))) {
+					continue;
 				}
 				customMobs(entity1, p, targetDamage, DamageType.PLAYER_MAGIC);
 				damaged += 1;
@@ -313,7 +311,10 @@ public class CustomItems implements Listener {
 		int damage = 0;
 		int alreadyDebuffed = 0;
 		for(Entity entity : entities) {
-			if(!doNotKill.contains(entity.getType()) && entity instanceof LivingEntity entity1 && !entity.equals(p)) {
+			if(!doNotKill.contains(entity.getType()) && entity instanceof LivingEntity entity1 && !entity.equals(p) && entity1.getHealth() > 0) {
+				if(entity instanceof Player target && (target.getGameMode().equals(GameMode.CREATIVE) || target.getGameMode().equals(GameMode.SPECTATOR))) {
+					continue;
+				}
 				if(entity1.getScoreboardTags().contains("IceSprayed")) {
 					alreadyDebuffed++;
 				} else {
