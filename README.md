@@ -6,5 +6,5 @@ This plugin is a fan project by a SkyBlock sweat and is not affiliated with or e
 **THIS PLUGIN IS INTENDED TO BE USED WITHOUT ANY OTHER COMBAT-RELATED PLUGINS.  IT HAS NOT BEEN TESTED WITH OTHER PLUGINS (and probably won't be for the foreseeable future)**
 
 
-# Documentation
-https://docs.google.com/document/d/1UX1amfhHxzVG-SChIbLrAEgsXr6ITOVU-xCh23qaguM/edit
+# Info About Items, Mobs, & Gameplay Changes
+Check out the Wiki [here](https://github.com/Poseidon-I/HypixelSBInVanillaMC/wiki) (work-in-progress)
