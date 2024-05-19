@@ -2,6 +2,9 @@ name: Manual wiki sync
 on:
   workflow_dispatch:
 
+permissions:
+  actions: write
+
 jobs:
   trigger-workflow:
     runs-on: ubuntu-latest
