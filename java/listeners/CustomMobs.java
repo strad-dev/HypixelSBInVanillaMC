@@ -26,7 +26,6 @@ public class CustomMobs implements Listener {
 		for(Entity temp : entities) {
 			if(temp instanceof LivingEntity entity1) {
 				entity.getWorld().spawnEntity(entity1.getLocation(), EntityType.LIGHTNING_BOLT);
-				entity1.damage(10);
 			}
 		}
 	}

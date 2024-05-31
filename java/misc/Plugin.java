@@ -32,6 +32,8 @@ public class Plugin extends JavaPlugin {
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
 		getServer().getPluginManager().registerEvents(new NonEntityDamage(), this);
+		getServer().getPluginManager().registerEvents(new BetterAnvil(), this);
+		getServer().getPluginManager().registerEvents(new KeepEnchantsOnCraft(), this);
 		getServer().getPluginManager().registerEvents(new NoArrows(), this);
 		getServer().getPluginManager().registerEvents(new ArrowSounds(), this);
 		getServer().getPluginManager().registerEvents(new NoArrowsOnGround(), this);
@@ -43,7 +45,6 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new ChatListener(), this);
 		getServer().getPluginManager().registerEvents(new CustomItemUses(), this);
 		getServer().getPluginManager().registerEvents(new StopBossesTeleporting(), this);
-		getServer().getPluginManager().registerEvents(new SomeTNTDoNoDamage(), this);
 		getServer().getPluginManager().registerEvents(new GivePlayersRecipes(), this);
 		getServer().getPluginManager().registerEvents(new AllMobsHaveNames(), this);
 
@@ -88,9 +89,9 @@ public class Plugin extends JavaPlugin {
 				Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
 				if(score.getScore() < 2500) {
 					score.setScore(score.getScore() + 1);
-					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
+					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
 				} else {
-					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText("Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE", ChatColor.AQUA.asBungee()));
+					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE", ChatColor.AQUA.asBungee()));
 				}
 			} catch(Exception exception) {
 				Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");

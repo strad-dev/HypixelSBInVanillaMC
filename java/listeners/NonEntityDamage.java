@@ -1,6 +1,9 @@
 package listeners;
 
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -24,9 +27,9 @@ public class NonEntityDamage implements Listener {
 			switch(e.getCause()) {
 				case THORNS -> type = DamageType.MELEE;
 				case POISON, WITHER -> type = DamageType.MAGIC;
-				case CONTACT, DROWNING, DRYOUT, FIRE, FIRE_TICK, FLY_INTO_WALL, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION, SUFFOCATION ->
+				case CONTACT, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION, SUFFOCATION ->
 						type = DamageType.ENVIRONMENTAL;
-				case FALL -> type = DamageType.FALL;
+				case FALL, FLY_INTO_WALL -> type = DamageType.FALL;
 				case CRAMMING, KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.ABSOLUTE;
 				case CUSTOM -> type = DamageType.IFRAME_ENVIRONMENTAL;
 				default -> {
@@ -79,7 +82,7 @@ public class NonEntityDamage implements Listener {
 		Set<Entity> damagedEntities = new HashSet<>();
 		damagedEntities.add(origin);
 		for(int i = 0; i < distance * 5 && pierce > 0; i++) {
-			if(!l.getBlock().isEmpty()) {
+			if(l.getBlock().getType().isSolid()) {
 				break;
 			}
 			ArrayList<Entity> entities = (ArrayList<Entity>) world.getNearbyEntities(l, 1, 1, 1);

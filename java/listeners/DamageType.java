@@ -55,7 +55,7 @@ public enum DamageType {
 	/*
 	 * I-Frame Environmental Damage Type
 	 * ------------------
-	 * Used for all environmental damage that should proc I-Frames
+	 * Used for all environmental damage that should proc normal I-Frames
 	 * Affected by: Armor, Toughness, Protection, Resistance
 	 * Knockback: None
 	 * I-Frames: Normal
@@ -65,7 +65,7 @@ public enum DamageType {
 	/*
 	 * Fall Damage Type
 	 * ------------------
-	 * Used for all damage via other methods (e.g. Fall, Fire)
+	 * Used for Fall & Physics-Induced Damage
 	 * Affected by: Feather Falling, Toughness, Protection, Resistance
 	 * Knockback: None
 	 * I-Frames: Normal

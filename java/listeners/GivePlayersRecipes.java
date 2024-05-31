@@ -1,8 +1,10 @@
 package listeners;
 
+import ingredients.*;
+import items.Terminator;
+import items.*;
 import misc.AddRecipes;
 import misc.Plugin;
-import misc.SimilarData;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -11,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import summonItems.*;
 
 import java.util.List;
 import java.util.Map;
@@ -39,15 +42,17 @@ public class GivePlayersRecipes implements Listener {
 		p.sendMessage(" " + ChatColor.BLUE + ChatColor.BOLD + ChatColor.MAGIC + "E" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " Hypixel SkyBlock in Vanilla Minecraft Plugin " + ChatColor.MAGIC + "E" + ChatColor.RESET + "\n" +
 				ChatColor.BLACK + "---" + ChatColor.DARK_BLUE + "---" + ChatColor.DARK_GREEN + "---" + ChatColor.DARK_AQUA + "---" + ChatColor.DARK_RED + "---" + ChatColor.DARK_PURPLE + "---" + ChatColor.GOLD + "---" + ChatColor.GRAY + "---" +
 				ChatColor.DARK_GRAY + "---" + ChatColor.BLUE + "---" + ChatColor.GREEN + "---" + ChatColor.AQUA + "---" + ChatColor.RED + "---" + ChatColor.LIGHT_PURPLE + "---" + ChatColor.YELLOW + "---" + ChatColor.WHITE + "---\n" +
-				ChatColor.RESET + ChatColor.AQUA + ChatColor.BOLD + "DOCUMENTATION: " + ChatColor.RESET + "https://docs.google.com/document/d/1UX1amfhHxzVG-SChIbLrAEgsXr6ITOVU-xCh23qaguM/edit?usp=sharing \n\n" +
+				ChatColor.RESET + ChatColor.AQUA + ChatColor.BOLD + "GITHUB: " + ChatColor.RESET + "https://github.com/Poseidon-I/HypixelSBInVanillaMC \n\n" +
 				ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + "DISCORD: " + ChatColor.RESET + "https://discord.gg/gNfPwa8 \n\n" +
-				ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + "YOUTUBE PLAYLIST: " + ChatColor.RESET + "https://www.youtube.com/playlist?list=PLbM7AgwT4xmHo3ySkIA4jIEgvn8TzLQb0");
+				ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + "YOUTUBE PLAYLIST: " + ChatColor.RESET + "https://www.youtube.com/playlist?list=PLbM7AgwT4xmHo3ySkIA4jIEgvn8TzLQb0 \n\n" +
+				ChatColor.RESET + ChatColor.YELLOW + "Found a bug?  Have a suggestion?  Make a ticket in the Github or contact stradivariusviolin on Discord.");
 		p.removeScoreboardTag("AbilityCooldown");
 		p.removeScoreboardTag("TerminatorCooldown");
 		p.removeScoreboardTag("IceSprayed");
 		p.removeScoreboardTag("SalvationCooldown");
 		p.removeScoreboardTag("WandCooldown");
 		p.removeScoreboardTag("IceSprayCooldown");
+		p.removeScoreboardTag("IceCooldown");
 
 		this.inventory = p.getInventory();
 		for(int i = 0; i < inventory.getSize(); i++) {
@@ -57,51 +62,51 @@ public class GivePlayersRecipes implements Listener {
 					if(item.getItemMeta().hasLore()) {
 						List<String> lore = item.getItemMeta().getLore();
 						switch(lore.get(0)) {
-							case "skyblock/combat/aspect_of_the_void" -> setItem(i, SimilarData.AOTV());
-							case "skyblock/combat/scylla" -> setItem(i, SimilarData.scylla());
-							case "skyblock/combat/terminator" -> setItem(i, SimilarData.term());
-							case "skyblock/combat/ice_spray_wand" -> setItem(i, SimilarData.iceSpray());
+							case "skyblock/combat/aspect_of_the_void" -> setItem(i, AOTV.getItem());
+							case "skyblock/combat/scylla" -> setItem(i, Scylla.getItem(item.getEnchantmentLevel(Enchantment.SHARPNESS)));
+							case "skyblock/combat/terminator" -> setItem(i, Terminator.getItem(item.getEnchantmentLevel(Enchantment.POWER)));
+							case "skyblock/combat/ice_spray_wand" -> setItem(i, IceSpray.getItem());
 							case "skyblock/combat/wand_of_restoration" ->
-									setItem(i, SimilarData.wandOfRestoration());
+									setItem(i, WandOfRestoration.getItem());
 							case "skyblock/combat/wand_of_atonement" ->
-									setItem(i, SimilarData.wandOfAtonement());
-							case "skyblock/combat/holy_ice" -> setItem(i, SimilarData.holyIce());
-							case "skyblock/combat/dark_claymore" -> setItem(i, SimilarData.claymore());
-							case "skyblock/combat/warden_helmet" -> setItem(i, SimilarData.wardenHelmet());
-							case "skyblock/combat/necron_elytra" -> setItem(i, SimilarData.necronElytra());
-							case "skyblock/combat/goldor_pants" -> setItem(i, SimilarData.goldorLeggings());
-							case "skyblock/combat/maxor_boots" -> setItem(i, SimilarData.maxorBoots());
-							case "skyblock/ingredient/shadow_warp" -> setItem(i, SimilarData.shadowWarp());
-							case "skyblock/ingredient/implosion" -> setItem(i, SimilarData.implosion());
+									setItem(i, WandOfAtonement.getItem());
+							case "skyblock/combat/holy_ice" -> setItem(i, HolyIce.getItem());
+							case "skyblock/combat/dark_claymore" -> setItem(i, Claymore.getItem(item.getEnchantmentLevel(Enchantment.SHARPNESS)));
+							case "skyblock/combat/warden_helmet" -> setItem(i, WardenHelmet.getItem());
+							case "skyblock/combat/necron_elytra" -> setItem(i, NecronElytra.getItem());
+							case "skyblock/combat/goldor_pants" -> setItem(i, GoldorLeggings.getItem());
+							case "skyblock/combat/maxor_boots" -> setItem(i, MaxorBoots.getItem());
+							case "skyblock/ingredient/shadow_warp" -> setItem(i, ShadowWarp.getItem());
+							case "skyblock/ingredient/implosion" -> setItem(i, Implosion.getItem());
 							case "skyblock/ingredient/wither_shield" ->
-									setItem(i, SimilarData.witherShield());
-							case "skyblock/ingredient/necron_handle" -> setItem(i, SimilarData.handle());
+									setItem(i, WitherShield.getItem());
+							case "skyblock/ingredient/necron_handle" -> setItem(i, Handle.getItem());
 							case "skyblock/ingredient/giant_sword_remnant" ->
-									setItem(i, SimilarData.giantSwordRemnant());
+									setItem(i, GiantSwordRemnant.getItem());
 							case "skyblock/ingredient/maxor_secrets" ->
-									setItem(i, SimilarData.maxorSecrets());
+									setItem(i, MaxorSecrets.getItem());
 							case "skyblock/ingredient/storm_secrets" ->
-									setItem(i, SimilarData.stormSecrets());
+									setItem(i, StormSecrets.getItem());
 							case "skyblock/ingredient/goldor_secrets" ->
-									setItem(i, SimilarData.goldorSecrets());
+									setItem(i, GoldorSecrets.getItem());
 							case "skyblock/ingredient/necron_secrets" ->
-									setItem(i, SimilarData.necronSecrets());
-							case "skyblock/ingredient/warden_heart" -> setItem(i, SimilarData.wardenHeart());
-							case "skyblock/ingredient/judgement_core" -> setItem(i, SimilarData.core());
+									setItem(i, NecronSecrets.getItem());
+							case "skyblock/ingredient/warden_heart" -> setItem(i, WardenHeart.getItem());
+							case "skyblock/ingredient/judgement_core" -> setItem(i, Core.getItem());
 							case "skyblock/ingredient/tessellated_pearl" ->
-									setItem(i, SimilarData.tessellatedPearl());
-							case "skyblock/ingredient/null_blade" -> setItem(i, SimilarData.nullBlade());
+									setItem(i, TessellatedPearl.getItem());
+							case "skyblock/ingredient/null_blade" -> setItem(i, NullBlade.getItem());
 							case "skyblock/ingredient/braided_feather" ->
-									setItem(i, SimilarData.braidedFeather());
-							case "skyblock/ingredient/tarantula_silk" -> setItem(i, SimilarData.taraSilk());
-							case "skyblock/ingredient/revenant_viscera" -> setItem(i, SimilarData.viscera());
-							case "skyblock/summon/superior_remnant" -> setItem(i, SimilarData.supRemnant());
-							case "skyblock/summon/corrupt_pearl" -> setItem(i, SimilarData.corruptedPearl());
-							case "skyblock/summon/antimatter" -> setItem(i, SimilarData.antimatter());
-							case "skyblock/summon/omega_egg" -> setItem(i, SimilarData.omegaEgg());
-							case "skyblock/summon/spider_relic" -> setItem(i, SimilarData.spiderRelic());
-							case "skyblock/summon/atoned_flesh" -> setItem(i, SimilarData.atonedFlesh());
-							case "skyblock/summon/giant_flesh" -> setItem(i, SimilarData.giantZombieFlesh());
+									setItem(i, BraidedFeather.getItem());
+							case "skyblock/ingredient/tarantula_silk" -> setItem(i, TarantulaSilk.getItem());
+							case "skyblock/ingredient/revenant_viscera" -> setItem(i, Viscera.getItem());
+							case "skyblock/summon/superior_remnant" -> setItem(i, SuperiorRemnant.getItem());
+							case "skyblock/summon/corrupt_pearl" -> setItem(i, CorruptPearl.getItem());
+							case "skyblock/summon/antimatter" -> setItem(i, Antimatter.getItem());
+							case "skyblock/summon/omega_egg" -> setItem(i, OmegaEgg.getItem());
+							case "skyblock/summon/spider_relic" -> setItem(i, SpiderRelic.getItem());
+							case "skyblock/summon/atoned_flesh" -> setItem(i, AtonedFlesh.getItem());
+							case "skyblock/summon/giant_flesh" -> setItem(i, GiantZombieFlesh.getItem());
 						}
 					}
 				}

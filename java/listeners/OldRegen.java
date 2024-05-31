@@ -2,9 +2,7 @@ package listeners;
 
 /*
  * Code obtained from OldCombatMechanics plugin
- * Spigot: https://www.spigotmc.org/resources/oldcombatmechanics-disable-1-9-hit-cooldown.19510/
  * Github: https://github.com/kernitus/BukkitOldCombatMechanics/tree/master
- * Exact File: https://github.com/kernitus/BukkitOldCombatMechanics/blob/master/src/main/java/kernitus/plugin/OldCombatMechanics/module/ModulePlayerRegen.java
  */
 
 import misc.Plugin;

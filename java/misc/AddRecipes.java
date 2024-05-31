@@ -1,5 +1,8 @@
 package misc;
 
+import ingredients.*;
+import items.Terminator;
+import items.*;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -30,11 +33,11 @@ public class AddRecipes {
 	}
 
 	public static Recipe addScyllaRecipe(Plugin plugin) {
-		ItemStack scylla = SimilarData.scylla();
-		ItemStack shadowWarp = SimilarData.shadowWarp();
-		ItemStack implosion = SimilarData.implosion();
-		ItemStack witherShield = SimilarData.witherShield();
-		ItemStack handle = SimilarData.handle();
+		ItemStack scylla = Scylla.getItem(0);
+		ItemStack shadowWarp = ShadowWarp.getItem();
+		ItemStack implosion = Implosion.getItem();
+		ItemStack witherShield = WitherShield.getItem();
+		ItemStack handle = Handle.getItem();
 
 		NamespacedKey scyllaKey = new NamespacedKey(plugin, "scylla");
 		ShapedRecipe scyllaRecipe = new ShapedRecipe(scyllaKey, scylla);
@@ -51,33 +54,35 @@ public class AddRecipes {
 	}
 
 	public static Recipe addClaymoreRecipe(Plugin plugin) {
-		ItemStack claymore = SimilarData.claymore();
-		ItemStack stormSecrets = SimilarData.stormSecrets();
-		ItemStack gsRemnant = SimilarData.giantSwordRemnant();
+		ItemStack claymore = Claymore.getItem(0);
+		ItemStack stormSecrets = StormSecrets.getItem();
+		ItemStack gsRemnant = GiantSwordRemnant.getItem();
 
 		NamespacedKey claymoreKey = new NamespacedKey(plugin, "claymore");
 		ShapedRecipe claymoreRecipe = new ShapedRecipe(claymoreKey, claymore);
 
-		claymoreRecipe.shape("NNN", "NSN", "NHN");
+		claymoreRecipe.shape("NSN", "NDN", "NHN");
 		claymoreRecipe.setIngredient('S', new RecipeChoice.ExactChoice(stormSecrets));
 		claymoreRecipe.setIngredient('N', Material.NETHER_STAR);
+		claymoreRecipe.setIngredient('D', Material.NETHERITE_SWORD);
 		claymoreRecipe.setIngredient('H', new RecipeChoice.ExactChoice(gsRemnant));
 
 		return claymoreRecipe;
 	}
 
 	public static Recipe addTermRecipe(Plugin plugin) {
-		ItemStack term = SimilarData.term();
-		ItemStack core = SimilarData.core();
-		ItemStack tessellated = SimilarData.tessellatedPearl();
-		ItemStack nullBlade = SimilarData.nullBlade();
-		ItemStack braidedFeather = SimilarData.braidedFeather();
-		ItemStack taraSilk = SimilarData.taraSilk();
+		ItemStack term = Terminator.getItem(0);
+		ItemStack core = Core.getItem();
+		ItemStack tessellated = TessellatedPearl.getItem();
+		ItemStack nullBlade = NullBlade.getItem();
+		ItemStack braidedFeather = BraidedFeather.getItem();
+		ItemStack taraSilk = TarantulaSilk.getItem();
 
 		NamespacedKey termKey = new NamespacedKey(plugin, "term");
 		ShapedRecipe termRecipe = new ShapedRecipe(termKey, term);
 
-		termRecipe.shape("TNS", "NCF", "TNS");
+		termRecipe.shape("TNS", "CBF", "TNS");
+		termRecipe.setIngredient('B', Material.BOW);
 		termRecipe.setIngredient('T', new RecipeChoice.ExactChoice(tessellated));
 		termRecipe.setIngredient('N', new RecipeChoice.ExactChoice(nullBlade));
 		termRecipe.setIngredient('S', new RecipeChoice.ExactChoice(taraSilk));
@@ -88,8 +93,8 @@ public class AddRecipes {
 	}
 
 	public static Recipe addAOTVRecipe(Plugin plugin) {
-		ItemStack aotv = SimilarData.AOTV();
-		ItemStack tessellated = SimilarData.tessellatedPearl();
+		ItemStack aotv = AOTV.getItem();
+		ItemStack tessellated = TessellatedPearl.getItem();
 
 		NamespacedKey aotvKey = new NamespacedKey(plugin, "aotv");
 		ShapedRecipe aotvRecipe = new ShapedRecipe(aotvKey, aotv);
@@ -102,7 +107,7 @@ public class AddRecipes {
 	}
 
 	public static Recipe addWandOfRestorationRecipe(Plugin plugin) {
-		ItemStack wand = SimilarData.wandOfRestoration();
+		ItemStack wand = WandOfRestoration.getItem();
 
 		NamespacedKey restorationKey = new NamespacedKey(plugin, "wandOfRestoration");
 		ShapedRecipe wandRecipe = new ShapedRecipe(restorationKey, wand);
@@ -116,9 +121,9 @@ public class AddRecipes {
 	}
 
 	public static Recipe addWandOfAtonementRecipe(Plugin plugin) {
-		ItemStack oldWand = SimilarData.wandOfRestoration();
-		ItemStack wand = SimilarData.wandOfAtonement();
-		ItemStack viscera = SimilarData.viscera();
+		ItemStack oldWand = WandOfRestoration.getItem();
+		ItemStack wand = WandOfAtonement.getItem();
+		ItemStack viscera = Viscera.getItem();
 
 		NamespacedKey atonementKey = new NamespacedKey(plugin, "wandOfAtonement");
 		ShapedRecipe wandRecipe = new ShapedRecipe(atonementKey, wand);
@@ -132,7 +137,7 @@ public class AddRecipes {
 	}
 
 	public static Recipe addHolyIceRecipe(Plugin plugin) {
-		ItemStack ice = SimilarData.holyIce();
+		ItemStack ice = HolyIce.getItem();
 
 		NamespacedKey iceKey = new NamespacedKey(plugin, "holyIce");
 		ShapedRecipe iceRecipe = new ShapedRecipe(iceKey, ice);
@@ -145,9 +150,9 @@ public class AddRecipes {
 	}
 
 	public static Recipe addWardenHelmetRecipe(Plugin plugin) {
-		ItemStack wardenHelmet = SimilarData.wardenHelmet();
-		ItemStack wardenHeart = SimilarData.wardenHeart();
-		ItemStack viscera = SimilarData.viscera();
+		ItemStack wardenHelmet = WardenHelmet.getItem();
+		ItemStack wardenHeart = WardenHeart.getItem();
+		ItemStack viscera = Viscera.getItem();
 
 		NamespacedKey wardenKey = new NamespacedKey(plugin, "wardenHelmet");
 		ShapedRecipe wardenRecipe = new ShapedRecipe(wardenKey, wardenHelmet);
@@ -161,15 +166,15 @@ public class AddRecipes {
 	}
 
 	public static Recipe addNecronElytraRecipe(Plugin plugin) {
-		ItemStack necronElytra = SimilarData.necronElytra();
-		ItemStack necronSecrets = SimilarData.necronSecrets();
+		ItemStack necronElytra = NecronElytra.getItem();
+		ItemStack necronSecrets = NecronSecrets.getItem();
 
 		NamespacedKey elytraKey = new NamespacedKey(plugin, "necronElytra");
 		ShapedRecipe elytraRecipe = new ShapedRecipe(elytraKey, necronElytra);
 
 		elytraRecipe.shape("NSN", "NCN", "NEN");
-		elytraRecipe.setIngredient('C', new RecipeChoice.ExactChoice(necronSecrets));
-		elytraRecipe.setIngredient('S', Material.NETHERITE_CHESTPLATE);
+		elytraRecipe.setIngredient('S', new RecipeChoice.ExactChoice(necronSecrets));
+		elytraRecipe.setIngredient('C', Material.NETHERITE_CHESTPLATE);
 		elytraRecipe.setIngredient('N', Material.NETHER_STAR);
 		elytraRecipe.setIngredient('E', Material.ELYTRA);
 
@@ -177,8 +182,8 @@ public class AddRecipes {
 	}
 
 	public static Recipe addGoldorLeggingsRecipe(Plugin plugin) {
-		ItemStack goldorLeggings = SimilarData.goldorLeggings();
-		ItemStack goldorSecrets = SimilarData.goldorSecrets();
+		ItemStack goldorLeggings = GoldorLeggings.getItem();
+		ItemStack goldorSecrets = GoldorSecrets.getItem();
 
 		NamespacedKey goldorKey = new NamespacedKey(plugin, "goldorLeggings");
 		ShapedRecipe goldorRecipe = new ShapedRecipe(goldorKey, goldorLeggings);
@@ -192,8 +197,8 @@ public class AddRecipes {
 	}
 
 	public static Recipe addMaxorBootsRecipe(Plugin plugin) {
-		ItemStack maxorBoots = SimilarData.maxorBoots();
-		ItemStack maxorSecrets = SimilarData.maxorSecrets();
+		ItemStack maxorBoots = MaxorBoots.getItem();
+		ItemStack maxorSecrets = MaxorSecrets.getItem();
 
 		NamespacedKey maxorKey = new NamespacedKey(plugin, "maxorBoots");
 		ShapedRecipe maxorRecipe = new ShapedRecipe(maxorKey, maxorBoots);

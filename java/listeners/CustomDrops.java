@@ -1,17 +1,17 @@
 package listeners;
 
+import ingredients.*;
+import items.IceSpray;
 import misc.Plugin;
-import misc.SimilarData;
+import mobs.InfuriatedWitherSkeleton;
 import org.bukkit.*;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import summonItems.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -48,6 +48,8 @@ public class CustomDrops implements Listener {
 			case 1 -> rngLootingBonus = 1.167;
 			case 2 -> rngLootingBonus = 1.333;
 			case 3 -> rngLootingBonus = 1.500;
+			case 4 -> rngLootingBonus = 1.750;
+			case 5 -> rngLootingBonus = 2.000;
 		}
 		Random random = new Random();
 		World world = died.getWorld();
@@ -87,14 +89,16 @@ public class CustomDrops implements Listener {
 				world.dropItemNaturally(l, item);
 				if(chicken.getCustomName().contains("Chickzilla")) {
 					if(random.nextDouble() < 0.1 * rngLootingBonus) {
-						item = SimilarData.braidedFeather();
+						item = BraidedFeather.getItem();
 						chicken.getWorld().dropItem(chicken.getLocation(), item);
 						sendRareDropMessage(p, "Braided Feather");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Braided Feather.");
 					}
 				} else if(random.nextDouble() < 0.02 * rngLootingBonus && p != null) {
-					item = SimilarData.omegaEgg();
+					item = OmegaEgg.getItem();
 					chicken.getWorld().dropItem(chicken.getLocation(), item);
 					sendRareDropMessage(p, "Omega Egg");
+					Bukkit.getLogger().info(killer.getName() + " dropped an Omega Egg.");
 				}
 			}
 			case Cod ignored -> {
@@ -234,7 +238,6 @@ public class CustomDrops implements Listener {
 				if(random.nextDouble() < 0.2 * rngLootingBonus) {
 					item = new ItemStack(Material.TIDE_ARMOR_TRIM_SMITHING_TEMPLATE);
 					world.dropItemNaturally(l, item);
-					sendRareDropMessage(p, "Tide Armor Trim");
 				}
 				if(random.nextDouble() < 0.333 * rngLootingBonus) {
 					item = new ItemStack(Material.PRISMARINE_CRYSTALS);
@@ -243,9 +246,10 @@ public class CustomDrops implements Listener {
 			}
 			case EnderDragon dragon -> {
 				if(Objects.requireNonNull(dragon.getCustomName()).contains("Superior Dragon") || random.nextDouble() < 0.02 * rngLootingBonus) {
-					item = SimilarData.supRemnant();
+					item = SuperiorRemnant.getItem();
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Remnant of the Superior Dragon");
+					Bukkit.getLogger().info(killer.getName() + " dropped a Remnant of the Superior Dragon.");
 				}
 			}
 			case Enderman enderman -> {
@@ -254,22 +258,25 @@ public class CustomDrops implements Listener {
 				world.dropItemNaturally(l, item);
 				if(Objects.requireNonNull(enderman.getCustomName()).contains("Voidgloom Seraph")) {
 					if(random.nextDouble() < 0.1 * rngLootingBonus) {
-						item = SimilarData.core();
+						item = Core.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Judgement Core");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Judgement Core.");
 					}
 				} else if(enderman.getCustomName().contains("Mutant Enderman")) {
 					if(random.nextDouble() < 0.1 * rngLootingBonus) {
-						item = SimilarData.tessellatedPearl();
+						item = TessellatedPearl.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tessellated Ender Pearl");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Tessellated Ender Pearl.");
 					}
 				} else {
 					if((died.getWorld().getEnvironment().equals(World.Environment.THE_END) && random.nextDouble() < 0.005 * rngLootingBonus ||
 							!died.getWorld().getEnvironment().equals(World.Environment.THE_END) && random.nextDouble() < 0.03 * rngLootingBonus) && p != null) {
-						item = SimilarData.corruptedPearl();
+						item = CorruptPearl.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Corrupted Pearl");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Corrupted Pearl.");
 					}
 				}
 			}
@@ -348,14 +355,16 @@ public class CustomDrops implements Listener {
 				world.dropItemNaturally(l, item);
 				if(Objects.requireNonNull(golem.getCustomName()).contains("meloG norI")) {
 					if(random.nextDouble() < 0.1 * rngLootingBonus) {
-						item = SimilarData.nullBlade();
+						item = NullBlade.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Null Blade");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Null Blade.");
 					}
 				} else if(random.nextDouble() < 0.02 * rngLootingBonus && p != null) {
-					item = SimilarData.antimatter();
+					item = Antimatter.getItem();
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Antimatter");
+					Bukkit.getLogger().info(killer.getName() + " dropped an Antimatter.");
 				}
 			}
 			case MagmaCube cube -> {
@@ -516,14 +525,16 @@ public class CustomDrops implements Listener {
 				}
 				if(Objects.requireNonNull(spider.getCustomName()).contains("Tarantula Broodfather")) {
 					if(random.nextDouble() < 0.1 * rngLootingBonus) {
-						item = SimilarData.taraSilk();
+						item = TarantulaSilk.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tarantula Silk");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Tarantula Silk.");
 					}
 				} else if(random.nextDouble() < 0.03 * rngLootingBonus && p != null) {
-					item = SimilarData.spiderRelic();
+					item = SpiderRelic.getItem();
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Spider Relic");
+					Bukkit.getLogger().info(killer.getName() + " dropped a Spider Relic.");
 				}
 			}
 			case Squid ignored -> {
@@ -533,9 +544,10 @@ public class CustomDrops implements Listener {
 			}
 			case Stray ignored -> {
 				if(random.nextDouble() < 0.01 * rngLootingBonus && p != null) {
-					item = SimilarData.iceSpray();
+					item = IceSpray.getItem();
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Ice Spray Wand");
+					Bukkit.getLogger().info(killer.getName() + " dropped an Ice Spray Wand.");
 				}
 			}
 			case Strider strider -> {
@@ -579,9 +591,10 @@ public class CustomDrops implements Listener {
 				item.setAmount(random.nextInt(1 + lootingLevel) + 1);
 				world.dropItemNaturally(l, item);
 				if(random.nextDouble() < 0.02 * rngLootingBonus && p != null) {
-					item = SimilarData.wardenHeart();
+					item = WardenHeart.getItem();
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Warden Heart");
+					Bukkit.getLogger().info(killer.getName() + " dropped a Warden Heart.");
 				}
 			}
 			case Witch ignored -> {
@@ -620,44 +633,52 @@ public class CustomDrops implements Listener {
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=lightning_bolt]");
 				if(Objects.requireNonNull(wither.getCustomName()).contains("Maxor")) {
 					if(random.nextDouble() < 0.01 * rngLootingBonus) {
-						item = SimilarData.maxorSecrets();
+						item = MaxorSecrets.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Maxor's Secrets");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Maxor's Secrets.");
 					} else if(random.nextDouble() < 0.06 * rngLootingBonus) {
-						item = SimilarData.shadowWarp();
+						item = ShadowWarp.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Shadow Warp");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Shadow Warp.");
 					}
 				} else if(Objects.requireNonNull(wither.getCustomName()).contains("Storm")) {
 					wither.getServer().dispatchCommand(Bukkit.getConsoleSender(), "weather clear");
 					if(random.nextDouble() < 0.01 * rngLootingBonus) {
-						item = SimilarData.stormSecrets();
+						item = StormSecrets.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Storm's Secrets");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Storm's Secrets.");
 					} else if(random.nextDouble() < 0.06 * rngLootingBonus) {
-						item = SimilarData.implosion();
+						item = Implosion.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Implosion");
+						Bukkit.getLogger().info(killer.getName() + " dropped an Implosion.");
 					}
 				} else if(Objects.requireNonNull(wither.getCustomName()).contains("Goldor")) {
 					if(random.nextDouble() < 0.01 * rngLootingBonus) {
-						item = SimilarData.goldorSecrets();
+						item = GoldorSecrets.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Goldor's Secrets");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Goldor's Secrets.");
 					} else if(random.nextDouble() < 0.06 * rngLootingBonus) {
-						item = SimilarData.witherShield();
+						item = WitherShield.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Wither Shield");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Wither Shield.");
 					}
 				} else if(Objects.requireNonNull(wither.getCustomName()).contains("Necron")) {
 					if(random.nextDouble() < 0.01 * rngLootingBonus) {
-						item = SimilarData.necronSecrets();
+						item = NecronSecrets.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Necron's Secrets");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Necron's Secrets.");
 					} else if(random.nextDouble() < 0.06 * rngLootingBonus) {
-						item = SimilarData.handle();
+						item = Handle.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Necron's Handle");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Necron's Handle.");
 					}
 				}
 			}
@@ -673,7 +694,7 @@ public class CustomDrops implements Listener {
 					sendRareDropMessage(p, "Wither Skeleton Skull");
 				} else {
 					if(random.nextDouble() < 0.03 * rngLootingBonus && p != null) {
-						spawnInfuriation(skeleton);
+						new InfuriatedWitherSkeleton().onSpawn(p, skeleton);
 					}
 				}
 			}
@@ -729,25 +750,29 @@ public class CustomDrops implements Listener {
 				}
 				if(Objects.requireNonNull(zombie.getCustomName()).contains("Atoned Horror")) {
 					if(random.nextDouble() < 0.1 * rngLootingBonus) {
-						item = SimilarData.viscera();
+						item = Viscera.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Revenant Viscera");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Revenant Viscera.");
 					}
 				} else if(Objects.requireNonNull(zombie.getCustomName()).contains("Sadan")) {
 					if(random.nextDouble() < 0.1 * rngLootingBonus) {
-						item = SimilarData.giantSwordRemnant();
+						item = GiantSwordRemnant.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Remnant of the Giant's Sword");
+						Bukkit.getLogger().info(killer.getName() + " dropped a Remnant of the Giant's Sword.");
 					}
 					Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).removePlayer(p);
 				} else if(random.nextDouble() < 0.005 * rngLootingBonus && p != null) {
-					item = SimilarData.giantZombieFlesh();
+					item = GiantZombieFlesh.getItem();
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Giant Zombie Flesh");
+					Bukkit.getLogger().info(killer.getName() + " dropped a Giant Zombie Flesh.");
 				} else if(random.nextDouble() < 0.01 * rngLootingBonus && p != null) {
-					item = SimilarData.atonedFlesh();
+					item = AtonedFlesh.getItem();
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Atoned Flesh");
+					Bukkit.getLogger().info(killer.getName() + " dropped an Atoned Flesh.");
 				}
 			}
 			case null, default -> {
@@ -764,27 +789,8 @@ public class CustomDrops implements Listener {
 		List<ItemStack> drops = e.getDrops();
 		drops.clear();
 		e.setDroppedExp(e.getDroppedExp() * 2);
-	}
-
-	public static void spawnInfuriation(Entity e) {
-		WitherSkeleton skeleton = (WitherSkeleton) e.getWorld().spawnEntity(e.getLocation(), EntityType.WITHER_SKELETON);
-		skeleton.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Highly Infuriated Wither Skeleton" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 50 + "/" + 50);
-		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
-		sword.addEnchantment(Enchantment.KNOCKBACK, 2);
-
-		Objects.requireNonNull(skeleton.getEquipment()).setItemInMainHand(sword);
-		skeleton.getEquipment().setItemInMainHandDropChance(0.0F);
-		skeleton.getEquipment().setItemInOffHand(sword);
-		skeleton.getEquipment().setItemInOffHandDropChance(0.0F);
-
-		Objects.requireNonNull(skeleton.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(50.0);
-		skeleton.setHealth(50.0);
-		Objects.requireNonNull(skeleton.getAttribute(Attribute.GENERIC_ARMOR)).setBaseValue(12.5);
-		Objects.requireNonNull(skeleton.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.5);
-		skeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		skeleton.setTarget(Plugin.getNearestPlayer(skeleton));
-		skeleton.setCustomNameVisible(true);
-		skeleton.addScoreboardTag("SkyblockBoss");
-		Objects.requireNonNull(Plugin.getNearestPlayer(e)).sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "From the ashes of the Wither Skeleton rises its reincarnation: a HIGHLY INFURIATED Wither Skeleton");
+		if(died.getScoreboardTags().contains("SkyblockBoss")) {
+			e.setDroppedExp(e.getDroppedExp() * 10);
+		}
 	}
 }
