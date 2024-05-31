@@ -46,12 +46,12 @@ public class InfuriatedWitherSkeleton implements CustomMob {
 	}
 
 	@Override
-	public void whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+		return true;
 	}
 
 	@Override
-	public void whenDamaging(LivingEntity damagee) {
-
+	public boolean whenDamaging(LivingEntity damagee) {
+		return true;
 	}
 }

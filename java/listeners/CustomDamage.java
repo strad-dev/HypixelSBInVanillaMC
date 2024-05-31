@@ -37,16 +37,19 @@ public class CustomDamage implements Listener {
 
 		// apply custom damage to special mobs before going through with general damage
 		Random random = new Random();
+		boolean doContinue = true;
 		try {
 			CustomMob damageeMob = CustomMob.getMob(damagee);
 			CustomMob damagerMob = CustomMob.getMob(damager);
 
+			// this section controls when bosses are damaged
 			if(damageeMob != null) {
-				damageeMob.whenDamaged(damagee, damager, originalDamage, type);
+				doContinue = damageeMob.whenDamaged(damagee, damager, originalDamage, type);
 			}
 
+			// this section controls when bosses deal damage
 			if(damagerMob != null) {
-				damagerMob.whenDamaging(damagee);
+				doContinue = damagerMob.whenDamaging(damagee);
 			}
 
 			if(damager instanceof Wither wither) {
@@ -95,13 +98,12 @@ public class CustomDamage implements Listener {
 					}
 				}
 			}
-		} catch(IllegalArgumentException exception) {
-			// illegal arguments mean an invalid damage type was passed
-			return;
 		} catch(NullPointerException exception) {
 			// continue
 		}
-		calculateFinalDamage(damagee, damager, originalDamage, type);
+		if(doContinue) {
+			calculateFinalDamage(damagee, damager, originalDamage, type);
+		}
 	}
 
 	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type) {

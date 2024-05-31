@@ -52,7 +52,7 @@ public class AtonedHorror implements CustomMob {
 	}
 
 	@Override
-	public void whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		Random random = new Random();
 		if(random.nextDouble() < 0.15) {
 			TNTPrimed tnt = (TNTPrimed) damager.getWorld().spawnEntity(damager.getLocation(), EntityType.TNT);
@@ -71,12 +71,13 @@ public class AtonedHorror implements CustomMob {
 		}
 		if(type == DamageType.PLAYER_MAGIC) {
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the Atoned Horror.");
-			throw new IllegalArgumentException("Ranged Damage attempted on Atoned Horror");
+			return false;
 		}
+		return true;
 	}
 
 	@Override
-	public void whenDamaging(LivingEntity damagee) {
+	public boolean whenDamaging(LivingEntity damagee) {
 		TNTPrimed tnt = (TNTPrimed) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.TNT);
 		tnt.setFuseTicks(50);
 
@@ -89,5 +90,6 @@ public class AtonedHorror implements CustomMob {
 			}
 			tnt.remove();
 		}, 30L);
+		return true;
 	}
 }

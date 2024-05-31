@@ -33,15 +33,16 @@ public class Chickzilla implements CustomMob {
 	}
 
 	@Override
-	public void whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		if(damager instanceof LivingEntity damager1) {
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Chickzilla has REFLECTED " + originalDamage / 2 + " Damage back to you!");
 			CustomDamage.calculateFinalDamage(damager1, damagee, originalDamage / 2, DamageType.MELEE); // damager takes 50% of their original damage
 		}
+		return true;
 	}
 
 	@Override
-	public void whenDamaging(LivingEntity damagee) {
-
+	public boolean whenDamaging(LivingEntity damagee) {
+		return true;
 	}
 }

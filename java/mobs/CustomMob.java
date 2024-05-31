@@ -35,7 +35,12 @@ public interface CustomMob {
 		return null;
 		// TODO Implement Withers & Ender Dragons into this interface, either directly or through subinterfaces
 	}
+
 	String onSpawn(Player p, Mob e);
-	void whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
-	void whenDamaging(LivingEntity damagee);
+
+	// return true --> allow for normal damage to be calculated
+	// return false --> do not allow for normal damage to be calculated
+	boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
+
+	boolean whenDamaging(LivingEntity damagee);
 }

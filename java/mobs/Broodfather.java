@@ -35,14 +35,14 @@ public class Broodfather implements CustomMob {
 	}
 
 	@Override
-	public void whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		CustomDamage.teleport(damagee, damager, 12);
 		CustomDamage.calculateFinalDamage(damagee, damager, 1, DamageType.ABSOLUTE);
-		throw new IllegalArgumentException("Custom damage initiated");
+		return false;
 	}
 
 	@Override
-	public void whenDamaging(LivingEntity damagee) {
-
+	public boolean whenDamaging(LivingEntity damagee) {
+		return true;
 	}
 }

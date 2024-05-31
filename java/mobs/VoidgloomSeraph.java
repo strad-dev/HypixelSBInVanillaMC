@@ -39,7 +39,7 @@ public class VoidgloomSeraph implements CustomMob {
 	}
 
 	@Override
-	public void whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		Random random = new Random();
 		if(damager instanceof LivingEntity entity1) {
 			if(random.nextDouble() < 0.15) {
@@ -48,10 +48,11 @@ public class VoidgloomSeraph implements CustomMob {
 				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Voidgloom Seraph's Dark Magic has caused you to teleport to it!  It also deals extra damage to you!");
 			}
 		}
+		return true;
 	}
 
 	@Override
-	public void whenDamaging(LivingEntity damagee) {
-
+	public boolean whenDamaging(LivingEntity damagee) {
+		return true;
 	}
 }

@@ -35,7 +35,7 @@ public class meloGnorI implements CustomMob {
 	}
 
 	@Override
-	public void whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		if(type == DamageType.MELEE) {
 			if(damager instanceof LivingEntity entity1) {
 				if(originalDamage > 10.0) {
@@ -48,7 +48,7 @@ public class meloGnorI implements CustomMob {
 						PluginUtils.changeName(damagee);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt has HEALED ITSELF by " + (originalDamage - 10.0) + " HP!");
 					}
-					throw new IllegalArgumentException("Too much damage was dealt.");
+					return false;
 				} else {
 					Random random = new Random();
 					if(random.nextDouble() < 0.15) {
@@ -58,16 +58,18 @@ public class meloGnorI implements CustomMob {
 						damagee.teleport(damager);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The meloG norI's unstableness has caused it to teleport to you!");
 					}
+					return true;
 				}
 			}
+			return false;
 		} else {
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the meloG norI.");
-			throw new IllegalArgumentException("Invalid damage attempted on meloG norI");
+			return false;
 		}
 	}
 
 	@Override
-	public void whenDamaging(LivingEntity damagee) {
-
+	public boolean whenDamaging(LivingEntity damagee) {
+		return true;
 	}
 }

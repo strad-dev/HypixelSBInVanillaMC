@@ -6,7 +6,7 @@
 
     <groupId>dev.lingling</groupId>
     <artifactId>SkyBlock_in_Vanilla</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.2_2</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>

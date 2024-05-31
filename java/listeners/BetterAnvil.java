@@ -44,8 +44,6 @@ public class BetterAnvil implements Listener {
 						int itemLevel = FIRST_ITEM.getEnchantmentLevel(enchantment);
 						if(itemLevel < bookLevel) {
 							result.addUnsafeEnchantment(enchantment, bookLevel);
-						} else if(itemLevel == bookLevel) {
-							result.addUnsafeEnchantment(enchantment, bookLevel + 1);
 						}
 					}
 				}

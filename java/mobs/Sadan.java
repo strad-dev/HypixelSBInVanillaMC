@@ -58,7 +58,7 @@ public class Sadan implements CustomMob {
 	}
 
 	@Override
-	public void whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		if(!(damager instanceof FallingBlock)) {
 			Random random = new Random();
 			if(damager instanceof LivingEntity entity && random.nextDouble() < 0.5) {
@@ -91,9 +91,11 @@ public class Sadan implements CustomMob {
 				}
 			}
 		}
+		return true;
 	}
 
 	@Override
-	public void whenDamaging(LivingEntity damagee) {
+	public boolean whenDamaging(LivingEntity damagee) {
+		return true;
 	}
 }
