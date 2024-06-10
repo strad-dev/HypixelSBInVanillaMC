@@ -4,5 +4,9 @@ Disclaimers:
 * This plugin is a fan project by a SkyBlock sweat and is not affiliated with or endorsed by Hypixel.
 * **THIS PLUGIN IS INTENDED TO BE USED WITHOUT ANY OTHER COMBAT-RELATED PLUGINS. IT HAS NOT BEEN TESTED WITH OTHER PLUGINS (and probably won't be for the foreseeable future)**
 
+# Install the plugin
+Go to the [releases](https://github.com/Poseidon-I/HypixelSBInVanillaMC/releases) page and download the latest version.
+Install it into your server once downloaded.
+
 ## Info About Items, Mobs, & Gameplay Changes
 Check out the Wiki [here](https://github.com/Poseidon-I/HypixelSBInVanillaMC/wiki) (work-in-progress)
