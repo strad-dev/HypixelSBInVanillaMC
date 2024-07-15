@@ -1,4 +1,4 @@
-# Hypixel SkyBlock in Vanilla Minecraft plugin
+![image](https://github.com/user-attachments/assets/55fef443-c2c8-4087-8578-0901211bba7f)# Hypixel SkyBlock in Vanilla Minecraft plugin
 Disclaimers: 
 * This plugin is a remake of select Hypixel SkyBlock items and mobs added directly to base Vanilla Minecraft. It is not the entirety of Hypixel SkyBlock and does not incorporate any features from there except for the selected items and mobs.
 * This plugin is a fan project by a SkyBlock sweat and is not affiliated with or endorsed by Hypixel.
@@ -6,7 +6,8 @@ Disclaimers:
 
 # Install the plugin
 Go to the [releases](https://github.com/Poseidon-I/HypixelSBInVanillaMC/releases) page and download the latest version.
-Install it into your server once downloaded.
+Install it into your server by dragging it into the `plugins` folder once downloaded.
+**REQUIRES SPIGOT OR PAPER**
 
 ## Info About Items, Mobs, & Gameplay Changes
 Check out the Wiki [here](https://github.com/Poseidon-I/HypixelSBInVanillaMC/wiki) (work-in-progress)
