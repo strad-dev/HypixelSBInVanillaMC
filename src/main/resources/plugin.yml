@@ -1,0 +1,15 @@
+name: SkyBlockInVanilla
+version: 1.0.2_2
+main: misc.Plugin
+api-version: '1.20.6'
+
+commands:
+  getopitems:
+    description: Get insanely overpowered SkyBlock items!  Valid itemSets - combat, ingredient, summon
+    usage: /getopitems [itemSet] <player>
+  w:
+    description: Whisper messages to another player!
+    usage: /w [player] [message]
+  locateplayer:
+    description: Locate a player on the server!
+    usage: /locateplayer [player]
