@@ -1,14 +1,21 @@
 package misc;
 
-import ingredients.*;
-import items.Terminator;
-import items.*;
+import items.GoldorLeggings;
+import items.MaxorBoots;
+import items.NecronElytra;
+import items.WardenHelmet;
+import items.ingredients.mining.*;
+import items.ingredients.misc.*;
+import items.ingredients.witherLords.*;
+import items.misc.*;
+import items.weapons.Claymore;
+import items.weapons.Scylla;
+import items.weapons.Terminator;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Recipe;
-import org.bukkit.inventory.RecipeChoice;
-import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.*;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashSet;
@@ -29,6 +36,11 @@ public class AddRecipes {
 		allRecipes.add(new NamespacedKey(plugin, "wandOfRestoration"));
 		allRecipes.add(new NamespacedKey(plugin, "wandOfAtonement"));
 		allRecipes.add(new NamespacedKey(plugin, "holyIce"));
+		allRecipes.add(new NamespacedKey(plugin, "sharp7"));
+		allRecipes.add(new NamespacedKey(plugin, "power7"));
+		allRecipes.add(new NamespacedKey(plugin, "looting5"));
+		allRecipes.add(new NamespacedKey(plugin, "featherFalling5"));
+		allRecipes.add(new NamespacedKey(plugin, "divanPickaxe"));
 		return allRecipes;
 	}
 
@@ -57,15 +69,17 @@ public class AddRecipes {
 		ItemStack claymore = Claymore.getItem(0);
 		ItemStack stormSecrets = StormSecrets.getItem();
 		ItemStack gsRemnant = GiantSwordRemnant.getItem();
+		ItemStack bigStone = ConcentratedStone.getItem();
 
 		NamespacedKey claymoreKey = new NamespacedKey(plugin, "claymore");
 		ShapedRecipe claymoreRecipe = new ShapedRecipe(claymoreKey, claymore);
 
-		claymoreRecipe.shape("NSN", "NDN", "NHN");
+		claymoreRecipe.shape("NSN", "CDC", "NHN");
 		claymoreRecipe.setIngredient('S', new RecipeChoice.ExactChoice(stormSecrets));
 		claymoreRecipe.setIngredient('N', Material.NETHER_STAR);
 		claymoreRecipe.setIngredient('D', Material.NETHERITE_SWORD);
 		claymoreRecipe.setIngredient('H', new RecipeChoice.ExactChoice(gsRemnant));
+		claymoreRecipe.setIngredient('C', new RecipeChoice.ExactChoice(bigStone));
 
 		return claymoreRecipe;
 	}
@@ -134,6 +148,34 @@ public class AddRecipes {
 		wandRecipe.setIngredient('D', Material.DIAMOND);
 
 		return wandRecipe;
+	}
+
+	public static Recipe addDrillRecipe(Plugin plugin) {
+		ItemStack pick = DivanPickaxe.getItem();
+		ItemStack alloy = Alloy.getItem();
+		ItemStack diamond = RefinedDiamond.getItem();
+		ItemStack emerald = RefinedEmerald.getItem();
+		ItemStack gold = RefinedGold.getItem();
+		ItemStack iron = RefinedIron.getItem();
+		ItemStack lapis = RefinedLapis.getItem();
+		ItemStack netherite = RefinedNetherite.getItem();
+		ItemStack redstone = RefinedRedstone.getItem();
+
+		NamespacedKey drillKey = new NamespacedKey(plugin, "divanPickaxe");
+		ShapedRecipe drillRecipe = new ShapedRecipe(drillKey, pick);
+
+		drillRecipe.shape("DAE", "GPI", "LNR");
+		drillRecipe.setIngredient('D', new RecipeChoice.ExactChoice(diamond));
+		drillRecipe.setIngredient('A', new RecipeChoice.ExactChoice(alloy));
+		drillRecipe.setIngredient('E', new RecipeChoice.ExactChoice(emerald));
+		drillRecipe.setIngredient('G', new RecipeChoice.ExactChoice(gold));
+		drillRecipe.setIngredient('P', Material.NETHERITE_PICKAXE);
+		drillRecipe.setIngredient('I', new RecipeChoice.ExactChoice(iron));
+		drillRecipe.setIngredient('L', new RecipeChoice.ExactChoice(lapis));
+		drillRecipe.setIngredient('N', new RecipeChoice.ExactChoice(netherite));
+		drillRecipe.setIngredient('R', new RecipeChoice.ExactChoice(redstone));
+
+		return drillRecipe;
 	}
 
 	public static Recipe addHolyIceRecipe(Plugin plugin) {
@@ -209,6 +251,98 @@ public class AddRecipes {
 		maxorRecipe.setIngredient('S', new RecipeChoice.ExactChoice(maxorSecrets));
 
 		return maxorRecipe;
+	}
+
+	public static Recipe addSharp7Recipe(Plugin plugin) {
+		ItemStack sharp7 = new ItemStack(Material.ENCHANTED_BOOK);
+		EnchantmentStorageMeta meta = (EnchantmentStorageMeta) sharp7.getItemMeta();
+		meta.addStoredEnchant(Enchantment.SHARPNESS, 7, true);
+		sharp7.setItemMeta(meta);
+
+		ItemStack sharp6 = new ItemStack(Material.ENCHANTED_BOOK);
+		meta = (EnchantmentStorageMeta) sharp6.getItemMeta();
+		meta.addStoredEnchant(Enchantment.SHARPNESS, 6, true);
+		sharp6.setItemMeta(meta);
+
+		ItemStack upgrader = EnchantmentUpgrader.getItem();
+
+		NamespacedKey sharp7Key = new NamespacedKey(plugin, "sharp7");
+		ShapelessRecipe sharp7Recipe = new ShapelessRecipe(sharp7Key, sharp7);
+
+		sharp7Recipe.addIngredient(new RecipeChoice.ExactChoice(sharp6));
+		sharp7Recipe.addIngredient(new RecipeChoice.ExactChoice(sharp6));
+		sharp7Recipe.addIngredient(new RecipeChoice.ExactChoice(upgrader));
+
+		return sharp7Recipe;
+	}
+
+	public static Recipe addPower7Recipe(Plugin plugin) {
+		ItemStack power7 = new ItemStack(Material.ENCHANTED_BOOK);
+		EnchantmentStorageMeta meta = (EnchantmentStorageMeta) power7.getItemMeta();
+		meta.addStoredEnchant(Enchantment.POWER, 7, true);
+		power7.setItemMeta(meta);
+
+		ItemStack power6 = new ItemStack(Material.ENCHANTED_BOOK);
+		meta = (EnchantmentStorageMeta) power6.getItemMeta();
+		meta.addStoredEnchant(Enchantment.POWER, 6, true);
+		power6.setItemMeta(meta);
+
+		ItemStack upgrader = EnchantmentUpgrader.getItem();
+
+		NamespacedKey power7Key = new NamespacedKey(plugin, "power7");
+		ShapelessRecipe power7Recipe = new ShapelessRecipe(power7Key, power7);
+
+		power7Recipe.addIngredient(new RecipeChoice.ExactChoice(power6));
+		power7Recipe.addIngredient(new RecipeChoice.ExactChoice(power6));
+		power7Recipe.addIngredient(new RecipeChoice.ExactChoice(upgrader));
+
+		return power7Recipe;
+	}
+
+	public static Recipe addLooting5Recipe(Plugin plugin) {
+		ItemStack looting5 = new ItemStack(Material.ENCHANTED_BOOK);
+		EnchantmentStorageMeta meta = (EnchantmentStorageMeta) looting5.getItemMeta();
+		meta.addStoredEnchant(Enchantment.LOOTING, 5, true);
+		looting5.setItemMeta(meta);
+
+		ItemStack looting4 = new ItemStack(Material.ENCHANTED_BOOK);
+		meta = (EnchantmentStorageMeta) looting4.getItemMeta();
+		meta.addStoredEnchant(Enchantment.LOOTING, 4, true);
+		looting4.setItemMeta(meta);
+
+		ItemStack upgrader = EnchantmentUpgrader.getItem();
+
+		NamespacedKey looting5Key = new NamespacedKey(plugin, "looting5");
+		ShapelessRecipe looting5Recipe = new ShapelessRecipe(looting5Key, looting5);
+
+		looting5Recipe.addIngredient(new RecipeChoice.ExactChoice(looting4));
+		looting5Recipe.addIngredient(new RecipeChoice.ExactChoice(looting4));
+		looting5Recipe.addIngredient(new RecipeChoice.ExactChoice(upgrader));
+
+		return looting5Recipe;
+	}
+
+	public static Recipe addFeatherFalling5Recipe(Plugin plugin) {
+		ItemStack featherFalling5 = new ItemStack(Material.ENCHANTED_BOOK);
+		EnchantmentStorageMeta meta = (EnchantmentStorageMeta) featherFalling5.getItemMeta();
+		meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
+		featherFalling5.setItemMeta(meta);
+
+		ItemStack featherFalling4 = new ItemStack(Material.ENCHANTED_BOOK);
+		meta = (EnchantmentStorageMeta) featherFalling4.getItemMeta();
+		meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 4, true);
+		featherFalling4.setItemMeta(meta);
+
+		ItemStack feather = BraidedFeather.getItem();
+
+		NamespacedKey featherFalling5Key = new NamespacedKey(plugin, "featherFalling5");
+		ShapelessRecipe featherFalling5Recipe = new ShapelessRecipe(featherFalling5Key, featherFalling5);
+
+		featherFalling5Recipe.addIngredient(new RecipeChoice.ExactChoice(featherFalling4));
+		featherFalling5Recipe.addIngredient(new RecipeChoice.ExactChoice(featherFalling5));
+		featherFalling5Recipe.addIngredient(new RecipeChoice.ExactChoice(feather));
+
+		return featherFalling5Recipe;
 	}
 
 	public static Recipe addGodAppleRecipe(Plugin plugin) {

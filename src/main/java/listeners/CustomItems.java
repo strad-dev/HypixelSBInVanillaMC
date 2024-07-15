@@ -1,6 +1,6 @@
 package listeners;
 
-import items.CustomItem;
+import items.AbilityItem;
 import misc.Plugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -34,7 +34,7 @@ public class CustomItems implements Listener {
 			return "";
 		} else if(!item.getItemMeta().hasLore()) {
 			return "";
-		} else return item.getItemMeta().getLore().get(0);
+		} else return item.getItemMeta().getLore().getFirst();
 	}
 
 	public static List<EntityType> createList() {
@@ -97,6 +97,13 @@ public class CustomItems implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 		ItemStack itemInUse = p.getInventory().getItemInMainHand();
+		if(itemInUse.hasItemMeta()) {
+			if(itemInUse.getItemMeta().hasLore()) {
+				if(itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/summon")){
+					e.setCancelled(true);
+				}
+			}
+		}
 		try {
 			score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
 		} catch(Exception exception) {
@@ -107,7 +114,7 @@ public class CustomItems implements Listener {
 
 		if(Objects.equals(e.getHand(), EquipmentSlot.HAND)) {
 			if(!p.getScoreboardTags().contains("AbilityCooldown")) {
-				CustomItem item = CustomItem.getItem(getID(itemInUse));
+				AbilityItem item = AbilityItem.getItem(getID(itemInUse));
 				if(item != null) {
 					if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
 						if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
@@ -120,6 +127,11 @@ public class CustomItems implements Listener {
 							item.onRightClick(p);
 							p.addScoreboardTag(item.cooldownTag());
 							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag(item.cooldownTag()), item.cooldown());
+
+							if(!p.getGameMode().equals(GameMode.CREATIVE)) {
+								Score score = CustomItems.currentScore();
+								score.setScore(score.getScore() - item.manaCost());
+							}
 						}
 						p.addScoreboardTag("AbilityCooldown");
 						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);

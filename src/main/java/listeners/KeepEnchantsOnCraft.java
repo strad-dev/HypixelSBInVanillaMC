@@ -7,6 +7,10 @@ import org.bukkit.event.inventory.CraftItemEvent;
 public class KeepEnchantsOnCraft implements Listener {
 	@EventHandler
 	public void onCraftItem(CraftItemEvent e) {
-		e.getInventory().getResult().addUnsafeEnchantments(e.getInventory().getMatrix()[4].getEnchantments());
+		try {
+			e.getInventory().getResult().addUnsafeEnchantments(e.getInventory().getMatrix()[4].getEnchantments());
+		} catch(Exception exception) {
+			// nothing
+		}
 	}
 }

@@ -1,8 +1,19 @@
 package commands;
 
-import ingredients.*;
-import items.Terminator;
-import items.*;
+import items.GoldorLeggings;
+import items.MaxorBoots;
+import items.NecronElytra;
+import items.WardenHelmet;
+import items.armor.WitherKingCrown;
+import items.ingredients.mining.*;
+import items.ingredients.misc.*;
+import items.ingredients.witherLords.*;
+import items.misc.*;
+import items.summonItems.*;
+import items.weapons.Claymore;
+import items.weapons.Scylla;
+import items.weapons.Terminator;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -13,11 +24,18 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import summonItems.*;
 
 import static org.bukkit.Bukkit.getServer;
 
 public class GetOPItems implements CommandExecutor {
+	public void sendMessage(CommandSender sender, Player p, String item) {
+		sender.sendMessage("Successfully gave " + p.getName() + " " + item);
+		Bukkit.getLogger().info(sender.getName() + " gave " + p.getName() + " " + item);
+		if(!p.equals(sender)) {
+			p.sendMessage(ChatColor.DARK_RED + String.valueOf(ChatColor.BOLD) + "AN ADMIN HAS GIVEN YOU " + item);
+		}
+	}
+
 	@Override
 	public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
 		if(commandSender instanceof Player player && (player.getGameMode().equals(GameMode.CREATIVE) || player.isOp())) {
@@ -49,36 +67,60 @@ public class GetOPItems implements CommandExecutor {
 							IceSpray.getItem(),
 							Claymore.getItem(0),
 							Terminator.getItem(0),
+							DivanPickaxe.getItem(),
 							WandOfAtonement.getItem(),
 							HolyIce.getItem(),
+							new ItemStack(Material.GOLDEN_CARROT, 64),
 							WardenHelmet.getItem(),
+							WitherKingCrown.getItem(),
 							NecronElytra.getItem(),
 							GoldorLeggings.getItem(),
 							MaxorBoots.getItem(),
-							new ItemStack(Material.GOLDEN_CARROT, 64),
 							new ItemStack(Material.TOTEM_OF_UNDYING));
-					commandSender.sendMessage("Successfully gave " + player.getName() + " Combat Items");
+					sendMessage(commandSender, player, "Combat Items");
 					return true;
 				}
-				case "ingredient" -> {
+				case "ingredient/withers" -> {
 					player.getInventory().addItem(
 							ShadowWarp.getItem(),
 							Implosion.getItem(),
 							WitherShield.getItem(),
 							Handle.getItem(),
-							GiantSwordRemnant.getItem(),
 							MaxorSecrets.getItem(),
 							StormSecrets.getItem(),
 							GoldorSecrets.getItem(),
-							NecronSecrets.getItem(),
+							NecronSecrets.getItem());
+					sendMessage(commandSender, player, "Wither Ingredients");
+					return true;
+				}
+				case "ingredient/misc" -> {
+					player.getInventory().addItem(
 							WardenHeart.getItem(),
 							Core.getItem(),
 							TessellatedPearl.getItem(),
 							NullBlade.getItem(),
 							BraidedFeather.getItem(),
 							TarantulaSilk.getItem(),
-							Viscera.getItem());
-					commandSender.sendMessage("Successfully gave " + player.getName() + " Ingredients");
+							Viscera.getItem(),
+							GiantSwordRemnant.getItem(),
+							Alloy.getItem(),
+							ConcentratedStone.getItem());
+
+					sendMessage(commandSender, player, "Misc Ingredients");
+					return true;
+				}
+				case "ingredient/mining" -> {
+					player.getInventory().addItem(
+							Alloy.getItem(),
+							ConcentratedStone.getItem(),
+							RefinedDiamond.getItem(),
+							RefinedEmerald.getItem(),
+							RefinedGold.getItem(),
+							RefinedIron.getItem(),
+							RefinedLapis.getItem(),
+							RefinedNetherite.getItem(),
+							RefinedRedstone.getItem());
+					sendMessage(commandSender, player, "Mining Ingredients");
 					return true;
 				}
 				case "summon" -> {
@@ -90,7 +132,7 @@ public class GetOPItems implements CommandExecutor {
 							SpiderRelic.getItem(),
 							AtonedFlesh.getItem(),
 							GiantZombieFlesh.getItem());
-					commandSender.sendMessage("Successfully gave " + player.getName() + " Summon Items");
+					sendMessage(commandSender, player, "Summon Items");
 					return true;
 				}
 				case "t7" -> {
@@ -105,11 +147,11 @@ public class GetOPItems implements CommandExecutor {
 					meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
 					godBook.setItemMeta(meta);
 					player.getInventory().addItem(godBook);
-					commandSender.sendMessage("Successfully gave " + player.getName() + " The God Book");
+					sendMessage(commandSender, player, "The God Book");
 					return true;
 				}
 				default -> {
-					commandSender.sendMessage("Invalid Item Set profided.\nSets: combat, summon, ingredient, t7");
+					commandSender.sendMessage("Invalid Item Set profided.\nSets: combat, summon, ingredient/withers, ingredient/misc, ingredient/mining, t7");
 					return false;
 				}
 			}

@@ -11,7 +11,7 @@ public class PluginUtils {
 	public static void changeName(LivingEntity entity) {
 		if(!(entity instanceof Player)) {
 			String[] oldName;
-			int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
+			int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount());
 			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
 			try {
 				oldName = Objects.requireNonNull(entity.getCustomName()).split(" ");

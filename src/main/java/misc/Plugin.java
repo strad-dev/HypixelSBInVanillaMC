@@ -26,6 +26,7 @@ public class Plugin extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		instance = this;
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
 		Objects.requireNonNull(this.getCommand("locateplayer")).setExecutor((new LocatePlayer()));
 		Objects.requireNonNull(this.getCommand("w")).setExecutor((new Tell()));
@@ -47,6 +48,8 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new StopBossesTeleporting(), this);
 		getServer().getPluginManager().registerEvents(new GivePlayersRecipes(), this);
 		getServer().getPluginManager().registerEvents(new AllMobsHaveNames(), this);
+		getServer().getPluginManager().registerEvents(new CustomChestLoot(), this);
+		getServer().getPluginManager().registerEvents(new WitherKingDragonCustomAI(), this);
 
 		getServer().addRecipe(AddRecipes.addScyllaRecipe(this));
 		getServer().addRecipe(AddRecipes.addClaymoreRecipe(this));
@@ -58,11 +61,14 @@ public class Plugin extends JavaPlugin {
 		getServer().addRecipe(AddRecipes.addMaxorBootsRecipe(this));
 		getServer().addRecipe(AddRecipes.addGodAppleRecipe(this));
 		getServer().addRecipe(AddRecipes.addWandOfRestorationRecipe(this));
-		getServer().addRecipe(AddRecipes.addWandOfAtonementRecipe(this));
+		getServer().addRecipe(AddRecipes.addDrillRecipe(this));
 		getServer().addRecipe(AddRecipes.addHolyIceRecipe(this));
+		getServer().addRecipe(AddRecipes.addSharp7Recipe(this));
+		getServer().addRecipe(AddRecipes.addPower7Recipe(this));
+		getServer().addRecipe(AddRecipes.addLooting5Recipe(this));
+		getServer().addRecipe(AddRecipes.addFeatherFalling5Recipe(this));
 
 		getLogger().info("Started SkyBlock in Vanilla!");
-		instance = this;
 
 		try {
 			Objects.requireNonNull(getServer().getScoreboardManager()).getMainScoreboard().registerNewObjective("Intelligence", Criteria.DUMMY, "Intelligence");
@@ -80,7 +86,7 @@ public class Plugin extends JavaPlugin {
 			getLogger().info("Could not find Sadan Bossbar.  Adding to Bossbars.");
 		}
 
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 40L);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 100L);
 	}
 
 	public void passiveIntel() {
@@ -99,7 +105,7 @@ public class Plugin extends JavaPlugin {
 				return;
 			}
 		}
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 40L);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 100L);
 	}
 
 	@Override

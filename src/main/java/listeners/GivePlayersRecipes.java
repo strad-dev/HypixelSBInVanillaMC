@@ -1,8 +1,18 @@
 package listeners;
 
-import ingredients.*;
-import items.Terminator;
-import items.*;
+import items.GoldorLeggings;
+import items.MaxorBoots;
+import items.NecronElytra;
+import items.WardenHelmet;
+import items.armor.WitherKingCrown;
+import items.ingredients.mining.*;
+import items.ingredients.misc.*;
+import items.ingredients.witherLords.*;
+import items.misc.*;
+import items.summonItems.*;
+import items.weapons.Claymore;
+import items.weapons.Scylla;
+import items.weapons.Terminator;
 import misc.AddRecipes;
 import misc.Plugin;
 import org.bukkit.ChatColor;
@@ -13,7 +23,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import summonItems.*;
 
 import java.util.List;
 import java.util.Map;
@@ -61,7 +70,7 @@ public class GivePlayersRecipes implements Listener {
 				if(item.hasItemMeta()) {
 					if(item.getItemMeta().hasLore()) {
 						List<String> lore = item.getItemMeta().getLore();
-						switch(lore.get(0)) {
+						switch(lore.getFirst()) {
 							case "skyblock/combat/aspect_of_the_void" -> setItem(i, AOTV.getItem());
 							case "skyblock/combat/scylla" -> setItem(i, Scylla.getItem(item.getEnchantmentLevel(Enchantment.SHARPNESS)));
 							case "skyblock/combat/terminator" -> setItem(i, Terminator.getItem(item.getEnchantmentLevel(Enchantment.POWER)));
@@ -70,9 +79,11 @@ public class GivePlayersRecipes implements Listener {
 									setItem(i, WandOfRestoration.getItem());
 							case "skyblock/combat/wand_of_atonement" ->
 									setItem(i, WandOfAtonement.getItem());
+							case "skyblock/combat/divan_pickaxe" -> setItem(i, DivanPickaxe.getItem());
 							case "skyblock/combat/holy_ice" -> setItem(i, HolyIce.getItem());
 							case "skyblock/combat/dark_claymore" -> setItem(i, Claymore.getItem(item.getEnchantmentLevel(Enchantment.SHARPNESS)));
 							case "skyblock/combat/warden_helmet" -> setItem(i, WardenHelmet.getItem());
+							case "skyblock/combat/wither_king_crown" -> setItem(i, WitherKingCrown.getItem());
 							case "skyblock/combat/necron_elytra" -> setItem(i, NecronElytra.getItem());
 							case "skyblock/combat/goldor_pants" -> setItem(i, GoldorLeggings.getItem());
 							case "skyblock/combat/maxor_boots" -> setItem(i, MaxorBoots.getItem());
@@ -100,6 +111,16 @@ public class GivePlayersRecipes implements Listener {
 									setItem(i, BraidedFeather.getItem());
 							case "skyblock/ingredient/tarantula_silk" -> setItem(i, TarantulaSilk.getItem());
 							case "skyblock/ingredient/revenant_viscera" -> setItem(i, Viscera.getItem());
+							case "skyblock/ingredient/alloy" -> setItem(i, Alloy.getItem());
+							case "skyblock/ingredient/concentrated_stone" -> setItem(i, ConcentratedStone.getItem());
+							case "skyblock/ingredient/refined_diamond" -> setItem(i, RefinedDiamond.getItem());
+							case "skyblock/ingredient/refined_emerald" -> setItem(i, RefinedEmerald.getItem());
+							case "skyblock/ingredient/refined_gold" -> setItem(i, RefinedGold.getItem());
+							case "skyblock/ingredient/refined_iron" -> setItem(i, RefinedIron.getItem());
+							case "skyblock/ingredient/refined_lapis" -> setItem(i, RefinedLapis.getItem());
+							case "skyblock/ingredient/refined_netherite" -> setItem(i, RefinedNetherite.getItem());
+							case "skyblock/ingredient/refined_redstone" -> setItem(i, RefinedRedstone.getItem());
+							case "skyblock/ingredient/enchantment_upgrader" -> setItem(i, EnchantmentUpgrader.getItem());
 							case "skyblock/summon/superior_remnant" -> setItem(i, SuperiorRemnant.getItem());
 							case "skyblock/summon/corrupt_pearl" -> setItem(i, CorruptPearl.getItem());
 							case "skyblock/summon/antimatter" -> setItem(i, Antimatter.getItem());

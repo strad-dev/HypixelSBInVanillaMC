@@ -6,7 +6,7 @@
 
     <groupId>dev.lingling</groupId>
     <artifactId>SkyBlock_in_Vanilla</artifactId>
-    <version>1.0.2_2</version>
+    <version>1.1.0</version>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.20.6-R0.1-SNAPSHOT</version>
+            <version>1.21-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

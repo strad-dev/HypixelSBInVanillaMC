@@ -2,7 +2,8 @@ package listeners;
 
 import misc.Plugin;
 import misc.PluginUtils;
-import mobs.CustomMob;
+import mobs.generic.CustomMob;
+import mobs.withers.WitherKing;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
@@ -24,11 +25,30 @@ import java.util.Random;
 
 public class CustomDamage implements Listener {
 	private static EntityDamageEvent e;
+	private static boolean isBlocking;
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+		isBlocking = damagee instanceof Player p && p.isBlocking();
+
 		if(damager instanceof Projectile projectile) {
-			if(projectile instanceof SpectralArrow && (damagee instanceof Player p && !p.isBlocking() || !(damagee instanceof Player))) {
-				damagee.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 0));
+			// stop stupidly annoying arrows
+			if(projectile instanceof Arrow arrow) {
+				if(arrow.getPierceLevel() == 0) {
+					arrow.remove();
+				} else {
+					arrow.setPierceLevel(arrow.getPierceLevel() - 1);
+					Vector arrowSpeed = arrow.getVelocity();
+					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> arrow.setVelocity(arrowSpeed), 1L);
+				}
+			}
+
+			if(!isBlocking) {
+				if(projectile instanceof SpectralArrow) {
+					damagee.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 0));
+				}
+				if(projectile instanceof Arrow a && a.hasCustomEffects()) {
+					damagee.addPotionEffects(a.getCustomEffects());
+				}
 			}
 			if(projectile.getShooter() instanceof LivingEntity temp) {
 				damager = temp;
@@ -36,7 +56,6 @@ public class CustomDamage implements Listener {
 		}
 
 		// apply custom damage to special mobs before going through with general damage
-		Random random = new Random();
 		boolean doContinue = true;
 		try {
 			CustomMob damageeMob = CustomMob.getMob(damagee);
@@ -51,42 +70,9 @@ public class CustomDamage implements Listener {
 			if(damagerMob != null) {
 				doContinue = damagerMob.whenDamaging(damagee);
 			}
-
-			if(damager instanceof Wither wither) {
-				if(wither.getCustomName().contains("Storm") && random.nextBoolean()) {
-					wither.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
-				} else if(wither.getCustomName().contains("Necron")) {
-					calculateFinalDamage(damagee, damager, originalDamage + 4, DamageType.RANGED);
-					return;
-				}
-			} else if(damager instanceof EnderDragon dragon) {
-				if(dragon.getCustomName().contains("Strong Dragon")) {
-					calculateFinalDamage(damagee, damager, originalDamage + 6, DamageType.RANGED);
-					return;
-				} else if(dragon.getCustomName().contains("Superior Dragon") && random.nextBoolean()) {
-					calculateFinalDamage(damagee, damager, originalDamage + 3, DamageType.RANGED);
-					return;
-				}
-			} else if(damagee instanceof Wither wither) {
-				if(wither.getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
-					return;
-				}
-				if(Objects.requireNonNull(wither.getCustomName()).contains("Maxor") && random.nextDouble() < 0.1) {
-					teleport(wither, damagee, 8);
-				}
-			} else if(damagee instanceof EnderDragon dragon) {
-				if(Objects.requireNonNull(dragon.getCustomName()).contains("Young Dragon") && random.nextDouble() < 0.1) {
-					teleport(dragon, damagee, 32);
-				}
-				if(type == DamageType.RANGED) {
-					calculateFinalDamage(damagee, damager, originalDamage / 2, DamageType.RANGED);
-					return;
-				}
-			}
-			if(damagee instanceof Player p && !p.isBlocking() || !(damagee instanceof Player)) {
+			if(!isBlocking) {
 				switch(damager) {
-					case Wither ignored ->
-							damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 200, 1));
+					case Wither ignored -> damagee.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 200, 1));
 					case CaveSpider ignored ->
 							damagee.addPotionEffect(new PotionEffect(PotionEffectType.POISON, 300, 0));
 					case WitherSkeleton ignored ->
@@ -101,6 +87,7 @@ public class CustomDamage implements Listener {
 		} catch(NullPointerException exception) {
 			// continue
 		}
+
 		if(doContinue) {
 			calculateFinalDamage(damagee, damager, originalDamage, type);
 		}
@@ -110,7 +97,7 @@ public class CustomDamage implements Listener {
 		if(type != DamageType.ABSOLUTE) {
 			// ice spray logic
 			if(damagee.getScoreboardTags().contains("IceSprayed")) {
-				finalDamage++;
+				finalDamage *= 1.1;
 			}
 
 			if(damager instanceof LivingEntity entity1) {
@@ -120,7 +107,7 @@ public class CustomDamage implements Listener {
 			}
 
 			// shield logic (for weirdos)
-			if(damagee instanceof Player p && p.isBlocking() && (type == DamageType.MELEE || type == DamageType.RANGED || type == DamageType.PLAYER_MAGIC)) {
+			if(isBlocking && (type == DamageType.MELEE || type == DamageType.RANGED)) {
 				finalDamage *= 0.5;
 			}
 
@@ -167,7 +154,7 @@ public class CustomDamage implements Listener {
 			} catch(Exception exception) {
 				// continue
 			}
-			finalDamage *= Math.max(0.6, 1 - prots * 0.03);
+			finalDamage *= Math.max(0.5, 1 - prots * 0.025);
 
 			if(type == DamageType.FALL) {
 				try {
@@ -195,7 +182,7 @@ public class CustomDamage implements Listener {
 				if(damagee instanceof EnderDragon) {
 					damagee.teleport(new Location(damagee.getWorld(), 0.5, 70.0, 0.5));
 				}
-				if(type == DamageType.PLAYER_MAGIC || damagee instanceof Player p && p.isBlocking()) {
+				if(type == DamageType.PLAYER_MAGIC || isBlocking) {
 					damagee.setHealth(0.0);
 				} else {
 					e.setCancelled(false);
@@ -219,6 +206,9 @@ public class CustomDamage implements Listener {
 				if(damagee instanceof Mob && damager instanceof LivingEntity) {
 					((Mob) damagee).setTarget((LivingEntity) damager);
 				}
+				if(damagee.getScoreboardTags().contains("WitherKing")) {
+					WitherKing.checkSkeletons(damagee, damager);
+				}
 
 				// apply knockback
 				if((type == DamageType.MELEE || type == DamageType.RANGED) && damager != null) {
@@ -232,7 +222,7 @@ public class CustomDamage implements Listener {
 						factor *= 0.25;
 					}
 
-					if(damagee instanceof Player p && p.isBlocking()) {
+					if(isBlocking) {
 						factor *= 0.5;
 					}
 
@@ -292,17 +282,6 @@ public class CustomDamage implements Listener {
 				} catch(Exception exception) {
 					// nothing here lol
 				}
-
-				// stop stupidly annoying arrows
-				if(damager instanceof Arrow arrow) {
-					if(arrow.getPierceLevel() == 0) {
-						arrow.remove();
-					} else {
-						arrow.setPierceLevel(arrow.getPierceLevel() - 1);
-						Vector arrowSpeed = arrow.getVelocity();
-						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> arrow.setVelocity(arrowSpeed), 1L);
-					}
-				}
 			}
 		}
 	}
@@ -316,15 +295,15 @@ public class CustomDamage implements Listener {
 		l2.add(added);
 		while(true) {
 			if(l.getY() > 319 || l2.getY() < -63) {
-				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The " + e.getName() + " could not find a spot to teleport to!");
+				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + e.getName() + " could not find a spot to teleport to!");
 				break;
 			} else if(l.getBlock().isEmpty()) {
 				e.teleport(l);
-				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The " + e.getName() + " has teleported away!");
+				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + e.getName() + " has teleported away!");
 				break;
 			} else if(l2.getBlock().isEmpty()) {
 				e.teleport(l2);
-				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The " + e.getName() + " has teleported away!");
+				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + e.getName() + " has teleported away!");
 				break;
 			}
 			l.add(0, 1, 0);
@@ -342,7 +321,7 @@ public class CustomDamage implements Listener {
 		CustomDamage.e = e;
 		if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
-			if(entity.getHealth() > 0) {
+			if(entity.getHealth() > 0 && !entity.isDead()) {
 				DamageType type;
 				switch(e.getCause()) {
 					case BLOCK_EXPLOSION, ENTITY_ATTACK, ENTITY_EXPLOSION, THORNS -> type = DamageType.MELEE;
@@ -365,7 +344,7 @@ public class CustomDamage implements Listener {
 
 					// apply intelligence to players
 					if(e.getDamager() instanceof Player p) {
-						if(e.getEntity() instanceof Monster || e.getEntity().getScoreboardTags().contains("SkyblockBoss")) {
+						if(type.equals(DamageType.MELEE) && (e.getEntity() instanceof Monster || e.getEntity().getScoreboardTags().contains("SkyblockBoss") || e.getEntity() instanceof Player)) {
 							try {
 								Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
 								if(score.getScore() < 2500) {

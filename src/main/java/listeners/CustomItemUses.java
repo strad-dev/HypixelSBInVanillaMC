@@ -1,6 +1,6 @@
 package listeners;
 
-import mobs.CustomMob;
+import mobs.generic.CustomMob;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -19,7 +19,6 @@ import java.util.Objects;
 
 @SuppressWarnings("DataFlowIssue")
 public class CustomItemUses implements Listener {
-	private String newName;
 
 	@EventHandler
 	public void onPlayerInteractEntity(PlayerInteractEntityEvent e) {
@@ -28,12 +27,13 @@ public class CustomItemUses implements Listener {
 		ItemStack item = inventory.getItemInMainHand();
 		String id;
 		try {
-			id = item.getItemMeta().getLore().get(0);
+			id = item.getItemMeta().getLore().getFirst();
 		} catch(Exception exception) {
 			id = "";
 		}
 		if(e.getRightClicked() instanceof Mob entity && e.getHand().equals(EquipmentSlot.HAND)) {
 			CustomMob mob = SummonItem.spawnABoss(id);
+			String newName;
 			if(mob == null) {
 				if(item.getType().equals(Material.NAME_TAG)) {
 					e.setCancelled(true);
@@ -42,6 +42,9 @@ public class CustomItemUses implements Listener {
 					return;
 				}
 			} else {
+				if(entity.getScoreboardTags().contains("SkyblockBoss")) {
+					return;
+				}
 				newName = mob.onSpawn(p, entity);
 			}
 			int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
