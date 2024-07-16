@@ -99,7 +99,7 @@ public class CustomItems implements Listener {
 		ItemStack itemInUse = p.getInventory().getItemInMainHand();
 		if(itemInUse.hasItemMeta()) {
 			if(itemInUse.getItemMeta().hasLore()) {
-				if(itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/summon")){
+				if(itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/summon")) {
 					e.setCancelled(true);
 				}
 			}
@@ -113,9 +113,10 @@ public class CustomItems implements Listener {
 		}
 
 		if(Objects.equals(e.getHand(), EquipmentSlot.HAND)) {
-			if(!p.getScoreboardTags().contains("AbilityCooldown")) {
-				AbilityItem item = AbilityItem.getItem(getID(itemInUse));
-				if(item != null) {
+			AbilityItem item = AbilityItem.getItem(getID(itemInUse));
+			if(item != null) {
+				e.setCancelled(true);
+				if(!p.getScoreboardTags().contains("AbilityCooldown")) {
 					if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
 						if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
 							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
@@ -139,8 +140,8 @@ public class CustomItems implements Listener {
 						item.onLeftClick(p);
 					}
 				}
-				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
 			}
+			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
 		}
 	}
 }
