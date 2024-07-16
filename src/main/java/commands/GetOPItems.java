@@ -27,6 +27,8 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import static org.bukkit.Bukkit.getServer;
 
 public class GetOPItems implements CommandExecutor {
+	private static final String ITEM_SETS = "combat, summon, ingredient/withers, ingredient/misc, ingredient/mining, t7";
+
 	public void sendMessage(CommandSender sender, Player p, String item) {
 		sender.sendMessage("Successfully gave " + p.getName() + " " + item);
 		Bukkit.getLogger().info(sender.getName() + " gave " + p.getName() + " " + item);
@@ -54,7 +56,7 @@ public class GetOPItems implements CommandExecutor {
 			try {
 				itemSet = strings[0];
 			} catch(Exception exception) {
-				commandSender.sendMessage(ChatColor.RED + "You must provide a valid Item Set.\nSets: combat, summon, ingredient, t7");
+				commandSender.sendMessage(ChatColor.RED + "You must provide a valid Item Set.\nSets: " + ITEM_SETS);
 				return false;
 			}
 
@@ -150,7 +152,7 @@ public class GetOPItems implements CommandExecutor {
 					return true;
 				}
 				default -> {
-					commandSender.sendMessage("Invalid Item Set profided.\nSets: combat, summon, ingredient/withers, ingredient/misc, ingredient/mining, t7");
+					commandSender.sendMessage("Invalid Item Set profided.\nSets: " + ITEM_SETS);
 					return false;
 				}
 			}
