@@ -40,6 +40,7 @@ public class AddRecipes {
 		allRecipes.add(new NamespacedKey(plugin, "power7"));
 		allRecipes.add(new NamespacedKey(plugin, "looting5"));
 		allRecipes.add(new NamespacedKey(plugin, "featherFalling5"));
+		allRecipes.add(new NamespacedKey(plugin, "efficiency6"));
 		allRecipes.add(new NamespacedKey(plugin, "divanPickaxe"));
 		return allRecipes;
 	}
@@ -322,6 +323,30 @@ public class AddRecipes {
 		return looting5Recipe;
 	}
 
+	public static Recipe addEfficiency6Recipe(Plugin plugin) {
+		ItemStack efficiency6 = new ItemStack(Material.ENCHANTED_BOOK);
+		EnchantmentStorageMeta meta = (EnchantmentStorageMeta) efficiency6.getItemMeta();
+		meta.addStoredEnchant(Enchantment.EFFICIENCY, 6, true);
+		efficiency6.setItemMeta(meta);
+
+		ItemStack stones = ConcentratedStone.getItem();
+
+		NamespacedKey efficiency6Key = new NamespacedKey(plugin, "efficiency6");
+		ShapelessRecipe efficiency6Recipe = new ShapelessRecipe(efficiency6Key, efficiency6);
+
+		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
+		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
+		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
+		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
+		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
+		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
+		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
+		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
+		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
+
+		return efficiency6Recipe;
+	}
+
 	public static Recipe addFeatherFalling5Recipe(Plugin plugin) {
 		ItemStack featherFalling5 = new ItemStack(Material.ENCHANTED_BOOK);
 		EnchantmentStorageMeta meta = (EnchantmentStorageMeta) featherFalling5.getItemMeta();
@@ -344,6 +369,7 @@ public class AddRecipes {
 
 		return featherFalling5Recipe;
 	}
+
 
 	public static Recipe addGodAppleRecipe(Plugin plugin) {
 		NamespacedKey godAppleKey = new NamespacedKey(plugin, "enchanted_golden_apple");

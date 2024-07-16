@@ -68,6 +68,7 @@ public class Plugin extends JavaPlugin {
 		getServer().addRecipe(AddRecipes.addSharp7Recipe(this));
 		getServer().addRecipe(AddRecipes.addPower7Recipe(this));
 		getServer().addRecipe(AddRecipes.addLooting5Recipe(this));
+		getServer().addRecipe(AddRecipes.addEfficiency6Recipe(this));
 		getServer().addRecipe(AddRecipes.addFeatherFalling5Recipe(this));
 
 		getLogger().info("Started SkyBlock in Vanilla!");
