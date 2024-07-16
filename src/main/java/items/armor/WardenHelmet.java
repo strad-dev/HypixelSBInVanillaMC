@@ -23,8 +23,8 @@ public class WardenHelmet implements Armor {
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Warden Helmet");
 		AttributeModifier damage = new AttributeModifier(UUID.fromString("4b5a478b-3b58-42ab-917d-8194a1a6d679"), "wardenHelmetDamage", 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
 		AttributeModifier armor = new AttributeModifier(UUID.fromString("b9f30162-1921-4cc6-ad60-91cc43234ba3"), "wardenHelmetArmor", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
-		AttributeModifier toughness = new AttributeModifier(UUID.fromString("c1474682-574f-472c-a611-62da34f6e1f1"), "wardenHelmetToughness", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
-		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("4e16c033-3349-4fb7-a0c6-0fac98ef6c6a"), "wardenHelmetAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
+		AttributeModifier toughness = new AttributeModifier(UUID.fromString("c1474682-574f-472c-a611-62da34f6e1f1"), "wardenHelmetToughness", 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
+		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("4e16c033-3349-4fb7-a0c6-0fac98ef6c6a"), "wardenHelmetAntiKB", 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
 		AttributeModifier speed = new AttributeModifier(UUID.fromString("f15d0a37-e366-4c5a-982d-57995d036a6c"), "wardenHelmetSpeed", -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HEAD);
 		data.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, speed);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
@@ -38,8 +38,8 @@ public class WardenHelmet implements Armor {
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+2");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-10%");
+		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+4");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-20%");
 		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x0.5");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "The brute force of the Warden");

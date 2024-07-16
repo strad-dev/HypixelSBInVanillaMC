@@ -21,7 +21,7 @@ public class WitherKingCrown implements Armor {
 		ItemMeta data = crown.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Crown of the Wither King");
-		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
+		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownDamage"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownArmor"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownToughness"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
@@ -34,7 +34,7 @@ public class WitherKingCrown implements Armor {
 		List<String> lore = new ArrayList<>();
 		lore.add("skyblock/combat/wither_king_crown");
 		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+2");
+		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+3");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
 		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-10%");
