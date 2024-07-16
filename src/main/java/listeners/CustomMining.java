@@ -23,7 +23,7 @@ public class CustomMining implements Listener {
 		World world = l.getWorld();
 		ItemStack itemInHand = p.getInventory().getItemInMainHand();
 		Random random = new Random();
-		if(itemInHand.getItemMeta().hasEnchant(Enchantment.FORTUNE)) { // TODO do replace all 0.1 with 0.00
+		if(itemInHand.getItemMeta().hasEnchant(Enchantment.FORTUNE)) {
 			int fortune = itemInHand.getItemMeta().getEnchantLevel(Enchantment.FORTUNE);
 			double fortuneMulti = 1 + 0.25 * fortune;
 			ItemStack item;
@@ -37,43 +37,43 @@ public class CustomMining implements Listener {
 						}
 						world.dropItemNaturally(l, item);
 					}
-					if(random.nextDouble() < 0.11 * fortuneMulti) {
+					if(random.nextDouble() < 0.001 * fortuneMulti) {
 						world.dropItemNaturally(l, ConcentratedStone.getItem());
 						CustomDrops.sendRareDropMessage(p, "Concentrated Stone");
 					}
 				}
 				case LAPIS_ORE, DEEPSLATE_LAPIS_ORE -> {
-					if(random.nextDouble() < 0.125 * fortuneMulti) {
+					if(random.nextDouble() < 0.0025 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedLapis.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Lapis");
 					}
 				}
 				case IRON_ORE, DEEPSLATE_IRON_ORE -> {
-					if(random.nextDouble() < 0.125 * fortuneMulti) {
+					if(random.nextDouble() < 0.0025 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedIron.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Iron");
 					}
 				}
 				case GOLD_ORE, DEEPSLATE_GOLD_ORE -> {
-					if(random.nextDouble() < 0.125 * fortuneMulti) {
+					if(random.nextDouble() < 0.0025 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedGold.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Gold");
 					}
 				}
 				case REDSTONE_ORE, DEEPSLATE_REDSTONE_ORE -> {
-					if(random.nextDouble() < 0.125 * fortuneMulti) {
+					if(random.nextDouble() < 0.0025 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedIron.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Redstone");
 					}
 				}
 				case DIAMOND_ORE, DEEPSLATE_DIAMOND_ORE -> {
-					if(random.nextDouble() < 0.15 * fortuneMulti) {
+					if(random.nextDouble() < 0.005 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedDiamond.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Diamond");
 					}
 				}
 				case EMERALD_ORE, DEEPSLATE_EMERALD_ORE -> {
-					if(random.nextDouble() < 0.15 * fortuneMulti) {
+					if(random.nextDouble() < 0.005 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedEmerald.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Emerald");
 					}
@@ -83,7 +83,7 @@ public class CustomMining implements Listener {
 						item = new ItemStack(Material.ANCIENT_DEBRIS);
 						world.dropItemNaturally(l, item);
 					}
-					if(random.nextDouble() < 0.15 * fortuneMulti) {
+					if(random.nextDouble() < 0.005 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedNetherite.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Netherite");
 					}

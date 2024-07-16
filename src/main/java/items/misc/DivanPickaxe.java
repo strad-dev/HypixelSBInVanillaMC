@@ -23,10 +23,10 @@ public class DivanPickaxe implements CustomItem {
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.AQUA + "Divan's Pickaxe");
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "DivanModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
-		AttributeModifier miningSpeed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "DivanSpeed"), 0.2, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.MAINHAND);
+		AttributeModifier miningSpeed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "DivanSpeed"), 0.333, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.MAINHAND);
 		AttributeModifier miningReach = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "DivanReach"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, attackDamage);
-		data.addAttributeModifier(Attribute.PLAYER_MINING_EFFICIENCY, miningSpeed);
+		data.addAttributeModifier(Attribute.PLAYER_BLOCK_BREAK_SPEED, miningSpeed);
 		data.addAttributeModifier(Attribute.PLAYER_BLOCK_INTERACTION_RANGE, miningReach);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
@@ -34,7 +34,7 @@ public class DivanPickaxe implements CustomItem {
 		lore.add("skyblock/combat/divan_pickaxe");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
-		lore.add(ChatColor.GRAY + "Mining Speed: " + ChatColor.RED + "+20%");
+		lore.add(ChatColor.GRAY + "Mining Speed: " + ChatColor.RED + "x1.33");
 		lore.add(ChatColor.GRAY + "Range: " + ChatColor.RED + "+1");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Passive Ability: Double Drops");
