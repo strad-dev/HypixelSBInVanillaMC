@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CorruptPearl implements summonItems.SummonItem {
+public class CorruptPearl implements SummonItem {
 	public static ItemStack getItem() {
 		ItemStack corruptPearl = new ItemStack(Material.ENDER_EYE);
 		corruptPearl.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);

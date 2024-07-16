@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpiderRelic implements summonItems.SummonItem {
+public class SpiderRelic implements SummonItem {
 	public static ItemStack getItem() {
 		ItemStack spiderRelic = new ItemStack(Material.FERMENTED_SPIDER_EYE);
 		spiderRelic.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);

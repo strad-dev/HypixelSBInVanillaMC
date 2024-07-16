@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OmegaEgg implements summonItems.SummonItem {
+public class OmegaEgg implements SummonItem {
 	public static ItemStack getItem() {
 
 		ItemStack omegaEgg = new ItemStack(Material.EGG);

@@ -1,4 +1,4 @@
-package summonItems;
+package items.summonItems;
 
 import mobs.CustomMob;
 import mobs.generic.*;

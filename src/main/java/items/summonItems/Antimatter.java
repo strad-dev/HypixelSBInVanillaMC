@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Antimatter implements summonItems.SummonItem {
+public class Antimatter implements SummonItem {
 	public static ItemStack getItem() {
 
 		ItemStack antimatter = new ItemStack(Material.WARPED_FUNGUS);

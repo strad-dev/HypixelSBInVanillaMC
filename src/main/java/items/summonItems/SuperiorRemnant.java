@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SuperiorRemnant implements summonItems.SummonItem {
+public class SuperiorRemnant implements SummonItem {
 	public static ItemStack getItem() {
 		ItemStack supRemnant = new ItemStack(Material.QUARTZ);
 		supRemnant.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);

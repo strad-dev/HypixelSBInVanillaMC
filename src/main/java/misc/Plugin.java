@@ -120,7 +120,7 @@ public class Plugin extends JavaPlugin {
 		ArrayList<Player> playersInWorld = new ArrayList<>(world.getEntitiesByClass(Player.class));
 		if(playersInWorld.isEmpty()) return null;
 		playersInWorld.sort(Comparator.comparingDouble(o -> o.getLocation().distanceSquared(location)));
-		return playersInWorld.get(0);
+		return playersInWorld.getFirst();
 	}
 
 	public static Plugin getInstance() {
