@@ -59,6 +59,10 @@ public class CustomMining implements Listener {
 					item = new ItemStack(Material.LAPIS_LAZULI);
 					item.setAmount(random.nextInt((fortune + 1) * 6) + 4);
 					world.dropItemNaturally(l, item);
+					if(random.nextDouble() < 0.125 * fortuneMulti) {
+						world.dropItemNaturally(l, RefinedLapis.getItem());
+						CustomDrops.sendRareDropMessage(p, "Refined Lapis");
+					}
 				}
 				case IRON_ORE, DEEPSLATE_IRON_ORE -> {
 					item = new ItemStack(Material.RAW_IRON);
