@@ -88,6 +88,12 @@ public class CustomMining implements Listener {
 						CustomDrops.sendRareDropMessage(p, "Refined Netherite");
 					}
 				}
+				case OBSIDIAN -> {
+					if(fortune == 4) {
+						item = new ItemStack(Material.OBSIDIAN);
+						world.dropItemNaturally(l, item);
+					}
+				}
 			}
 		}
 	}
