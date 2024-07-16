@@ -115,9 +115,9 @@ public class CustomItems implements Listener {
 		if(Objects.equals(e.getHand(), EquipmentSlot.HAND)) {
 			AbilityItem item = AbilityItem.getItem(getID(itemInUse));
 			if(item != null) {
-				e.setCancelled(true);
-				if(!p.getScoreboardTags().contains("AbilityCooldown")) {
-					if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+				if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+					e.setCancelled(true);
+					if(!p.getScoreboardTags().contains("AbilityCooldown")) {
 						if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
 							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
 							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
@@ -136,7 +136,9 @@ public class CustomItems implements Listener {
 						}
 						p.addScoreboardTag("AbilityCooldown");
 						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
-					} else if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.PHYSICAL)) {
+					}
+				} else if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.PHYSICAL)) {
+					if(!p.getScoreboardTags().contains("AbilityCooldown")) {
 						item.onLeftClick(p);
 					}
 				}
