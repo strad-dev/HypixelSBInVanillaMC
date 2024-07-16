@@ -26,7 +26,7 @@ public class RefinedLapis implements Ingredients {
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "This piece of Lapis");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "is brighter than usual.");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Maybe it has useful properties?.");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Maybe it has useful properties?");
 		lore.add("");
 		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
 

@@ -3,6 +3,7 @@ package mobs.generic;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.Plugin;
+import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;

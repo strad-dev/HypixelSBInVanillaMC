@@ -1,6 +1,6 @@
 package mobs.enderDragons;
 
-import mobs.generic.CustomMob;
+import mobs.CustomMob;
 import org.bukkit.entity.DragonFireball;
 
 import java.util.Random;

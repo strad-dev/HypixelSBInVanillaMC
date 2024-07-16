@@ -1,5 +1,6 @@
 package summonItems;
 
+import mobs.CustomMob;
 import mobs.generic.*;
 import org.bukkit.entity.LivingEntity;
 

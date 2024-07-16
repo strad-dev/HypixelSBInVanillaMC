@@ -23,7 +23,7 @@ public class CustomMining implements Listener {
 		World world = l.getWorld();
 		ItemStack itemInHand = p.getInventory().getItemInMainHand();
 		Random random = new Random();
-		if(itemInHand.getItemMeta().hasEnchant(Enchantment.FORTUNE)) {
+		if(itemInHand.getItemMeta().hasEnchant(Enchantment.FORTUNE)) { // TODO do replace all 0.1 with 0.00
 			int fortune = itemInHand.getItemMeta().getEnchantLevel(Enchantment.FORTUNE);
 			double fortuneMulti = 1 + 0.25 * fortune;
 			ItemStack item;
@@ -40,7 +40,7 @@ public class CustomMining implements Listener {
 						item.setAmount(1);
 					}
 					world.dropItemNaturally(l, item);
-					if(random.nextDouble() < 0.001 * fortuneMulti) {
+					if(random.nextDouble() < 0.11 * fortuneMulti) {
 						world.dropItemNaturally(l, ConcentratedStone.getItem());
 						CustomDrops.sendRareDropMessage(p, "Concentrated Stone");
 					}
@@ -64,7 +64,7 @@ public class CustomMining implements Listener {
 					item = new ItemStack(Material.RAW_IRON);
 					item.setAmount(random.nextInt(fortune + 1) + 1);
 					world.dropItemNaturally(l, item);
-					if(random.nextDouble() < 0.0025 * fortuneMulti) {
+					if(random.nextDouble() < 0.125 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedIron.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Iron");
 					}
@@ -73,7 +73,7 @@ public class CustomMining implements Listener {
 					item = new ItemStack(Material.RAW_GOLD);
 					item.setAmount(random.nextInt(fortune + 1) + 1);
 					world.dropItemNaturally(l, item);
-					if(random.nextDouble() < 0.0025 * fortuneMulti) {
+					if(random.nextDouble() < 0.125 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedGold.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Gold");
 					}
@@ -82,7 +82,7 @@ public class CustomMining implements Listener {
 					item = new ItemStack(Material.REDSTONE);
 					item.setAmount(random.nextInt(fortune + 2) + 4);
 					world.dropItemNaturally(l, item);
-					if(random.nextDouble() < 0.0025 * fortuneMulti) {
+					if(random.nextDouble() < 0.125 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedIron.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Redstone");
 					}
@@ -91,7 +91,7 @@ public class CustomMining implements Listener {
 					item = new ItemStack(Material.DIAMOND);
 					item.setAmount(random.nextInt(fortune + 1) + 1);
 					world.dropItemNaturally(l, item);
-					if(random.nextDouble() < 0.005 * fortuneMulti) {
+					if(random.nextDouble() < 0.15 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedDiamond.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Diamond");
 					}
@@ -100,7 +100,7 @@ public class CustomMining implements Listener {
 					item = new ItemStack(Material.EMERALD);
 					item.setAmount(random.nextInt(fortune + 1) + 1);
 					world.dropItemNaturally(l, item);
-					if(random.nextDouble() < 0.005 * fortuneMulti) {
+					if(random.nextDouble() < 0.15 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedEmerald.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Emerald");
 					}
@@ -113,7 +113,7 @@ public class CustomMining implements Listener {
 						item.setAmount(1);
 					}
 					world.dropItemNaturally(l, item);
-					if(random.nextDouble() < 0.005 * fortuneMulti) {
+					if(random.nextDouble() < 0.15 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedNetherite.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Netherite");
 					}

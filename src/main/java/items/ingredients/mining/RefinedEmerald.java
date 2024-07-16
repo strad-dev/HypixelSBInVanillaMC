@@ -18,7 +18,7 @@ public class RefinedEmerald implements Ingredients {
 
 		ItemMeta data = refinedEmerald.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Refined Emerald");
+		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Refined Emerald");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();

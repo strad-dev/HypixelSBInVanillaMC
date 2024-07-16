@@ -1,7 +1,7 @@
 package listeners;
 
 import mobs.enderDragons.CustomDragon;
-import mobs.generic.CustomMob;
+import mobs.CustomMob;
 import mobs.withers.CustomWither;
 import org.bukkit.entity.DragonFireball;
 import org.bukkit.entity.EnderDragon;

@@ -18,7 +18,7 @@ public class RefinedNetherite implements Ingredients {
 
 		ItemMeta data = refinedNetherite.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Refined Netherite");
+		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Refined Netherite");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();

@@ -1,6 +1,6 @@
 package listeners;
 
-import mobs.generic.CustomMob;
+import mobs.CustomMob;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;

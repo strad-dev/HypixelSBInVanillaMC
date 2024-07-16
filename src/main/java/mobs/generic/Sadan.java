@@ -4,6 +4,7 @@ import listeners.CustomDamage;
 import listeners.DamageType;
 import listeners.NonEntityDamage;
 import misc.Plugin;
+import mobs.CustomMob;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;

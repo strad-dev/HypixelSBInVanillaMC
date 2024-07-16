@@ -1,6 +1,6 @@
 package mobs.withers;
 
-import mobs.generic.CustomMob;
+import mobs.CustomMob;
 import org.bukkit.entity.WitherSkull;
 
 import java.util.Random;

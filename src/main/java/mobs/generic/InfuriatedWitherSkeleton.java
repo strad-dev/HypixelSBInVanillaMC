@@ -1,6 +1,7 @@
 package mobs.generic;
 
 import listeners.DamageType;
+import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
