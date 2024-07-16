@@ -1,9 +1,8 @@
 package commands;
 
-import items.GoldorLeggings;
-import items.MaxorBoots;
-import items.NecronElytra;
-import items.WardenHelmet;
+import items.armor.GoldorLeggings;
+import items.armor.MaxorBoots;
+import items.armor.NecronElytra;
 import items.armor.WitherKingCrown;
 import items.ingredients.mining.*;
 import items.ingredients.misc.*;
@@ -71,7 +70,7 @@ public class GetOPItems implements CommandExecutor {
 							WandOfAtonement.getItem(),
 							HolyIce.getItem(),
 							new ItemStack(Material.GOLDEN_CARROT, 64),
-							WardenHelmet.getItem(),
+							WardenHeart.getItem(),
 							WitherKingCrown.getItem(),
 							NecronElytra.getItem(),
 							GoldorLeggings.getItem(),
