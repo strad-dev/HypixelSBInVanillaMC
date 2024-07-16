@@ -1,9 +1,9 @@
 package misc;
 
-import items.GoldorLeggings;
-import items.MaxorBoots;
-import items.NecronElytra;
-import items.WardenHelmet;
+import items.armor.GoldorLeggings;
+import items.armor.MaxorBoots;
+import items.armor.NecronElytra;
+import items.armor.WardenHelmet;
 import items.ingredients.mining.*;
 import items.ingredients.misc.*;
 import items.ingredients.witherLords.*;

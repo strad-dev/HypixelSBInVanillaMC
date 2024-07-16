@@ -62,6 +62,7 @@ public class Plugin extends JavaPlugin {
 		getServer().addRecipe(AddRecipes.addMaxorBootsRecipe(this));
 		getServer().addRecipe(AddRecipes.addGodAppleRecipe(this));
 		getServer().addRecipe(AddRecipes.addWandOfRestorationRecipe(this));
+		getServer().addRecipe(AddRecipes.addWandOfAtonementRecipe(this));
 		getServer().addRecipe(AddRecipes.addDrillRecipe(this));
 		getServer().addRecipe(AddRecipes.addHolyIceRecipe(this));
 		getServer().addRecipe(AddRecipes.addSharp7Recipe(this));

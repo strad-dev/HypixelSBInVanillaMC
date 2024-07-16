@@ -1,10 +1,6 @@
 package listeners;
 
-import items.GoldorLeggings;
-import items.MaxorBoots;
-import items.NecronElytra;
-import items.WardenHelmet;
-import items.armor.WitherKingCrown;
+import items.armor.*;
 import items.ingredients.mining.*;
 import items.ingredients.misc.*;
 import items.ingredients.witherLords.*;
