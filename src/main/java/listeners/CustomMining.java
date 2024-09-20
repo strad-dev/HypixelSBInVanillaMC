@@ -23,7 +23,7 @@ public class CustomMining implements Listener {
 		World world = l.getWorld();
 		ItemStack itemInHand = p.getInventory().getItemInMainHand();
 		Random random = new Random();
-		if(itemInHand.getItemMeta().hasEnchant(Enchantment.FORTUNE)) {
+		if(itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasEnchant(Enchantment.FORTUNE)) {
 			boolean dropDouble = itemInHand.getItemMeta().getLore().getFirst().contains("skyblock/combat/divan_pickaxe");
 			int fortune = itemInHand.getItemMeta().getEnchantLevel(Enchantment.FORTUNE);
 			double fortuneMulti = 1 + 0.25 * fortune;

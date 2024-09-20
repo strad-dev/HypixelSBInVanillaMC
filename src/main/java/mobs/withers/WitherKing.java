@@ -22,7 +22,6 @@ public class WitherKing implements CustomWither {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		spawnLightning(e, 128);
 
 		e.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(2.0);
 		e.getAttribute(Attribute.GENERIC_FLYING_SPEED).setBaseValue(2.0);
