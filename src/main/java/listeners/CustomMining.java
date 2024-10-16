@@ -24,7 +24,10 @@ public class CustomMining implements Listener {
 		ItemStack itemInHand = p.getInventory().getItemInMainHand();
 		Random random = new Random();
 		if(itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasEnchant(Enchantment.FORTUNE)) {
-			boolean dropDouble = itemInHand.getItemMeta().getLore().getFirst().contains("skyblock/combat/divan_pickaxe");
+			boolean dropDouble = false;
+			if(itemInHand.getItemMeta().hasLore()) {
+				dropDouble = itemInHand.getItemMeta().getLore().getFirst().contains("skyblock/combat/divan_pickaxe");
+			}
 			int fortune = itemInHand.getItemMeta().getEnchantLevel(Enchantment.FORTUNE);
 			double fortuneMulti = 1 + 0.25 * fortune;
 			ItemStack item;
@@ -47,6 +50,7 @@ public class CustomMining implements Listener {
 						world.dropItemNaturally(l, ConcentratedStone.getItem());
 						CustomDrops.sendRareDropMessage(p, "Concentrated Stone");
 					}
+					e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
 				}
 				case COAL_ORE, DEEPSLATE_COAL_ORE -> {
 					if(dropDouble) {
@@ -130,11 +134,9 @@ public class CustomMining implements Listener {
 				}
 				case ANCIENT_DEBRIS -> {
 					e.setCancelled(true);
-					item = new ItemStack(Material.NETHERITE_SCRAP);
+					item = new ItemStack(Material.ANCIENT_DEBRIS);
 					if(fortune == 4) {
 						item.setAmount(2);
-					} else {
-						item.setAmount(1);
 					}
 					if(dropDouble) {
 						item.setAmount(item.getAmount() + 1);
@@ -144,9 +146,10 @@ public class CustomMining implements Listener {
 						world.dropItemNaturally(l, RefinedNetherite.getItem());
 						CustomDrops.sendRareDropMessage(p, "Refined Netherite");
 					}
+					e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
 				}
 				case OBSIDIAN -> {
-					if(fortune == 4) {
+					if(dropDouble) {
 						item = new ItemStack(Material.OBSIDIAN);
 						world.dropItemNaturally(l, item);
 					}

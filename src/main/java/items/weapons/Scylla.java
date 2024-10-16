@@ -8,10 +8,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -120,21 +117,28 @@ public class Scylla implements AbilityItem {
 		double targetDamage = Objects.requireNonNull(p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)).getValue();
 		int damaged = 0;
 		double damage = 0;
-		try {
-			int sharpness = p.getInventory().getItem(p.getInventory().getHeldItemSlot()).getEnchantmentLevel(Enchantment.SHARPNESS);
+		int smite = 0;
+		int bane = 0;
+		if(p.getInventory().getItemInMainHand().containsEnchantment(Enchantment.SHARPNESS)) {
+			int sharpness = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.SHARPNESS);
 			targetDamage += sharpness * 0.5 + 0.5;
-		} catch(Exception exception) {
-			// nothing
+		} else if(p.getInventory().getItemInMainHand().containsEnchantment(Enchantment.SMITE)) {
+			smite = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.SMITE);
+		} else if(p.getInventory().getItemInMainHand().containsEnchantment(Enchantment.BANE_OF_ARTHROPODS)) {
+			bane = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS);
 		}
-		targetDamage = Math.ceil(targetDamage * 0.51);
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
-				if(entity instanceof Player target && (target.getGameMode().equals(GameMode.CREATIVE) || target.getGameMode().equals(GameMode.SPECTATOR))) {
-					continue;
+				double tempDamage = targetDamage;
+				if(entity1 instanceof Zombie || entity1 instanceof AbstractSkeleton || entity1 instanceof Wither || entity1 instanceof SkeletonHorse || entity1 instanceof ZombieHorse || entity1 instanceof Phantom || entity1 instanceof Zoglin) {
+					tempDamage += smite * 2.5;
+				} else if(entity1 instanceof Spider || entity1 instanceof Bee || entity1 instanceof Silverfish || entity1 instanceof Endermite) {
+					tempDamage += bane * 2.5;
 				}
-				customMobs(entity1, p, targetDamage, DamageType.PLAYER_MAGIC);
+				tempDamage = Math.ceil(tempDamage * 0.51);
+				customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC);
 				damaged += 1;
-				damage += targetDamage;
+				damage += tempDamage;
 			}
 		}
 		if(damaged > 0) {
@@ -173,6 +177,7 @@ public class Scylla implements AbilityItem {
 	@Override
 	public void onLeftClick(Player p) {
 	}
+
 	public int manaCost() {
 		return MANA_COST;
 	}

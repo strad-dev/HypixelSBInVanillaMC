@@ -1,5 +1,5 @@
 name: SkyBlockInVanilla
-version: 1.1.0
+version: 1.1.1
 main: misc.Plugin
 api-version: '1.21'
 

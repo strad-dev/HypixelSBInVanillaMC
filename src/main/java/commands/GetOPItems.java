@@ -143,6 +143,7 @@ public class GetOPItems implements CommandExecutor {
 					meta.addStoredEnchant(Enchantment.EFFICIENCY, 6, true);
 					meta.addStoredEnchant(Enchantment.PROTECTION, 5, true);
 					meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
+					meta.addStoredEnchant(Enchantment.SWEEPING_EDGE, 4, true);
 					godBook.setItemMeta(meta);
 					player.getInventory().addItem(godBook);
 					sendMessage(commandSender, player, "The God Book");

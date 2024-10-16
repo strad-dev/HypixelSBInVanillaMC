@@ -8,7 +8,6 @@ package listeners;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
@@ -53,11 +52,6 @@ public class BetterAnvil implements Listener {
 				}
 			}
 		}
-	}
-
-	@SuppressWarnings("unused")
-	private boolean canEnchantAboveMax(int i, Enchantment enchantment, Player player) {
-		return true;
 	}
 
 	public boolean canEnchant(ItemStack itemStack, Enchantment enchantment) {

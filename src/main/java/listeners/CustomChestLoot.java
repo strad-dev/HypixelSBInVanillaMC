@@ -34,8 +34,8 @@ public class CustomChestLoot implements Listener {
 				meta.addStoredEnchant(Enchantment.FORTUNE, 4, true);
 				book.setItemMeta(meta);
 
-				chest.getBlockInventory().addItem(book); // 1%
-			} else if(random.nextDouble() < 0.025) {
+				chest.getBlockInventory().addItem(book);
+			} else if(random.nextDouble() < 0.025) { // 1%
 				ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
 				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
 				meta.addStoredEnchant(Enchantment.SHARPNESS, 6, true);
@@ -53,6 +53,27 @@ public class CustomChestLoot implements Listener {
 				ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
 				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
 				meta.addStoredEnchant(Enchantment.PROTECTION, 5, true);
+				book.setItemMeta(meta);
+
+				chest.getBlockInventory().addItem(book);
+			} else if(random.nextDouble() < 0.06) { // 1%
+				ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
+				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
+				meta.addStoredEnchant(Enchantment.SWEEPING_EDGE, 4, true);
+				book.setItemMeta(meta);
+
+				chest.getBlockInventory().addItem(book);
+			} else if(random.nextDouble() < 0.07) { // 1%
+				ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
+				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
+				meta.addStoredEnchant(Enchantment.SMITE, 6, true);
+				book.setItemMeta(meta);
+
+				chest.getBlockInventory().addItem(book);
+			} else if(random.nextDouble() < 0.08) { // 1%
+				ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
+				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
+				meta.addStoredEnchant(Enchantment.BANE_OF_ARTHROPODS, 6, true);
 				book.setItemMeta(meta);
 
 				chest.getBlockInventory().addItem(book);

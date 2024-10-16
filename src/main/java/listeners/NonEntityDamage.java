@@ -23,6 +23,7 @@ public class NonEntityDamage implements Listener {
 	@EventHandler
 	public void onEntityDamage(EntityDamageEvent e) {
 		if(e.getEntity() instanceof LivingEntity entity) {
+			e.setCancelled(true);
 			DamageType type;
 			switch(e.getCause()) {
 				case THORNS -> type = DamageType.MELEE;

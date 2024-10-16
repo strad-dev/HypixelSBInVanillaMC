@@ -11,6 +11,13 @@ public enum DamageType {
 	 * I-Frames: Normal
 	 */
 
+	MELEE_SWEEP,
+	/*
+	 * Melee Sweep Damage Type
+	 * ------------------
+	 * Used for all damage caused by Sweep attacks.  No difference from MELEE.
+	 */
+
 	RANGED,
 	/*
 	 * Ranged Damage Type

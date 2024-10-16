@@ -20,12 +20,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
 public class CustomDamage implements Listener {
 	private static EntityDamageEvent e;
 	private static boolean isBlocking;
+	private static boolean flamingArrow;
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		isBlocking = damagee instanceof Player p && p.isBlocking();
@@ -39,6 +41,10 @@ public class CustomDamage implements Listener {
 					arrow.setPierceLevel(arrow.getPierceLevel() - 1);
 					Vector arrowSpeed = arrow.getVelocity();
 					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> arrow.setVelocity(arrowSpeed), 1L);
+				}
+
+				if(arrow.isVisualFire()) {
+					flamingArrow = true;
 				}
 			}
 
@@ -107,11 +113,11 @@ public class CustomDamage implements Listener {
 			}
 
 			// shield logic (for weirdos)
-			if(isBlocking && (type == DamageType.MELEE || type == DamageType.RANGED)) {
+			if(isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED)) {
 				finalDamage *= 0.5;
 			}
 
-			if(type == DamageType.MELEE || type == DamageType.RANGED || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
+			if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.GENERIC_ARMOR)).getValue();
 				finalDamage *= Math.max(0.25, 1 - armor * 0.0375);
 			}
@@ -172,6 +178,19 @@ public class CustomDamage implements Listener {
 	@SuppressWarnings("DuplicateExpressions")
 	public static void dealDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type) {
 		if(finalDamage > 0) {
+
+			// sweeping edge
+			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.SWEEPING_EDGE)) {
+				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SWEEPING_EDGE);
+				List<Entity> entities = damagee.getNearbyEntities(2, 2, 2);
+				List<EntityType> doNotKill = CustomItems.createList();
+				for(Entity entity : entities) {
+					if(!doNotKill.contains(entity.getType()) && !entity.equals(damager) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
+						customMobs(entity1, damager, e.getDamage() * 0.25 * level, DamageType.MELEE_SWEEP);
+					}
+				}
+			}
+
 			damagee.playHurtAnimation(0.0F);
 			damagee.getWorld().playSound(damagee, Objects.requireNonNull(damagee.getHurtSound()), 1.0F, 1.0F);
 
@@ -183,7 +202,7 @@ public class CustomDamage implements Listener {
 				if(damagee instanceof EnderDragon) {
 					damagee.teleport(new Location(damagee.getWorld(), 0.5, 70.0, 0.5));
 				}
-				if(type == DamageType.PLAYER_MAGIC || isBlocking) {
+				if(type == DamageType.PLAYER_MAGIC || type == DamageType.MELEE_SWEEP || isBlocking) {
 					damagee.setHealth(0.0);
 				} else {
 					e.setCancelled(false);
@@ -192,6 +211,7 @@ public class CustomDamage implements Listener {
 				}
 				CustomDrops.loot(damagee, damager);
 			} else {
+				// absorption
 				if(finalDamage > absorption) {
 					damagee.setAbsorptionAmount(0.0);
 					finalDamage -= absorption;
@@ -200,19 +220,31 @@ public class CustomDamage implements Listener {
 					finalDamage = 0.0;
 				}
 
+				// damage
 				damagee.setHealth(oldHealth - finalDamage);
-				if(type == DamageType.MELEE || type == DamageType.IFRAME_ENVIRONMENTAL) {
+				if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.IFRAME_ENVIRONMENTAL) {
 					damagee.setNoDamageTicks(9);
 				}
+
 				if(damagee instanceof Mob && damager instanceof LivingEntity) {
 					((Mob) damagee).setTarget((LivingEntity) damager);
 				}
+
 				if(damagee.getScoreboardTags().contains("WitherKing")) {
 					WitherKing.checkSkeletons(damagee, damager);
 				}
 
+				// fire aspect
+				if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
+					int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
+					damagee.setFireTicks(level * 80);
+				} else if(flamingArrow) {
+					damagee.setFireTicks(100);
+					flamingArrow = false;
+				}
+
 				// apply knockback
-				if((type == DamageType.MELEE || type == DamageType.RANGED) && damager != null) {
+				if((type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED) && damager != null) {
 					double antiKB = Objects.requireNonNull(damagee.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).getValue();
 					double factor = 0.33 * (1 - antiKB);
 					Vector oldVelocity = damagee.getVelocity();
@@ -322,6 +354,9 @@ public class CustomDamage implements Listener {
 		CustomDamage.e = e;
 		if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
+			if(entity instanceof Player p && (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR)) {
+				return;
+			}
 			if(entity.getHealth() > 0 && !entity.isDead()) {
 				DamageType type;
 				switch(e.getCause()) {
