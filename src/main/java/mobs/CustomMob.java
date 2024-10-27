@@ -3,6 +3,7 @@ package mobs;
 import listeners.DamageType;
 import mobs.enderDragons.*;
 import mobs.generic.*;
+import mobs.hardmode.withers.*;
 import mobs.withers.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -32,15 +33,35 @@ public interface CustomMob {
 			} else if(tags.contains("InfuriatedSkeleton")) {
 				return new InfuriatedWitherSkeleton();
 			} else if(tags.contains("Maxor")) {
-				return new Maxor();
+				if(tags.contains("HardMode")) {
+					return new MasterMaxor();
+				} else {
+					return new Maxor();
+				}
 			} else if(tags.contains("Storm")) {
-				return new Storm();
+				if(tags.contains("HardMode")) {
+					return new MasterStorm();
+				} else {
+					return new Storm();
+				}
 			} else if(tags.contains("Goldor")) {
-				return new Goldor();
+				if(tags.contains("HardMode")) {
+					return new MasterGoldor();
+				} else {
+					return new Goldor();
+				}
 			} else if(tags.contains("Necron")) {
-				return new Necron();
+				if(tags.contains("HardMode")) {
+					return new MasterNecron();
+				} else {
+					return new Necron();
+				}
 			} else if(tags.contains("WitherKing")) {
-				return new WitherKing();
+				if(tags.contains("HardMode")) {
+					return new MasterWitherKing();
+				} else {
+					return new WitherKing();
+				}
 			} else if(tags.contains("HolyDragon")) {
 				return new Holy();
 			} else if(tags.contains("OldDragon")) {

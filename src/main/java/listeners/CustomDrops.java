@@ -61,6 +61,7 @@ public class CustomDrops implements Listener {
 		Location l = died.getLocation();
 		boolean onFire = died.getFireTicks() > 0;
 		ItemStack item;
+		boolean hardMode = died.getScoreboardTags().contains("HardMode");
 		switch(died) {
 			case Blaze ignored -> {
 				item = new ItemStack(Material.BLAZE_ROD);
@@ -450,7 +451,14 @@ public class CustomDrops implements Listener {
 					sendRareDropMessage(p, "Gold Ingot");
 				}
 			}
-			// no drops
+			case Pillager pillager -> {
+				if(pillager.getInventory().contains(Material.WHITE_BANNER)) {
+					item = new ItemStack(Material.OMINOUS_BOTTLE);
+					world.dropItemNaturally(l, item);
+
+					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give @a white_banner[banner_patterns=[{pattern:rhombus,color:cyan},{pattern:stripe_bottom,color:light_gray},{pattern:stripe_center,color:gray},{pattern:half_horizontal,color:light_gray},{pattern:stripe_middle,color:black},{pattern:half_horizontal,color:light_gray},{pattern:circle,color:light_gray},{pattern:border,color:black}],custom_name='[\"\",{\"text\":\"Ominous Banner\",\"italic\":false,\"color\":\"gold\"}]',hide_additional_tooltip={}]");
+				}
+			}
 			// no drops
 			case PufferFish ignored -> {
 				item = new ItemStack(Material.PUFFERFISH);
@@ -648,12 +656,16 @@ public class CustomDrops implements Listener {
 			case Wither wither -> {
 				world.dropItemNaturally(l, new ItemStack(Material.NETHER_STAR));
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=wither_skull]");
+				double multiplier = 1;
+				if(hardMode) {
+					multiplier = 2;
+				}
 				if(wither.getScoreboardTags().contains("Maxor")) {
-					if(random.nextDouble() < 0.025 * rngLootingBonus) {
+					if(random.nextDouble() < 0.025 * rngLootingBonus * multiplier) {
 						item = MaxorSecrets.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Maxor's Secrets");
-					} else if(random.nextDouble() < 0.075 * rngLootingBonus) {
+					} else if(random.nextDouble() < 0.075 * rngLootingBonus * multiplier) {
 						item = ShadowWarp.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Shadow Warp");
@@ -661,31 +673,31 @@ public class CustomDrops implements Listener {
 				} else if(wither.getScoreboardTags().contains("Storm")) {
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=lightning_bolt]");
 					wither.getWorld().setThundering(false);
-					if(random.nextDouble() < 0.025 * rngLootingBonus) {
+					if(random.nextDouble() < 0.025 * rngLootingBonus * multiplier) {
 						item = StormSecrets.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Storm's Secrets");
-					} else if(random.nextDouble() < 0.075 * rngLootingBonus) {
+					} else if(random.nextDouble() < 0.075 * rngLootingBonus * multiplier) {
 						item = Implosion.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Implosion");
 					}
 				} else if(wither.getScoreboardTags().contains("Goldor")) {
-					if(random.nextDouble() < 0.025 * rngLootingBonus) {
+					if(random.nextDouble() < 0.025 * rngLootingBonus * multiplier) {
 						item = GoldorSecrets.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Goldor's Secrets");
-					} else if(random.nextDouble() < 0.075 * rngLootingBonus) {
+					} else if(random.nextDouble() < 0.075 * rngLootingBonus * multiplier) {
 						item = WitherShield.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Wither Shield");
 					}
 				} else if(wither.getScoreboardTags().contains("Necron")) {
-					if(random.nextDouble() < 0.025 * rngLootingBonus) {
+					if(random.nextDouble() < 0.025 * rngLootingBonus * multiplier) {
 						item = NecronSecrets.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Necron's Secrets");
-					} else if(random.nextDouble() < 0.075 * rngLootingBonus) {
+					} else if(random.nextDouble() < 0.075 * rngLootingBonus * multiplier) {
 						item = Handle.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Necron's Handle");
@@ -695,42 +707,44 @@ public class CustomDrops implements Listener {
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[tag=WitherKingDragon]");
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[tag=GuardSkeleton]");
 					wither.getWorld().setThundering(false);
-					if(random.nextDouble() < 0.04 * rngLootingBonus) {
-						item = MaxorSecrets.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Maxor's Secrets");
-					} else if(random.nextDouble() < 0.12 * rngLootingBonus) {
-						item = ShadowWarp.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Shadow Warp");
-					} else if(random.nextDouble() < 0.16 * rngLootingBonus) {
-						item = StormSecrets.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Storm's Secrets");
-					} else if(random.nextDouble() < 0.24 * rngLootingBonus) {
-						item = Implosion.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Implosion");
-					} else if(random.nextDouble() < 0.28 * rngLootingBonus) {
-						item = GoldorSecrets.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Goldor's Secrets");
-					} else if(random.nextDouble() < 0.36 * rngLootingBonus) {
-						item = WitherShield.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Wither Shield");
-					} else if(random.nextDouble() < 0.4 * rngLootingBonus) {
-						item = NecronSecrets.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Necron's Secrets");
-					} else if(random.nextDouble() < 0.48 * rngLootingBonus) {
-						item = Handle.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Necron's Handle");
-					} else if(random.nextDouble() < 0.5 * rngLootingBonus) {
-						item = WitherKingCrown.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Crown of the Wither King");
+					for(int i = 0; i < 1 * multiplier; i ++) {
+						if(random.nextDouble() < 0.04 * rngLootingBonus) {
+							item = MaxorSecrets.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Maxor's Secrets");
+						} else if(random.nextDouble() < 0.12 * rngLootingBonus) {
+							item = ShadowWarp.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Shadow Warp");
+						} else if(random.nextDouble() < 0.16 * rngLootingBonus) {
+							item = StormSecrets.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Storm's Secrets");
+						} else if(random.nextDouble() < 0.24 * rngLootingBonus) {
+							item = Implosion.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Implosion");
+						} else if(random.nextDouble() < 0.28 * rngLootingBonus) {
+							item = GoldorSecrets.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Goldor's Secrets");
+						} else if(random.nextDouble() < 0.36 * rngLootingBonus) {
+							item = WitherShield.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Wither Shield");
+						} else if(random.nextDouble() < 0.4 * rngLootingBonus) {
+							item = NecronSecrets.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Necron's Secrets");
+						} else if(random.nextDouble() < 0.48 * rngLootingBonus) {
+							item = Handle.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Necron's Handle");
+						} else if(random.nextDouble() < 0.5 * rngLootingBonus) {
+							item = WitherKingCrown.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Crown of the Wither King");
+						}
 					}
 				}
 			}

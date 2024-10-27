@@ -80,6 +80,8 @@ public class WitherKing implements CustomWither {
 		if(!type.equals(DamageType.RANGED) && random.nextDouble() < 0.1 || type.equals(DamageType.RANGED) && random.nextDouble() < 0.05) {
 			teleport(damagee, damager, 16);
 		}
+
+		checkSkeletons(damagee, damager);
 		return true;
 	}
 

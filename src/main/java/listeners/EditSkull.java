@@ -18,8 +18,12 @@ public class EditSkull implements Listener {
 			CustomWither wither = (CustomWither) CustomMob.getMob((Wither) skull.getShooter());
 			wither.whenShootingSkull(skull);
 		} else if(e.getEntity() instanceof DragonFireball fireball) {
-			CustomDragon dragon = (CustomDragon) CustomMob.getMob((EnderDragon) fireball.getShooter());
-			dragon.whenShootingFireball(fireball);
+			try {
+				CustomDragon dragon = (CustomDragon) CustomMob.getMob((EnderDragon) fireball.getShooter());
+				dragon.whenShootingFireball(fireball);
+			} catch(Exception exception) {
+				// continue
+			}
 		}
 	}
 }

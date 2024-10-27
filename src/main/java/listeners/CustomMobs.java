@@ -31,6 +31,7 @@ public class CustomMobs implements Listener {
 
 	@EventHandler
 	public void onEntitySpawn(EntitySpawnEvent e) {
+		boolean hardMode = Plugin.getNearestPlayer(e.getEntity()).hasPotionEffect(PotionEffectType.BAD_OMEN);
 		if(e.getEntity() instanceof LivingEntity entity) {
 			String name = "";
 
@@ -38,7 +39,7 @@ public class CustomMobs implements Listener {
 			try {
 				switch(entity) {
 					case Wither wither -> {
-						name = CustomWither.spawnRandom().onSpawn(Plugin.getNearestPlayer(wither), wither);
+						name = CustomWither.spawnRandom(hardMode).onSpawn(Plugin.getNearestPlayer(wither), wither);
 						wither.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 						wither.setTarget(Plugin.getNearestPlayer(wither));
 						wither.setCustomNameVisible(true);

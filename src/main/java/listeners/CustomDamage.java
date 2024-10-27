@@ -230,10 +230,6 @@ public class CustomDamage implements Listener {
 					((Mob) damagee).setTarget((LivingEntity) damager);
 				}
 
-				if(damagee.getScoreboardTags().contains("WitherKing")) {
-					WitherKing.checkSkeletons(damagee, damager);
-				}
-
 				// fire aspect
 				if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
 					int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
