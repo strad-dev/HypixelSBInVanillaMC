@@ -1,5 +1,11 @@
 package misc;
 
+import com.fren_gor.ultimateAdvancementAPI.AdvancementTab;
+import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI;
+import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;
+import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
+import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
+import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
 import commands.GetOPItems;
 import commands.LocatePlayer;
 import commands.Tell;
@@ -70,6 +76,15 @@ public class Plugin extends JavaPlugin {
 		getServer().addRecipe(AddRecipes.addLooting5Recipe(this));
 		getServer().addRecipe(AddRecipes.addEfficiency6Recipe(this));
 		getServer().addRecipe(AddRecipes.addFeatherFalling5Recipe(this));
+
+		UltimateAdvancementAPI api = UltimateAdvancementAPI.getInstance(this);
+
+		AdvancementTab tab = api.createAdvancementTab("skyblock");
+
+		RootAdvancement root = new RootAdvancement(tab, "root", new AdvancementDisplay(Material.NETHER_STAR, "SkyBlock", AdvancementFrameType.TASK, false, false, 0, 0, "Fully featured in 3-5 business days!"), "textures/block/light_blue_concrete");
+		BaseAdvancement advancement = new BaseAdvancement("defeat_wither_lords", new AdvancementDisplay(Material.NETHERITE_SWORD, "Slayer of Withers, Master of Worlds", AdvancementFrameType.CHALLENGE, true, true, 1, 0, "You are a mighty warrior."), root);
+
+		tab.registerAdvancements(root, advancement);
 
 		getLogger().info("Started SkyBlock in Vanilla!");
 

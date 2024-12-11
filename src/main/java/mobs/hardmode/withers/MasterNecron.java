@@ -65,10 +65,12 @@ public class MasterNecron implements CustomWither {
 			wither.removeScoreboardTag("400Frenzy");
 			wither.getWorld().playSound(wither, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ": WITNESS MY RAW NUCLEAR POWER!");
+			wither.setHealth(400.0);
 		} else {
 			wither.removeScoreboardTag("200Frenzy");
 			wither.getWorld().playSound(wither, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ": Sometimes when you have a problem, you just need to destroy it and start again!");
+			wither.setHealth(200.0);
 		}
 	}
 
@@ -84,8 +86,10 @@ public class MasterNecron implements CustomWither {
 			return false;
 		} else if(damagee.getScoreboardTags().contains("400Frenzy") && hp - originalDamage < 400) {
 			frenzy(damagee, 400);
+			return false;
 		} else if(damagee.getScoreboardTags().contains("200Frenzy") && hp - originalDamage < 200) {
 			frenzy(damagee, 200);
+			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.addScoreboardTag("Invulnerable");
 			Bukkit.broadcastMessage(name + ": You have destroyed us... but you have not destroyed our forefathers.");

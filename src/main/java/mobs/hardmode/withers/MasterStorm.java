@@ -50,7 +50,7 @@ public class MasterStorm implements CustomWither {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("1", "BOOM!", 0, 21, 0)), 580);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("BOOM!", "", 0, 21, 0));
-			PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 300, new ArrayList<>());
+			PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 300, immune);
 			e.removeScoreboardTag("Survival1");
 			e.removeScoreboardTag("Invulnerable");
 			e.setAI(true);
@@ -136,11 +136,15 @@ public class MasterStorm implements CustomWither {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("1", "BIGGER BOOM!", 0, 21, 0)), 580);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("BIGGER BOOM!", "", 0, 21, 0));
-				PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 64, 300, new ArrayList<>());
+				List<EntityType> immune = new ArrayList<>();
+				immune.add(EntityType.WITHER_SKELETON);
+				PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 64, 300, immune);
 				damagee.removeScoreboardTag("Survival2");
 				damagee.removeScoreboardTag("Invulnerable");
 				damagee.setAI(true);
 			}, 600);
+			damagee.setHealth(250.0);
+			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.addScoreboardTag("Invulnerable");
 			Bukkit.broadcastMessage(name + ": I knew I should have prepared better.");

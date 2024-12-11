@@ -66,7 +66,7 @@ public class PluginUtils {
 			WitherSkeleton e = (WitherSkeleton) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.WITHER_SKELETON);
 			e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither King's Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 20 + "/" + 20);
 			ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
-			sword.addEnchantment(Enchantment.KNOCKBACK, 2);
+			sword.addEnchantment(Enchantment.KNOCKBACK, 1);
 			ItemStack shield = new ItemStack(Material.SHIELD);
 
 			Objects.requireNonNull(e.getEquipment()).setItemInMainHand(sword);

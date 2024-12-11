@@ -75,10 +75,12 @@ public class MasterMaxor implements CustomWither {
 					wither.removeScoreboardTag("400Crystal");
 					wither.getWorld().playSound(wither, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 					Bukkit.broadcastMessage(name + ": HAHAHA!  Good luck getting around my tricks!");
+					wither.setHealth(400.0);
 				} else {
 					wither.removeScoreboardTag("200Crystal");
 					wither.getWorld().playSound(wither, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 					Bukkit.broadcastMessage(name + ": If you fail, you should try and try again!");
+					wither.setHealth(200.0);
 				}
 				wither.addScoreboardTag("Invulnerable");
 				return;
@@ -101,8 +103,10 @@ public class MasterMaxor implements CustomWither {
 			return false;
 		} else if(damagee.getScoreboardTags().contains("400Crystal") && hp - originalDamage < 400) {
 			spawnCrystal(damagee, 400);
+			return false;
 		} else if(damagee.getScoreboardTags().contains("200Crystal") && hp - originalDamage < 200) {
 			spawnCrystal(damagee, 200);
+			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.addScoreboardTag("Invulnerable");
 			Bukkit.broadcastMessage(name + ": Well looks like you defeated me.");

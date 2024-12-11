@@ -26,7 +26,7 @@ public class WitherKing implements CustomWither {
 
 		e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(2.0);
 		e.getAttribute(Attribute.FLYING_SPEED).setBaseValue(2.0);
-		e.getAttribute(Attribute.SCALE).setBaseValue(3.0);
+		e.getAttribute(Attribute.SCALE).setBaseValue(2.0);
 		e.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(13.0);
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(600.0);
 		e.setHealth(600.0);

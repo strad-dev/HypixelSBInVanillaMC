@@ -58,19 +58,8 @@ public class AtonedHorror implements CustomMob {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		Random random = new Random();
 		if(random.nextDouble() < 0.15) {
-			TNTPrimed tnt = (TNTPrimed) damager.getWorld().spawnEntity(damager.getLocation(), EntityType.TNT);
-			tnt.setFuseTicks(40);
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Atoned Horror becomes enraged and summons an extra TNT!");
-
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				List<Entity> entities = tnt.getNearbyEntities(5, 5, 5);
-				for(Entity entity : entities) {
-					if(entity instanceof LivingEntity entity1 && !entity.equals(damager)) {
-						CustomDamage.customMobs(entity1, tnt, 20, DamageType.PLAYER_MAGIC);
-					}
-				}
-				tnt.remove();
-			}, 20L);
+			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
 		}
 		if(type == DamageType.PLAYER_MAGIC) {
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the Atoned Horror.");
