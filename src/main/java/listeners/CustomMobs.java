@@ -2,6 +2,7 @@ package listeners;
 
 import misc.Plugin;
 import mobs.enderDragons.CustomDragon;
+import mobs.hardmode.withers.MasterMaxor;
 import mobs.withers.CustomWither;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -39,7 +40,11 @@ public class CustomMobs implements Listener {
 			try {
 				switch(entity) {
 					case Wither wither -> {
-						name = CustomWither.spawnRandom(hardMode).onSpawn(Plugin.getNearestPlayer(wither), wither);
+						if(hardMode) {
+							new MasterMaxor().onSpawn(Plugin.getNearestPlayer(wither), wither);
+						} else {
+							name = CustomWither.spawnRandom().onSpawn(Plugin.getNearestPlayer(wither), wither);
+						}
 						wither.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 						wither.setTarget(Plugin.getNearestPlayer(wither));
 						wither.setCustomNameVisible(true);

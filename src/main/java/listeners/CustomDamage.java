@@ -94,7 +94,7 @@ public class CustomDamage implements Listener {
 			// continue
 		}
 
-		if(doContinue) {
+		if(type == DamageType.ABSOLUTE || doContinue) {
 			calculateFinalDamage(damagee, damager, originalDamage, type);
 		}
 	}

@@ -3,6 +3,7 @@ package mobs.withers;
 import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.Plugin;
+import misc.PluginUtils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
@@ -119,28 +120,7 @@ public class WitherKing implements CustomWither {
 	private static void spawnSkeletons(Entity damager) {
 		if(damager instanceof LivingEntity entity) {
 			Location l = entity.getLocation();
-			for(int i = 0; i < 15; i++) {
-				WitherSkeleton e = (WitherSkeleton) entity.getWorld().spawnEntity(l, EntityType.WITHER_SKELETON);
-				e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither King's Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 20 + "/" + 20);
-				ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
-				sword.addEnchantment(Enchantment.KNOCKBACK, 2);
-				ItemStack shield = new ItemStack(Material.SHIELD);
-
-				Objects.requireNonNull(e.getEquipment()).setItemInMainHand(sword);
-				e.getEquipment().setItemInMainHandDropChance(0.0F);
-				e.getEquipment().setItemInOffHand(shield);
-				e.getEquipment().setItemInOffHandDropChance(0.0F);
-
-				Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.5);
-				Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
-				e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-				e.setTarget(entity);
-				e.teleport(entity);
-				e.setCustomNameVisible(true);
-				e.addScoreboardTag("SkyblockBoss");
-				e.addScoreboardTag("GuardSkeleton");
-				e.setPersistent(true);
-			}
+			PluginUtils.spawnGuards(entity);
 			entity.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Wither King summons His Guards to defend Him!");
 			l.getWorld().playSound(l, Sound.ITEM_GOAT_HORN_SOUND_2, 2.0F, 1.0F);
 		}

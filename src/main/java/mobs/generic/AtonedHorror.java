@@ -3,6 +3,7 @@ package mobs.generic;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.Plugin;
+import misc.PluginUtils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -56,19 +58,8 @@ public class AtonedHorror implements CustomMob {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		Random random = new Random();
 		if(random.nextDouble() < 0.15) {
-			TNTPrimed tnt = (TNTPrimed) damager.getWorld().spawnEntity(damager.getLocation(), EntityType.TNT);
-			tnt.setFuseTicks(40);
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Atoned Horror becomes enraged and summons an extra TNT!");
-
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				List<Entity> entities = tnt.getNearbyEntities(5, 5, 5);
-				for(Entity entity : entities) {
-					if(entity instanceof LivingEntity entity1 && !entity.equals(damager)) {
-						CustomDamage.customMobs(entity1, tnt, 20, DamageType.PLAYER_MAGIC);
-					}
-				}
-				tnt.remove();
-			}, 20L);
+			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
 		}
 		if(type == DamageType.PLAYER_MAGIC) {
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the Atoned Horror.");
@@ -79,18 +70,7 @@ public class AtonedHorror implements CustomMob {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee) {
-		TNTPrimed tnt = (TNTPrimed) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.TNT);
-		tnt.setFuseTicks(50);
-
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			List<Entity> entities = tnt.getNearbyEntities(5, 5, 5);
-			for(Entity entity : entities) {
-				if(entity instanceof LivingEntity entity1 && !entity.equals(damagee)) {
-					CustomDamage.customMobs(entity1, tnt, 20, DamageType.PLAYER_MAGIC);
-				}
-			}
-			tnt.remove();
-		}, 30L);
+		PluginUtils.spawnTNT(damagee, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
 		return true;
 	}
 }
