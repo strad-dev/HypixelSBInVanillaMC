@@ -1,6 +1,7 @@
 package mobs.hardmode.generic;
 
 import listeners.DamageType;
+import misc.PluginUtils;
 import mobs.CustomMob;
 import mobs.hardmode.withers.MasterWitherKing;
 import org.bukkit.ChatColor;
@@ -17,14 +18,15 @@ import java.util.Objects;
 public class MartialWitherSkeleton implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Martial Arts" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ";
+		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Martial Arts" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ");
+		PluginUtils.changeName(e);
 
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
 		sword.addUnsafeEnchantment(Enchantment.KNOCKBACK, 10);
 		Objects.requireNonNull(e.getEquipment()).setItemInMainHand(sword);
 
-		return name;
+		return "";
 	}
 
 	@Override

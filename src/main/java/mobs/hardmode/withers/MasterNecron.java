@@ -20,14 +20,15 @@ import static listeners.CustomDamage.calculateFinalDamage;
 import static listeners.CustomDamage.teleport;
 
 public class MasterNecron implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD;
+	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
 		PluginUtils.spawnTNT(e, e.getLocation(), 0, 32, 75, immune);
-		e.getWorld().playSound(e.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
+		p = Plugin.getNearestPlayer(e);
+		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
 		e.setHealth(500.0);
@@ -36,6 +37,8 @@ public class MasterNecron implements CustomWither {
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("400Frenzy");
 		e.addScoreboardTag("200Frenzy");
+		e.setCustomName(name);
+		PluginUtils.changeName(e);
 
 		return name;
 	}
@@ -64,12 +67,12 @@ public class MasterNecron implements CustomWither {
 		if(which == 400) {
 			wither.removeScoreboardTag("400Frenzy");
 			wither.getWorld().playSound(wither, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ": WITNESS MY RAW NUCLEAR POWER!");
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": WITNESS MY RAW NUCLEAR POWER!");
 			wither.setHealth(400.0);
 		} else {
 			wither.removeScoreboardTag("200Frenzy");
 			wither.getWorld().playSound(wither, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ": Sometimes when you have a problem, you just need to destroy it and start again!");
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Sometimes when you have a problem, you just need to destroy it and start again!");
 			wither.setHealth(200.0);
 		}
 	}
@@ -91,32 +94,34 @@ public class MasterNecron implements CustomWither {
 			frenzy(damagee, 200);
 			return false;
 		} else if(hp - originalDamage < 1) {
+			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
-			Bukkit.broadcastMessage(name + ": You have destroyed us... but you have not destroyed our forefathers.");
-			damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have destroyed us... but you have not destroyed our forefathers.");
+			Player p = Plugin.getNearestPlayer(damagee);
+			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-				Bukkit.broadcastMessage(name + ": He is a very powerful being.  If you wish to defeat him, tread carefully.");
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": He is a very powerful being.  If you wish to defeat him, tread carefully.");
 			}, 50);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
-				damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
+				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
 				PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 32, 75, new ArrayList<>());
 			}, 100);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC +  "MASTER-Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Who dares wake me from my slumber?");
 			}, 250);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER-Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Foolish players!  You do not know who you are dealing with!");
 			}, 300);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER-Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I do not wish to fight, but you leave me no choice.");
 			}, 350);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER-Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Prepare to meet your ultimate demise.");
 			}, 400);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

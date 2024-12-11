@@ -3,6 +3,7 @@ package mobs.hardmode.generic;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.Plugin;
+import misc.PluginUtils;
 import mobs.CustomMob;
 import mobs.hardmode.withers.MasterWitherKing;
 import org.bukkit.Bukkit;
@@ -15,12 +16,14 @@ import org.bukkit.entity.Player;
 public class SoulWitherSkeleton implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of the Soul" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ";
+		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of the Soul" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ");
+		PluginUtils.changeName(e);
+
 		e.setAI(false);
 
 		teleport(e);
 
-		return name;
+		return "";
 	}
 
 	private void teleport(Mob e) {

@@ -20,6 +20,12 @@ import java.util.List;
 import java.util.Objects;
 
 public class CustomMobs implements Listener {
+	private static boolean isWitherLordFightActive = false;
+
+	public static void updateWitherLordFight(boolean isWitherLordFightActive) {
+		CustomMobs.isWitherLordFightActive = isWitherLordFightActive;
+	}
+
 	/**
 	 * summons lightning on every entity in a given radius
 	 * @param entity the entity at the center
@@ -44,16 +50,21 @@ public class CustomMobs implements Listener {
 			try {
 				switch(entity) {
 					case Wither wither -> {
-						if(hardMode) {
-							new MasterMaxor().onSpawn(Plugin.getNearestPlayer(wither), wither);
+						if(!isWitherLordFightActive) {
+							if(hardMode) {
+								name = new MasterMaxor().onSpawn(Plugin.getNearestPlayer(wither), wither);
+								isWitherLordFightActive = true;
+							} else {
+								name = CustomWither.spawnRandom().onSpawn(Plugin.getNearestPlayer(wither), wither);
+							}
+							wither.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
+							wither.setTarget(Plugin.getNearestPlayer(wither));
+							wither.setCustomNameVisible(true);
+							wither.setPersistent(true);
+							wither.addScoreboardTag("SkyblockBoss");
 						} else {
-							name = CustomWither.spawnRandom().onSpawn(Plugin.getNearestPlayer(wither), wither);
+							return;
 						}
-						wither.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-						wither.setTarget(Plugin.getNearestPlayer(wither));
-						wither.setCustomNameVisible(true);
-						wither.setPersistent(true);
-						wither.addScoreboardTag("SkyblockBoss");
 					}
 					case EnderDragon dragon -> {
 						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
@@ -80,7 +91,6 @@ public class CustomMobs implements Listener {
 			} catch(Exception exception) {
 				// do nothing
 			}
-
 			// add health to the entity name if it doesn't exist already
 			int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
 			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();

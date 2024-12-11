@@ -1,6 +1,7 @@
 package mobs.hardmode.generic;
 
 import listeners.DamageType;
+import misc.PluginUtils;
 import mobs.CustomMob;
 import mobs.hardmode.withers.MasterWitherKing;
 import org.bukkit.ChatColor;
@@ -14,7 +15,9 @@ import org.bukkit.entity.Player;
 public class IceWitherSkeleton implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		return ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Ice" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ";
+		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Ice" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ");
+		PluginUtils.changeName(e);
+		return "";
 	}
 
 	@Override

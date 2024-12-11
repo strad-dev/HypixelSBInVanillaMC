@@ -15,14 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MasterGoldor implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD;
+	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
 		PluginUtils.spawnTNT(e, e.getLocation(), 0, 32, 50, immune);
-		e.getWorld().playSound(e.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
+		p = Plugin.getNearestPlayer(e);
+		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
 		e.getAttribute(Attribute.ARMOR).setBaseValue(20.0);
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
@@ -30,6 +31,8 @@ public class MasterGoldor implements CustomWither {
 		e.addScoreboardTag("Goldor");
 		e.addScoreboardTag("HardMode");
 		e.addScoreboardTag("SkyblockBoss");
+		e.setCustomName(name);
+		PluginUtils.changeName(e);
 
 		damageAll(e);
 
@@ -56,24 +59,26 @@ public class MasterGoldor implements CustomWither {
 		}
 
 		if(damagee.getHealth() - originalDamage < 1) {
+			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
-			Bukkit.broadcastMessage(name + ": How did you break through my shield???");
-			damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": How did you break through my shield???");
+			Player p = Plugin.getNearestPlayer(damagee);
+			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-				Bukkit.broadcastMessage(name + ": Anyway I don't think you're surviving what's coming next.");
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Anyway I don't think you're surviving what's coming next.");
 			}, 50);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
-				damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
+				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
 				PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 32, 50, new ArrayList<>());
 			}, 100);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I have heard a lot about you.");
 			}, 250);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Your perseverence is immeasurable, but your journey ends here.  Goodbye.");
 			}, 300);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

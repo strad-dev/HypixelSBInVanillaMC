@@ -2,6 +2,7 @@ package mobs.hardmode.withers;
 
 import items.armor.WitherKingCrown;
 import items.ingredients.witherLords.*;
+import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.Plugin;
 import misc.PluginUtils;
@@ -11,7 +12,6 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
-import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -21,7 +21,7 @@ import java.util.*;
 import static listeners.CustomDrops.sendRareDropMessage;
 
 public class MasterWitherKing implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER-Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD;
+	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER-Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
 	private static Mob witherKing;
 
@@ -31,7 +31,8 @@ public class MasterWitherKing implements CustomWither {
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
 		PluginUtils.spawnTNT(e, e.getLocation(), 0, 48, 100, immune);
-		e.getWorld().playSound(e.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
+		p = Plugin.getNearestPlayer(e);
+		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
 		e.getAttribute(Attribute.SCALE).setBaseValue(2.0);
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
@@ -45,6 +46,8 @@ public class MasterWitherKing implements CustomWither {
 		e.addScoreboardTag("SoulUndefeated");
 		e.addScoreboardTag("MartialUndefeated");
 		e.setAI(false);
+		e.setCustomName(name);
+		PluginUtils.changeName(e);
 
 		ArrayList<String> ordering = new ArrayList<>();
 		ordering.add("Power");
@@ -53,25 +56,26 @@ public class MasterWitherKing implements CustomWither {
 		ordering.add("Soul");
 		ordering.add("Martial");
 		Collections.shuffle(ordering);
+		Player finalP = p;
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ": My henchmen are the best in the land.  They will defeat you swiftly!");
+			finalP.getWorld().playSound(finalP.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My henchmen are the best in the land.  They will defeat you swiftly!");
 			spawnHenchman(e, ordering.getFirst());
 			spawnHenchman(e, ordering.get(1));
 		}, 30);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ": One more to join the fray.  I hope you are having fun!");
+			finalP.getWorld().playSound(finalP.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": One more to join the fray.  I hope you are having fun!");
 			spawnHenchman(e, ordering.get(2));
 		}, 1230);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ": Another one can't hurt, can it?");
+			finalP.getWorld().playSound(finalP.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Another one can't hurt, can it?");
 			spawnHenchman(e, ordering.get(3));
 		}, 2430);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ": My last Henchman.  Go forth and destroy the insolent players!");
+			finalP.getWorld().playSound(finalP.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My last Henchman.  Go forth and destroy the insolent players!");
 			spawnHenchman(e, ordering.get(4));
 		}, 3630);
 
@@ -137,13 +141,13 @@ public class MasterWitherKing implements CustomWither {
 		witherKing.removeScoreboardTag(which + "Undefeated");
 		int left = countHenchmenLeft();
 		switch(left) {
-			case 4 -> Bukkit.broadcastMessage(name + ": My most loyal henchman, what have they done to you?");
+			case 4 -> Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My most loyal henchman, what have they done to you?");
 			case 3 ->
-					Bukkit.broadcastMessage(name + ": It seems my henchmen are not as powerful as I thought they were.  I suppose i must help them out.");
+					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": It seems my henchmen are not as powerful as I thought they were.  I suppose i must help them out.");
 			case 2 ->
-					Bukkit.broadcastMessage(name + ": Are you this heartless?  Murdering my defenseless followers for no good reason.");
-			case 1 -> Bukkit.broadcastMessage(name + ": You are getting on my nerves.  Quit being annoying!");
-			case 0 -> Bukkit.broadcastMessage(name + ": My energy is waning...  I must use my last hurrah.");
+					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Are you this heartless?  Murdering my defenseless followers for no good reason.");
+			case 1 -> Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You are getting on my nerves.  Quit being annoying!");
+			case 0 -> Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My energy is waning...  I must use my last hurrah.");
 		}
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
@@ -216,70 +220,76 @@ public class MasterWitherKing implements CustomWither {
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.addScoreboardTag("Invulnerable");
-			Bukkit.broadcastMessage(name + ": You have defeated me...  Centuries of preparation down the drain.");
-			damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain.");
+			Player p = Plugin.getNearestPlayer(damagee);
+			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-				Bukkit.broadcastMessage(name + ": Congratulations, you have proven yourself as a mighty warrior.");
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Congratulations, you have proven yourself as a mighty warrior.");
 			}, 50);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-				Bukkit.broadcastMessage(name + ": My strength slips away... I can see the light at the end of the tunnel.");
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My strength slips away... I can see the light at the end of the tunnel.");
 			}, 100);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-				Bukkit.broadcastMessage(name + ": Goodbye cruel world!  I hope to never see it again!");
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Goodbye cruel world!  I hope to never see it again!");
 			}, 150);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
-				damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
+				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
 			}, 200);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				ItemStack item;
-				World world = damagee.getWorld();
-				Location l = damagee.getLocation();
-				Player p;
-				if(damager instanceof Player p1) {
-					p = p1;
-				} else {
-					p = Plugin.getNearestPlayer(damagee);
-					if(p != null && p.getLocation().distance(damagee.getLocation()) > 16) {
-						p = null;
-					}
-				}
-				item = MaxorSecrets.getItem();
-				world.dropItemNaturally(l, item);
-				sendRareDropMessage(p, "Maxor's Secrets");
-				item = ShadowWarp.getItem();
-				world.dropItemNaturally(l, item);
-				sendRareDropMessage(p, "Shadow Warp");
-				item = StormSecrets.getItem();
-				world.dropItemNaturally(l, item);
-				sendRareDropMessage(p, "Storm's Secrets");
-				item = Implosion.getItem();
-				world.dropItemNaturally(l, item);
-				sendRareDropMessage(p, "Implosion");
-				item = GoldorSecrets.getItem();
-				world.dropItemNaturally(l, item);
-				sendRareDropMessage(p, "Goldor's Secrets");
-				item = WitherShield.getItem();
-				world.dropItemNaturally(l, item);
-				sendRareDropMessage(p, "Wither Shield");
-				item = NecronSecrets.getItem();
-				world.dropItemNaturally(l, item);
-				sendRareDropMessage(p, "Necron's Secrets");
-				item = Handle.getItem();
-				world.dropItemNaturally(l, item);
-				sendRareDropMessage(p, "Necron's Handle");
-				item = WitherKingCrown.getItem();
-				world.dropItemNaturally(l, item);
-				sendRareDropMessage(p, "Crown of the Wither King");
-
-
-			}, 220);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> dropLoot(damagee, damager), 220);
 			return false;
 		}
 		return true;
+	}
+
+	private void dropLoot(LivingEntity damagee, Entity damager) {
+		ItemStack item;
+		World world = damagee.getWorld();
+		Location l = damagee.getLocation();
+		Player p;
+		if(damager instanceof Player p1) {
+			p = p1;
+		} else {
+			p = Plugin.getNearestPlayer(damagee);
+			if(p != null && p.getLocation().distance(damagee.getLocation()) > 16) {
+				p = null;
+			}
+		}
+		item = MaxorSecrets.getItem();
+		world.dropItemNaturally(l, item);
+		sendRareDropMessage(p, "Maxor's Secrets");
+		item = ShadowWarp.getItem();
+		world.dropItemNaturally(l, item);
+		sendRareDropMessage(p, "Shadow Warp");
+		item = StormSecrets.getItem();
+		world.dropItemNaturally(l, item);
+		sendRareDropMessage(p, "Storm's Secrets");
+		item = Implosion.getItem();
+		world.dropItemNaturally(l, item);
+		sendRareDropMessage(p, "Implosion");
+		item = GoldorSecrets.getItem();
+		world.dropItemNaturally(l, item);
+		sendRareDropMessage(p, "Goldor's Secrets");
+		item = WitherShield.getItem();
+		world.dropItemNaturally(l, item);
+		sendRareDropMessage(p, "Wither Shield");
+		item = NecronSecrets.getItem();
+		world.dropItemNaturally(l, item);
+		sendRareDropMessage(p, "Necron's Secrets");
+		item = Handle.getItem();
+		world.dropItemNaturally(l, item);
+		sendRareDropMessage(p, "Necron's Handle");
+		item = WitherKingCrown.getItem();
+		world.dropItemNaturally(l, item);
+		sendRareDropMessage(p, "Crown of the Wither King");
+
+		CustomMobs.updateWitherLordFight(false);
+
+		p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
+		Bukkit.broadcastMessage(p.getName() + " has completed the challenge " + ChatColor.DARK_PURPLE + "[Slayer of Withers, Master of Worlds]");
 	}
 
 	@Override

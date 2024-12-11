@@ -77,14 +77,14 @@ public class Plugin extends JavaPlugin {
 		getServer().addRecipe(AddRecipes.addEfficiency6Recipe(this));
 		getServer().addRecipe(AddRecipes.addFeatherFalling5Recipe(this));
 
-		UltimateAdvancementAPI api = UltimateAdvancementAPI.getInstance(this);
+		/*UltimateAdvancementAPI api = UltimateAdvancementAPI.getInstance(this);
 
 		AdvancementTab tab = api.createAdvancementTab("skyblock");
 
 		RootAdvancement root = new RootAdvancement(tab, "root", new AdvancementDisplay(Material.NETHER_STAR, "SkyBlock", AdvancementFrameType.TASK, false, false, 0, 0, "Fully featured in 3-5 business days!"), "textures/block/light_blue_concrete");
 		BaseAdvancement advancement = new BaseAdvancement("defeat_wither_lords", new AdvancementDisplay(Material.NETHERITE_SWORD, "Slayer of Withers, Master of Worlds", AdvancementFrameType.CHALLENGE, true, true, 1, 0, "You are a mighty warrior."), root);
 
-		tab.registerAdvancements(root, advancement);
+		tab.registerAdvancements(root, advancement);*/
 
 		getLogger().info("Started SkyBlock in Vanilla!");
 

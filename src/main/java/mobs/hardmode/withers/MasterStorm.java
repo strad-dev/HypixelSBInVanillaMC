@@ -18,14 +18,15 @@ import java.util.Random;
 import static listeners.CustomDamage.calculateFinalDamage;
 
 public class MasterStorm implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD;
+	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
 		PluginUtils.spawnTNT(e, e.getLocation(), 0, 32, 50, immune);
-		e.getWorld().playSound(e.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
+		p = Plugin.getNearestPlayer(e);
+		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
 		e.setHealth(500.0);
@@ -36,12 +37,15 @@ public class MasterStorm implements CustomWither {
 		e.addScoreboardTag("Invulnerable");
 		e.addScoreboardTag("Survival1");
 		e.addScoreboardTag("Survival2Trigger");
+		e.setCustomName(name);
+		PluginUtils.changeName(e);
 
 		spawnGuards(e);
 		spawnLightning(e);
+		Player finalP = p;
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			e.getWorld().playSound(e, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ": When I'm not making lightning, I love creating explosions!");
+			finalP.getWorld().playSound(finalP, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": When I'm not making lightning, I love creating explosions!");
 		}, 480);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("5", "BOOM!", 0, 21, 0)), 500);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("4", "BOOM!", 0, 21, 0)), 520);
@@ -122,14 +126,15 @@ public class MasterStorm implements CustomWither {
 			damagee.addScoreboardTag("Survival2");
 			damagee.addScoreboardTag("Invulnerable");
 
-			damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ": You think you're funny?  Try surviving this!");
+			Player p = Plugin.getNearestPlayer(damagee);
+			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You think you're funny?  Try surviving this!");
 
 			spawnMoreGuards(damagee);
 			spawnMoreLightning(damagee);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-				Bukkit.broadcastMessage(name + ": I wasn't giving my all in that last explosion.  Good luck surviving this one!");
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I wasn't giving my all in that last explosion.  Good luck surviving this one!");
 			}, 480);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("3", "BIGGER BOOM!", 0, 21, 0)), 540);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("2", "BIGGER BOOM!", 0, 21, 0)), 560);
@@ -146,24 +151,26 @@ public class MasterStorm implements CustomWither {
 			damagee.setHealth(250.0);
 			return false;
 		} else if(hp - originalDamage < 1) {
+			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
-			Bukkit.broadcastMessage(name + ": I knew I should have prepared better.");
-			damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I knew I should have prepared better.");
+			Player p = Plugin.getNearestPlayer(damagee);
+			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-				Bukkit.broadcastMessage(name + ": Have fun dealing with the others.");
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Have fun dealing with the others.");
 			}, 50);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
-				damagee.getWorld().playSound(damagee.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
+				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
 				PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 32, 50, new ArrayList<>());
 			}, 100);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I hear some vermin prowling around my territory.");
 			}, 250);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				damagee.getWorld().playSound(damagee, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I hope you're prepared for a long fight!");
 			}, 300);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
