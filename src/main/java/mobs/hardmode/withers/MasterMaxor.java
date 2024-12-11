@@ -18,6 +18,7 @@ import static listeners.CustomDamage.teleport;
 
 public class MasterMaxor implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD;
+
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 300, new ArrayList<>());
@@ -33,7 +34,7 @@ public class MasterMaxor implements CustomWither {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(name + ": Centuries of rumination, only to be rudely awaken by you unworthy scum!"), 100);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(name + ": You are brave for attempting to fight us."), 150);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(name + ": WE WILL WIPE THE FLOOR WITH YOUR REMAINS!!!"), 200);
-		Bukkit.getLogger().info("MASTER Maxor has been summoned!");
+		Bukkit.getLogger().info("A player has initiated THE GAUNTLET!");
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> PluginUtils.spawnTNT(e, e.getLocation(), 0, 32, 50, new ArrayList<>()), 220);
 
@@ -44,7 +45,7 @@ public class MasterMaxor implements CustomWither {
 
 	private void spawnGuards(Mob e) {
 		if(!e.isDead()) {
-			PluginUtils.spawnGuards(e);
+			PluginUtils.spawnGuards(e, 15);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 300);
 		}
 	}
@@ -71,8 +72,8 @@ public class MasterMaxor implements CustomWither {
 				damagee.remove();
 				PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 32, 50, new ArrayList<>());
 			}, 100);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": It seems that you have defeated my brother."), 250);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": No worries, the party is just getting started!"), 300);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": It seems that you have defeated my brother."), 250);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": No worries, the party is just getting started!"), 300);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
 				new MasterStorm().onSpawn(Plugin.getNearestPlayer(damagee), wither);

@@ -120,7 +120,7 @@ public class WitherKing implements CustomWither {
 	private static void spawnSkeletons(Entity damager) {
 		if(damager instanceof LivingEntity entity) {
 			Location l = entity.getLocation();
-			PluginUtils.spawnGuards(entity);
+			PluginUtils.spawnGuards(entity, 15);
 			entity.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Wither King summons His Guards to defend Him!");
 			l.getWorld().playSound(l, Sound.ITEM_GOAT_HORN_SOUND_2, 2.0F, 1.0F);
 		}

@@ -46,6 +46,7 @@ public class PluginUtils {
 	public static void spawnTNT(Entity spawner, Location l, int fuse, int radius, int damage, List<EntityType> immune) {
 		TNTPrimed tnt = (TNTPrimed) l.getWorld().spawnEntity(l, EntityType.TNT);
 		tnt.setFuseTicks(fuse + 20);
+		spawner.getWorld().playSound(spawner.getLocation(), Sound.ENTITY_TNT_PRIMED, 2.0F, 1.0F);
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			List<Entity> entities = tnt.getNearbyEntities(radius, radius, radius);
@@ -55,12 +56,13 @@ public class PluginUtils {
 				}
 			}
 			tnt.remove();
-			spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), (int) Math.pow(radius, 2.5), radius, radius, radius);
+			spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), (int) Math.pow(radius, 3), radius, radius / 2.0, radius);
+			spawner.getWorld().playSound(spawner.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 0.6F);
 		}, fuse);
 	}
 
-	public static void spawnGuards(LivingEntity entity) {
-		for(int i = 0; i < 15; i++) {
+	public static void spawnGuards(LivingEntity entity, int num) {
+		for(int i = 0; i < num; i++) {
 			WitherSkeleton e = (WitherSkeleton) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.WITHER_SKELETON);
 			e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither King's Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 20 + "/" + 20);
 			ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
