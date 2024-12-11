@@ -20,7 +20,7 @@ public class Holy implements CustomDragon {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Young Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(2.00);
+		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(2.00);
 		e.addScoreboardTag("HolyDragon");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The YOUNG DRAGON has arrived to practise yeeting Nons into the Void!");
 		Bukkit.getLogger().info("The Holy Dragon has been summoned!");

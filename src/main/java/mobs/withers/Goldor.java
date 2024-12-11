@@ -10,7 +10,7 @@ public class Goldor implements CustomWither {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		e.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(13.0);
+		e.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(13.0);
 		e.addScoreboardTag("Goldor");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "GOLDOR, the most defensive Wither in the universe, has come to stand in your way!");
 		Bukkit.getLogger().info("Goldor has been summoned!");

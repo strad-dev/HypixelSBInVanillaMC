@@ -19,7 +19,7 @@ public class Old implements CustomDragon {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Old Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(400.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(400.0);
 		e.setHealth(400.0);
 		e.addScoreboardTag("OldDragon");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The OLD DRAGON has arrived for one last battle!");

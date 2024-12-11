@@ -25,11 +25,11 @@ public class WardenHelmet implements Armor {
 		AttributeModifier toughness = new AttributeModifier(UUID.fromString("c1474682-574f-472c-a611-62da34f6e1f1"), "wardenHelmetToughness", 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
 		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("4e16c033-3349-4fb7-a0c6-0fac98ef6c6a"), "wardenHelmetAntiKB", 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
 		AttributeModifier speed = new AttributeModifier(UUID.fromString("f15d0a37-e366-4c5a-982d-57995d036a6c"), "wardenHelmetSpeed", -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HEAD);
-		data.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, speed);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
-		data.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, antiKB);
+		data.addAttributeModifier(Attribute.MOVEMENT_SPEED, speed);
+		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
+		data.addAttributeModifier(Attribute.ARMOR, armor);
+		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
+		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();

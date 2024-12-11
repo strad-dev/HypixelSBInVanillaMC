@@ -21,11 +21,11 @@ public class MutantEnderman implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Mutant Enderman" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(150.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(150.0);
 		e.setHealth(150.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)).setBaseValue(11.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)).setBaseValue(20.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.45);
+		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR_TOUGHNESS)).setBaseValue(11.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.ATTACK_DAMAGE)).setBaseValue(20.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.45);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		e.setTarget(Plugin.getNearestPlayer(e));
 		e.setCustomNameVisible(true);

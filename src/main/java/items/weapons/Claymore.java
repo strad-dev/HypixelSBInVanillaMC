@@ -26,9 +26,9 @@ public class Claymore implements AbilityItem {
 		AttributeModifier attackSpeed = new AttributeModifier(UUID.fromString("e51c72e7-2b0d-4064-8d7f-89133cfd4b8b"), "claymoreModifier", 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
 		AttributeModifier attackDamage = new AttributeModifier(UUID.fromString("25cc1a90-327d-4115-a912-869e883862f4"), "claymoreModifierDmg", 9, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
 		AttributeModifier attackRange = new AttributeModifier(UUID.fromString("95037a43-49c4-4d9e-93a7-49c50c59e811"), "claymoreModifierRange", 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, attackDamage);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, attackSpeed);
-		data.addAttributeModifier(Attribute.PLAYER_ENTITY_INTERACTION_RANGE, attackRange);
+		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
+		data.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeed);
+		data.addAttributeModifier(Attribute.ENTITY_INTERACTION_RANGE, attackRange);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		String loreDamage;

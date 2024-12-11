@@ -63,7 +63,7 @@ public class CustomItemUses implements Listener {
 				newName = mob.onSpawn(p, entity);
 			}
 			int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
-			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
 			newName += " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + maxHealth;
 			// " ♥ 20/20";
 			entity.setCustomName(newName);

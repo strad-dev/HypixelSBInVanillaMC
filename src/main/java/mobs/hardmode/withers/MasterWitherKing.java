@@ -25,11 +25,11 @@ public class MasterWitherKing implements CustomWither {
 	public String onSpawn(Player p, Mob e) {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
-		e.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(2.0);
-		e.getAttribute(Attribute.GENERIC_FLYING_SPEED).setBaseValue(2.0);
-		e.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(6.0);
-		e.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(14.0);
-		e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(2000.0);
+		e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(2.0);
+		e.getAttribute(Attribute.FLYING_SPEED).setBaseValue(2.0);
+		e.getAttribute(Attribute.SCALE).setBaseValue(6.0);
+		e.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(14.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(2000.0);
 		e.setHealth(2000.0);
 		e.addScoreboardTag("WitherKing");
 		e.addScoreboardTag("HardMode");
@@ -58,10 +58,10 @@ public class MasterWitherKing implements CustomWither {
 			EnderDragon dragon = (EnderDragon) e.getWorld().spawnEntity(e.getLocation().add(0, 12, 0), EntityType.ENDER_DRAGON);
 			dragon.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Wither King's Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 1024 + "/" + 1024);
 			dragon.setCustomNameVisible(true);
-			dragon.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1.0);
-			dragon.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(20.0);
-			dragon.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(20.0);
-			dragon.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1024.0);
+			dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+			dragon.getAttribute(Attribute.ARMOR).setBaseValue(20.0);
+			dragon.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(20.0);
+			dragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1024.0);
 			dragon.setHealth(1024.0);
 			dragon.addScoreboardTag("SkyblockBoss");
 			dragon.addScoreboardTag("WitherKingDragon");
@@ -128,55 +128,55 @@ public class MasterWitherKing implements CustomWither {
 	}
 
 	public static void checkSkeletons(LivingEntity damagee, Entity damager) {
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.9 && damagee.getScoreboardTags().contains("WitherKing90")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.9 && damagee.getScoreboardTags().contains("WitherKing90")) {
 			damagee.removeScoreboardTag("WitherKing90");
 			spawnSkeletons(damager);
 			Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿"
 					+ ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Ouch!  That hurts!  BRING IN THE GUARDS.");
 		}
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.80 && damagee.getScoreboardTags().contains("WitherKing80")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.80 && damagee.getScoreboardTags().contains("WitherKing80")) {
 			damagee.removeScoreboardTag("WitherKing80");
 			spawnSkeletons(damager);
 			Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿"
 					+ ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Wow.  You are still alive?  Take more guards then.");
 		}
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.70 && damagee.getScoreboardTags().contains("WitherKing70")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.70 && damagee.getScoreboardTags().contains("WitherKing70")) {
 			damagee.removeScoreboardTag("WitherKing70");
 			spawnSkeletons(damager);
 			Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿"
 					+ ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Your persistence is immesureable.  I applaud you.");
 		}
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.60 && damagee.getScoreboardTags().contains("WitherKing60")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.60 && damagee.getScoreboardTags().contains("WitherKing60")) {
 			damagee.removeScoreboardTag("WitherKing60");
 			spawnSkeletons(damager);
 			Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿"
 					+ ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Still not tired yet?  I hope not, I was just getting the party started.");
 		}
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.50 && damagee.getScoreboardTags().contains("WitherKing50")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.50 && damagee.getScoreboardTags().contains("WitherKing50")) {
 			damagee.removeScoreboardTag("WitherKing50");
 			spawnSkeletons(damager);
 			Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿"
 					+ ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You're halfway there.  Time to step up my game.");
 		}
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.40 && damagee.getScoreboardTags().contains("WitherKing40")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.40 && damagee.getScoreboardTags().contains("WitherKing40")) {
 			damagee.removeScoreboardTag("WitherKing40");
 			spawnSkeletons(damager);
 			Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿"
 					+ ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I thought I could get rid of you by forcing you to come near me.  I guess I was wrong.");
 		}
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.30 && damagee.getScoreboardTags().contains("WitherKing30")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.30 && damagee.getScoreboardTags().contains("WitherKing30")) {
 			damagee.removeScoreboardTag("WitherKing30");
 			spawnSkeletons(damager);
 			Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿"
 					+ ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Enjoying this, are you?");
 		}
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.20 && damagee.getScoreboardTags().contains("WitherKing20")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.20 && damagee.getScoreboardTags().contains("WitherKing20")) {
 			damagee.removeScoreboardTag("WitherKing20");
 			spawnSkeletons(damager);
 			Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿"
 					+ ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Not tired yet?  I applaud you, most warriors are usually dead by now.");
 		}
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.10 && damagee.getScoreboardTags().contains("WitherKing10")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.10 && damagee.getScoreboardTags().contains("WitherKing10")) {
 			damagee.removeScoreboardTag("WitherKing10");
 			spawnSkeletons(damager);
 			Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿"
@@ -200,9 +200,9 @@ public class MasterWitherKing implements CustomWither {
 				e.getEquipment().setItemInOffHand(shield);
 				e.getEquipment().setItemInOffHandDropChance(0.0F);
 
-				e.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(0.5);
-				e.getAttribute(Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
-				e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(50.0);
+				e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+				e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
+				e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(50.0);
 				e.setHealth(50.0);
 				e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 				e.setTarget(entity);

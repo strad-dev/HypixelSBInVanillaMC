@@ -23,7 +23,7 @@ public class MasterMaxor implements CustomWither {
 	public String onSpawn(Player p, Mob e) {
 		PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 300, new ArrayList<>());
 
-		e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(500.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
 		e.setHealth(500.0);
 		e.addScoreboardTag("Maxor");
 		e.addScoreboardTag("HardMode");

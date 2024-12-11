@@ -17,7 +17,7 @@ public class AllMobsHaveNames implements Listener {
 			if(temp instanceof LivingEntity entity && entity.getCustomName() == null) {
 				// add health to the entity name
 				int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
-				int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+				int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
 
 				// " ♥ 20/20";
 				entity.setCustomName(ChatColor.AQUA + entity.getName() + " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + maxHealth);

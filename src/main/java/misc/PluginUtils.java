@@ -18,7 +18,7 @@ public class PluginUtils {
 		if(!(entity instanceof Player)) {
 			String[] oldName;
 			int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount());
-			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
 			try {
 				oldName = Objects.requireNonNull(entity.getCustomName()).split(" ");
 			} catch(Exception exception) {
@@ -74,8 +74,8 @@ public class PluginUtils {
 			e.getEquipment().setItemInOffHand(shield);
 			e.getEquipment().setItemInOffHandDropChance(0.0F);
 
-			Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.5);
-			Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
+			Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
+			Objects.requireNonNull(e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
 			e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 			e.setTarget(entity);
 			e.teleport(entity);

@@ -18,10 +18,10 @@ public class Apex implements CustomDragon {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Apex Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(500.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(500.0);
 		e.setHealth(500.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_ARMOR)).setBaseValue(12.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(0.875);
+		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR)).setBaseValue(12.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.875);
 		e.addScoreboardTag("ApexDragon");
 		e.addScoreboardTag("HardMode");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Apex Dragon has been summoned!");

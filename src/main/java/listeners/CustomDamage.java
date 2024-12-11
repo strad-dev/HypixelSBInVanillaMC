@@ -74,7 +74,7 @@ public class CustomDamage implements Listener {
 
 			// this section controls when bosses deal damage
 			if(damagerMob != null) {
-				doContinue = damagerMob.whenDamaging(damagee);
+				doContinue = damagerMob.whenDamaging(damagee, damager, originalDamage, type);
 			}
 			if(!isBlocking) {
 				switch(damager) {
@@ -118,11 +118,11 @@ public class CustomDamage implements Listener {
 			}
 
 			if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
-				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.GENERIC_ARMOR)).getValue();
+				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
 				finalDamage *= Math.max(0.25, 1 - armor * 0.0375);
 			}
 
-			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS)).getValue() - 8, 0); // only toughness values of 9 or more will give damage reduction
+			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR_TOUGHNESS)).getValue() - 8, 0); // only toughness values of 9 or more will give damage reduction
 			finalDamage *= Math.max(0.2, 1 - toughness * 0.1);
 
 			double resistance = 0;
@@ -241,7 +241,7 @@ public class CustomDamage implements Listener {
 
 				// apply knockback
 				if((type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED) && damager != null) {
-					double antiKB = Objects.requireNonNull(damagee.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE)).getValue();
+					double antiKB = Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
 					double factor = 0.33 * (1 - antiKB);
 					Vector oldVelocity = damagee.getVelocity();
 					double x = oldVelocity.getX();

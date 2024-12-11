@@ -26,7 +26,7 @@ public class AOTV implements AbilityItem {
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Aspect of the Void");
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "AOTVModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, attackDamage);
+		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();

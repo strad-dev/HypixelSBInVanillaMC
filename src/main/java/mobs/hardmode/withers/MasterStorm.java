@@ -23,7 +23,7 @@ public class MasterStorm implements CustomWither {
 		immune.add(EntityType.WITHER_SKELETON);
 		PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 300, immune);
 
-		e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(500.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
 		e.setHealth(500.0);
 		e.setAI(false);
 		e.addScoreboardTag("Storm");

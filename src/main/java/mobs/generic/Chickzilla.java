@@ -18,7 +18,7 @@ public class Chickzilla implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Chickzilla" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue(1000.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(1000.0);
 		e.setHealth(1000.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		e.setTarget(Plugin.getNearestPlayer(e));

@@ -14,8 +14,8 @@ public class MasterGoldor implements CustomWither {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 
-		e.getAttribute(Attribute.GENERIC_ARMOR).setBaseValue(20.0);
-		e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(500.0);
+		e.getAttribute(Attribute.ARMOR).setBaseValue(20.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
 		e.setHealth(500.0);
 		e.addScoreboardTag("Goldor");
 		e.addScoreboardTag("HardMode");

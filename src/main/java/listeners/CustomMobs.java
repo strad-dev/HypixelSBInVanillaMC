@@ -54,7 +54,7 @@ public class CustomMobs implements Listener {
 					case EnderDragon dragon -> {
 						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
 							name = CustomDragon.spawnRandom().onSpawn(Plugin.getNearestPlayer(dragon), dragon);
-							dragon.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+							dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 							dragon.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 							dragon.setTarget(Plugin.getNearestPlayer(dragon));
 							dragon.setCustomNameVisible(true);
@@ -79,7 +79,7 @@ public class CustomMobs implements Listener {
 
 			// add health to the entity name if it doesn't exist already
 			int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
-			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
 			if(name.isEmpty()) {
 				name = ChatColor.AQUA + entity.getName();
 			}

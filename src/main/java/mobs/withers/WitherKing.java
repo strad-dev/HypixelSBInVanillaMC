@@ -24,11 +24,11 @@ public class WitherKing implements CustomWither {
 	public String onSpawn(Player p, Mob e) {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
-		e.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(2.0);
-		e.getAttribute(Attribute.GENERIC_FLYING_SPEED).setBaseValue(2.0);
-		e.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(3.0);
-		e.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(13.0);
-		e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(600.0);
+		e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(2.0);
+		e.getAttribute(Attribute.FLYING_SPEED).setBaseValue(2.0);
+		e.getAttribute(Attribute.SCALE).setBaseValue(3.0);
+		e.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(13.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(600.0);
 		e.setHealth(600.0);
 		e.addScoreboardTag("WitherKing");
 		e.addScoreboardTag("WitherKing75");
@@ -46,9 +46,9 @@ public class WitherKing implements CustomWither {
 			EnderDragon dragon = (EnderDragon) e.getWorld().spawnEntity(e.getLocation().add(0, 12, 0), EntityType.ENDER_DRAGON);
 			dragon.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither King's Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 1024 + "/" + 1024);
 			dragon.setCustomNameVisible(true);
-			dragon.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE).setBaseValue(1.0);
-			dragon.getAttribute(Attribute.GENERIC_ARMOR_TOUGHNESS).setBaseValue(17.9);
-			dragon.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1024.0);
+			dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+			dragon.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(17.9);
+			dragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1024.0);
 			dragon.setHealth(1024.0);
 			dragon.addScoreboardTag("SkyblockBoss");
 			dragon.addScoreboardTag("WitherKingDragon");
@@ -103,15 +103,15 @@ public class WitherKing implements CustomWither {
 	}
 
 	public static void checkSkeletons(LivingEntity damagee, Entity damager) {
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.75 && damagee.getScoreboardTags().contains("WitherKing75")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.75 && damagee.getScoreboardTags().contains("WitherKing75")) {
 			damagee.removeScoreboardTag("WitherKing75");
 			spawnSkeletons(damager);
 		}
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.50 && damagee.getScoreboardTags().contains("WitherKing50")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.50 && damagee.getScoreboardTags().contains("WitherKing50")) {
 			damagee.removeScoreboardTag("WitherKing50");
 			spawnSkeletons(damager);
 		}
-		if(damagee.getHealth() <= damagee.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() * 0.25 && damagee.getScoreboardTags().contains("WitherKing25")) {
+		if(damagee.getHealth() <= damagee.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.25 && damagee.getScoreboardTags().contains("WitherKing25")) {
 			damagee.removeScoreboardTag("WitherKing25");
 			spawnSkeletons(damager);
 		}

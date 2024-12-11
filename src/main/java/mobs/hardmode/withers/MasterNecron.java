@@ -14,8 +14,8 @@ public class MasterNecron implements CustomWither {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		e.getAttribute(Attribute.GENERIC_SCALE).setBaseValue(2);
-		e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(1000.0);
+		e.getAttribute(Attribute.SCALE).setBaseValue(2);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000.0);
 		e.setHealth(1000.0);
 		e.addScoreboardTag("Necron");
 		e.addScoreboardTag("HardMode");

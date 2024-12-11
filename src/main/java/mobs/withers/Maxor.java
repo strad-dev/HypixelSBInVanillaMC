@@ -16,8 +16,8 @@ public class Maxor implements CustomWither {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED)).setBaseValue(2.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.GENERIC_FLYING_SPEED)).setBaseValue(2.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(2.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.FLYING_SPEED)).setBaseValue(2.0);
 		e.addScoreboardTag("Maxor");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "MAXOR, the fastest Wither in the universe, has come to destroy you 0.01 seconds faster than all other Withers!");
 		Bukkit.getLogger().info("Maxor has been summoned!");

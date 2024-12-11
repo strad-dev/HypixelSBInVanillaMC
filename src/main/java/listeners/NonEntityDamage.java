@@ -64,7 +64,7 @@ public class NonEntityDamage implements Listener {
 		Location l = origin.getLocation();
 		if(origin instanceof LivingEntity entity) {
 			try {
-				l.add(0, Objects.requireNonNull(entity.getAttribute(Attribute.GENERIC_SCALE)).getValue() * 1.62, 0);
+				l.add(0, Objects.requireNonNull(entity.getAttribute(Attribute.SCALE)).getValue() * 1.62, 0);
 			} catch(Exception exception) {
 				l.add(0, 1.62, 0);
 			}

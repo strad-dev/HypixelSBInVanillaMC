@@ -26,12 +26,12 @@ public class MaxorBoots implements Armor {
 		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("0c759c56-bd52-41a4-803f-f15275e61e4c"), "maxorBootsAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
 		AttributeModifier speed = new AttributeModifier(UUID.fromString("02307a42-a70a-4e55-a915-a71264f7455d"), "maxorBootsSpeed", 3, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.FEET);
 		AttributeModifier antiFall = new AttributeModifier(UUID.fromString("02307a42-a70a-4e55-a915-a71264f7455d"), "maxorBootsAntiFall", -0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
-		data.addAttributeModifier(Attribute.GENERIC_MOVEMENT_SPEED, speed);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
-		data.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, antiKB);
-		data.addAttributeModifier(Attribute.GENERIC_FALL_DAMAGE_MULTIPLIER, antiFall);
+		data.addAttributeModifier(Attribute.MOVEMENT_SPEED, speed);
+		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
+		data.addAttributeModifier(Attribute.ARMOR, armor);
+		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
+		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
+		data.addAttributeModifier(Attribute.FALL_DAMAGE_MULTIPLIER, antiFall);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();

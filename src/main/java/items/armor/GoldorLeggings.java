@@ -24,10 +24,10 @@ public class GoldorLeggings implements Armor {
 		AttributeModifier armor = new AttributeModifier(UUID.fromString("80b8389f-f018-48c9-b3c0-c576bce5520a"), "goldorLeggingsArmor", 6, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
 		AttributeModifier toughness = new AttributeModifier(UUID.fromString("307e9660-858e-4ba3-9e60-2e0debf02345"), "goldorLeggingsToughness", 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
 		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("e4fd0260-7d71-4881-b47b-4c1bc68ac440"), "goldorLeggingsAntiKB", 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
-		data.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, antiKB);
+		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
+		data.addAttributeModifier(Attribute.ARMOR, armor);
+		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
+		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();

@@ -25,10 +25,10 @@ public class WitherKingCrown implements Armor {
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownArmor"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownToughness"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
-		data.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, antiKB);
+		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
+		data.addAttributeModifier(Attribute.ARMOR, armor);
+		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
+		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();

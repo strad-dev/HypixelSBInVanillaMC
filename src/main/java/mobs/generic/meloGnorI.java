@@ -22,7 +22,7 @@ public class meloGnorI implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "meloG norI" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		e.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(200.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		e.setTarget(Plugin.getNearestPlayer(e));
 		e.setHealth(200.0);

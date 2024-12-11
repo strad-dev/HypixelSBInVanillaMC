@@ -24,10 +24,10 @@ public class NecronElytra implements Armor {
 		AttributeModifier armor = new AttributeModifier(UUID.fromString("92166a58-d64d-465b-9810-3f8966f33566"), "necronElytraArmor", 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
 		AttributeModifier toughness = new AttributeModifier(UUID.fromString("e0f20d73-639a-4530-937e-c7f298b268ec"), "necronElytraToughness", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
 		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("2855bb5e-6e64-4dea-a5c1-63725ec18c9a"), "necronElytraAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, damage);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR, armor);
-		data.addAttributeModifier(Attribute.GENERIC_ARMOR_TOUGHNESS, toughness);
-		data.addAttributeModifier(Attribute.GENERIC_KNOCKBACK_RESISTANCE, antiKB);
+		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
+		data.addAttributeModifier(Attribute.ARMOR, armor);
+		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
+		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();

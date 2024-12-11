@@ -36,8 +36,8 @@ public class Scylla implements AbilityItem {
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Hyperion");
 		AttributeModifier attackSpeed = new AttributeModifier(UUID.fromString("d818fcd7-a2f8-434a-bfc3-6a352185714b"), "scyllaModifier", 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
 		AttributeModifier attackDamage = new AttributeModifier(UUID.fromString("b1bda7a7-b3eb-43b3-9e91-2473e9004f79"), "scyllaModifierDmg", 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, attackDamage);
-		data.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, attackSpeed);
+		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
+		data.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeed);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 
@@ -114,7 +114,7 @@ public class Scylla implements AbilityItem {
 		p.getWorld().spawnParticle(Particle.EXPLOSION, l, 20);
 		List<Entity> entities = p.getNearbyEntities(10, 10, 10);
 		List<EntityType> doNotKill = CustomItems.createList();
-		double targetDamage = Objects.requireNonNull(p.getAttribute(Attribute.GENERIC_ATTACK_DAMAGE)).getValue();
+		double targetDamage = Objects.requireNonNull(p.getAttribute(Attribute.ATTACK_DAMAGE)).getValue();
 		int damaged = 0;
 		double damage = 0;
 		int smite = 0;
