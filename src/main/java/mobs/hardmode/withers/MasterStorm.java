@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static listeners.CustomDamage.calculateFinalDamage;
+
 public class MasterStorm implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD;
 
@@ -150,7 +152,11 @@ public class MasterStorm implements CustomWither {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-
+		if(damager.getScoreboardTags().contains("Survival1")) {
+			calculateFinalDamage(damagee, Plugin.getNearestPlayer(damagee), 12, DamageType.RANGED);
+		} else if(damager.getScoreboardTags().contains("Survival2")) {
+			calculateFinalDamage(damagee, Plugin.getNearestPlayer(damagee), 18, DamageType.RANGED);
+		}
 		return true;
 	}
 
