@@ -35,7 +35,7 @@ public class Apex implements CustomDragon {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		return false;
 	}
 }

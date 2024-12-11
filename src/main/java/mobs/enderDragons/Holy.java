@@ -38,7 +38,7 @@ public class Holy implements CustomDragon {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		return true;
 	}
 }

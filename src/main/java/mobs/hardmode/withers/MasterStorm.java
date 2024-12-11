@@ -149,11 +149,8 @@ public class MasterStorm implements CustomWither {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee) {
-		Random random = new Random();
-		if(random.nextBoolean()) {
-			damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
-		}
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+
 		return true;
 	}
 

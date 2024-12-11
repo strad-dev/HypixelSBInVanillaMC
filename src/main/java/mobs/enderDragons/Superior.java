@@ -48,7 +48,7 @@ public class Superior implements CustomDragon {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		calculateFinalDamage(damagee, Plugin.getNearestPlayer(damagee), 3, DamageType.RANGED);
 		return true;
 	}

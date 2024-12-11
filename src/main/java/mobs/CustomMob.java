@@ -95,5 +95,5 @@ public interface CustomMob {
 	// return false --> do not allow for normal damage to be calculated
 	boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
 
-	boolean whenDamaging(LivingEntity damagee);
+	boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
 }

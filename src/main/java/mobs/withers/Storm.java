@@ -30,7 +30,7 @@ public class Storm implements CustomWither {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		Random random = new Random();
 		if(random.nextBoolean()) {
 			damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);

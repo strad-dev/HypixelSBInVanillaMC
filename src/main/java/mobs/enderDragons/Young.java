@@ -33,6 +33,11 @@ public class Young implements CustomDragon {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+		Random random = new Random();
+		if(random.nextDouble() < 0.1) {
+			teleport(damagee, damagee, 32);
+		}
+
 		if(type == DamageType.RANGED) {
 			calculateFinalDamage(damagee, damager, originalDamage / 3, DamageType.RANGED);
 			return false;
@@ -41,11 +46,7 @@ public class Young implements CustomDragon {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee) {
-		Random random = new Random();
-		if(random.nextDouble() < 0.1) {
-			teleport(damagee, damagee, 32);
-		}
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		return true;
 	}
 }

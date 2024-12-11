@@ -24,7 +24,7 @@ public class Necron implements CustomWither {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		calculateFinalDamage(damagee, Plugin.getNearestPlayer(damagee), 4, DamageType.RANGED);
 		return true;
 	}

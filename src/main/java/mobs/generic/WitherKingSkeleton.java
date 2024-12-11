@@ -24,7 +24,7 @@ public class WitherKingSkeleton implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		return true;
 	}
 }
