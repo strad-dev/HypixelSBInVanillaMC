@@ -48,16 +48,12 @@ public class MasterNecron implements CustomWither {
 		wither.addScoreboardTag("Invulnerable");
 		wither.setAI(false);
 		Bukkit.getOnlinePlayers().forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 0)));
+		Player p = Plugin.getNearestPlayer(wither);
 		teleport(wither, Plugin.getNearestPlayer(wither), 16);
 		for(int i = 0; i < 161; i += 20) {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				wither.getWorld().playSound(wither, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 0.5F);
-				List<Entity> entities = (List<Entity>) wither.getWorld().getNearbyEntities(wither.getLocation(), 8, 16, 8);
-				for(Entity temp : entities) {
-					if(temp instanceof LivingEntity entity && !entity.getScoreboardTags().contains("SkyblockBoss")) {
-						CustomDamage.calculateFinalDamage(entity, wither, 50, DamageType.PLAYER_MAGIC);
-					}
-				}
+				p.getWorld().playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 0.5F);
+				PluginUtils.spawnTNT(wither, wither.getLocation(), 0, 16, 50, new ArrayList<>());
 			}, i);
 		}
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

@@ -1,5 +1,6 @@
 package mobs.hardmode.withers;
 
+import listeners.CustomDamage;
 import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.Plugin;
@@ -53,7 +54,7 @@ public class MasterStorm implements CustomWither {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 560);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 580);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("BOOM!", "", 0, 21, 0));
+			Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BOOM!", "", 0, 21, 0));
 			PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 300, immune);
 			e.removeScoreboardTag("Survival1");
 			e.removeScoreboardTag("Invulnerable");
@@ -91,10 +92,10 @@ public class MasterStorm implements CustomWither {
 		if(!e.isDead() && !e.getScoreboardTags().contains("Survival2")) {
 			if(e.getScoreboardTags().contains("Survival1")) {
 				CustomMobs.spawnLightning(e, 24);
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 100);
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnLightning(e), 100);
 			} else {
 				CustomMobs.spawnLightning(e, 16);
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 200);
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnLightning(e), 200);
 			}
 		}
 	}
@@ -126,6 +127,7 @@ public class MasterStorm implements CustomWither {
 			damagee.removeScoreboardTag("Survival2Trigger");
 			damagee.addScoreboardTag("Survival2");
 			damagee.addScoreboardTag("Invulnerable");
+			CustomDamage.teleport(damagee, damager, 0);
 
 			Player p = Plugin.getNearestPlayer(damagee);
 			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
@@ -136,12 +138,12 @@ public class MasterStorm implements CustomWither {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I wasn't giving my all in that last explosion.  Good luck surviving this one!");
-			}, 480);
+			}, 520);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "3", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 540);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 560);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 580);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("BIGGER BOOM!", "", 0, 21, 0));
+				Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", "", 0, 21, 0));
 				List<EntityType> immune = new ArrayList<>();
 				immune.add(EntityType.WITHER_SKELETON);
 				PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 64, 300, immune);

@@ -88,8 +88,6 @@ public interface CustomMob {
 				return new Young();
 			} else if(tags.contains("WitherKingDragon")) {
 				return new WitherKingDragon();
-			} else if(tags.contains("GuardSkeleton")) {
-				return new WitherKingSkeleton();
 			} else if(tags.contains("Power")) {
 				return new PowerWitherSkeleton();
 			} else if(tags.contains("Fire")) {
@@ -100,6 +98,8 @@ public interface CustomMob {
 				return new SoulWitherSkeleton();
 			} else if(tags.contains("Martial")) {
 				return new MartialWitherSkeleton();
+			} else if(tags.contains("GuardSkeleton")) {
+				return new WitherKingSkeleton();
 			} else {
 				return null;
 			}

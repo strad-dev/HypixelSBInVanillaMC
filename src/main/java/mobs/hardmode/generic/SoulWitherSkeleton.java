@@ -8,10 +8,10 @@ import mobs.CustomMob;
 import mobs.hardmode.withers.MasterWitherKing;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SoulWitherSkeleton implements CustomMob {
 	@Override
@@ -37,6 +37,10 @@ public class SoulWitherSkeleton implements CustomMob {
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		if(damagee.getHealth() - originalDamage < 1) {
+			List<EntityType> immune = new ArrayList<>();
+			immune.add(EntityType.WITHER_SKELETON);
+			immune.add(EntityType.WITHER);
+			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
 			MasterWitherKing.defeatHenchman("Soul");
 			damagee.remove();
 			return false;

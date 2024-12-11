@@ -70,17 +70,17 @@ public class MasterWitherKing implements CustomWither {
 			finalP.getWorld().playSound(finalP.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": One more to join the fray.  I hope you are having fun!");
 			spawnHenchman(e, ordering.get(2));
-		}, 1230);
+		}, 630);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			finalP.getWorld().playSound(finalP.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Another one can't hurt, can it?");
 			spawnHenchman(e, ordering.get(3));
-		}, 2430);
+		}, 1230);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			finalP.getWorld().playSound(finalP.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My last Henchman.  Go forth and destroy the insolent players!");
 			spawnHenchman(e, ordering.get(4));
-		}, 3630);
+		}, 1830);
 
 		spawnGuards(e);
 		boom(e);
@@ -111,11 +111,26 @@ public class MasterWitherKing implements CustomWither {
 		e.addScoreboardTag("HardMode");
 		e.setPersistent(true);
 		switch(which) {
-			case "Power" -> new PowerWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
-			case "Fire" -> new FireWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
-			case "Ice" -> new IceWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
-			case "Soul" -> new SoulWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
-			case "Martial" -> new MartialWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+			case "Power" -> {
+				e.addScoreboardTag("Power");
+				new PowerWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+			}
+			case "Fire" -> {
+				e.addScoreboardTag("Fire");
+				new FireWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+			}
+			case "Ice" -> {
+				e.addScoreboardTag("Ice");
+				new IceWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+			}
+			case "Soul" -> {
+				e.addScoreboardTag("Soul");
+				new SoulWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+			}
+			case "Martial" -> {
+				e.addScoreboardTag("Martial");
+				new MartialWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+			}
 		}
 	}
 
@@ -152,15 +167,12 @@ public class MasterWitherKing implements CustomWither {
 			case 1 -> Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You are getting on my nerves.  Quit being annoying!");
 			case 0 -> Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My energy is waning...  I must use my last hurrah.");
 		}
-		List<EntityType> immune = new ArrayList<>();
-		immune.add(EntityType.WITHER_SKELETON);
-		PluginUtils.spawnTNT(witherKing, witherKing.getLocation(), 0, 12, 25, immune);
 	}
 
 	private void spawnGuards(Mob mob) {
 		if(!mob.isDead()) {
 			Player p = Plugin.getNearestPlayer(mob);
-			int health = 50 + countHenchmenLeft() * 10;
+			int health = 100 - countHenchmenLeft() * 10;
 			for(int i = 0; i < 10 + countHenchmenLeft() * 2; i++) {
 				WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
 				e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + health);
@@ -188,21 +200,21 @@ public class MasterWitherKing implements CustomWither {
 			}
 			mob.getWorld().playSound(mob, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
 
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(mob), 400);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(mob), 300 + countHenchmenLeft() * 20L);
 		}
 	}
 
 	private void boom(Mob e) {
 		if(!e.isDead()) {
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 560);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 580);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 460 + countHenchmenLeft() * 20L);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 480 + countHenchmenLeft() * 20L);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("ENOURMOUS BOOM!", "", 0, 21, 0));
+				Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BOOM!", "", 0, 21, 0));
 				List<EntityType> immune = new ArrayList<>();
 				immune.add(EntityType.WITHER_SKELETON);
-				PluginUtils.spawnTNT(e, e.getLocation(), 0, 48, 100 + countHenchmenLeft() * 20, immune);
+				PluginUtils.spawnTNT(e, e.getLocation(), 0, 48, 200 - countHenchmenLeft() * 20, immune);
 				boom(e);
-			}, 600);
+			}, 500 + countHenchmenLeft() * 20L);
 		}
 	}
 
@@ -218,7 +230,7 @@ public class MasterWitherKing implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			return false;
-		} else if(hp - originalDamage < minHealth) {
+		} else if(hp - originalDamage < minHealth && countHenchmenLeft() != 0) {
 			damagee.setHealth(minHealth);
 			return false;
 		} else if(hp - originalDamage < 1) {

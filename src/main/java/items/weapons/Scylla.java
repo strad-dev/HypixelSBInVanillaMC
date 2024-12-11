@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -167,10 +166,6 @@ public class Scylla implements AbilityItem {
 		}
 		if(!effects.contains(PotionEffectType.RESISTANCE)) { // reduced damage
 			p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 101, 0));
-		}
-		if(!p.getGameMode().equals(GameMode.CREATIVE)) {
-			Score score = CustomItems.currentScore();
-			score.setScore(score.getScore() - manaCost());
 		}
 	}
 
