@@ -20,9 +20,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class CustomMobs implements Listener {
-
-	public static void spawnLightning(Entity entity, int range) {
-		List<Entity> entities = (List<Entity>) entity.getWorld().getNearbyEntities(entity.getLocation(), range, 320, range);
+	/**
+	 * summons lightning on every entity in a given radius
+	 * @param entity the entity at the center
+	 * @param radius the radius to spawn lightning on
+	 */
+	public static void spawnLightning(Entity entity, int radius) {
+		List<Entity> entities = (List<Entity>) entity.getWorld().getNearbyEntities(entity.getLocation(), radius, 320, radius);
 		for(Entity temp : entities) {
 			if(temp instanceof LivingEntity entity1) {
 				entity.getWorld().spawnEntity(entity1.getLocation(), EntityType.LIGHTNING_BOLT);

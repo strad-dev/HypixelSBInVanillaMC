@@ -91,9 +91,23 @@ public interface CustomMob {
 
 	String onSpawn(Player p, Mob e);
 
-	// return true --> allow for normal damage to be calculated
-	// return false --> do not allow for normal damage to be calculated
+	/**
+	 * Handles custom entity behavior when the mob is damaged
+	 * @param damagee the entity in question
+	 * @param damager the entity dealing damage
+	 * @param originalDamage the original damage amount
+	 * @param type the originla damage type
+	 * @return true if the original calculation can proceed; false if not
+	 */
 	boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
 
+	/**
+	 * Handles custom entity behavior when the mob deals damage
+	 * @param damagee the entity taking the damage
+	 * @param damager the entity in question
+	 * @param originalDamage the original damage amount
+	 * @param type the originla damage type
+	 * @return true if the original calculation can proceed; false if not
+	 */
 	boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
 }

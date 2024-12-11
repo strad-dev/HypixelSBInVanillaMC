@@ -42,7 +42,7 @@ public enum DamageType {
 	/*
 	 * Player Magic Damage Type
 	 * ------------------
-	 * Used for all damage via Player Abilities (e.g. Wither Impact, Ice Spray)
+	 * Used for all other Magic damage - either Player Abilities (e.g. Wither Impact, Ice Spray) or other Magical attacks (e.g. MASTER Goldor AOE)
 	 * Affected by: Armor, Toughness, Protection, Resistance
 	 * Knockback: None
 	 * I-Frames: None

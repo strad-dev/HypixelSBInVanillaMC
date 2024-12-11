@@ -21,60 +21,11 @@ import static listeners.CustomDamage.teleport;
 import static listeners.CustomMobs.spawnLightning;
 
 public class MasterWitherKing implements CustomWither {
+	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER-Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD;
+
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER Wither King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
-		e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(2.0);
-		e.getAttribute(Attribute.FLYING_SPEED).setBaseValue(2.0);
-		e.getAttribute(Attribute.SCALE).setBaseValue(6.0);
-		e.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(14.0);
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(2000.0);
-		e.setHealth(2000.0);
-		e.addScoreboardTag("WitherKing");
-		e.addScoreboardTag("HardMode");
-		e.addScoreboardTag("WitherKing90");
-		e.addScoreboardTag("WitherKing80");
-		e.addScoreboardTag("WitherKing70");
-		e.addScoreboardTag("WitherKing60");
-		e.addScoreboardTag("WitherKing50");
-		e.addScoreboardTag("WitherKing40");
-		e.addScoreboardTag("WitherKing30");
-		e.addScoreboardTag("WitherKing20");
-		e.addScoreboardTag("WitherKing10");
-		e.getWorld().setThundering(true);
-		e.getWorld().setWeatherDuration(1000000);
-		Bukkit.broadcastMessage(newName + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Oh?  How long has it been?");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(newName + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Awakening my true form, what an interesting choice."), 40);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(newName + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I suppose defeating my reduced form was not enough for you."), 80);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(newName + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I could convince you to retreat, but I know that will not stop you."), 120);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.broadcastMessage(newName + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": If you can defeat me, you will have earned it.  Good luck."), 160);
-		Bukkit.getLogger().info("The MASTER WITHER KING has been summoned!");
-
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			spawnLightning(e, 128);
-			e.getWorld().createExplosion(e.getLocation(), 15);
-
-			EnderDragon dragon = (EnderDragon) e.getWorld().spawnEntity(e.getLocation().add(0, 12, 0), EntityType.ENDER_DRAGON);
-			dragon.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Wither King's Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 1024 + "/" + 1024);
-			dragon.setCustomNameVisible(true);
-			dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
-			dragon.getAttribute(Attribute.ARMOR).setBaseValue(20.0);
-			dragon.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(20.0);
-			dragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1024.0);
-			dragon.setHealth(1024.0);
-			dragon.addScoreboardTag("SkyblockBoss");
-			dragon.addScoreboardTag("WitherKingDragon");
-			dragon.addScoreboardTag("HardMode");
-			dragon.setTarget(p);
-			dragon.setPersistent(true);
-
-			p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Wither King summons His Dragon!");
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> teleportDragon(dragon, e), 200);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> shootFireball(dragon, e), 50);
-		}, 200);
-
-		return newName;
 	}
 
 	public void teleportDragon(EnderDragon dragon, Mob e) {
