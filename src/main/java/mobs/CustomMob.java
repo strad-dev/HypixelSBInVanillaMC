@@ -3,6 +3,14 @@ package mobs;
 import listeners.DamageType;
 import mobs.enderDragons.*;
 import mobs.generic.*;
+import mobs.generic.AtonedHorror;
+import mobs.generic.Broodfather;
+import mobs.generic.Chickzilla;
+import mobs.generic.MutantEnderman;
+import mobs.generic.Sadan;
+import mobs.generic.VoidgloomSeraph;
+import mobs.generic.meloGnorI;
+import mobs.hardmode.generic.*;
 import mobs.hardmode.withers.*;
 import mobs.withers.*;
 import org.bukkit.entity.Entity;
@@ -82,6 +90,16 @@ public interface CustomMob {
 				return new WitherKingDragon();
 			} else if(tags.contains("GuardSkeleton")) {
 				return new WitherKingSkeleton();
+			} else if(tags.contains("Power")) {
+				return new PowerWitherSkeleton();
+			} else if(tags.contains("Fire")) {
+				return new FireWitherSkeleton();
+			} else if(tags.contains("Ice")) {
+				return new IceWitherSkeleton();
+			} else if(tags.contains("Soul")) {
+				return new SoulWitherSkeleton();
+			} else if(tags.contains("Martial")) {
+				return new MartialWitherSkeleton();
 			} else {
 				return null;
 			}

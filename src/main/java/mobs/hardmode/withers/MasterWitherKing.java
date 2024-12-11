@@ -2,6 +2,7 @@ package mobs.hardmode.withers;
 
 import items.armor.WitherKingCrown;
 import items.ingredients.witherLords.*;
+import listeners.CustomDamage;
 import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.Plugin;
@@ -45,8 +46,10 @@ public class MasterWitherKing implements CustomWither {
 		e.addScoreboardTag("IceUndefeated");
 		e.addScoreboardTag("SoulUndefeated");
 		e.addScoreboardTag("MartialUndefeated");
+		e.setPersistent(true);
 		e.setAI(false);
 		e.setCustomName(name);
+		CustomDamage.teleport(e, p, 0);
 		PluginUtils.changeName(e);
 
 		ArrayList<String> ordering = new ArrayList<>();
@@ -191,8 +194,8 @@ public class MasterWitherKing implements CustomWither {
 
 	private void boom(Mob e) {
 		if(!e.isDead()) {
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("2", "BOOM!", 0, 21, 0)), 560);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("1", "BOOM!", 0, 21, 0)), 580);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 560);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 580);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("ENOURMOUS BOOM!", "", 0, 21, 0));
 				List<EntityType> immune = new ArrayList<>();

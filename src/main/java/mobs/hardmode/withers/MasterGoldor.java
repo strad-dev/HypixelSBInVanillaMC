@@ -31,6 +31,7 @@ public class MasterGoldor implements CustomWither {
 		e.addScoreboardTag("Goldor");
 		e.addScoreboardTag("HardMode");
 		e.addScoreboardTag("SkyblockBoss");
+		e.setPersistent(true);
 		e.setCustomName(name);
 		PluginUtils.changeName(e);
 
@@ -57,8 +58,9 @@ public class MasterGoldor implements CustomWither {
 		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
-
-		if(damagee.getHealth() - originalDamage < 1) {
+		if(damagee.getScoreboardTags().contains("Invulnerable")) {
+			return false;
+		} else if(damagee.getHealth() - (originalDamage / 4) < 1) {
 			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": How did you break through my shield???");

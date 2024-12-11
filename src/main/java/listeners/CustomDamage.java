@@ -3,7 +3,6 @@ package listeners;
 import misc.Plugin;
 import misc.PluginUtils;
 import mobs.CustomMob;
-import mobs.withers.WitherKing;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;

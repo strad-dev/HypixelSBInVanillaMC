@@ -1,6 +1,5 @@
 package mobs.hardmode.generic;
 
-import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.Plugin;
 import misc.PluginUtils;
@@ -19,7 +18,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 

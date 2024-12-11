@@ -23,7 +23,7 @@ public class FireWitherSkeleton implements CustomMob {
 	public String onSpawn(Player p, Mob e) {
 		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Fire" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ");
 		PluginUtils.changeName(e);
-
+		e.addScoreboardTag("Fire");
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
 		sword.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 255);

@@ -13,7 +13,6 @@ import org.bukkit.entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static listeners.CustomDamage.calculateFinalDamage;
 
@@ -37,6 +36,7 @@ public class MasterStorm implements CustomWither {
 		e.addScoreboardTag("Invulnerable");
 		e.addScoreboardTag("Survival1");
 		e.addScoreboardTag("Survival2Trigger");
+		e.setPersistent(true);
 		e.setCustomName(name);
 		PluginUtils.changeName(e);
 
@@ -47,11 +47,11 @@ public class MasterStorm implements CustomWither {
 			finalP.getWorld().playSound(finalP, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": When I'm not making lightning, I love creating explosions!");
 		}, 480);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("5", "BOOM!", 0, 21, 0)), 500);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("4", "BOOM!", 0, 21, 0)), 520);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("3", "BOOM!", 0, 21, 0)), 540);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("2", "BOOM!", 0, 21, 0)), 560);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("1", "BOOM!", 0, 21, 0)), 580);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "5", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 500);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "4", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 520);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "3", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 540);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 560);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 580);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("BOOM!", "", 0, 21, 0));
 			PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 300, immune);
@@ -79,10 +79,10 @@ public class MasterStorm implements CustomWither {
 		if(!e.isDead()) {
 			if(e.getScoreboardTags().contains("Survival2")) {
 				PluginUtils.spawnGuards(e, 20);
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 151);
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnMoreGuards(e), 151);
 			} else {
 				PluginUtils.spawnGuards(e, 10);
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 301);
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnMoreGuards(e), 301);
 			}
 		}
 	}
@@ -103,10 +103,10 @@ public class MasterStorm implements CustomWither {
 		if(!e.isDead()) {
 			if(e.getScoreboardTags().contains("Survival2")) {
 				CustomMobs.spawnLightning(e, 32);
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 60);
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnMoreLightning(e), 60);
 			} else {
 				CustomMobs.spawnLightning(e, 16);
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 200);
+				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnMoreLightning(e), 200);
 			}
 		}
 	}
@@ -122,6 +122,7 @@ public class MasterStorm implements CustomWither {
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			return false;
 		} else if(damagee.getScoreboardTags().contains("Survival2Trigger") && hp - originalDamage < 250) {
+			damagee.setAI(false);
 			damagee.removeScoreboardTag("Survival2Trigger");
 			damagee.addScoreboardTag("Survival2");
 			damagee.addScoreboardTag("Invulnerable");
@@ -136,9 +137,9 @@ public class MasterStorm implements CustomWither {
 				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I wasn't giving my all in that last explosion.  Good luck surviving this one!");
 			}, 480);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("3", "BIGGER BOOM!", 0, 21, 0)), 540);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("2", "BIGGER BOOM!", 0, 21, 0)), 560);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("1", "BIGGER BOOM!", 0, 21, 0)), 580);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "3", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 540);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 560);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 580);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle("BIGGER BOOM!", "", 0, 21, 0));
 				List<EntityType> immune = new ArrayList<>();
@@ -194,7 +195,5 @@ public class MasterStorm implements CustomWither {
 
 	@Override
 	public void whenShootingSkull(WitherSkull skull) {
-		CustomMobs.spawnLightning(skull, 32);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> CustomMobs.spawnLightning(skull, 32), 12);
 	}
 }

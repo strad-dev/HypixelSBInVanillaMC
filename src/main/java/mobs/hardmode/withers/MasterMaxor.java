@@ -8,7 +8,6 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -67,15 +66,13 @@ public class MasterMaxor implements CustomWither {
 		Location l = wither.getLocation();
 		Player p = Plugin.getNearestPlayer(wither);
 		Random random = new Random();
-		l.add(random.nextInt(128) - 64, 0, random.nextInt(128) - 64);
+		l.add(random.nextInt(48) - 24, 0, random.nextInt(48) - 24);
 		for(int i = 319; i > -64; i --) {
 			Block b = l.getWorld().getBlockAt((int) l.getX(), i, (int) l.getZ());
-			System.out.println(b.getType());
-			if(b.getType() != Material.AIR) {
+			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
 				l.setY(i + 1);
 				EnderCrystal crystal = (EnderCrystal) wither.getWorld().spawnEntity(l, EntityType.END_CRYSTAL);
 				crystal.setInvulnerable(true);
-				System.out.println("Crystal spawned at " + l.getX() + " " + l.getY() + " " + l.getZ());
 				crystal.setCustomName(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Energy Crystal");
 				crystal.addScoreboardTag("SkyblockBoss");
 				if(which == 400) {

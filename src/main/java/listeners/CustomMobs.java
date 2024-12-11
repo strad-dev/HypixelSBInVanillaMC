@@ -42,7 +42,11 @@ public class CustomMobs implements Listener {
 
 	@EventHandler
 	public void onEntitySpawn(EntitySpawnEvent e) {
-		boolean hardMode = Plugin.getNearestPlayer(e.getEntity()).hasPotionEffect(PotionEffectType.BAD_OMEN);
+		Player p = Plugin.getNearestPlayer(e.getEntity());
+		boolean hardMode = false;
+		if(p != null) {
+			hardMode = Plugin.getNearestPlayer(e.getEntity()).hasPotionEffect(PotionEffectType.BAD_OMEN);
+		}
 		if(e.getEntity() instanceof LivingEntity entity) {
 			String name = "";
 
