@@ -29,6 +29,7 @@ public class CustomDamage implements Listener {
 	private static EntityDamageEvent e;
 	private static boolean isBlocking;
 	private static boolean flamingArrow;
+	private static int punchArrow = 0;
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		isBlocking = damagee instanceof Player p && p.isBlocking();
@@ -44,8 +45,12 @@ public class CustomDamage implements Listener {
 					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> arrow.setVelocity(arrowSpeed), 1L);
 				}
 
-				if(arrow.isVisualFire()) {
+				if(arrow.getWeapon().containsEnchantment(Enchantment.FLAME)) {
 					flamingArrow = true;
+				}
+
+				if(arrow.getWeapon().containsEnchantment(Enchantment.PUNCH)) {
+					punchArrow = arrow.getWeapon().getEnchantmentLevel(Enchantment.PUNCH);
 				}
 			}
 
@@ -264,10 +269,11 @@ public class CustomDamage implements Listener {
 					double antiKB = Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
 					double enchantments = 1;
 					if(damager instanceof LivingEntity livingEntity) {
-						if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK)) {
+						if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK) && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
 							enchantments += 0.5 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
-						} else if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.PUNCH)) {
-							enchantments += 0.5 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.PUNCH);
+						} else if(punchArrow > 0) {
+							enchantments += 0.5 * punchArrow;
+							punchArrow = 0;
 						}
 					}
 					double factor = 0.33333 * (1 - antiKB) * enchantments;

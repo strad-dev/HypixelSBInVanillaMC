@@ -89,7 +89,7 @@ public class Terminator implements AbilityItem {
 		// calculate power and strength bonus
 		double powerBonus;
 		try {
-			int power = p.getInventory().getItem(p.getInventory().getHeldItemSlot()).getEnchantmentLevel(Enchantment.POWER);
+			int power = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.POWER);
 			powerBonus = power * 0.2;
 			if(power == 7) {
 				powerBonus += 0.1;
@@ -114,16 +114,19 @@ public class Terminator implements AbilityItem {
 		left.setDamage(2 + add);
 		left.setPierceLevel(4);
 		left.setShooter(p);
+		left.setWeapon(p.getInventory().getItemInMainHand());
 		left.addScoreboardTag("TerminatorArrow");
 
 		middle.setDamage(2 + add);
 		middle.setPierceLevel(4);
 		middle.setShooter(p);
+		middle.setWeapon(p.getInventory().getItemInMainHand());
 		middle.addScoreboardTag("TerminatorArrow");
 
 		right.setDamage(2 + add);
 		right.setPierceLevel(4);
 		right.setShooter(p);
+		right.setWeapon(p.getInventory().getItemInMainHand());
 		right.addScoreboardTag("TerminatorArrow");
 
 		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
