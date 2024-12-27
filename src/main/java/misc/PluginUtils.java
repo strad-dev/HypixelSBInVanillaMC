@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,7 +35,16 @@ public class PluginUtils {
 	}
 
 	/**
+	 * Plays a sound for every player on the server
+	 * @param s The sound to play
+	 */
+	public static void playGlobalSound(Sound s) {
+		Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player, s, 1.0F, 1.0F));
+	}
+
+	/**
 	 * Spawns a custom TNT
+	 * If the fuse is 0 ticks, the TNT entity will not be spawned
 	 *
 	 * @param spawner stores the spawner of the TNT; this entity is ALWAYS immune to the TNT's damage
 	 * @param l       the location the TNT should be spawned at
@@ -44,21 +54,32 @@ public class PluginUtils {
 	 * @param immune  represents which entity types are immune to damage; by default, no entity types are immune
 	 */
 	public static void spawnTNT(Entity spawner, Location l, int fuse, int radius, int damage, List<EntityType> immune) {
-		TNTPrimed tnt = (TNTPrimed) l.getWorld().spawnEntity(l, EntityType.TNT);
-		tnt.setFuseTicks(fuse + 20);
-		spawner.getWorld().playSound(spawner.getLocation(), Sound.ENTITY_TNT_PRIMED, 2.0F, 1.0F);
-
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			List<Entity> entities = tnt.getNearbyEntities(radius, radius, radius);
+		if(fuse == 0) {
+			List<Entity> entities = (List<Entity>) l.getWorld().getNearbyEntities(l, radius, radius, radius);
 			for(Entity entity : entities) {
 				if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType())) {
-					CustomDamage.customMobs(entity1, tnt, damage, DamageType.PLAYER_MAGIC);
+					CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
 				}
 			}
-			tnt.remove();
 			spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), (int) Math.pow(radius, 3), radius, radius / 2.0, radius);
 			spawner.getWorld().playSound(spawner.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 0.6F);
-		}, fuse);
+		} else {
+			TNTPrimed tnt = (TNTPrimed) l.getWorld().spawnEntity(l, EntityType.TNT);
+			tnt.setFuseTicks(fuse + 20);
+			spawner.getWorld().playSound(spawner.getLocation(), Sound.ENTITY_TNT_PRIMED, 2.0F, 1.0F);
+
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				List<Entity> entities = tnt.getNearbyEntities(radius, radius, radius);
+				for(Entity entity : entities) {
+					if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType())) {
+						CustomDamage.customMobs(entity1, tnt, damage, DamageType.PLAYER_MAGIC);
+					}
+				}
+				tnt.remove();
+				spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), (int) Math.pow(radius, 3), radius, radius / 2.0, radius);
+				spawner.getWorld().playSound(spawner.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 0.6F);
+			}, fuse);
+		}
 	}
 
 	public static void spawnGuards(LivingEntity entity, int num) {

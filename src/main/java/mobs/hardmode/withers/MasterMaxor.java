@@ -18,38 +18,34 @@ public class MasterMaxor implements CustomWither {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 300, new ArrayList<>());
-		
-		p = Plugin.getNearestPlayer(e);
 
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
-		e.setHealth(500.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(800.0);
+		e.setHealth(800.0);
 		e.addScoreboardTag("Maxor");
 		e.addScoreboardTag("HardMode");
-		e.addScoreboardTag("400Crystal");
-		e.addScoreboardTag("200Crystal");
+		e.addScoreboardTag("600Crystal");
+		e.addScoreboardTag("300Crystal");
 		Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": It seems to me that you think we are weak.");
-		p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-		Player finalP = p;
+		PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			finalP.getWorld().playSound(finalP, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Foolish desicion!  You have not seen us at our most powerful!");
 		}, 50);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			finalP.getWorld().playSound(finalP, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Centuries of rumination, only to be rudely awaken by you unworthy scum!");
 		}, 100);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			finalP.getWorld().playSound(finalP, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You are brave for attempting to fight us.");
 		}, 150);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			finalP.getWorld().playSound(finalP, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": WE WILL WIPE THE FLOOR WITH YOUR REMAINS!!!");
 		}, 200);
 		Bukkit.getLogger().info("A player has initiated THE GAUNTLET!");
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> PluginUtils.spawnTNT(e, e.getLocation(), 0, 32, 50, new ArrayList<>()), 220);
-
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 300);
 
 		return name;
@@ -64,9 +60,8 @@ public class MasterMaxor implements CustomWither {
 
 	private void spawnCrystal(LivingEntity wither, int which) {
 		Location l = wither.getLocation();
-		Player p = Plugin.getNearestPlayer(wither);
 		Random random = new Random();
-		l.add(random.nextInt(48) - 24, 0, random.nextInt(48) - 24);
+		l.add(random.nextInt(32) - 16, 0, random.nextInt(32) - 16);
 		for(int i = 319; i > -64; i --) {
 			Block b = l.getWorld().getBlockAt((int) l.getX(), i, (int) l.getZ());
 			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
@@ -75,24 +70,24 @@ public class MasterMaxor implements CustomWither {
 				crystal.setInvulnerable(true);
 				crystal.setCustomName(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Energy Crystal");
 				crystal.addScoreboardTag("SkyblockBoss");
-				if(which == 400) {
-					wither.removeScoreboardTag("400Crystal");
-					p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				if(which == 600) {
+					wither.removeScoreboardTag("600Crystal");
+					PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": HAHAHA!  Good luck getting around my tricks!");
-					wither.setHealth(400.0);
+					wither.setHealth(600.0);
 				} else {
-					wither.removeScoreboardTag("200Crystal");
-					p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+					wither.removeScoreboardTag("300Crystal");
+					PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": If you fail, you should try and try again!");
-					wither.setHealth(200.0);
+					wither.setHealth(300.0);
 				}
 				wither.addScoreboardTag("Invulnerable");
 				return;
 			}
 		}
 		Bukkit.broadcastMessage(ChatColor.RED + "Oops!  Unable to summon a crystal!  Take it for free.");
-		wither.removeScoreboardTag("400Crystal");
-		wither.removeScoreboardTag("200Crystal");
+		wither.removeScoreboardTag("600Crystal");
+		wither.removeScoreboardTag("300Crystal");
 	}
 
 	@Override
@@ -105,33 +100,32 @@ public class MasterMaxor implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			return false;
-		} else if(damagee.getScoreboardTags().contains("400Crystal") && hp - originalDamage < 400) {
-			spawnCrystal(damagee, 400);
+		} else if(damagee.getScoreboardTags().contains("600Crystal") && hp - originalDamage < 600) {
+			spawnCrystal(damagee, 600);
 			return false;
-		} else if(damagee.getScoreboardTags().contains("200Crystal") && hp - originalDamage < 200) {
-			spawnCrystal(damagee, 200);
+		} else if(damagee.getScoreboardTags().contains("300Crystal") && hp - originalDamage < 300) {
+			spawnCrystal(damagee, 300);
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Well looks like you defeated me.");
-			Player p = Plugin.getNearestPlayer(damagee);
-			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": HOW DID YOU DEFEAT ME?!?!?!");
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": This is only the beginning!");
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": THIS IS ONLY THE BEGINNING!!!");
 			}, 50);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
-				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_DEATH);
 				PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 32, 50, new ArrayList<>());
 			}, 100);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": It seems that you have defeated my brother.");
 			}, 250);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": No worries, the party is just getting started!");
 			}, 300);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

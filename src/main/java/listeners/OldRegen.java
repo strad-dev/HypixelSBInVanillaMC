@@ -12,6 +12,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -29,6 +30,10 @@ public class OldRegen implements Listener {
 	public void onEntityRegainHealth(EntityRegainHealthEvent e) {
 		if(e.getEntityType() != EntityType.PLAYER) {
 			if(e.getEntity() instanceof LivingEntity entity) {
+				if(entity instanceof Wither && entity.getScoreboardTags().contains("Invulnerable")) {
+					e.setCancelled(true);
+					return;
+				}
 				StringBuilder newName;
 				try {
 					String[] oldName = Objects.requireNonNull(entity.getCustomName()).split(" ");

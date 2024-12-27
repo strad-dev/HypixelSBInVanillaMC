@@ -15,6 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
@@ -203,11 +204,30 @@ public class CustomDamage implements Listener {
 					damagee.teleport(new Location(damagee.getWorld(), 0.5, 70.0, 0.5));
 				}
 				if(type == DamageType.PLAYER_MAGIC || type == DamageType.MELEE_SWEEP || isBlocking) {
-					damagee.setHealth(0.0);
+					if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
+						if(damagee instanceof Player p) {
+							if(p.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
+								p.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
+							} else if(p.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
+								p.getEquipment().setItemInOffHand(new ItemStack(Material.AIR));
+							}
+							p.sendTitle(ChatColor.BOLD + "" + ChatColor.YELLOW + "TOTEM POPPED", ChatColor.DARK_GREEN + "This title exists because the Totem would not pop naturally otherwise and I can't get the animation to pop up.", 10, 30, 10);
+						}
+						damagee.getWorld().playSound(damagee, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
+						damagee.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, damagee.getLocation(), 1024);
+
+						damagee.setHealth(1.0);
+						damagee.getActivePotionEffects().forEach(effect -> damagee.removePotionEffect(effect.getType()));
+						damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 900, 1));
+						damagee.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 800, 0));
+						damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
+					} else {
+						damagee.setHealth(0.0);
+					}
 				} else {
 					e.setCancelled(false);
 					damagee.setHealth(0.1);
-					e.setDamage(10);
+					e.setDamage(20);
 				}
 				CustomDrops.loot(damagee, damager);
 			} else {
@@ -242,7 +262,15 @@ public class CustomDamage implements Listener {
 				// apply knockback
 				if((type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED) && damager != null) {
 					double antiKB = Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
-					double factor = 0.33 * (1 - antiKB);
+					double enchantments = 1;
+					if(damager instanceof LivingEntity livingEntity) {
+						if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK)) {
+							enchantments += 0.5 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
+						} else if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.PUNCH)) {
+							enchantments += 0.5 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.PUNCH);
+						}
+					}
+					double factor = 0.33333 * (1 - antiKB) * enchantments;
 					Vector oldVelocity = damagee.getVelocity();
 					double x = oldVelocity.getX();
 					double y = oldVelocity.getY();
@@ -322,7 +350,7 @@ public class CustomDamage implements Listener {
 		Vector added = new Vector(random.nextInt(radius * 2 + 1) - radius, 0, random.nextInt(radius * 2 + 1) - radius);
 		l.add(added);
 		l2.add(added);
-		for(int i = 319; i > -64; i --) {
+		for(int i = 319; i > -64; i--) {
 			Block b = l.getWorld().getBlockAt((int) l.getX(), i, (int) l.getZ());
 			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
 				l.setY(i + 1);
