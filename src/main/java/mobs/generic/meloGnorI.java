@@ -66,7 +66,9 @@ public class meloGnorI implements CustomMob {
 				}
 			}
 		} else {
-			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the meloG norI.");
+			if(damager instanceof Player p) {
+				p.sendTitle("", ChatColor.YELLOW + "You cannot deal " + type + " to the meloG norI.", 0, 20, 0);
+			}
 			damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 		}
 		return false;

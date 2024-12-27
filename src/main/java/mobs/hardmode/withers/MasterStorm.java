@@ -11,6 +11,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,14 +23,14 @@ public class MasterStorm implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		//noinspection DuplicatedCode
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
 		PluginUtils.spawnTNT(e, e.getLocation(), 0, 32, 50, immune);
-		p = Plugin.getNearestPlayer(e);
-		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
+		PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN);
 
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
-		e.setHealth(500.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000.0);
+		e.setHealth(1000.0);
 		e.setAI(false);
 		e.addScoreboardTag("Storm");
 		e.addScoreboardTag("HardMode");
@@ -43,9 +44,15 @@ public class MasterStorm implements CustomWither {
 
 		spawnGuards(e);
 		spawnLightning(e);
-		Player finalP = p;
+		for(int i = 0; i < 600; i += 15) {
+			spamSkulls(e, p, i);
+		}
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			finalP.getWorld().playSound(finalP, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Are you enjoying the party?  I sure am while watching you suffer!");
+		}, 200);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": When I'm not making lightning, I love creating explosions!");
 		}, 480);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "5", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 500);
@@ -65,31 +72,31 @@ public class MasterStorm implements CustomWither {
 	}
 
 	private void spawnGuards(LivingEntity e) {
-		if(!e.isDead() && !e.getScoreboardTags().contains("Survival2")) {
+		if(!e.isDead() && !e.getScoreboardTags().contains("Survival2") && !e.getScoreboardTags().contains("Dead")) {
 			if(e.getScoreboardTags().contains("Survival1")) {
-				PluginUtils.spawnGuards(e, 15);
+				PluginUtils.spawnGuards(e, 3);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 201);
 			} else {
-				PluginUtils.spawnGuards(e, 10);
+				PluginUtils.spawnGuards(e, 2);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 301);
 			}
 		}
 	}
 
 	private void spawnMoreGuards(LivingEntity e) {
-		if(!e.isDead()) {
+		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
 			if(e.getScoreboardTags().contains("Survival2")) {
-				PluginUtils.spawnGuards(e, 20);
+				PluginUtils.spawnGuards(e, 4);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnMoreGuards(e), 151);
 			} else {
-				PluginUtils.spawnGuards(e, 10);
+				PluginUtils.spawnGuards(e, 3);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnMoreGuards(e), 301);
 			}
 		}
 	}
 
 	private void spawnLightning(LivingEntity e) {
-		if(!e.isDead() && !e.getScoreboardTags().contains("Survival2")) {
+		if(!e.isDead() && !e.getScoreboardTags().contains("Survival2") && !e.getScoreboardTags().contains("Dead")) {
 			if(e.getScoreboardTags().contains("Survival1")) {
 				CustomMobs.spawnLightning(e, 24);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnLightning(e), 100);
@@ -101,7 +108,7 @@ public class MasterStorm implements CustomWither {
 	}
 
 	private void spawnMoreLightning(LivingEntity e) {
-		if(!e.isDead()) {
+		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
 			if(e.getScoreboardTags().contains("Survival2")) {
 				CustomMobs.spawnLightning(e, 32);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnMoreLightning(e), 60);
@@ -122,7 +129,7 @@ public class MasterStorm implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			return false;
-		} else if(damagee.getScoreboardTags().contains("Survival2Trigger") && hp - originalDamage < 250) {
+		} else if(damagee.getScoreboardTags().contains("Survival2Trigger") && hp - originalDamage < 500) {
 			damagee.setAI(false);
 			damagee.removeScoreboardTag("Survival2Trigger");
 			damagee.addScoreboardTag("Survival2");
@@ -130,14 +137,21 @@ public class MasterStorm implements CustomWither {
 			CustomDamage.teleport(damagee, damager, 0);
 
 			Player p = Plugin.getNearestPlayer(damagee);
-			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You think you're funny?  Try surviving this!");
 
 			spawnMoreGuards(damagee);
 			spawnMoreLightning(damagee);
+			for(int i = 0; i < 600; i += 10) {
+				spamSkulls(damagee, p, i);
+			}
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I wasn't giving my all in that last explosion.  Good luck surviving this one!");
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Still alive?  You won’t survive what’s coming!");
+			}, 200);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I wasn't giving my all in that last explosion.  Good luck getting past this one!");
 			}, 520);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "3", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 540);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 560);
@@ -151,38 +165,47 @@ public class MasterStorm implements CustomWither {
 				damagee.removeScoreboardTag("Invulnerable");
 				damagee.setAI(true);
 			}, 600);
-			damagee.setHealth(250.0);
+			damagee.setHealth(500.0);
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
+			damagee.addScoreboardTag("Dead");
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I knew I should have prepared better.");
-			Player p = Plugin.getNearestPlayer(damagee);
-			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Have fun dealing with the others.");
-			}, 50);
+			}, 60);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
-				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_DEATH);
 				PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 32, 50, new ArrayList<>());
 			}, 100);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I hear some vermin prowling around my territory.");
-			}, 250);
+			}, 240);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I hope you're prepared for a long fight!");
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I hope you came prepared for a long fight!");
 			}, 300);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
 				new MasterGoldor().onSpawn(Plugin.getNearestPlayer(damagee), wither);
-			}, 320);
+			}, 340);
 			return false;
 		}
 		return true;
+	}
+
+	private void spamSkulls(LivingEntity damagee, Player p, int i) {
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			Vector direction = p.getLocation().toVector().subtract(damagee.getLocation().toVector()).normalize();
+			WitherSkull skull = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL); skull.setDirection(direction);
+			skull.setShooter(damagee);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SHOOT);
+		}, i);
 	}
 
 	@Override
@@ -192,6 +215,7 @@ public class MasterStorm implements CustomWither {
 		} else if(damager.getScoreboardTags().contains("Survival2")) {
 			calculateFinalDamage(damagee, Plugin.getNearestPlayer(damagee), 18, DamageType.RANGED);
 		}
+		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
 		return true;
 	}
 

@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -40,6 +39,16 @@ public class PluginUtils {
 	 */
 	public static void playGlobalSound(Sound s) {
 		Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player, s, 1.0F, 1.0F));
+	}
+
+	/**
+	 * Plays a sound for every player on the server
+	 * @param s The sound to play
+	 * @param volume The volume of the sound
+	 * @param pitch The pitch of the sound
+	 */
+	public static void playGlobalSound(Sound s, float volume, float pitch) {
+		Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player, s, volume, pitch));
 	}
 
 	/**
@@ -85,7 +94,7 @@ public class PluginUtils {
 	public static void spawnGuards(LivingEntity entity, int num) {
 		for(int i = 0; i < num; i++) {
 			WitherSkeleton e = (WitherSkeleton) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.WITHER_SKELETON);
-			e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither King's Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 20 + "/" + 20);
+			e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 75 + "/" + 75);
 			ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 			sword.addEnchantment(Enchantment.KNOCKBACK, 1);
 			ItemStack shield = new ItemStack(Material.SHIELD);
@@ -95,6 +104,7 @@ public class PluginUtils {
 			e.getEquipment().setItemInOffHand(shield);
 			e.getEquipment().setItemInOffHandDropChance(0.0F);
 
+			//noinspection DuplicatedCode
 			Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
 			Objects.requireNonNull(e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
 			e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));

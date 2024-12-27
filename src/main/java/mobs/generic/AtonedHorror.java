@@ -60,7 +60,9 @@ public class AtonedHorror implements CustomMob {
 			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
 		}
 		if(type == DamageType.PLAYER_MAGIC) {
-			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the Atoned Horror.");
+			if(damager instanceof Player p) {
+				p.sendTitle("", ChatColor.YELLOW + "You cannot deal " + type + " to the Atoned Horror.", 0, 20, 0);
+			}
 			return false;
 		}
 		return true;

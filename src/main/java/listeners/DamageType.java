@@ -78,7 +78,7 @@ public enum DamageType {
 	 * I-Frames: Normal
 	 */
 
-	ABSOLUTE
+	ABSOLUTE;
 	/*
 	 * ABSOLUTE Damage Type
 	 * ------------------
@@ -87,4 +87,31 @@ public enum DamageType {
 	 * Knockback: None
 	 * I-Frames: None
 	 */
+
+	public String toString(DamageType type) {
+		switch (type) {
+			case MELEE -> {
+				return "Melee Damage";
+			}
+			case MELEE_SWEEP -> {
+				return "Melee AOE Damage";
+			}
+			case RANGED -> {
+				return "Ranged Damage";
+			}
+			case MAGIC, PLAYER_MAGIC -> {
+				return "Magic Damage";
+			}
+			case ENVIRONMENTAL, IFRAME_ENVIRONMENTAL -> {
+				return "Environmental Damage";
+			}
+			case FALL -> {
+				return "Fall Damage";
+			}
+			case ABSOLUTE -> {
+				return "Absolute Damage";
+			}
+			default -> throw new IllegalArgumentException("Unknown Damage Type");
+		}
+	}
 }

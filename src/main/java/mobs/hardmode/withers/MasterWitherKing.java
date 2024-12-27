@@ -36,8 +36,8 @@ public class MasterWitherKing implements CustomWither {
 		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
 		e.getAttribute(Attribute.SCALE).setBaseValue(2.0);
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
-		e.setHealth(500.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(2000.0);
+		e.setHealth(2000.0);
 		e.addScoreboardTag("WitherKing");
 		e.addScoreboardTag("HardMode");
 		e.addScoreboardTag("SkyblockBoss");
@@ -98,8 +98,10 @@ public class MasterWitherKing implements CustomWither {
 		Objects.requireNonNull(e.getEquipment()).setItemInMainHand(sword);
 		e.getEquipment().setItemInMainHandDropChance(0.0F);
 
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
-		e.setHealth(300.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(666.0);
+		e.setHealth(666.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.SCALE)).setBaseValue(2.0);
+		//noinspection DuplicatedCode
 		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
 		Objects.requireNonNull(e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
@@ -170,10 +172,10 @@ public class MasterWitherKing implements CustomWither {
 	}
 
 	private void spawnGuards(Mob mob) {
-		if(!mob.isDead()) {
+		if(!mob.isDead() && !(mob.getScoreboardTags().contains("Dead"))) {
 			Player p = Plugin.getNearestPlayer(mob);
-			int health = 100 - countHenchmenLeft() * 10;
-			for(int i = 0; i < 10 + countHenchmenLeft() * 2; i++) {
+			int health = 250 - countHenchmenLeft() * 20;
+			for(int i = 0; i < 8 - countHenchmenLeft(); i++) {
 				WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
 				e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + health);
 				ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
@@ -187,6 +189,7 @@ public class MasterWitherKing implements CustomWither {
 
 				e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(health);
 				e.setHealth(health);
+				//noinspection DuplicatedCode
 				Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
 				Objects.requireNonNull(e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
 				e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
@@ -198,14 +201,14 @@ public class MasterWitherKing implements CustomWither {
 				e.addScoreboardTag("HardMode");
 				e.setPersistent(true);
 			}
-			mob.getWorld().playSound(mob, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
 
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(mob), 300 + countHenchmenLeft() * 20L);
 		}
 	}
 
 	private void boom(Mob e) {
-		if(!e.isDead()) {
+		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 460 + countHenchmenLeft() * 20L);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 480 + countHenchmenLeft() * 20L);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
@@ -214,7 +217,7 @@ public class MasterWitherKing implements CustomWither {
 				immune.add(EntityType.WITHER_SKELETON);
 				PluginUtils.spawnTNT(e, e.getLocation(), 0, 48, 200 - countHenchmenLeft() * 20, immune);
 				boom(e);
-			}, 500 + countHenchmenLeft() * 20L);
+			}, 400 + countHenchmenLeft() * 40L);
 		}
 	}
 
@@ -226,7 +229,7 @@ public class MasterWitherKing implements CustomWither {
 		}
 
 		double hp = damagee.getHealth();
-		double minHealth = countHenchmenLeft() * 100;
+		double minHealth = countHenchmenLeft() * 400;
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			return false;
@@ -235,26 +238,27 @@ public class MasterWitherKing implements CustomWither {
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.addScoreboardTag("Invulnerable");
+			damagee.addScoreboardTag("Dead");
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain.");
 			Player p = Plugin.getNearestPlayer(damagee);
 			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Congratulations, you have proven yourself as a mighty warrior.");
-			}, 50);
+			}, 60);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My strength slips away... I can see the light at the end of the tunnel.");
-			}, 100);
+			}, 120);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Goodbye cruel world!  I hope to never see it again!");
-			}, 150);
+			}, 240);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
 				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
-			}, 200);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> dropLoot(damagee, damager), 220);
+			}, 300);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> dropLoot(damagee, damager), 340);
 			return false;
 		}
 		return true;
@@ -269,9 +273,6 @@ public class MasterWitherKing implements CustomWither {
 			p = p1;
 		} else {
 			p = Plugin.getNearestPlayer(damagee);
-			if(p != null && p.getLocation().distance(damagee.getLocation()) > 16) {
-				p = null;
-			}
 		}
 		item = MaxorSecrets.getItem();
 		world.dropItemNaturally(l, item);

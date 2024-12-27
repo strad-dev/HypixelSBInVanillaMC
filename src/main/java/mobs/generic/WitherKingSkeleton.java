@@ -16,8 +16,8 @@ public class WitherKingSkeleton implements CustomMob {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		if(type.equals(DamageType.PLAYER_MAGIC)) {
-			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " to the Wither King's Guards.");
+		if(type.equals(DamageType.PLAYER_MAGIC) && damager instanceof Player p) {
+			p.sendTitle("", ChatColor.YELLOW + "You cannot deal " + type + " to Wither Guards.", 0, 20, 0);
 			return false;
 		}
 		return true;
