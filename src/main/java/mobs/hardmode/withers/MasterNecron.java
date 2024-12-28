@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static listeners.CustomDamage.calculateFinalDamage;
-import static listeners.CustomDamage.teleport;
+import static misc.PluginUtils.teleport;
 
 public class MasterNecron implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
@@ -47,7 +47,7 @@ public class MasterNecron implements CustomWither {
 		wither.addScoreboardTag("Invulnerable");
 		wither.setAI(false);
 		Bukkit.getOnlinePlayers().forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 0)));
-		teleport(wither, Plugin.getNearestPlayer(wither), 16);
+		teleport(wither, 16);
 		for(int i = 0; i < 161; i += 20) {
 			int finalI = i;
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
@@ -92,11 +92,11 @@ public class MasterNecron implements CustomWither {
 		} else if(hp - originalDamage < 1) {
 			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have destroyed us... but you have not destroyed our forefathers.");
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have destroyed us... but you have not destroyed our forefather.");
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": He is a very powerful being.  If you wish to defeat him, tread carefully.");
+				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": He is a very powerful being.  If you wish to defeat Him, tread carefully.");
 			}, 60);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();

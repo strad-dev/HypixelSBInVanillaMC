@@ -7,7 +7,6 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -23,7 +22,6 @@ import org.bukkit.util.Vector;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 
 public class CustomDamage implements Listener {
 	private static EntityDamageEvent e;
@@ -347,27 +345,6 @@ public class CustomDamage implements Listener {
 				}
 			}
 		}
-	}
-
-	public static void teleport(Entity e, Entity damager, int radius) {
-		Random random = new Random();
-		Location l = e.getLocation();
-		Location l2 = e.getLocation();
-		Vector added = new Vector(random.nextInt(radius * 2 + 1) - radius, 0, random.nextInt(radius * 2 + 1) - radius);
-		l.add(added);
-		l2.add(added);
-		for(int i = 319; i > -64; i--) {
-			Block b = l.getWorld().getBlockAt((int) l.getX(), i, (int) l.getZ());
-			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
-				l.setY(i + 1);
-				e.teleport(l);
-				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + e.getName() + " has teleported away!");
-				e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
-				return;
-			}
-		}
-		damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + e.getName() + " could not find a spot to teleport to!");
-		e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
 	}
 
 	public static void setEvent(EntityDamageEvent e) {

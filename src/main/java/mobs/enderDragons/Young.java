@@ -11,7 +11,7 @@ import org.bukkit.util.Vector;
 import java.util.Random;
 
 import static listeners.CustomDamage.calculateFinalDamage;
-import static listeners.CustomDamage.teleport;
+import static misc.PluginUtils.teleport;
 
 public class Young implements CustomDragon {
 	@Override
@@ -35,7 +35,7 @@ public class Young implements CustomDragon {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		Random random = new Random();
 		if(random.nextDouble() < 0.1) {
-			teleport(damagee, damagee, 32);
+			teleport(damagee, 32);
 		}
 
 		if(type == DamageType.RANGED) {

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static listeners.CustomDamage.calculateFinalDamage;
+import static misc.PluginUtils.teleport;
 
 public class MasterStorm implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
@@ -134,7 +135,7 @@ public class MasterStorm implements CustomWither {
 			damagee.removeScoreboardTag("Survival2Trigger");
 			damagee.addScoreboardTag("Survival2");
 			damagee.addScoreboardTag("Invulnerable");
-			CustomDamage.teleport(damagee, damager, 0);
+			teleport(damagee, 0);
 
 			Player p = Plugin.getNearestPlayer(damagee);
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);

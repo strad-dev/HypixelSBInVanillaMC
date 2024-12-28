@@ -1,6 +1,5 @@
 package mobs.hardmode.withers;
 
-import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.Plugin;
 import misc.PluginUtils;
@@ -53,7 +52,7 @@ public class MasterGoldor implements CustomWither {
 		}
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			return false;
-		} else if(damagee.getHealth() - (originalDamage / 4) < 1) {
+		} else if(damagee.getHealth() - originalDamage < 1) {
 			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
 			damagee.addScoreboardTag("Dead");

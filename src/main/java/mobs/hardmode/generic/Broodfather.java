@@ -17,6 +17,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Objects;
 
+import static misc.PluginUtils.teleport;
+
 public class Broodfather implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -37,7 +39,7 @@ public class Broodfather implements CustomMob {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		CustomDamage.teleport(damagee, damager, 12);
+		teleport(damagee, 12);
 		CustomDamage.calculateFinalDamage(damagee, damager, 1, DamageType.ABSOLUTE);
 		return false;
 	}

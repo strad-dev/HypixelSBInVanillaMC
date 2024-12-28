@@ -2,13 +2,6 @@ package mobs;
 
 import listeners.DamageType;
 import mobs.enderDragons.*;
-import mobs.generic.AtonedHorror;
-import mobs.generic.Broodfather;
-import mobs.generic.Chickzilla;
-import mobs.generic.MutantEnderman;
-import mobs.generic.Sadan;
-import mobs.generic.VoidgloomSeraph;
-import mobs.generic.meloGnorI;
 import mobs.generic.*;
 import mobs.hardmode.withers.*;
 import mobs.withers.*;

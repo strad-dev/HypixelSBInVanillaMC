@@ -14,8 +14,8 @@ import org.bukkit.entity.*;
 import java.util.Random;
 
 import static listeners.CustomDamage.calculateFinalDamage;
-import static listeners.CustomDamage.teleport;
 import static listeners.CustomMobs.spawnLightning;
+import static misc.PluginUtils.teleport;
 
 public class WitherKing implements CustomWither {
 	@Override
@@ -77,7 +77,7 @@ public class WitherKing implements CustomWither {
 
 		Random random = new Random();
 		if(!type.equals(DamageType.RANGED) && random.nextDouble() < 0.1 || type.equals(DamageType.RANGED) && random.nextDouble() < 0.05) {
-			teleport(damagee, damager, 16);
+			teleport(damagee, 16);
 		}
 
 		checkSkeletons(damagee, damager);

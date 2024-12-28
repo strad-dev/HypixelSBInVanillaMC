@@ -19,6 +19,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.*;
 
 import static listeners.CustomDrops.sendRareDropMessage;
+import static misc.PluginUtils.teleport;
 
 public class MasterWitherKing implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER-Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
@@ -48,7 +49,7 @@ public class MasterWitherKing implements CustomWither {
 		e.setPersistent(true);
 		e.setAI(false);
 		e.setCustomName(name);
-		CustomDamage.teleport(e, p, 0);
+		teleport(e, 0);
 		PluginUtils.changeName(e);
 
 		ArrayList<String> ordering = new ArrayList<>();
@@ -64,22 +65,22 @@ public class MasterWitherKing implements CustomWither {
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My henchmen are the best in the land.  They will defeat you swiftly!");
 			spawnHenchman(e, ordering.getFirst());
 			spawnHenchman(e, ordering.get(1));
-		}, 30);
+		}, 40);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			finalP.getWorld().playSound(finalP.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": One more to join the fray.  I hope you are having fun!");
 			spawnHenchman(e, ordering.get(2));
-		}, 630);
+		}, 640);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			finalP.getWorld().playSound(finalP.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Another one can't hurt, can it?");
 			spawnHenchman(e, ordering.get(3));
-		}, 1230);
+		}, 1240);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			finalP.getWorld().playSound(finalP.getLocation(), Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My last Henchman.  Go forth and destroy the insolent players!");
 			spawnHenchman(e, ordering.get(4));
-		}, 1830);
+		}, 1840);
 
 		spawnGuards(e);
 		boom(e);
@@ -176,7 +177,7 @@ public class MasterWitherKing implements CustomWither {
 			int health = 250 - countHenchmenLeft() * 20;
 			for(int i = 0; i < 8 - countHenchmenLeft(); i++) {
 				WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
-				e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + health);
+				e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + health);
 				ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 				sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 5);
 				ItemStack shield = new ItemStack(Material.SHIELD);
@@ -240,17 +241,17 @@ public class MasterWitherKing implements CustomWither {
 			damagee.addScoreboardTag("Dead");
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain.");
 			Player p = Plugin.getNearestPlayer(damagee);
-			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Congratulations, you have proven yourself as a mighty warrior.");
 			}, 60);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My strength slips away... I can see the light at the end of the tunnel.");
 			}, 120);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 1.0F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Goodbye cruel world!  I hope to never see it again!");
 			}, 240);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

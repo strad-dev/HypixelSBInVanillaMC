@@ -1,6 +1,5 @@
 package mobs.hardmode.withers;
 
-import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.Plugin;
 import misc.PluginUtils;
@@ -28,7 +27,7 @@ public class SoulWitherSkeleton implements CustomMob {
 
 	private void teleport(Mob e) {
 		if(!e.isDead()) {
-			CustomDamage.teleport(e, Plugin.getNearestPlayer(e), 16);
+			PluginUtils.teleport(e, 16);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> teleport(e), 300);
 		}
 	}
