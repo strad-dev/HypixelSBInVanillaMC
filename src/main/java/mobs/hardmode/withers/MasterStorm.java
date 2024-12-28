@@ -120,6 +120,15 @@ public class MasterStorm implements CustomWither {
 		}
 	}
 
+	private void spamSkulls(LivingEntity damagee, Player p, int i) {
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			Vector direction = p.getLocation().toVector().subtract(damagee.getLocation().toVector()).normalize();
+			WitherSkull skull = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL); skull.setDirection(direction);
+			skull.setShooter(damagee);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SHOOT);
+		}, i);
+	}
+
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
@@ -202,15 +211,6 @@ public class MasterStorm implements CustomWither {
 			return false;
 		}
 		return true;
-	}
-
-	private void spamSkulls(LivingEntity damagee, Player p, int i) {
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			Vector direction = p.getLocation().toVector().subtract(damagee.getLocation().toVector()).normalize();
-			WitherSkull skull = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL); skull.setDirection(direction);
-			skull.setShooter(damagee);
-			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SHOOT);
-		}, i);
 	}
 
 	@Override

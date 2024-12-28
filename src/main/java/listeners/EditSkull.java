@@ -14,7 +14,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 public class EditSkull implements Listener {
 	@EventHandler
 	public void onProjectileLaunch(ProjectileLaunchEvent e) {
-		if(e.getEntity() instanceof WitherSkull skull) {
+		if(e.getEntity() instanceof WitherSkull skull && skull.getShooter() != null) {
 			CustomWither wither = (CustomWither) CustomMob.getMob((Wither) skull.getShooter());
 			wither.whenShootingSkull(skull);
 		} else if(e.getEntity() instanceof DragonFireball fireball) {
