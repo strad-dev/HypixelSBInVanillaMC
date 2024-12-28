@@ -131,6 +131,7 @@ public class MasterStorm implements CustomWither {
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			return false;
 		} else if(damagee.getScoreboardTags().contains("Survival2Trigger") && hp - originalDamage < 500) {
+			PluginUtils.changeName(damagee);
 			damagee.setAI(false);
 			damagee.removeScoreboardTag("Survival2Trigger");
 			damagee.addScoreboardTag("Survival2");
@@ -172,6 +173,8 @@ public class MasterStorm implements CustomWither {
 			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
 			damagee.addScoreboardTag("Dead");
+			damagee.setHealth(1.0);
+			PluginUtils.changeName(damagee);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I knew I should have prepared better.");
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

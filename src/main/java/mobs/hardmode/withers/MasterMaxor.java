@@ -85,6 +85,7 @@ public class MasterMaxor implements CustomWither {
 				}
 				wither.addScoreboardTag("Invulnerable");
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> wither.addScoreboardTag("InvulnerableReminder"), 60L);
+				Bukkit.broadcastMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!  Maybe it is useful?");
 				return;
 			}
 		}
@@ -110,14 +111,18 @@ public class MasterMaxor implements CustomWither {
 			return false;
 		} else if(damagee.getScoreboardTags().contains("600Crystal") && hp - originalDamage < 600) {
 			spawnCrystal(damagee, 600);
+			PluginUtils.changeName(damagee);
 			return false;
 		} else if(damagee.getScoreboardTags().contains("300Crystal") && hp - originalDamage < 300) {
 			spawnCrystal(damagee, 300);
+			PluginUtils.changeName(damagee);
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
 			damagee.addScoreboardTag("Dead");
+			damagee.setHealth(1.0);
+			PluginUtils.changeName(damagee);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": HOW DID YOU DEFEAT ME?!?!?!");
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

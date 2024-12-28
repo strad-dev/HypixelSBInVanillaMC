@@ -29,8 +29,8 @@ public class MasterNecron implements CustomWither {
 		p = Plugin.getNearestPlayer(e);
 		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
-		e.setHealth(500.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1400.0);
+		e.setHealth(1400.0);
 		e.addScoreboardTag("Necron");
 		e.addScoreboardTag("HardMode");
 		e.addScoreboardTag("SkyblockBoss");
@@ -52,7 +52,7 @@ public class MasterNecron implements CustomWither {
 			int finalI = i;
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 0.5F);
-				PluginUtils.spawnTNT(wither, wither.getLocation(), 0, 16 + finalI, 40 + finalI * 5, new ArrayList<>());
+				PluginUtils.spawnTNT(wither, wither.getLocation(), 0, 16 + (finalI / 20), 40 + (finalI / 20) * 5, new ArrayList<>());
 			}, i);
 		}
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
@@ -85,9 +85,11 @@ public class MasterNecron implements CustomWither {
 			return false;
 		} else if(damagee.getScoreboardTags().contains("1100Frenzy") && hp - originalDamage < 1100) {
 			frenzy(damagee, 1100);
+			PluginUtils.changeName(damagee);
 			return false;
 		} else if(damagee.getScoreboardTags().contains("300Frenzy") && hp - originalDamage < 300) {
 			frenzy(damagee, 300);
+			PluginUtils.changeName(damagee);
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.setAI(false);

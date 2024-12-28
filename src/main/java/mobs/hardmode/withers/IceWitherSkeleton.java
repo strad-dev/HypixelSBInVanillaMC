@@ -47,8 +47,8 @@ public class IceWitherSkeleton implements CustomMob {
 			damagee.getWorld().playSound(damagee, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.0F);
 			damagee.getWorld().spawnParticle(Particle.SNOWFLAKE, damagee.getLocation(), 1000);
 			if(damagee instanceof Player p) {
-				p.sendTitle(ChatColor.AQUA + "" + ChatColor.BOLD + "❄ ❅ ❆", ChatColor.BLUE + "Brrrr...", 0, 101, 0);
-				p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "The Henchman of Ice Ice Sprayed you for 5 seconds!");
+				p.sendTitle(ChatColor.AQUA + "" + ChatColor.BOLD + "❄ ❅ ❆", ChatColor.BLUE + "Brrrr...", 0, 201, 0);
+				p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "The Henchman of Ice Ice Sprayed you for 10 seconds!");
 			}
 		}
 		return true;

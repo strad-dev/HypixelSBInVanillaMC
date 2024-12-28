@@ -2,7 +2,6 @@ package mobs.hardmode.withers;
 
 import items.armor.WitherKingCrown;
 import items.ingredients.witherLords.*;
-import listeners.CustomDamage;
 import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.Plugin;
@@ -161,13 +160,16 @@ public class MasterWitherKing implements CustomWither {
 		witherKing.removeScoreboardTag(which + "Undefeated");
 		int left = countHenchmenLeft();
 		switch(left) {
-			case 4 -> Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My most loyal henchman, what have they done to you?");
+			case 4 ->
+					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My most loyal henchman, what have they done to you?");
 			case 3 ->
 					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": It seems my henchmen are not as powerful as I thought they were.  I suppose i must help them out.");
 			case 2 ->
 					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Are you this heartless?  Murdering my defenseless followers for no good reason.");
-			case 1 -> Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You are getting on my nerves.  Quit being annoying!");
-			case 0 -> Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My energy is waning...  I must use my last hurrah.");
+			case 1 ->
+					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You are getting on my nerves.  Quit being annoying!");
+			case 0 ->
+					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My energy is waning...  I must use my last hurrah.");
 		}
 	}
 
@@ -209,14 +211,24 @@ public class MasterWitherKing implements CustomWither {
 
 	private void boom(Mob e) {
 		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 460 + countHenchmenLeft() * 20L);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 480 + countHenchmenLeft() * 20L);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BOOM!", "", 0, 21, 0));
-				List<EntityType> immune = new ArrayList<>();
-				immune.add(EntityType.WITHER_SKELETON);
-				PluginUtils.spawnTNT(e, e.getLocation(), 0, 48, 200 - countHenchmenLeft() * 20, immune);
-				boom(e);
+				if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
+					Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0));
+				}
+			}, 360 + countHenchmenLeft() * 40L);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
+					Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0));
+				}
+			}, 380 + countHenchmenLeft() * 40L);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+				if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
+					Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BOOM!", "", 0, 21, 0));
+					List<EntityType> immune = new ArrayList<>();
+					immune.add(EntityType.WITHER_SKELETON);
+					PluginUtils.spawnTNT(e, e.getLocation(), 0, 48, 200 - countHenchmenLeft() * 20, immune);
+					boom(e);
+				}
 			}, 400 + countHenchmenLeft() * 40L);
 		}
 	}
@@ -232,13 +244,17 @@ public class MasterWitherKing implements CustomWither {
 		double minHealth = countHenchmenLeft() * 400;
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
+			PluginUtils.changeName(damagee);
 			return false;
 		} else if(hp - originalDamage < minHealth && countHenchmenLeft() != 0) {
 			damagee.setHealth(minHealth);
+			PluginUtils.changeName(damagee);
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.addScoreboardTag("Invulnerable");
 			damagee.addScoreboardTag("Dead");
+			damagee.setHealth(1.0);
+			PluginUtils.changeName(damagee);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain.");
 			Player p = Plugin.getNearestPlayer(damagee);
 			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
