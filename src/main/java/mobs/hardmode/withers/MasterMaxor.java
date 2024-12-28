@@ -103,6 +103,7 @@ public class MasterMaxor implements CustomWither {
 		double hp = damagee.getHealth();
 
 		if(damager instanceof Player && damagee.getScoreboardTags().contains("Invulnerable")) {
+			PluginUtils.changeName(damagee);
 			if(damagee.getScoreboardTags().contains("InvulnerableReminder")) {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": YOUR WEAK, PUNY ATTACKS CANNOT GET AROUND MY TRICKS!");

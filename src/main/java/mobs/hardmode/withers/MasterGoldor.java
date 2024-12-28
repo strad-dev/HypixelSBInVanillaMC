@@ -51,6 +51,7 @@ public class MasterGoldor implements CustomWither {
 			return false;
 		}
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
+			PluginUtils.changeName(damagee);
 			return false;
 		} else if(damagee.getHealth() - originalDamage < 1) {
 			damagee.setAI(false);

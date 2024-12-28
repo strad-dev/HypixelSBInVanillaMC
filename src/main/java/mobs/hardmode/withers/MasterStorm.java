@@ -129,6 +129,7 @@ public class MasterStorm implements CustomWither {
 		double hp = damagee.getHealth();
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
+			PluginUtils.changeName(damagee);
 			return false;
 		} else if(damagee.getScoreboardTags().contains("Survival2Trigger") && hp - originalDamage < 500) {
 			PluginUtils.changeName(damagee);

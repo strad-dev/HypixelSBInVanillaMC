@@ -82,6 +82,7 @@ public class MasterNecron implements CustomWither {
 		double hp = damagee.getHealth();
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
+			PluginUtils.changeName(damagee);
 			return false;
 		} else if(damagee.getScoreboardTags().contains("1100Frenzy") && hp - originalDamage < 1100) {
 			frenzy(damagee, 1100);
