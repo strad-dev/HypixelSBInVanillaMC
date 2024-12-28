@@ -1,37 +1,21 @@
-package mobs.hardmode.generic;
+package mobs.hardmode.withers;
 
-import listeners.CustomDamage;
 import listeners.DamageType;
-import misc.Plugin;
 import misc.PluginUtils;
 import mobs.CustomMob;
-import mobs.hardmode.withers.MasterWitherKing;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SoulWitherSkeleton implements CustomMob {
+public class PowerWitherSkeleton implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of the Soul" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ");
+		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Power" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ");
 		PluginUtils.changeName(e);
-		e.addScoreboardTag("Soul");
-
-		e.setAI(false);
-
-		teleport(e);
-
+		e.addScoreboardTag("Power");
 		return "";
-	}
-
-	private void teleport(Mob e) {
-		if(!e.isDead()) {
-			CustomDamage.teleport(e, Plugin.getNearestPlayer(e), 16);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> teleport(e), 300);
-		}
 	}
 
 	@Override
@@ -41,7 +25,7 @@ public class SoulWitherSkeleton implements CustomMob {
 			immune.add(EntityType.WITHER_SKELETON);
 			immune.add(EntityType.WITHER);
 			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
-			MasterWitherKing.defeatHenchman("Soul");
+			MasterWitherKing.defeatHenchman("Power");
 			damagee.remove();
 			return false;
 		}
@@ -50,6 +34,7 @@ public class SoulWitherSkeleton implements CustomMob {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+		PluginUtils.spawnTNT(damager, damagee.getLocation(), 20, 6, 10, new ArrayList<>());
 		return true;
 	}
 }

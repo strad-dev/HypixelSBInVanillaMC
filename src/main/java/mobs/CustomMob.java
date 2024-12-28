@@ -10,7 +10,6 @@ import mobs.generic.Sadan;
 import mobs.generic.VoidgloomSeraph;
 import mobs.generic.meloGnorI;
 import mobs.generic.*;
-import mobs.hardmode.generic.*;
 import mobs.hardmode.withers.*;
 import mobs.withers.*;
 import org.bukkit.entity.Entity;
@@ -111,7 +110,7 @@ public interface CustomMob {
 
 	/**
 	 * Handles custom entity behavior when the mob is damaged
-	 * @param damagee the entity in question
+	 * @param damagee the custom entity
 	 * @param damager the entity dealing damage
 	 * @param originalDamage the original damage amount
 	 * @param type the originla damage type
@@ -122,7 +121,7 @@ public interface CustomMob {
 	/**
 	 * Handles custom entity behavior when the mob deals damage
 	 * @param damagee the entity taking the damage
-	 * @param damager the entity in question
+	 * @param damager the custom entity
 	 * @param originalDamage the original damage amount
 	 * @param type the originla damage type
 	 * @return true if the original calculation can proceed; false if not

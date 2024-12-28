@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
@@ -72,9 +73,13 @@ public class IceSpray implements AbilityItem {
 				} else {
 					damage += 1;
 					customMobs(entity1, p, 1, DamageType.PLAYER_MAGIC);
-					entity1.addPotionEffect(PotionEffectType.SLOWNESS.createEffect(101, 3));
+					entity1.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 101, 3));
 					entity1.addScoreboardTag("IceSprayed");
 					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> entity1.removeScoreboardTag("IceSprayed"), 101L);
+					if(entity1 instanceof Player enemy) {
+						enemy.sendTitle(ChatColor.AQUA + "" + ChatColor.BOLD + "❄ ❅ ❆", ChatColor.BLUE + "Brrrr...", 0, 101, 0);
+						enemy.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + p.getName() + " has Ice Sprayed you for 5 seconds!");
+					}
 				}
 			}
 		}
@@ -91,6 +96,7 @@ public class IceSpray implements AbilityItem {
 	public void onLeftClick(Player p) {
 
 	}
+
 	public int manaCost() {
 		return MANA_COST;
 	}

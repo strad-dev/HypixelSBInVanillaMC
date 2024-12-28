@@ -7,7 +7,6 @@ import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.Plugin;
 import misc.PluginUtils;
-import mobs.hardmode.generic.*;
 import mobs.withers.CustomWither;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;

@@ -216,7 +216,7 @@ public class CustomDamage implements Listener {
 							} else if(p.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
 								p.getEquipment().setItemInOffHand(new ItemStack(Material.AIR));
 							}
-							p.sendTitle(ChatColor.BOLD + "" + ChatColor.YELLOW + "TOTEM POPPED", ChatColor.DARK_GREEN + "This title exists because the Totem would not pop naturally otherwise and I can't get the animation to pop up.", 10, 30, 10);
+							p.sendTitle(ChatColor.BOLD + "" + ChatColor.YELLOW + "\uD83D\uDC7C", ChatColor.DARK_GREEN + "Totem of Undying Used!", 5, 30, 5);
 						}
 						damagee.getWorld().playSound(damagee, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
 						damagee.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, damagee.getLocation(), 1024);
