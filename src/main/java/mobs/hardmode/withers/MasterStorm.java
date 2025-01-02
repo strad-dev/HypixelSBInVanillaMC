@@ -119,7 +119,6 @@ public class MasterStorm implements CustomWither {
 		}
 	}
 
-	// TODO - test angle of skull spam
 	private void spamSkulls(LivingEntity damagee, Player p, int i) {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			Vector directionMain = p.getLocation().toVector().subtract(damagee.getLocation().toVector()).normalize();
@@ -128,10 +127,10 @@ public class MasterStorm implements CustomWither {
 			WitherSkull skullMain = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL);
 			skullMain.setDirection(directionMain);
 			skullMain.setShooter(damagee);
-			WitherSkull skullLeft = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL);
+			WitherSkull skullLeft = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(1, 1.5, 0), EntityType.WITHER_SKULL);
 			skullLeft.setDirection(directionLeft);
 			skullLeft.setShooter(damagee);
-			WitherSkull skullRight = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL);
+			WitherSkull skullRight = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(-1, 1.5, 0), EntityType.WITHER_SKULL);
 			skullRight.setDirection(directionRight);
 			skullRight.setShooter(damagee);
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SHOOT);

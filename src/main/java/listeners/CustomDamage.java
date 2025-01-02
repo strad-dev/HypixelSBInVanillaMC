@@ -268,9 +268,9 @@ public class CustomDamage implements Listener {
 					double enchantments = 1;
 					if(damager instanceof LivingEntity livingEntity) {
 						if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK) && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
-							enchantments += 0.5 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
+							enchantments += 0.667 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
 						} else if(punchArrow > 0) {
-							enchantments += 0.5 * punchArrow;
+							enchantments += 0.667 * punchArrow;
 							punchArrow = 0;
 						}
 					}
@@ -292,19 +292,19 @@ public class CustomDamage implements Listener {
 						double yaw = Math.toRadians(rawYaw);
 						if(rawYaw <= -90) {
 							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y += 0.333 * antiKB;
+							y += 0.25 * antiKB;
 							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw >= 90) {
 							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y += 0.333 * antiKB;
+							y += 0.25 * antiKB;
 							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw < 0) {
 							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y += 0.333 * antiKB;
+							y += 0.25 * antiKB;
 							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw >= 0) {
 							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y += 0.333 * antiKB;
+							y += 0.25 * antiKB;
 							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
 						}
 					} else {
@@ -312,19 +312,19 @@ public class CustomDamage implements Listener {
 						double yaw = Math.toRadians(rawYaw);
 						if(rawYaw <= -90) {
 							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y += 0.333 * antiKB;
+							y += 0.25 * antiKB;
 							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw >= 90) {
 							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y += 0.333 * antiKB;
+							y += 0.25 * antiKB;
 							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw < 0) {
 							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y += 0.333 * antiKB;
+							y += 0.25 * antiKB;
 							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw >= 0) {
 							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y += 0.333 * antiKB;
+							y += 0.25 * antiKB;
 							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
 						}
 					}

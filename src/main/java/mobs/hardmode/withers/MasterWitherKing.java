@@ -269,12 +269,12 @@ public class MasterWitherKing implements CustomWither {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Goodbye cruel world!  I hope to never see it again!");
-			}, 240);
+			}, 180);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
 				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
-			}, 300);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> dropLoot(damagee, damager), 340);
+			}, 240);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> dropLoot(damagee, damager), 300);
 			return false;
 		}
 		return true;

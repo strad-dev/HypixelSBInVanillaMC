@@ -54,6 +54,7 @@ public class CustomMobs implements Listener {
 			try {
 				switch(entity) {
 					case Wither wither -> {
+						wither.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 						if(!isWitherLordFightActive) {
 							if(hardMode) {
 								name = new MasterMaxor().onSpawn(Plugin.getNearestPlayer(wither), wither);

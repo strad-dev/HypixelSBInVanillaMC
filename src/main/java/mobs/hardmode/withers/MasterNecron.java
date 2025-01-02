@@ -95,6 +95,9 @@ public class MasterNecron implements CustomWither {
 		} else if(hp - originalDamage < 1) {
 			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
+			damagee.addScoreboardTag("Dead");
+			damagee.setHealth(1.0);
+			PluginUtils.changeName(damagee);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have destroyed us... but you have not destroyed our forefather.");
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
