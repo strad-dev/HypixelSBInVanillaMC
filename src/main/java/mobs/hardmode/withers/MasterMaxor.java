@@ -85,7 +85,7 @@ public class MasterMaxor implements CustomWither {
 				}
 				wither.addScoreboardTag("Invulnerable");
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> wither.addScoreboardTag("InvulnerableReminder"), 60L);
-				Bukkit.broadcastMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!  Maybe it is useful?");
+				Bukkit.broadcastMessage(ChatColor.YELLOW + "An Energy Crystal has spawned!  Maybe it is useful?");
 				return;
 			}
 		}

@@ -39,7 +39,7 @@ public class CustomItemUses implements Listener {
 		if(e.getRightClicked() instanceof EnderCrystal crystal && crystal.getScoreboardTags().contains("SkyblockBoss")) {
 			crystal.remove();
 			p.addScoreboardTag("HasCrystal");
-			p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!  Maybe it is useful?");
+			p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!");
 		} else if(e.getRightClicked() instanceof Wither wither && wither.getScoreboardTags().contains("Maxor") && p.getScoreboardTags().contains("HasCrystal")) {
 			wither.removeScoreboardTag("Invulnerable");
 			Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???.");

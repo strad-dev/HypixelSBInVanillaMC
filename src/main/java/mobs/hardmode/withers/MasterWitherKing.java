@@ -99,7 +99,7 @@ public class MasterWitherKing implements CustomWither {
 
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(666.0);
 		e.setHealth(666.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.SCALE)).setBaseValue(2.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.SCALE)).setBaseValue(1.333);
 		//noinspection DuplicatedCode
 		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
 		Objects.requireNonNull(e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
@@ -255,7 +255,7 @@ public class MasterWitherKing implements CustomWither {
 			damagee.addScoreboardTag("Dead");
 			damagee.setHealth(1.0);
 			PluginUtils.changeName(damagee);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain.");
+			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain...");
 			Player p = Plugin.getNearestPlayer(damagee);
 			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

@@ -40,7 +40,7 @@ public class MasterGoldor implements CustomWither {
 
 	private void damageAll(Mob e) {
 		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-			PluginUtils.spawnTNT(e, e.getLocation(), 0, 8, Math.min(25, 5 + (int) Math.floor(1200.0 - e.getHealth() / 50.0)), new ArrayList<>());
+			PluginUtils.spawnTNT(e, e.getLocation(), 0, 6, Math.min(25, 5 + (int) Math.floor((1200.0 - e.getHealth()) / 50.0)), new ArrayList<>());
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> damageAll(e), 20);
 		}
 	}
