@@ -1,7 +1,6 @@
 package items.weapons;
 
 import items.AbilityItem;
-import listeners.NonEntityDamage;
 import misc.Plugin;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;

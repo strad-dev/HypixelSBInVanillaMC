@@ -1,19 +1,13 @@
 package listeners;
 
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Particle;
-import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import static listeners.CustomDamage.customMobs;
 

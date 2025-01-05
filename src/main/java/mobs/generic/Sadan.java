@@ -2,7 +2,6 @@ package mobs.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
-import listeners.NonEntityDamage;
 import misc.Plugin;
 import mobs.CustomMob;
 import org.bukkit.*;
