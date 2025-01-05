@@ -12,9 +12,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
+
+import static listeners.CustomDamage.customMobs;
 
 public class PluginUtils {
 	/**
@@ -60,8 +60,60 @@ public class PluginUtils {
 	}
 
 	/**
-	 * Spawns a custom TNT
-	 * If the fuse is 0 ticks, the TNT entity will not be spawned
+	 * Shoot a beam dealing damage to everything in its path!
+	 * @param origin The Entity shooting the beam
+	 * @param destination The Entity that is being targeted<br>If this is the same Entity as the origin, the beam is shot in the direction the Entity is looking at.
+	 * @param color The color of the beam
+	 * @param distance How far the beam should go
+	 * @param pierce How many enemies should be pierced
+	 * @param damage The damage of the beam
+	 */
+	public static void shootBeam(Entity origin, Entity destination, Color color, long distance, long pierce, double damage) {
+		Location l = origin.getLocation();
+		if(origin instanceof LivingEntity entity) {
+			try {
+				l.add(0, Objects.requireNonNull(entity.getAttribute(Attribute.SCALE)).getValue() * 1.62, 0);
+			} catch(Exception exception) {
+				l.add(0, 1.62, 0);
+			}
+		}
+		Vector v;
+		if(origin.equals(destination)) {
+			v = l.getDirection();
+		} else {
+
+			Location destinationLocation = destination.getLocation().add(0, destination.getHeight() / 2, 0);
+			double x = destinationLocation.getX() - l.getX();
+			double y = destinationLocation.getY() - l.getY();
+			double z = destinationLocation.getZ() - l.getZ();
+			v = new Vector(x, y, z);
+		}
+		v.setX(v.getX() / 5);
+		v.setY(v.getY() / 5);
+		v.setZ(v.getZ() / 5);
+		World world = origin.getWorld();
+		Set<Entity> damagedEntities = new HashSet<>();
+		damagedEntities.add(origin);
+		for(int i = 0; i < distance * 5 && pierce > 0; i++) {
+			if(l.getBlock().getType().isSolid()) {
+				break;
+			}
+			ArrayList<Entity> entities = (ArrayList<Entity>) world.getNearbyEntities(l, 1, 1, 1);
+			for(Entity entity : entities) {
+				if(entity instanceof LivingEntity temp && !damagedEntities.contains(entity)) {
+					damagedEntities.add(entity);
+					customMobs(temp, origin, damage, DamageType.RANGED);
+					pierce--;
+				}
+			}
+			Particle.DustOptions particle = new Particle.DustOptions(color, 1.0F);
+			world.spawnParticle(Particle.DUST, l, 1, particle);
+			l.add(v);
+		}
+	}
+
+	/**
+	 * Spawns a custom TNT<br>If the fuse is 0 ticks, the TNT entity will not be spawned
 	 *
 	 * @param spawner stores the spawner of the TNT; this entity is ALWAYS immune to the TNT's damage
 	 * @param l       the location the TNT should be spawned at

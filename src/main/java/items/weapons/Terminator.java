@@ -16,6 +16,8 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
+import static misc.PluginUtils.shootBeam;
+
 public class Terminator implements AbilityItem {
 	private static final String COOLDOWN_TAG = "TerminatorCooldown";
 	private static final int COOLDOWN = 4;
@@ -30,14 +32,26 @@ public class Terminator implements AbilityItem {
 
 		String loreDamage;
 		switch(powerLevel) {
-			case 1 -> loreDamage = "2.2";
-			case 2 -> loreDamage = "2.4";
-			case 3 -> loreDamage = "2.6";
-			case 4 -> loreDamage = "2.8";
-			case 5 -> loreDamage = "3";
-			case 6 -> loreDamage = "3.2";
-			case 7 -> loreDamage = "3.5";
-			default -> loreDamage = "2";
+			case 1 -> loreDamage = "3.75";
+			case 2 -> loreDamage = "4";
+			case 3 -> loreDamage = "4.25";
+			case 4 -> loreDamage = "4.5";
+			case 5 -> loreDamage = "4.75";
+			case 6 -> loreDamage = "5";
+			case 7 -> loreDamage = "5.5";
+			default -> loreDamage = "3.5";
+		}
+
+		String salvationDamage;
+		switch(powerLevel) {
+			case 1 -> salvationDamage = "5.667";
+			case 2 -> salvationDamage = "6.333";
+			case 3 -> salvationDamage = "7";
+			case 4 -> salvationDamage = "7.667";
+			case 5 -> salvationDamage = "8.333";
+			case 6 -> salvationDamage = "9";
+			case 7 -> salvationDamage = "10";
+			default -> salvationDamage = "5";
 		}
 
 		List<String> lore = new ArrayList<>();
@@ -51,7 +65,7 @@ public class Terminator implements AbilityItem {
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Salvation " + ChatColor.GREEN + ChatColor.BOLD + "LEFT CLICK");
 		lore.add(ChatColor.GRAY + "Shoot a beam, penetrating up to");
-		lore.add(ChatColor.YELLOW + "5" + ChatColor.GRAY + " foes and dealing " + ChatColor.RED + "2");
+		lore.add(ChatColor.YELLOW + "5" + ChatColor.GRAY + " foes and dealing " + ChatColor.RED + salvationDamage);
 		lore.add(ChatColor.GRAY + "damage to each enemy.");
 		lore.add(ChatColor.GRAY + "Cooldown: " + ChatColor.GREEN + "1s");
 		lore.add("");
@@ -90,9 +104,9 @@ public class Terminator implements AbilityItem {
 		double powerBonus;
 		try {
 			int power = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.POWER);
-			powerBonus = power * 0.2;
+			powerBonus = power * 0.25;
 			if(power == 7) {
-				powerBonus += 0.1;
+				powerBonus += 0.25;
 			}
 		} catch(Exception exception) {
 			powerBonus = 0;
@@ -100,7 +114,7 @@ public class Terminator implements AbilityItem {
 
 		double strengthBonus;
 		try {
-			strengthBonus = 0.5 * p.getPotionEffect(PotionEffectType.STRENGTH).getAmplifier();
+			strengthBonus = 0.75 * p.getPotionEffect(PotionEffectType.STRENGTH).getAmplifier();
 		} catch(Exception exception) {
 			strengthBonus = 0;
 		}
@@ -111,19 +125,19 @@ public class Terminator implements AbilityItem {
 		Arrow middle = p.getWorld().spawnArrow(l, l.getDirection(), 3, 0.1F);
 		Arrow right = p.getWorld().spawnArrow(l, lRight.getDirection(), 3, 0.1F);
 
-		left.setDamage(2 + add);
+		left.setDamage(3.5 + add);
 		left.setPierceLevel(4);
 		left.setShooter(p);
 		left.setWeapon(p.getInventory().getItemInMainHand());
 		left.addScoreboardTag("TerminatorArrow");
 
-		middle.setDamage(2 + add);
+		middle.setDamage(3.5 + add);
 		middle.setPierceLevel(4);
 		middle.setShooter(p);
 		middle.setWeapon(p.getInventory().getItemInMainHand());
 		middle.addScoreboardTag("TerminatorArrow");
 
-		right.setDamage(2 + add);
+		right.setDamage(3.5 + add);
 		right.setPierceLevel(4);
 		right.setShooter(p);
 		right.setWeapon(p.getInventory().getItemInMainHand());
@@ -139,21 +153,24 @@ public class Terminator implements AbilityItem {
 		if(!p.getScoreboardTags().contains("SalvationCooldown")) {double powerBonus;
 			try {
 				int power = p.getInventory().getItem(p.getInventory().getHeldItemSlot()).getEnchantmentLevel(Enchantment.POWER);
-				powerBonus = power * 0.5;
+				powerBonus = power * 0.667;
+				if(power == 7) {
+					powerBonus += 0.331;
+				}
 			} catch(Exception exception) {
 				powerBonus = 0;
 			}
 
 			double strengthBonus;
 			try {
-				strengthBonus = p.getPotionEffect(PotionEffectType.STRENGTH).getAmplifier();
+				strengthBonus = 1.5 * p.getPotionEffect(PotionEffectType.STRENGTH).getAmplifier();
 			} catch(Exception exception) {
 				strengthBonus = 0;
 			}
 
 			// shoot the three arrows
 			double add = powerBonus + strengthBonus;
-			NonEntityDamage.shootBeam(p, p, Color.RED, 64, 5, 4 + add);
+			shootBeam(p, p, Color.RED, 64, 5, 5 + add);
 			p.playSound(p.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 			p.addScoreboardTag("SalvationCooldown");
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("SalvationCooldown"), 39L);

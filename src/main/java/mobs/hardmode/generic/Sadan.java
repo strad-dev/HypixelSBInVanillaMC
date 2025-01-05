@@ -19,6 +19,8 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Objects;
 import java.util.Random;
 
+import static misc.PluginUtils.shootBeam;
+
 public class Sadan implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -71,7 +73,7 @@ public class Sadan implements CustomMob {
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 0.5F);
 					}
 					case 1 -> {
-						NonEntityDamage.shootBeam(damagee, damager, Color.RED, 32, 1, 20);
+						shootBeam(damagee, damager, Color.RED, 32, 1, 20);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan has shot you with Laser Eyes!");
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 					}
