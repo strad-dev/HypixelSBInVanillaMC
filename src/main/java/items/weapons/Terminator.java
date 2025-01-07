@@ -31,14 +31,14 @@ public class Terminator implements AbilityItem {
 
 		String loreDamage;
 		switch(powerLevel) {
-			case 1 -> loreDamage = "3.75";
-			case 2 -> loreDamage = "4";
-			case 3 -> loreDamage = "4.25";
-			case 4 -> loreDamage = "4.5";
-			case 5 -> loreDamage = "4.75";
-			case 6 -> loreDamage = "5";
-			case 7 -> loreDamage = "5.5";
-			default -> loreDamage = "3.5";
+			case 1 -> loreDamage = "3.25";
+			case 2 -> loreDamage = "3.5";
+			case 3 -> loreDamage = "3.75";
+			case 4 -> loreDamage = "4";
+			case 5 -> loreDamage = "4.25";
+			case 6 -> loreDamage = "4.5";
+			case 7 -> loreDamage = "5";
+			default -> loreDamage = "3";
 		}
 
 		String salvationDamage;
@@ -124,19 +124,19 @@ public class Terminator implements AbilityItem {
 		Arrow middle = p.getWorld().spawnArrow(l, l.getDirection(), 3, 0.1F);
 		Arrow right = p.getWorld().spawnArrow(l, lRight.getDirection(), 3, 0.1F);
 
-		left.setDamage(3.5 + add);
+		left.setDamage(3 + add);
 		left.setPierceLevel(4);
 		left.setShooter(p);
 		left.setWeapon(p.getInventory().getItemInMainHand());
 		left.addScoreboardTag("TerminatorArrow");
 
-		middle.setDamage(3.5 + add);
+		middle.setDamage(3 + add);
 		middle.setPierceLevel(4);
 		middle.setShooter(p);
 		middle.setWeapon(p.getInventory().getItemInMainHand());
 		middle.addScoreboardTag("TerminatorArrow");
 
-		right.setDamage(3.5 + add);
+		right.setDamage(3 + add);
 		right.setPierceLevel(4);
 		right.setShooter(p);
 		right.setWeapon(p.getInventory().getItemInMainHand());
@@ -149,7 +149,8 @@ public class Terminator implements AbilityItem {
 
 	@Override
 	public void onLeftClick(Player p) {
-		if(!p.getScoreboardTags().contains("SalvationCooldown")) {double powerBonus;
+		if(!p.getScoreboardTags().contains("SalvationCooldown")) {
+			double powerBonus;
 			try {
 				int power = p.getInventory().getItem(p.getInventory().getHeldItemSlot()).getEnchantmentLevel(Enchantment.POWER);
 				powerBonus = power * 0.667;
@@ -172,7 +173,7 @@ public class Terminator implements AbilityItem {
 			shootBeam(p, p, Color.RED, 64, 5, 5 + add);
 			p.playSound(p.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 			p.addScoreboardTag("SalvationCooldown");
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("SalvationCooldown"), 39L);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("SalvationCooldown"), 19L);
 		}
 	}
 
