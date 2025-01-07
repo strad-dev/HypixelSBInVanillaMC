@@ -126,7 +126,7 @@ public class PluginUtils {
 		if(fuse == 0) {
 			List<Entity> entities = (List<Entity>) l.getWorld().getNearbyEntities(l, radius, radius, radius);
 			for(Entity entity : entities) {
-				if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType())) {
+				if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
 					CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
 				}
 			}
@@ -140,7 +140,7 @@ public class PluginUtils {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				List<Entity> entities = tnt.getNearbyEntities(radius, radius, radius);
 				for(Entity entity : entities) {
-					if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType())) {
+					if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
 						CustomDamage.customMobs(entity1, tnt, damage, DamageType.PLAYER_MAGIC);
 					}
 				}
@@ -152,9 +152,7 @@ public class PluginUtils {
 	}
 
 	/**
-	 * Teleports the entity to a random position in a given radius from its current location.
-	 * <br>
-	 * The entity will always be teleported to the highest block.
+	 * Teleports the entity to a random position in a given radius from its current location.<br>The entity will always be teleported to the highest block.
 	 *
 	 * @param e The entity to be teleported
 	 * @param radius The radius of the randomness

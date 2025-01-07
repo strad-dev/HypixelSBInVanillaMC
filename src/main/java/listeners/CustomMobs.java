@@ -27,7 +27,8 @@ public class CustomMobs implements Listener {
 	}
 
 	/**
-	 * summons lightning on every entity in a given radius
+	 * Summons lightning on every entity in a given radius
+	 *
 	 * @param entity the entity at the center
 	 * @param radius the radius to spawn lightning on
 	 */
@@ -45,7 +46,16 @@ public class CustomMobs implements Listener {
 		Player p = Plugin.getNearestPlayer(e.getEntity());
 		boolean hardMode = false;
 		if(p != null) {
-			hardMode = Plugin.getNearestPlayer(e.getEntity()).hasPotionEffect(PotionEffectType.BAD_OMEN);
+			// Hard Mode will apply if any player in a 64-block radius of the mob has the effect
+			hardMode = p.hasPotionEffect(PotionEffectType.BAD_OMEN);
+			if(!hardMode) {
+				for(Player p2 : Plugin.getInstance().getServer().getOnlinePlayers()) {
+					if(p2.getLocation().distanceSquared(e.getLocation()) <= 4096 && p2.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
+						hardMode = true;
+						break;
+					}
+				}
+			}
 		}
 		if(e.getEntity() instanceof LivingEntity entity) {
 			String name = "";

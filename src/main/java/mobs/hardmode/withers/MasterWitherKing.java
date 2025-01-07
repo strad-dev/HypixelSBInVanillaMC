@@ -21,8 +21,7 @@ import static listeners.CustomDrops.sendRareDropMessage;
 import static misc.PluginUtils.teleport;
 
 public class MasterWitherKing implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "MASTER-Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-
+	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 	private static Mob witherKing;
 
 	@Override
@@ -47,7 +46,7 @@ public class MasterWitherKing implements CustomWither {
 		e.addScoreboardTag("MartialUndefeated");
 		e.setPersistent(true);
 		e.setAI(false);
-		e.setCustomName(name);
+		e.setCustomName(name + " ");
 		teleport(e, 0);
 		PluginUtils.changeName(e);
 
