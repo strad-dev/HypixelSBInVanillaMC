@@ -24,7 +24,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import static org.bukkit.Bukkit.getServer;
 
 public class GetOPItems implements CommandExecutor {
-	private static final String ITEM_SETS = "combat, summon, ingredient/withers, ingredient/misc, ingredient/mining, t7";
+	private static final String ITEM_SETS = "combat, summon, ingredient/withers, ingredient/misc, ingredient/mining, t7, t7smite, t7bane";
 
 	public void sendMessage(CommandSender sender, Player p, String item) {
 		sender.sendMessage("Successfully gave " + p.getName() + " " + item);
@@ -144,9 +144,47 @@ public class GetOPItems implements CommandExecutor {
 					meta.addStoredEnchant(Enchantment.PROTECTION, 5, true);
 					meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
 					meta.addStoredEnchant(Enchantment.SWEEPING_EDGE, 4, true);
+					meta.addStoredEnchant(Enchantment.KNOCKBACK, 2, true);
+					meta.addStoredEnchant(Enchantment.PUNCH, 2, true);
 					godBook.setItemMeta(meta);
 					player.getInventory().addItem(godBook);
 					sendMessage(commandSender, player, "The God Book");
+					return true;
+				}
+				case "t7smite" -> {
+					ItemStack godBook = new ItemStack(Material.ENCHANTED_BOOK);
+					EnchantmentStorageMeta meta = (EnchantmentStorageMeta) godBook.getItemMeta();
+					meta.addStoredEnchant(Enchantment.SMITE, 6, true);
+					meta.addStoredEnchant(Enchantment.POWER, 7, true);
+					meta.addStoredEnchant(Enchantment.LOOTING, 5, true);
+					meta.addStoredEnchant(Enchantment.FORTUNE, 4, true);
+					meta.addStoredEnchant(Enchantment.EFFICIENCY, 6, true);
+					meta.addStoredEnchant(Enchantment.PROTECTION, 5, true);
+					meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
+					meta.addStoredEnchant(Enchantment.SWEEPING_EDGE, 4, true);
+					meta.addStoredEnchant(Enchantment.KNOCKBACK, 2, true);
+					meta.addStoredEnchant(Enchantment.PUNCH, 2, true);
+					godBook.setItemMeta(meta);
+					player.getInventory().addItem(godBook);
+					sendMessage(commandSender, player, "The God Book (Smite Edition)");
+					return true;
+				}
+				case "t7bane" -> {
+					ItemStack godBook = new ItemStack(Material.ENCHANTED_BOOK);
+					EnchantmentStorageMeta meta = (EnchantmentStorageMeta) godBook.getItemMeta();
+					meta.addStoredEnchant(Enchantment.BANE_OF_ARTHROPODS, 6, true);
+					meta.addStoredEnchant(Enchantment.POWER, 7, true);
+					meta.addStoredEnchant(Enchantment.LOOTING, 5, true);
+					meta.addStoredEnchant(Enchantment.FORTUNE, 4, true);
+					meta.addStoredEnchant(Enchantment.EFFICIENCY, 6, true);
+					meta.addStoredEnchant(Enchantment.PROTECTION, 5, true);
+					meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
+					meta.addStoredEnchant(Enchantment.SWEEPING_EDGE, 4, true);
+					meta.addStoredEnchant(Enchantment.KNOCKBACK, 2, true);
+					meta.addStoredEnchant(Enchantment.PUNCH, 2, true);
+					godBook.setItemMeta(meta);
+					player.getInventory().addItem(godBook);
+					sendMessage(commandSender, player, "The God Book (Bane of Arthropods Edition)");
 					return true;
 				}
 				default -> {

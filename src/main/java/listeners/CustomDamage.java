@@ -1,5 +1,7 @@
 package listeners;
 
+import items.CustomItem;
+import items.weapons.Scylla;
 import misc.Plugin;
 import misc.PluginUtils;
 import mobs.CustomMob;
@@ -114,6 +116,11 @@ public class CustomDamage implements Listener {
 				if(entity1.getScoreboardTags().contains("IceSprayed")) {
 					finalDamage *= 0.8;
 				}
+			}
+
+			// bonus damage to withers from hyperion
+			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && CustomItem.getItem(p.getInventory().getItemInMainHand()) instanceof Scylla) {
+				finalDamage += 4;
 			}
 
 			// shield logic (for weirdos)

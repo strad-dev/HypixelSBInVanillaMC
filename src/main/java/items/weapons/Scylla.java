@@ -57,6 +57,8 @@ public class Scylla implements AbilityItem {
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+" + loreDamage);
 		lore.add("");
+		lore.add(ChatColor.GRAY + "Deals " + ChatColor.RED + "+4" + ChatColor.GRAY + " damage to Withers.");
+		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Wither Impact " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
 		lore.add(ChatColor.GRAY + "Teleport " + ChatColor.GREEN + "10 blocks" + ChatColor.GRAY + " ahead of");
 		lore.add(ChatColor.GRAY + "you.  Then implode, dealing");
@@ -129,7 +131,9 @@ public class Scylla implements AbilityItem {
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
 				double tempDamage = targetDamage;
-				if(entity1 instanceof Zombie || entity1 instanceof AbstractSkeleton || entity1 instanceof Wither || entity1 instanceof SkeletonHorse || entity1 instanceof ZombieHorse || entity1 instanceof Phantom || entity1 instanceof Zoglin) {
+				if(entity1 instanceof Wither) {
+					tempDamage += 4 + smite * 2.5;
+				} else if(entity1 instanceof Zombie || entity1 instanceof AbstractSkeleton || entity1 instanceof SkeletonHorse || entity1 instanceof ZombieHorse || entity1 instanceof Phantom || entity1 instanceof Zoglin) {
 					tempDamage += smite * 2.5;
 				} else if(entity1 instanceof Spider || entity1 instanceof Bee || entity1 instanceof Silverfish || entity1 instanceof Endermite) {
 					tempDamage += bane * 2.5;

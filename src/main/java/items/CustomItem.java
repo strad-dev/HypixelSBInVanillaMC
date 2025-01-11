@@ -1,8 +1,60 @@
 package items;
 
+import items.misc.*;
+import items.weapons.Scylla;
+import items.weapons.Terminator;
+import org.bukkit.inventory.ItemStack;
+
 /**
  * A generic interface for all custom items.
  */
 
 public interface CustomItem {
+	/**
+	 * Returns an instance of the item given the item
+	 *
+	 * @param item the item
+	 * @return the item
+	 */
+	static AbilityItem getItem(ItemStack item) {
+		if(!item.hasItemMeta() || !item.getItemMeta().hasLore()) {
+			return null;
+		}
+		getItem(item.getItemMeta().getLore().getFirst());
+	}
+
+	/**
+	 * Returns an instance of the item given an ID
+	 *
+	 * @param id the ID of the item
+	 * @return the item
+	 */
+	static AbilityItem getItem(String id) {
+		switch(id) {
+			case "skyblock/combat/scylla" -> {
+				return new Scylla();
+			}
+			case "skyblock/combat/aspect_of_the_void" -> {
+				return new AOTV();
+			}
+			case "skyblock/combat/ice_spray_wand" -> {
+				return new IceSpray();
+			}
+			case "skyblock/combat/terminator" -> {
+				return new Terminator();
+			}
+			case "skyblock/combat/wand_of_restoration" -> {
+				return new WandOfRestoration();
+			}
+			case "skyblock/combat/wand_of_atonement" -> {
+				return new WandOfAtonement();
+			}
+			case "skyblock/combat/holy_ice" -> {
+				return new HolyIce();
+			}
+			default -> {
+				return null;
+			}
+		}
+	}
 }

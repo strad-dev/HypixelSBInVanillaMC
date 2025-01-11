@@ -30,7 +30,7 @@ public class MasterGoldor implements CustomWither {
 		e.addScoreboardTag("HardMode");
 		e.addScoreboardTag("SkyblockBoss");
 		e.setPersistent(true);
-		e.setCustomName(name);
+		e.setCustomName(name + " ");
 		PluginUtils.changeName(e);
 
 		damageAll(e);
