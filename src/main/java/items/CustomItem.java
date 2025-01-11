@@ -16,11 +16,11 @@ public interface CustomItem {
 	 * @param item the item
 	 * @return the item
 	 */
-	static AbilityItem getItem(ItemStack item) {
+	static CustomItem getItem(ItemStack item) {
 		if(!item.hasItemMeta() || !item.getItemMeta().hasLore()) {
 			return null;
 		}
-		getItem(item.getItemMeta().getLore().getFirst());
+		return getItem(item.getItemMeta().getLore().getFirst());
 	}
 
 	/**
@@ -29,7 +29,7 @@ public interface CustomItem {
 	 * @param id the ID of the item
 	 * @return the item
 	 */
-	static AbilityItem getItem(String id) {
+	static CustomItem getItem(String id) {
 		switch(id) {
 			case "skyblock/combat/scylla" -> {
 				return new Scylla();
