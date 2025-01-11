@@ -119,7 +119,10 @@ public class CustomDamage implements Listener {
 			}
 
 			// bonus damage to withers from hyperion
-			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && CustomItem.getItem(p.getInventory().getItemInMainHand()) instanceof Scylla) {
+			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p &&
+					p.getInventory().getItemInMainHand().hasItemMeta() &&
+					p.getInventory().getItemInMainHand().getItemMeta().hasLore() &&
+					p.getInventory().getItemInMainHand().getItemMeta().getLore().getFirst().equals("skyblock/combat/scylla")) {
 				finalDamage += 4;
 			}
 
@@ -209,6 +212,15 @@ public class CustomDamage implements Listener {
 			double oldHealth = damagee.getHealth();
 			boolean doesDie = finalDamage >= oldHealth + absorption;
 
+			// fire aspect - should always apply
+			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
+				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
+				damagee.setFireTicks(level * 80);
+			} else if(flamingArrow) {
+				damagee.setFireTicks(100);
+				flamingArrow = false;
+			}
+
 			if(doesDie) {
 				if(damagee instanceof EnderDragon) {
 					damagee.teleport(new Location(damagee.getWorld(), 0.5, 70.0, 0.5));
@@ -258,15 +270,6 @@ public class CustomDamage implements Listener {
 
 				if(damagee instanceof Mob && damager instanceof LivingEntity) {
 					((Mob) damagee).setTarget((LivingEntity) damager);
-				}
-
-				// fire aspect
-				if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
-					int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
-					damagee.setFireTicks(level * 80);
-				} else if(flamingArrow) {
-					damagee.setFireTicks(100);
-					flamingArrow = false;
 				}
 
 				// apply knockback

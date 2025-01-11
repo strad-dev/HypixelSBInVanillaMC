@@ -1,6 +1,7 @@
 package listeners;
 
 import items.AbilityItem;
+import items.CustomItem;
 import misc.Plugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -126,7 +127,13 @@ public class CustomItems implements Listener {
 		}
 
 		if(Objects.equals(e.getHand(), EquipmentSlot.HAND)) {
-			AbilityItem item = AbilityItem.getItem(getID(itemInUse));
+			CustomItem temp = CustomItem.getItem(getID(itemInUse));
+			AbilityItem item;
+			if(temp instanceof AbilityItem) {
+				item = (AbilityItem) temp;
+			} else {
+				item = null;
+			}
 			if(item != null) {
 				if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
 					e.setCancelled(true);

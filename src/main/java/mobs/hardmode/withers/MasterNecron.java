@@ -37,7 +37,7 @@ public class MasterNecron implements CustomWither {
 		e.addScoreboardTag("1100Frenzy");
 		e.addScoreboardTag("300Frenzy");
 		e.setPersistent(true);
-		e.setCustomName(name + " ");
+		e.setCustomName(name + " a");
 		PluginUtils.changeName(e);
 
 		return name;

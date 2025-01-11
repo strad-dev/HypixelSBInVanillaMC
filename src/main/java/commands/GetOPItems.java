@@ -144,6 +144,7 @@ public class GetOPItems implements CommandExecutor {
 					meta.addStoredEnchant(Enchantment.PROTECTION, 5, true);
 					meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
 					meta.addStoredEnchant(Enchantment.SWEEPING_EDGE, 4, true);
+					meta.addStoredEnchant(Enchantment.FIRE_ASPECT, 2, true);
 					meta.addStoredEnchant(Enchantment.KNOCKBACK, 2, true);
 					meta.addStoredEnchant(Enchantment.PUNCH, 2, true);
 					godBook.setItemMeta(meta);
@@ -162,6 +163,7 @@ public class GetOPItems implements CommandExecutor {
 					meta.addStoredEnchant(Enchantment.PROTECTION, 5, true);
 					meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
 					meta.addStoredEnchant(Enchantment.SWEEPING_EDGE, 4, true);
+					meta.addStoredEnchant(Enchantment.FIRE_ASPECT, 2, true);
 					meta.addStoredEnchant(Enchantment.KNOCKBACK, 2, true);
 					meta.addStoredEnchant(Enchantment.PUNCH, 2, true);
 					godBook.setItemMeta(meta);
@@ -180,6 +182,7 @@ public class GetOPItems implements CommandExecutor {
 					meta.addStoredEnchant(Enchantment.PROTECTION, 5, true);
 					meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
 					meta.addStoredEnchant(Enchantment.SWEEPING_EDGE, 4, true);
+					meta.addStoredEnchant(Enchantment.FIRE_ASPECT, 2, true);
 					meta.addStoredEnchant(Enchantment.KNOCKBACK, 2, true);
 					meta.addStoredEnchant(Enchantment.PUNCH, 2, true);
 					godBook.setItemMeta(meta);

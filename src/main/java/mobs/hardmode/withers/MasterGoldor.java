@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MasterGoldor implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ";
+	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -30,7 +30,7 @@ public class MasterGoldor implements CustomWither {
 		e.addScoreboardTag("HardMode");
 		e.addScoreboardTag("SkyblockBoss");
 		e.setPersistent(true);
-		e.setCustomName(name + " ");
+		e.setCustomName(name + " a");
 		PluginUtils.changeName(e);
 
 		damageAll(e);
