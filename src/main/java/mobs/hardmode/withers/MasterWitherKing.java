@@ -176,7 +176,7 @@ public class MasterWitherKing implements CustomWither {
 	private void spawnGuards(Mob mob) {
 		if(!mob.isDead() && !(mob.getScoreboardTags().contains("Dead"))) {
 			Player p = PluginUtils.getNearestPlayer(mob);
-			int health = 250 - countHenchmenLeft() * 20;
+			int health = 150 - countHenchmenLeft() * 10;
 			for(int i = 0; i < 4 - countHenchmenLeft() / 2; i++) {
 				WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
 				e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + health);
@@ -196,7 +196,6 @@ public class MasterWitherKing implements CustomWither {
 				Objects.requireNonNull(e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
 				e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 				e.setTarget(p);
-				e.teleport(p);
 				e.setCustomNameVisible(true);
 				e.addScoreboardTag("SkyblockBoss");
 				e.addScoreboardTag("GuardSkeleton");

@@ -217,8 +217,8 @@ public class PluginUtils {
 			e.getEquipment().setItemInOffHandDropChance(0.0F);
 
 			//noinspection DuplicatedCode
-			e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(75.0);
-			e.setHealth(75.0);
+			e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(50.0);
+			e.setHealth(50.0);
 			Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
 			Objects.requireNonNull(e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
 			e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
