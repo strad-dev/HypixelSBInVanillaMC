@@ -147,6 +147,9 @@ public class MasterStorm implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			PluginUtils.changeName(damagee);
+			if(damagee instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
+				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Storm!", 0, 20, 0);
+			}
 			return false;
 		} else if(damagee.getScoreboardTags().contains("Survival2Trigger") && hp - originalDamage < 500) {
 			PluginUtils.changeName(damagee);
@@ -156,7 +159,7 @@ public class MasterStorm implements CustomWither {
 			damagee.addScoreboardTag("Invulnerable");
 			teleport(damagee, 0);
 
-			Player p = Plugin.getNearestPlayer(damagee);
+			Player p = PluginUtils.getNearestPlayer(damagee);
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You think you're funny?  Try surviving this!");
 
@@ -214,7 +217,7 @@ public class MasterStorm implements CustomWither {
 			}, 300);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new MasterGoldor().onSpawn(Plugin.getNearestPlayer(damagee), wither);
+				new MasterGoldor().onSpawn(PluginUtils.getNearestPlayer(damagee), wither);
 			}, 340);
 			return false;
 		}
@@ -224,9 +227,9 @@ public class MasterStorm implements CustomWither {
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		if(damager.getScoreboardTags().contains("Survival1")) {
-			calculateFinalDamage(damagee, Plugin.getNearestPlayer(damagee), 12, DamageType.RANGED);
+			calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 12, DamageType.RANGED);
 		} else if(damager.getScoreboardTags().contains("Survival2")) {
-			calculateFinalDamage(damagee, Plugin.getNearestPlayer(damagee), 18, DamageType.RANGED);
+			calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 18, DamageType.RANGED);
 		}
 		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
 		return true;

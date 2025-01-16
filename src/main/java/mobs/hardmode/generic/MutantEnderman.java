@@ -1,7 +1,7 @@
 package mobs.hardmode.generic;
 
 import listeners.DamageType;
-import misc.Plugin;
+import misc.PluginUtils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,7 +27,7 @@ public class MutantEnderman implements CustomMob {
 		Objects.requireNonNull(e.getAttribute(Attribute.ATTACK_DAMAGE)).setBaseValue(20.0);
 		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.45);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(Plugin.getNearestPlayer(e));
+		e.setTarget(PluginUtils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("MutantEnderman");

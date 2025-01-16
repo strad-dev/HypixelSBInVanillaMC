@@ -2,7 +2,6 @@ package mobs.hardmode.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
-import misc.Plugin;
 import misc.PluginUtils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
@@ -24,7 +23,7 @@ public class meloGnorI implements CustomMob {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "meloG norI" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(Plugin.getNearestPlayer(e));
+		e.setTarget(PluginUtils.getNearestPlayer(e));
 		e.setHealth(200.0);
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
@@ -66,7 +65,7 @@ public class meloGnorI implements CustomMob {
 				}
 			}
 		} else {
-			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the meloG norI.");
+			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + DamageType.toString(type) + " damage to the meloG norI.");
 			damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 		}
 		return false;

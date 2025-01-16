@@ -3,6 +3,7 @@ package mobs.hardmode.generic;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.Plugin;
+import misc.PluginUtils;
 import mobs.CustomMob;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -43,7 +44,7 @@ public class Sadan implements CustomMob {
 		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.125);
 		Objects.requireNonNull(e.getAttribute(Attribute.SCALE)).setBaseValue(16.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(Plugin.getNearestPlayer(e));
+		e.setTarget(PluginUtils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("Sadan");

@@ -88,7 +88,7 @@ public enum DamageType {
 	 * I-Frames: None
 	 */
 
-	public String toString(DamageType type) {
+	public static String toString(DamageType type) {
 		switch (type) {
 			case MELEE -> {
 				return "Melee Damage";

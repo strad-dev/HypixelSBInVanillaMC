@@ -1,7 +1,6 @@
 package mobs.hardmode.generic;
 
 import listeners.DamageType;
-import misc.Plugin;
 import misc.PluginUtils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
@@ -40,7 +39,7 @@ public class AtonedHorror implements CustomMob {
 		Objects.requireNonNull(e.getAttribute(Attribute.ATTACK_DAMAGE)).setBaseValue(8.0);
 		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(Plugin.getNearestPlayer(e));
+		e.setTarget(PluginUtils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("AtonedHorror");
@@ -60,7 +59,7 @@ public class AtonedHorror implements CustomMob {
 			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
 		}
 		if(type == DamageType.PLAYER_MAGIC) {
-			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + type + " damage to the Atoned Horror.");
+			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + DamageType.toString(type) + " damage to the Atoned Horror.");
 			return false;
 		}
 		return true;

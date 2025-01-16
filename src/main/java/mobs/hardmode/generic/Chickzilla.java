@@ -2,7 +2,7 @@ package mobs.hardmode.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
-import misc.Plugin;
+import misc.PluginUtils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,7 +21,7 @@ public class Chickzilla implements CustomMob {
 		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(1000.0);
 		e.setHealth(1000.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(Plugin.getNearestPlayer(e));
+		e.setTarget(PluginUtils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("Chickzilla");

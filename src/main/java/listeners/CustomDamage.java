@@ -1,7 +1,5 @@
 package listeners;
 
-import items.CustomItem;
-import items.weapons.Scylla;
 import misc.Plugin;
 import misc.PluginUtils;
 import mobs.CustomMob;
@@ -95,6 +93,13 @@ public class CustomDamage implements Listener {
 					case null, default -> {
 					}
 				}
+			}
+
+			if(damagee instanceof EnderCrystal crystal && crystal.getScoreboardTags().contains("SkyblockBoss") && damager instanceof Player p) {
+				crystal.remove();
+				p.addScoreboardTag("HasCrystal");
+				p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!");
+				doContinue = false;
 			}
 		} catch(NullPointerException exception) {
 			// continue

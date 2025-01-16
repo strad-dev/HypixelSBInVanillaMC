@@ -10,6 +10,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class MasterMaxor implements CustomWither {
@@ -59,7 +60,7 @@ public class MasterMaxor implements CustomWither {
 		Location l = wither.getLocation();
 		Random random = new Random();
 		l.add(random.nextInt(32) - 16, 0, random.nextInt(32) - 16);
-		for(int i = 319; i > -64; i --) {
+		for(int i = 319; i > -64; i--) {
 			Block b = l.getWorld().getBlockAt((int) l.getX(), i, (int) l.getZ());
 			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
 				l.setY(i + 2);
@@ -102,9 +103,23 @@ public class MasterMaxor implements CustomWither {
 
 		double hp = damagee.getHealth();
 
-		if(damager instanceof Player && damagee.getScoreboardTags().contains("Invulnerable")) {
-			PluginUtils.changeName(damagee);
-			if(damagee.getScoreboardTags().contains("InvulnerableReminder")) {
+		if(damagee.getScoreboardTags().contains("Invulnerable")) {
+			if(damager instanceof Player p) {
+				if(p.getScoreboardTags().contains("HasCrystal")) {
+					damagee.removeScoreboardTag("Invulnerable");
+					Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???");
+					List<EntityType> immune = new ArrayList<>();
+					immune.add(EntityType.WITHER_SKELETON);
+					PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 8, 10, immune);
+					p.removeScoreboardTag("HasCrystal");
+					PluginUtils.changeName(damagee);
+				} else {
+					if(!damagee.getScoreboardTags().contains("Dead")) {
+						p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Maxor!", 0, 20, 0);
+					}
+				}
+			}
+			if(damagee.getScoreboardTags().contains("InvulnerableReminder") && !damagee.getScoreboardTags().contains("Dead")) {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": YOUR WEAK, PUNY ATTACKS CANNOT GET AROUND MY TRICKS!");
 				damagee.removeScoreboardTag("InvulnerableReminder");
@@ -145,7 +160,7 @@ public class MasterMaxor implements CustomWither {
 			}, 300);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new MasterStorm().onSpawn(Plugin.getNearestPlayer(damagee), wither);
+				new MasterStorm().onSpawn(PluginUtils.getNearestPlayer(damagee), wither);
 			}, 340);
 			return false;
 		}

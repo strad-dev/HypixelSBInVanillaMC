@@ -1,7 +1,7 @@
 package mobs.hardmode.enderDragons;
 
 import listeners.DamageType;
-import misc.Plugin;
+import misc.PluginUtils;
 import mobs.enderDragons.CustomDragon;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -50,7 +50,7 @@ public class Superior implements CustomDragon {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		calculateFinalDamage(damagee, Plugin.getNearestPlayer(damagee), 3, DamageType.RANGED);
+		calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 3, DamageType.RANGED);
 		return true;
 	}
 }

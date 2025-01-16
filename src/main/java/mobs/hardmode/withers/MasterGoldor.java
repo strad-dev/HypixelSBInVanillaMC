@@ -80,7 +80,7 @@ public class MasterGoldor implements CustomWither {
 			}, 300);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new MasterNecron().onSpawn(Plugin.getNearestPlayer(damagee), wither);
+				new MasterNecron().onSpawn(PluginUtils.getNearestPlayer(damagee), wither);
 			}, 340);
 			return false;
 		}

@@ -12,6 +12,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.*;
 
 import static listeners.CustomDamage.customMobs;
@@ -42,7 +43,31 @@ public class PluginUtils {
 	}
 
 	/**
+	 * Gets the closest non-Spectator Player to the provided Entity<br>If all players on the server are in Spectator, a semi-random Player will be returned.
+	 *
+	 * @param e the entity
+	 * @return the closest non-spectator player
+	 */
+	public static @Nullable Player getNearestPlayer(Entity e) {
+		World world = e.getWorld();
+		Location location = e.getLocation();
+		ArrayList<Player> playersInWorld = new ArrayList<>(world.getEntitiesByClass(Player.class));
+		for(int i = 0; i < playersInWorld.size(); i++) {
+			if(playersInWorld.get(i).getGameMode().equals(GameMode.SPECTATOR) && playersInWorld.size() > 1) {
+				playersInWorld.remove(i);
+				i --;
+			}
+		}
+		if(playersInWorld.isEmpty()) {
+			return null;
+		}
+		playersInWorld.sort(Comparator.comparingDouble(o -> o.getLocation().distanceSquared(location)));
+		return playersInWorld.getFirst();
+	}
+
+	/**
 	 * Plays a sound for every player on the server
+	 *
 	 * @param s The sound to play
 	 */
 	public static void playGlobalSound(Sound s) {
@@ -51,9 +76,10 @@ public class PluginUtils {
 
 	/**
 	 * Plays a sound for every player on the server
-	 * @param s The sound to play
+	 *
+	 * @param s      The sound to play
 	 * @param volume The volume of the sound
-	 * @param pitch The pitch of the sound
+	 * @param pitch  The pitch of the sound
 	 */
 	public static void playGlobalSound(Sound s, float volume, float pitch) {
 		Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player, s, volume, pitch));
@@ -61,12 +87,13 @@ public class PluginUtils {
 
 	/**
 	 * Shoot a beam dealing damage to everything in its path!
-	 * @param origin The Entity shooting the beam
+	 *
+	 * @param origin      The Entity shooting the beam
 	 * @param destination The Entity that is being targeted<br>If this is the same Entity as the origin, the beam is shot in the direction the Entity is looking at.
-	 * @param color The color of the beam
-	 * @param distance How far the beam should go
-	 * @param pierce How many enemies should be pierced
-	 * @param damage The damage of the beam
+	 * @param color       The color of the beam
+	 * @param distance    How far the beam should go
+	 * @param pierce      How many enemies should be pierced
+	 * @param damage      The damage of the beam
 	 */
 	public static void shootBeam(Entity origin, Entity destination, Color color, long distance, long pierce, double damage) {
 		Location l = origin.getLocation();
@@ -154,7 +181,7 @@ public class PluginUtils {
 	/**
 	 * Teleports the entity to a random position in a given radius from its current location.<br>The entity will always be teleported to the highest block.
 	 *
-	 * @param e The entity to be teleported
+	 * @param e      The entity to be teleported
 	 * @param radius The radius of the randomness
 	 */
 	public static void teleport(Entity e, int radius) {

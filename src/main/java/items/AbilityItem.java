@@ -1,8 +1,5 @@
 package items;
 
-import items.misc.*;
-import items.weapons.Scylla;
-import items.weapons.Terminator;
 import org.bukkit.entity.Player;
 
 /**

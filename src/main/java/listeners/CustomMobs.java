@@ -1,6 +1,7 @@
 package listeners;
 
 import misc.Plugin;
+import misc.PluginUtils;
 import mobs.enderDragons.CustomDragon;
 import mobs.hardmode.withers.MasterMaxor;
 import mobs.withers.CustomWither;
@@ -43,7 +44,7 @@ public class CustomMobs implements Listener {
 
 	@EventHandler
 	public void onEntitySpawn(EntitySpawnEvent e) {
-		Player p = Plugin.getNearestPlayer(e.getEntity());
+		Player p = PluginUtils.getNearestPlayer(e.getEntity());
 		boolean hardMode = false;
 		if(p != null) {
 			// Hard Mode will apply if any player in a 64-block radius of the mob has the effect
@@ -67,13 +68,13 @@ public class CustomMobs implements Listener {
 						wither.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 						if(!isWitherLordFightActive) {
 							if(hardMode) {
-								name = new MasterMaxor().onSpawn(Plugin.getNearestPlayer(wither), wither);
+								name = new MasterMaxor().onSpawn(PluginUtils.getNearestPlayer(wither), wither);
 								isWitherLordFightActive = true;
 							} else {
-								name = CustomWither.spawnRandom().onSpawn(Plugin.getNearestPlayer(wither), wither);
+								name = CustomWither.spawnRandom().onSpawn(PluginUtils.getNearestPlayer(wither), wither);
 							}
 							wither.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-							wither.setTarget(Plugin.getNearestPlayer(wither));
+							wither.setTarget(PluginUtils.getNearestPlayer(wither));
 							wither.setCustomNameVisible(true);
 							wither.setPersistent(true);
 							wither.addScoreboardTag("SkyblockBoss");
@@ -83,10 +84,10 @@ public class CustomMobs implements Listener {
 					}
 					case EnderDragon dragon -> {
 						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-							name = CustomDragon.spawnRandom().onSpawn(Plugin.getNearestPlayer(dragon), dragon);
+							name = CustomDragon.spawnRandom().onSpawn(PluginUtils.getNearestPlayer(dragon), dragon);
 							dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 							dragon.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-							dragon.setTarget(Plugin.getNearestPlayer(dragon));
+							dragon.setTarget(PluginUtils.getNearestPlayer(dragon));
 							dragon.setCustomNameVisible(true);
 							dragon.setPersistent(true);
 							dragon.addScoreboardTag("SkyblockBoss");

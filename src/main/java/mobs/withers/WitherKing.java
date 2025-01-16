@@ -62,7 +62,7 @@ public class WitherKing implements CustomWither {
 
 	public void teleportDragon(EnderDragon dragon, Mob e) {
 		if(!dragon.isDead()) {
-			Player p = Plugin.getNearestPlayer(e);
+			Player p = PluginUtils.getNearestPlayer(e);
 			dragon.teleport(p);
 			p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Wither King's Dragon teleports itself to you!");
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> teleportDragon(dragon, e), 300);
@@ -87,7 +87,7 @@ public class WitherKing implements CustomWither {
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
-		calculateFinalDamage(damagee, Plugin.getNearestPlayer(damagee), 6, DamageType.RANGED);
+		calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 6, DamageType.RANGED);
 		return true;
 	}
 

@@ -6,6 +6,7 @@ import items.ingredients.witherLords.*;
 import items.misc.IceSpray;
 import items.summonItems.*;
 import misc.Plugin;
+import misc.PluginUtils;
 import mobs.generic.InfuriatedWitherSkeleton;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
@@ -43,7 +44,7 @@ public class CustomDrops implements Listener {
 				// do nothing
 			}
 		} else {
-			p = Plugin.getNearestPlayer(died);
+			p = PluginUtils.getNearestPlayer(died);
 			if(p != null && p.getLocation().distance(died.getLocation()) > 16) {
 				p = null;
 			}

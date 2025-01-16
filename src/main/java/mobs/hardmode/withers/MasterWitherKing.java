@@ -30,7 +30,7 @@ public class MasterWitherKing implements CustomWither {
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
 		PluginUtils.spawnTNT(e, e.getLocation(), 0, 48, 100, immune);
-		p = Plugin.getNearestPlayer(e);
+		p = PluginUtils.getNearestPlayer(e);
 		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
 		e.getAttribute(Attribute.SCALE).setBaseValue(2.0);
@@ -88,7 +88,7 @@ public class MasterWitherKing implements CustomWither {
 
 	private void spawnHenchman(Mob mob, String which) {
 		WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
-		Player p = Plugin.getNearestPlayer(mob);
+		Player p = PluginUtils.getNearestPlayer(mob);
 
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
@@ -113,23 +113,23 @@ public class MasterWitherKing implements CustomWither {
 		switch(which) {
 			case "Power" -> {
 				e.addScoreboardTag("Power");
-				new PowerWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+				new PowerWitherSkeleton().onSpawn(PluginUtils.getNearestPlayer(mob), e);
 			}
 			case "Fire" -> {
 				e.addScoreboardTag("Fire");
-				new FireWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+				new FireWitherSkeleton().onSpawn(PluginUtils.getNearestPlayer(mob), e);
 			}
 			case "Ice" -> {
 				e.addScoreboardTag("Ice");
-				new IceWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+				new IceWitherSkeleton().onSpawn(PluginUtils.getNearestPlayer(mob), e);
 			}
 			case "Soul" -> {
 				e.addScoreboardTag("Soul");
-				new SoulWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+				new SoulWitherSkeleton().onSpawn(PluginUtils.getNearestPlayer(mob), e);
 			}
 			case "Martial" -> {
 				e.addScoreboardTag("Martial");
-				new MartialWitherSkeleton().onSpawn(Plugin.getNearestPlayer(mob), e);
+				new MartialWitherSkeleton().onSpawn(PluginUtils.getNearestPlayer(mob), e);
 			}
 		}
 	}
@@ -174,7 +174,7 @@ public class MasterWitherKing implements CustomWither {
 
 	private void spawnGuards(Mob mob) {
 		if(!mob.isDead() && !(mob.getScoreboardTags().contains("Dead"))) {
-			Player p = Plugin.getNearestPlayer(mob);
+			Player p = PluginUtils.getNearestPlayer(mob);
 			int health = 250 - countHenchmenLeft() * 20;
 			for(int i = 0; i < 8 - countHenchmenLeft(); i++) {
 				WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
@@ -244,6 +244,9 @@ public class MasterWitherKing implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			PluginUtils.changeName(damagee);
+			if(damagee instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
+				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage " + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GREEN + "!", 0, 20, 0);
+			}
 			return false;
 		} else if(hp - originalDamage < minHealth && countHenchmenLeft() != 0) {
 			damagee.setHealth(minHealth);
@@ -255,7 +258,7 @@ public class MasterWitherKing implements CustomWither {
 			damagee.setHealth(1.0);
 			PluginUtils.changeName(damagee);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain...");
-			Player p = Plugin.getNearestPlayer(damagee);
+			Player p = PluginUtils.getNearestPlayer(damagee);
 			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
@@ -287,7 +290,7 @@ public class MasterWitherKing implements CustomWither {
 		if(damager instanceof Player p1) {
 			p = p1;
 		} else {
-			p = Plugin.getNearestPlayer(damagee);
+			p = PluginUtils.getNearestPlayer(damagee);
 		}
 		item = MaxorSecrets.getItem();
 		world.dropItemNaturally(l, item);
