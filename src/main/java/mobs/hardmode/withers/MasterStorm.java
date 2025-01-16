@@ -74,7 +74,7 @@ public class MasterStorm implements CustomWither {
 	private void spawnGuards(LivingEntity e) {
 		if(!e.isDead() && !e.getScoreboardTags().contains("Survival2") && !e.getScoreboardTags().contains("Dead")) {
 			if(e.getScoreboardTags().contains("Survival1")) {
-				PluginUtils.spawnGuards(e, 3);
+				PluginUtils.spawnGuards(e, 2);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 201);
 			} else {
 				PluginUtils.spawnGuards(e, 2);
@@ -86,10 +86,10 @@ public class MasterStorm implements CustomWither {
 	private void spawnMoreGuards(LivingEntity e) {
 		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
 			if(e.getScoreboardTags().contains("Survival2")) {
-				PluginUtils.spawnGuards(e, 4);
+				PluginUtils.spawnGuards(e, 3);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnMoreGuards(e), 151);
 			} else {
-				PluginUtils.spawnGuards(e, 3);
+				PluginUtils.spawnGuards(e, 2);
 				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnMoreGuards(e), 301);
 			}
 		}
@@ -121,19 +121,21 @@ public class MasterStorm implements CustomWither {
 
 	private void spamSkulls(LivingEntity damagee, Player p, int i) {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			Vector directionMain = p.getLocation().toVector().subtract(damagee.getLocation().toVector()).normalize();
-			Vector directionLeft = p.getLocation().toVector().subtract(damagee.getLocation().add(1, 0, 0).toVector()).normalize();
-			Vector directionRight = p.getLocation().toVector().subtract(damagee.getLocation().add(-1, 0, 0).toVector()).normalize();
-			WitherSkull skullMain = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL);
-			skullMain.setDirection(directionMain);
-			skullMain.setShooter(damagee);
-			WitherSkull skullLeft = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(1, 1.5, 0), EntityType.WITHER_SKULL);
-			skullLeft.setDirection(directionLeft);
-			skullLeft.setShooter(damagee);
-			WitherSkull skullRight = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(-1, 1.5, 0), EntityType.WITHER_SKULL);
-			skullRight.setDirection(directionRight);
-			skullRight.setShooter(damagee);
-			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SHOOT);
+			if(!damagee.isDead()) {
+				Vector directionMain = p.getLocation().toVector().subtract(damagee.getLocation().toVector()).normalize();
+				Vector directionLeft = p.getLocation().toVector().subtract(damagee.getLocation().add(1, 0, 0).toVector()).normalize();
+				Vector directionRight = p.getLocation().toVector().subtract(damagee.getLocation().add(-1, 0, 0).toVector()).normalize();
+				WitherSkull skullMain = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL);
+				skullMain.setDirection(directionMain);
+				skullMain.setShooter(damagee);
+				WitherSkull skullLeft = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(1, 1.5, 0), EntityType.WITHER_SKULL);
+				skullLeft.setDirection(directionLeft);
+				skullLeft.setShooter(damagee);
+				WitherSkull skullRight = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(-1, 1.5, 0), EntityType.WITHER_SKULL);
+				skullRight.setDirection(directionRight);
+				skullRight.setShooter(damagee);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SHOOT);
+			}
 		}, i);
 	}
 
@@ -147,7 +149,7 @@ public class MasterStorm implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			PluginUtils.changeName(damagee);
-			if(damagee instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
+			if(damager instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
 				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Storm!", 0, 20, 0);
 			}
 			return false;

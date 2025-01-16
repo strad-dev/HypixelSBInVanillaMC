@@ -18,7 +18,11 @@ public class MasterMaxor implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 300, new ArrayList<>());
+		//noinspection DuplicatedCode
+		List<EntityType> immune = new ArrayList<>();
+		immune.add(EntityType.WITHER_SKELETON);
+		PluginUtils.spawnTNT(e, e.getLocation(), 0, 32, 50, immune);
+		PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN);
 
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(800.0);
 		e.setHealth(800.0);
@@ -27,31 +31,15 @@ public class MasterMaxor implements CustomWither {
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("600Crystal");
 		e.addScoreboardTag("300Crystal");
-		Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": WELL WELL WELL LOOK WHO'S BACK FOR A REMATCH!");
-		PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I HAVE BEEN PRACTISING 40 HOURS A DAY SINCE WE LAST MET!");
-		}, 60);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": MY TRICKS ARE MORE SOPHISTICATED THAN EVER; YOU WILL NEVER GET AROUND THEM!");
-		}, 120);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": NOW LET'S HAVE SOME FUN HERE!");
-		}, 180);
-		Bukkit.getLogger().info("A player has initiated THE GAUNTLET!");
 
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> PluginUtils.spawnTNT(e, e.getLocation(), 0, 32, 50, new ArrayList<>()), 220);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 520);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 300);
 
 		return name;
 	}
 
 	private void spawnGuards(Mob e) {
 		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-			PluginUtils.spawnGuards(e, 3);
+			PluginUtils.spawnGuards(e, 2);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 300);
 		}
 	}

@@ -2,6 +2,7 @@ package misc;
 
 import commands.GetOPItems;
 import commands.LocatePlayer;
+import commands.ResetWitherFight;
 import commands.Tell;
 import listeners.*;
 import net.md_5.bungee.api.ChatMessageType;
@@ -28,6 +29,7 @@ public class Plugin extends JavaPlugin {
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
 		Objects.requireNonNull(this.getCommand("locateplayer")).setExecutor((new LocatePlayer()));
 		Objects.requireNonNull(this.getCommand("w")).setExecutor((new Tell()));
+		Objects.requireNonNull(this.getCommand("resetwitherfight")).setExecutor((new ResetWitherFight()));
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
 		getServer().getPluginManager().registerEvents(new NonEntityDamage(), this);

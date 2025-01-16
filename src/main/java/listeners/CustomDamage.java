@@ -94,13 +94,6 @@ public class CustomDamage implements Listener {
 					}
 				}
 			}
-
-			if(damagee instanceof EnderCrystal crystal && crystal.getScoreboardTags().contains("SkyblockBoss") && damager instanceof Player p) {
-				crystal.remove();
-				p.addScoreboardTag("HasCrystal");
-				p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!");
-				doContinue = false;
-			}
 		} catch(NullPointerException exception) {
 			// continue
 		}
@@ -418,6 +411,11 @@ public class CustomDamage implements Listener {
 					customMobs(entity, damager, originalDamage, type);
 				}
 			}
+		} else if(e.getEntity() instanceof EnderCrystal crystal && crystal.getScoreboardTags().contains("SkyblockBoss") && e.getDamager() instanceof Player p) {
+			crystal.remove();
+			p.addScoreboardTag("HasCrystal");
+			p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!");
+			e.setCancelled(true);
 		}
 	}
 }

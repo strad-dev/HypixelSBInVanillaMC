@@ -13,3 +13,6 @@ commands:
   locateplayer:
     description: Locate a player on the server!
     usage: /locateplayer [player]
+  resetwitherfight:
+    description: Resets the status of the Wither Lords boss fight.  Useful if the boss was /kill'ed or otherwise dead in an unintended way.
+    usage: /resetwitherfight

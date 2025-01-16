@@ -176,7 +176,7 @@ public class MasterWitherKing implements CustomWither {
 		if(!mob.isDead() && !(mob.getScoreboardTags().contains("Dead"))) {
 			Player p = PluginUtils.getNearestPlayer(mob);
 			int health = 250 - countHenchmenLeft() * 20;
-			for(int i = 0; i < 8 - countHenchmenLeft(); i++) {
+			for(int i = 0; i < 4 - countHenchmenLeft() / 2; i++) {
 				WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
 				e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + health);
 				ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
@@ -244,7 +244,7 @@ public class MasterWitherKing implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			PluginUtils.changeName(damagee);
-			if(damagee instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
+			if(damager instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
 				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage " + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GREEN + "!", 0, 20, 0);
 			}
 			return false;

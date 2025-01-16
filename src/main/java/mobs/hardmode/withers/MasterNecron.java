@@ -83,7 +83,7 @@ public class MasterNecron implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			PluginUtils.changeName(damagee);
-			if(damagee instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
+			if(damager instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
 				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Necron!", 0, 20, 0);
 			}
 			return false;
