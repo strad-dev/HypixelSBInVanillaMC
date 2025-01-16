@@ -1,5 +1,12 @@
 package misc;
 
+import com.fren_gor.ultimateAdvancementAPI.AdvancementTab;
+import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI;
+import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;
+import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
+import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
+import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
+import com.fren_gor.ultimateAdvancementAPI.events.PlayerLoadingCompletedEvent;
 import commands.GetOPItems;
 import commands.LocatePlayer;
 import commands.ResetWitherFight;
@@ -9,6 +16,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -71,14 +79,18 @@ public class Plugin extends JavaPlugin {
 		getServer().addRecipe(AddRecipes.addEfficiency6Recipe(this));
 		getServer().addRecipe(AddRecipes.addFeatherFalling5Recipe(this));
 
-		/*UltimateAdvancementAPI api = UltimateAdvancementAPI.getInstance(this);
+		UltimateAdvancementAPI api = UltimateAdvancementAPI.getInstance(this);
 
 		AdvancementTab tab = api.createAdvancementTab("skyblock");
 
-		RootAdvancement root = new RootAdvancement(tab, "root", new AdvancementDisplay(Material.NETHER_STAR, "SkyBlock", AdvancementFrameType.TASK, false, false, 0, 0, "Fully featured in 3-5 business days!"), "textures/block/light_blue_concrete");
+		RootAdvancement root = new RootAdvancement(tab, "root", new AdvancementDisplay(Material.NETHER_STAR, "SkyBlock", AdvancementFrameType.TASK, false, false, 0, 0, "Fully featured in 3-5 business days!"), "textures/block/light_blue_concrete.png");
 		BaseAdvancement advancement = new BaseAdvancement("defeat_wither_lords", new AdvancementDisplay(Material.NETHERITE_SWORD, "Slayer of Withers, Master of Worlds", AdvancementFrameType.CHALLENGE, true, true, 1, 0, "You are a mighty warrior."), root);
+		tab.registerAdvancements(root, advancement);
 
-		tab.registerAdvancements(root, advancement);*/
+		tab.getEventManager().register(tab, PlayerLoadingCompletedEvent.class, event -> {
+			tab.showTab(event.getPlayer());
+			tab.grantRootAdvancement(event.getPlayer());
+		});
 
 		getLogger().info("Started SkyBlock in Vanilla!");
 

@@ -1,5 +1,6 @@
 package mobs.hardmode.withers;
 
+import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI;
 import items.armor.WitherKingCrown;
 import items.ingredients.witherLords.*;
 import listeners.CustomMobs;
@@ -244,13 +245,13 @@ public class MasterWitherKing implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			PluginUtils.changeName(damagee);
-			if(damager instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
-				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage " + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GREEN + "!", 0, 20, 0);
-			}
 			return false;
 		} else if(hp - originalDamage < minHealth && countHenchmenLeft() != 0) {
 			damagee.setHealth(minHealth);
 			PluginUtils.changeName(damagee);
+			if(damager instanceof Player p) {
+				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage " + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GREEN + "!", 0, 20, 0);
+			}
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.addScoreboardTag("Invulnerable");
@@ -322,8 +323,8 @@ public class MasterWitherKing implements CustomWither {
 
 		CustomMobs.updateWitherLordFight(false);
 
-		p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
-		Bukkit.broadcastMessage(p.getName() + " has completed the challenge " + ChatColor.DARK_PURPLE + "[Slayer of Withers, Master of Worlds]");
+		PluginUtils.playGlobalSound(Sound.UI_TOAST_CHALLENGE_COMPLETE);
+		UltimateAdvancementAPI.getInstance(Plugin.getInstance()).getAdvancement("skyblock:defeat_wither_lords").grant(p);
 	}
 
 	@Override

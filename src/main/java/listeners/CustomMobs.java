@@ -70,10 +70,10 @@ public class CustomMobs implements Listener {
 						wither.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 						if(!isWitherLordFightActive) {
 							if(hardMode) {
-								e.setCancelled(true);
+								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), wither::remove, 1);
 								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 									Wither wither2 = (Wither) wither.getWorld().spawnEntity(wither.getLocation(), EntityType.WITHER);
-									new MasterMaxor().onSpawn(PluginUtils.getNearestPlayer(wither), wither);
+									new MasterMaxor().onSpawn(PluginUtils.getNearestPlayer(wither2), wither2);
 								}, 220);
 								isWitherLordFightActive = true;
 								Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": WELL WELL WELL LOOK WHO'S BACK FOR A REMATCH!");
@@ -100,7 +100,6 @@ public class CustomMobs implements Listener {
 								wither.addScoreboardTag("SkyblockBoss");
 							}
 						} else {
-							e.setCancelled(true);
 							return;
 						}
 					}

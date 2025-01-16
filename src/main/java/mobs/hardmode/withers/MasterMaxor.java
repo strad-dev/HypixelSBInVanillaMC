@@ -31,6 +31,9 @@ public class MasterMaxor implements CustomWither {
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("600Crystal");
 		e.addScoreboardTag("300Crystal");
+		e.setPersistent(true);
+		e.setCustomName(name + " a");
+		PluginUtils.changeName(e);
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 300);
 
