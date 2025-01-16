@@ -47,7 +47,7 @@ public class MasterWitherKing implements CustomWither {
 		e.addScoreboardTag("MartialUndefeated");
 		e.setPersistent(true);
 		e.setAI(false);
-		e.setCustomName(name + " a");
+		e.setCustomName(name + " ❤ a");
 		teleport(e, 0);
 		PluginUtils.changeName(e);
 
