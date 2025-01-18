@@ -54,7 +54,7 @@ public class Sadan implements CustomMob {
 		((Ageable) e).setAdult();
 		e.setPersistent(true);
 
-		Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).addPlayer(p);
+		Bukkit.getOnlinePlayers().forEach(p1 -> Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan")).addPlayer(p1));
 		Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setProgress(1.0);
 		Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setTitle(newName + " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 600 + "/" + 600);
 		return newName;

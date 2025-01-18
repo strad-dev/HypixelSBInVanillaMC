@@ -98,6 +98,10 @@ public class CustomDamage implements Listener {
 			// continue
 		}
 
+		if(damagee instanceof Player p && (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR)) {
+			doContinue = false;
+		}
+
 		if(type == DamageType.ABSOLUTE || doContinue) {
 			calculateFinalDamage(damagee, damager, originalDamage, type);
 		}
@@ -276,9 +280,9 @@ public class CustomDamage implements Listener {
 					double enchantments = 1;
 					if(damager instanceof LivingEntity livingEntity) {
 						if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK) && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
-							enchantments += 0.667 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
+							enchantments += 0.66667 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
 						} else if(punchArrow > 0) {
-							enchantments += 0.667 * punchArrow;
+							enchantments += 0.66667 * punchArrow;
 							punchArrow = 0;
 						}
 					}
@@ -300,19 +304,19 @@ public class CustomDamage implements Listener {
 						double yaw = Math.toRadians(rawYaw);
 						if(rawYaw <= -90) {
 							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y = 0.25 * antiKB;
+							y = 0.2 * antiKB;
 							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw >= 90) {
 							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y = 0.25 * antiKB;
+							y = 0.2 * antiKB;
 							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw < 0) {
 							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y = 0.25 * antiKB;
+							y = 0.2 * antiKB;
 							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw >= 0) {
 							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y = 0.25 * antiKB;
+							y = 0.2 * antiKB;
 							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
 						}
 					} else {
@@ -320,19 +324,19 @@ public class CustomDamage implements Listener {
 						double yaw = Math.toRadians(rawYaw);
 						if(rawYaw <= -90) {
 							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y += 0.25 * antiKB;
+							y = 0.2 * antiKB;
 							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw >= 90) {
 							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y += 0.25 * antiKB;
+							y = 0.2 * antiKB;
 							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw < 0) {
 							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y += 0.25 * antiKB;
+							y = 0.2 * antiKB;
 							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
 						} else if(rawYaw >= 0) {
 							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y += 0.25 * antiKB;
+							y = 0.2 * antiKB;
 							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
 						}
 					}
@@ -364,9 +368,6 @@ public class CustomDamage implements Listener {
 		CustomDamage.e = e;
 		if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
-			if(entity instanceof Player p && (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR)) {
-				return;
-			}
 			if(entity.getHealth() > 0 && !entity.isDead()) {
 				DamageType type;
 				switch(e.getCause()) {

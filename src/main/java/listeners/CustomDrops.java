@@ -309,6 +309,9 @@ public class CustomDrops implements Listener {
 			// no drops
 			case Evoker ignored -> {
 				item = new ItemStack(Material.TOTEM_OF_UNDYING);
+				if(lootingLevel == 5) {
+					item.setAmount(2);
+				}
 				world.dropItemNaturally(l, item);
 				item = new ItemStack(Material.EMERALD);
 				item.setAmount(random.nextInt(2 + lootingLevel));
@@ -829,7 +832,7 @@ public class CustomDrops implements Listener {
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Remnant of the Giant's Sword");
 					}
-					Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).removePlayer(p);
+					Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan")).removeAll();
 				} else if(random.nextDouble() < 0.005 * rngLootingBonus && p != null) {
 					item = GiantZombieFlesh.getItem();
 					world.dropItemNaturally(l, item);
