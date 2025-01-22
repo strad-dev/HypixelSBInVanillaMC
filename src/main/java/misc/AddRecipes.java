@@ -46,7 +46,7 @@ public class AddRecipes {
 	}
 
 	public static Recipe addScyllaRecipe(Plugin plugin) {
-		ItemStack scylla = Scylla.getItem(0);
+		ItemStack scylla = Scylla.getItem(Enchantment.SHARPNESS, 0);
 		ItemStack shadowWarp = ShadowWarp.getItem();
 		ItemStack implosion = Implosion.getItem();
 		ItemStack witherShield = WitherShield.getItem();
@@ -67,7 +67,7 @@ public class AddRecipes {
 	}
 
 	public static Recipe addClaymoreRecipe(Plugin plugin) {
-		ItemStack claymore = Claymore.getItem(0);
+		ItemStack claymore = Claymore.getItem(Enchantment.SHARPNESS, 0);
 		ItemStack stormSecrets = StormSecrets.getItem();
 		ItemStack gsRemnant = GiantSwordRemnant.getItem();
 		ItemStack bigStone = ConcentratedStone.getItem();

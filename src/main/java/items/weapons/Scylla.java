@@ -27,7 +27,7 @@ import static listeners.CustomDamage.customMobs;
 public class Scylla implements AbilityItem {
 	private static final int MANA_COST = 12;
 
-	public static ItemStack getItem(int sharpnessLevel) {
+	public static ItemStack getItem(Enchantment ench, int enchLevel) {
 		ItemStack scylla = new ItemStack(Material.NETHERITE_SWORD);
 
 		ItemMeta data = scylla.getItemMeta();
@@ -39,23 +39,41 @@ public class Scylla implements AbilityItem {
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeed);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
-
-		String loreDamage;
-		switch(sharpnessLevel) {
-			case 1 -> loreDamage = "9";
-			case 2 -> loreDamage = "9.5";
-			case 3 -> loreDamage = "10";
-			case 4 -> loreDamage = "10.5";
-			case 5 -> loreDamage = "11";
-			case 6 -> loreDamage = "11.5";
-			case 7 -> loreDamage = "12";
-			default -> loreDamage = "8";
+		String loreDamage = "8";
+		if(ench.equals(Enchantment.SHARPNESS)) {
+			switch(enchLevel) {
+				case 1 -> loreDamage = "9";
+				case 2 -> loreDamage = "9.5";
+				case 3 -> loreDamage = "10";
+				case 4 -> loreDamage = "10.5";
+				case 5 -> loreDamage = "11";
+				case 6 -> loreDamage = "11.5";
+				case 7 -> loreDamage = "12";
+				default -> loreDamage = "8";
+			}
 		}
 
 		List<String> lore = new ArrayList<>();
 		lore.add("skyblock/combat/scylla");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+" + loreDamage);
+		lore.add("");
+		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
+			switch(enchLevel) {
+				case 1 -> loreDamage = "2.5";
+				case 2 -> loreDamage = "5";
+				case 3 -> loreDamage = "7.5";
+				case 4 -> loreDamage = "10";
+				case 5 -> loreDamage = "12.5";
+				case 6 -> loreDamage = "15";
+				default -> loreDamage = "0";
+			}
+			if(ench.equals(Enchantment.SMITE)) {
+				lore.add(ChatColor.GRAY + "Bonus Undead Damage: " + ChatColor.RED + "+" + loreDamage);
+			} else {
+				lore.add(ChatColor.GRAY + "Bonus Arthropod Damage: " + ChatColor.RED + "+" + loreDamage);
+			}
+		}
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Deals " + ChatColor.RED + "+4" + ChatColor.GRAY + " damage to Withers.");
 		lore.add("");

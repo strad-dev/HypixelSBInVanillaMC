@@ -60,10 +60,10 @@ public class GetOPItems implements CommandExecutor {
 			switch(itemSet) {
 				case "combat" -> {
 					player.getInventory().addItem(
-							Scylla.getItem(0),
+							Scylla.getItem(Enchantment.SHARPNESS, 0),
 							AOTV.getItem(),
 							IceSpray.getItem(),
-							Claymore.getItem(0),
+							Claymore.getItem(Enchantment.SHARPNESS,0),
 							Terminator.getItem(0),
 							DivanPickaxe.getItem(),
 							WandOfAtonement.getItem(),

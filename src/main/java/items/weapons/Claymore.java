@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
@@ -16,8 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class Claymore implements AbilityItem {
-	public static ItemStack getItem(int sharpnessLevel) {
-
+	public static ItemStack getItem(Enchantment ench, int enchLevel) {
 		ItemStack claymore = new ItemStack(Material.STONE_SWORD);
 
 		ItemMeta data = claymore.getItemMeta();
@@ -31,16 +31,18 @@ public class Claymore implements AbilityItem {
 		data.addAttributeModifier(Attribute.ENTITY_INTERACTION_RANGE, attackRange);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
-		String loreDamage;
-		switch(sharpnessLevel) {
-			case 1 -> loreDamage = "10";
-			case 2 -> loreDamage = "10.5";
-			case 3 -> loreDamage = "11";
-			case 4 -> loreDamage = "11.5";
-			case 5 -> loreDamage = "12";
-			case 6 -> loreDamage = "12.5";
-			case 7 -> loreDamage = "13";
-			default -> loreDamage = "9";
+		String loreDamage = "9";
+		if(ench.equals(Enchantment.SHARPNESS)) {
+			switch(enchLevel) {
+				case 1 -> loreDamage = "10";
+				case 2 -> loreDamage = "10.5";
+				case 3 -> loreDamage = "11";
+				case 4 -> loreDamage = "11.5";
+				case 5 -> loreDamage = "12";
+				case 6 -> loreDamage = "12.5";
+				case 7 -> loreDamage = "13";
+				default -> loreDamage = "9";
+			}
 		}
 
 		List<String> lore = new ArrayList<>();
@@ -48,6 +50,23 @@ public class Claymore implements AbilityItem {
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+" + loreDamage);
 		lore.add(ChatColor.GRAY + "Swing Range: " + ChatColor.RED + "+2");
+		lore.add("");
+		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
+			switch(enchLevel) {
+				case 1 -> loreDamage = "2.5";
+				case 2 -> loreDamage = "5";
+				case 3 -> loreDamage = "7.5";
+				case 4 -> loreDamage = "10";
+				case 5 -> loreDamage = "12.5";
+				case 6 -> loreDamage = "15";
+				default -> loreDamage = "0";
+			}
+			if(ench.equals(Enchantment.SMITE)) {
+				lore.add(ChatColor.GRAY + "Bonus Undead Damage: " + ChatColor.RED + "+" + loreDamage);
+			} else {
+				lore.add(ChatColor.GRAY + "Bonus Arthropod Damage: " + ChatColor.RED + "+" + loreDamage);
+			}
+		}
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "That thing was too big to be");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "called a sword, it was more like");
