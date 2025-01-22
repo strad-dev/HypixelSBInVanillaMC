@@ -168,8 +168,9 @@ public class Scylla implements AbilityItem {
 				p.playSound(finalL, Sound.ENTITY_PLAYER_LEVELUP, 2.0F, 2.0F);
 			}, 101L);
 		}
-		if(!effects.contains(PotionEffectType.RESISTANCE)) { // reduced damage
-			p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 101, 0));
+		if(!p.getScoreboardTags().contains("WitherShield")) { // reduced damage
+			p.addScoreboardTag("WitherShield");
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("WitherShield"), 101);
 		}
 	}
 

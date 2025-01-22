@@ -114,11 +114,16 @@ public class CustomDamage implements Listener {
 				finalDamage *= 1.1;
 			}
 
+			if(damagee.getScoreboardTags().contains("WitherShield")) {
+				finalDamage *= 0.9;
+			}
+
 			if(damager instanceof LivingEntity entity1) {
 				if(entity1.getScoreboardTags().contains("IceSprayed")) {
 					finalDamage *= 0.8;
 				}
 			}
+
 
 			// bonus damage to withers from hyperion
 			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p &&
