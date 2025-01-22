@@ -47,7 +47,7 @@ public class MasterWitherKing implements CustomWither {
 		e.addScoreboardTag("MartialUndefeated");
 		e.setPersistent(true);
 		e.setAI(false);
-		e.setCustomName(name + " ❤ a");
+		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
 		teleport(e, 0);
 		PluginUtils.changeName(e);
 
@@ -87,6 +87,10 @@ public class MasterWitherKing implements CustomWither {
 		return name;
 	}
 
+	public static Entity getEntity() {
+		return witherKing;
+	}
+
 	private void spawnHenchman(Mob mob, String which) {
 		WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
 		Player p = PluginUtils.getNearestPlayer(mob);
@@ -96,6 +100,8 @@ public class MasterWitherKing implements CustomWither {
 
 		Objects.requireNonNull(e.getEquipment()).setItemInMainHand(sword);
 		e.getEquipment().setItemInMainHandDropChance(0.0F);
+		Objects.requireNonNull(e.getEquipment()).setItemInOffHand(sword);
+		e.getEquipment().setItemInOffHandDropChance(0.0F);
 
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(666.0);
 		e.setHealth(666.0);

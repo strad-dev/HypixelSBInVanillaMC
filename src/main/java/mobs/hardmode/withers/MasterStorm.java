@@ -39,7 +39,7 @@ public class MasterStorm implements CustomWither {
 		e.addScoreboardTag("Survival1");
 		e.addScoreboardTag("Survival2Trigger");
 		e.setPersistent(true);
-		e.setCustomName(name + " ❤ a");
+		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
 		PluginUtils.changeName(e);
 
 		spawnGuards(e);

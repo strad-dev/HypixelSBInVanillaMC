@@ -32,7 +32,7 @@ public class MasterMaxor implements CustomWither {
 		e.addScoreboardTag("600Crystal");
 		e.addScoreboardTag("300Crystal");
 		e.setPersistent(true);
-		e.setCustomName(name + " ❤ a");
+		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
 		PluginUtils.changeName(e);
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 300);

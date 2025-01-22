@@ -27,7 +27,7 @@ public class SoulWitherSkeleton implements CustomMob {
 
 	private void teleport(Mob e) {
 		if(!e.isDead()) {
-			PluginUtils.teleport(e, 16);
+			PluginUtils.teleport(MasterWitherKing.getEntity(), 16);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> teleport(e), 300);
 		}
 	}

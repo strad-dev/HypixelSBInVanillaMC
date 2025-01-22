@@ -52,14 +52,14 @@ public class PluginUtils {
 		World world = e.getWorld();
 		Location location = e.getLocation();
 		ArrayList<Player> playersInWorld = new ArrayList<>(world.getEntitiesByClass(Player.class));
+		if(playersInWorld.isEmpty()) {
+			return null;
+		}
 		for(int i = 0; i < playersInWorld.size(); i++) {
 			if(playersInWorld.get(i).getGameMode().equals(GameMode.SPECTATOR) && playersInWorld.size() > 1) {
 				playersInWorld.remove(i);
 				i --;
 			}
-		}
-		if(playersInWorld.isEmpty()) {
-			return null;
 		}
 		playersInWorld.sort(Comparator.comparingDouble(o -> o.getLocation().distanceSquared(location)));
 		return playersInWorld.getFirst();
