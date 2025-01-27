@@ -185,14 +185,22 @@ public class PluginUtils {
 	 * @param radius The radius of the randomness
 	 */
 	public static void teleport(Entity e, int radius) {
+		teleport(e, e.getLocation(), radius);
+	}
+
+	/**
+	 * Teleports the entity to a random position in a given radius from the given location.<br>The entity will always be teleported to the highest block.
+	 *
+	 * @param e      The entity to be teleported
+	 * @param radius The radius of the randomness
+	 */
+	public static void teleport(Entity e, Location center, int radius) {
 		Random random = new Random();
 		Location l = e.getLocation();
-		Location l2 = e.getLocation();
 		Vector added = new Vector(random.nextInt(radius * 2 + 1) - radius, 0, random.nextInt(radius * 2 + 1) - radius);
 		l.add(added);
-		l2.add(added);
 		for(int i = 319; i > -64; i--) {
-			Block b = l.getWorld().getBlockAt((int) l.getX(), i, (int) l.getZ());
+			Block b = center.getWorld().getBlockAt((int) center.getX(), i, (int) center.getZ());
 			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
 				l.setY(i + 1);
 				e.teleport(l);

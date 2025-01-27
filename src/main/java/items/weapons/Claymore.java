@@ -50,8 +50,8 @@ public class Claymore implements AbilityItem {
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+" + loreDamage);
 		lore.add(ChatColor.GRAY + "Swing Range: " + ChatColor.RED + "+2");
-		lore.add("");
 		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
+			lore.add("");
 			switch(enchLevel) {
 				case 1 -> loreDamage = "2.5";
 				case 2 -> loreDamage = "5";

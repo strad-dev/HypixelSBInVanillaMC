@@ -74,22 +74,24 @@ public class CustomMobs implements Listener {
 								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 									Wither wither2 = (Wither) wither.getWorld().spawnEntity(wither.getLocation(), EntityType.WITHER);
 									new MasterMaxor().onSpawn(PluginUtils.getNearestPlayer(wither2), wither2);
-								}, 220);
+								}, 240);
 								isWitherLordFightActive = true;
-								Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": WELL WELL WELL LOOK WHO'S BACK FOR A REMATCH!");
-								PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+									PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": WELL WELL WELL LOOK WHO'S BACK FOR A REMATCH!");
+								}, 20);
 								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 									PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I HAVE BEEN PRACTISING 40 HOURS A DAY SINCE WE LAST MET!");
-								}, 60);
+								}, 80);
 								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 									PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": MY TRICKS ARE MORE SOPHISTICATED THAN EVER; YOU WILL NEVER GET AROUND THEM!");
-								}, 120);
+								}, 140);
 								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 									PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": NOW LET'S HAVE SOME FUN HERE!");
-								}, 180);
+								}, 200);
 								Bukkit.getLogger().info("A player has initiated THE GAUNTLET!");
 							} else {
 								name = CustomWither.spawnRandom().onSpawn(PluginUtils.getNearestPlayer(wither), wither);

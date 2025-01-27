@@ -265,24 +265,24 @@ public class MasterWitherKing implements CustomWither {
 			PluginUtils.changeName(damagee);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain...");
 			Player p = PluginUtils.getNearestPlayer(damagee);
-			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
+			p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Congratulations, you have proven yourself as a mighty warrior.");
 			}, 60);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My strength slips away... I can see the light at the end of the tunnel.");
 			}, 120);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.5F);
+				p.getWorld().playSound(p, Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Goodbye cruel world!  I hope to never see it again!");
 			}, 180);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
 				p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
 			}, 240);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> dropLoot(damagee, damager), 300);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> dropLoot(damagee, damager), 340);
 			return false;
 		}
 		return true;
