@@ -168,21 +168,16 @@ public class Scylla implements AbilityItem {
 		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		// wither shield
-		List<PotionEffect> temp = p.getActivePotionEffects().stream().toList();
-		List<PotionEffectType> effects = new ArrayList<>();
 		int absorptionLevel = -1;
-		for(PotionEffect effect : temp) {
-			if(effect.getType().equals(PotionEffectType.ABSORPTION)) {
-				absorptionLevel = effect.getAmplifier();
-			}
-			effects.add(effect.getType());
+		if(p.hasPotionEffect(PotionEffectType.ABSORPTION)) {
+			absorptionLevel = p.getPotionEffect(PotionEffectType.ABSORPTION).getAmplifier();
 		}
 		if(absorptionLevel != 2) { // absorption shield
 			p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 101, 2));
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 0.65F);
 			Location finalL = l;
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> { // convert to healing after 5 seconds
-				p.setHealth(Math.min(p.getHealth() + (p.getAbsorptionAmount() / 2), 20.0));
+				p.setHealth(Math.min(p.getHealth() + (p.getAbsorptionAmount() / 2), p.getAttribute(Attribute.MAX_HEALTH).getValue()));
 				p.playSound(finalL, Sound.ENTITY_PLAYER_LEVELUP, 2.0F, 2.0F);
 			}, 101L);
 		}
