@@ -227,7 +227,7 @@ public class PluginUtils {
 	public static void spawnGuards(LivingEntity entity, int num) {
 		for(int i = 0; i < num; i++) {
 			WitherSkeleton e = (WitherSkeleton) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.WITHER_SKELETON);
-			e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 75 + "/" + 75);
+			e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 50 + "/" + 50);
 			ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 			sword.addEnchantment(Enchantment.KNOCKBACK, 1);
 			ItemStack shield = new ItemStack(Material.SHIELD);
