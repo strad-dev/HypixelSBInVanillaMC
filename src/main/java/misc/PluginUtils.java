@@ -86,6 +86,20 @@ public class PluginUtils {
 	}
 
 	/**
+	 * Notifies the player that they received a rare drop
+	 *
+	 * @param p	      The Player that received the drop
+	 * @param message The name of the item
+	 */
+	public static void sendRareDropMessage(Player p, String message) {
+		if(p != null) {
+			p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + message);
+			Bukkit.getLogger().info(p.getName() + " dropped a " + message);
+			p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
+		}
+	}
+
+	/**
 	 * Shoot a beam dealing damage to everything in its path!
 	 *
 	 * @param origin      The Entity shooting the beam
@@ -196,14 +210,13 @@ public class PluginUtils {
 	 */
 	public static void teleport(Entity e, Location center, int radius) {
 		Random random = new Random();
-		Location l = e.getLocation();
 		Vector added = new Vector(random.nextInt(radius * 2 + 1) - radius, 0, random.nextInt(radius * 2 + 1) - radius);
-		l.add(added);
+		center.add(added);
 		for(int i = 319; i > -64; i--) {
 			Block b = center.getWorld().getBlockAt((int) center.getX(), i, (int) center.getZ());
 			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
-				l.setY(i + 1);
-				e.teleport(l);
+				center.setY(i + 1);
+				e.teleport(center);
 				e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
 				return;
 			}

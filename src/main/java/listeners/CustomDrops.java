@@ -19,20 +19,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
+
+import static misc.PluginUtils.sendRareDropMessage;
 
 @SuppressWarnings({"DataFlowIssue"})
 public class CustomDrops implements Listener {
-	public static void sendRareDropMessage(Player p, String message) {
-		if(p != null) {
-			p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + message);
-			Bukkit.getLogger().info(p.getName() + " dropped a " + message);
-			p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
-		}
-	}
-
-	
 	public static void loot(LivingEntity died, Entity killer) {
 		Player p;
 		int lootingLevel = 0;

@@ -52,7 +52,7 @@ public class MasterNecron implements CustomWither {
 			int finalI = i;
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 0.5F);
-				PluginUtils.spawnTNT(wither, wither.getLocation(), 0, 12 + (finalI / 40), 32 + (finalI / 20) * 2, new ArrayList<>());
+				PluginUtils.spawnTNT(wither, wither.getLocation(), 0, 8 + (finalI / 40), 32 + (finalI / 20) * 2, new ArrayList<>());
 			}, i);
 		}
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
