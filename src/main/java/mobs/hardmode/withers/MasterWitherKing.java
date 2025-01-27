@@ -335,6 +335,7 @@ public class MasterWitherKing implements CustomWither {
 		CustomMobs.updateWitherLordFight(false);
 
 		PluginUtils.playGlobalSound(Sound.UI_TOAST_CHALLENGE_COMPLETE);
+		UltimateAdvancementAPI.getInstance(Plugin.getInstance()).getAdvancement("skyblock:defeat_wither_lords").revoke(p);
 		UltimateAdvancementAPI.getInstance(Plugin.getInstance()).getAdvancement("skyblock:defeat_wither_lords").grant(p);
 	}
 

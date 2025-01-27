@@ -237,9 +237,9 @@ public class MasterStorm implements CustomWither {
 			return false;
 		}
 		if(damager.getScoreboardTags().contains("Survival1")) {
-			customMobs(damagee, PluginUtils.getNearestPlayer(damagee), 12, DamageType.RANGED);
+			customMobs(PluginUtils.getNearestPlayer(damagee), damagee, 12, DamageType.RANGED);
 		} else if(damager.getScoreboardTags().contains("Survival2")) {
-			customMobs(damagee, PluginUtils.getNearestPlayer(damagee), 18, DamageType.RANGED);
+			customMobs(PluginUtils.getNearestPlayer(damagee), damagee, 18, DamageType.RANGED);
 		}
 		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
 		return true;

@@ -138,7 +138,7 @@ public class MasterNecron implements CustomWither {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
 				new MasterWitherKing().onSpawn(PluginUtils.getNearestPlayer(damagee), wither);
-			}, 520);
+			}, 540);
 			return false;
 		}
 		return true;
