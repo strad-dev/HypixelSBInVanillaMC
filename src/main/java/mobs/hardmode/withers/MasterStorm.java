@@ -15,7 +15,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-import static listeners.CustomDamage.calculateFinalDamage;
+import static listeners.CustomDamage.customMobs;
 import static misc.PluginUtils.teleport;
 
 public class MasterStorm implements CustomWither {
@@ -228,10 +228,13 @@ public class MasterStorm implements CustomWither {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+		if(damagee instanceof Wither || damagee instanceof WitherSkeleton) {
+			return false;
+		}
 		if(damager.getScoreboardTags().contains("Survival1")) {
-			calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 12, DamageType.RANGED);
+			customMobs(damagee, PluginUtils.getNearestPlayer(damagee), 12, DamageType.RANGED);
 		} else if(damager.getScoreboardTags().contains("Survival2")) {
-			calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 18, DamageType.RANGED);
+			customMobs(damagee, PluginUtils.getNearestPlayer(damagee), 18, DamageType.RANGED);
 		}
 		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
 		return true;

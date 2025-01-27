@@ -59,23 +59,23 @@ public class MasterWitherKing implements CustomWither {
 		ordering.add("Martial");
 		Collections.shuffle(ordering);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 0.667F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My henchmen are the best in the land.  They will defeat you swiftly!");
 			spawnHenchman(e, ordering.getFirst());
 			spawnHenchman(e, ordering.get(1));
 		}, 40);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 0.667F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": One more to join the fray.  I hope you are having fun!");
 			spawnHenchman(e, ordering.get(2));
 		}, 640);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 0.667F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Another one can't hurt, can it?");
 			spawnHenchman(e, ordering.get(3));
 		}, 1240);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 0.667F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My last Henchman.  Go forth and destroy the insolent players!");
 			spawnHenchman(e, ordering.get(4));
 		}, 1840);
@@ -164,7 +164,7 @@ public class MasterWitherKing implements CustomWither {
 	public static void defeatHenchman(String which) {
 		witherKing.removeScoreboardTag(which + "Undefeated");
 		int left = countHenchmenLeft();
-		PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 0.667F);
+		PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 		switch(left) {
 			case 4 ->
 					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My most loyal henchman, what have they done to you?");
@@ -265,22 +265,22 @@ public class MasterWitherKing implements CustomWither {
 			PluginUtils.changeName(damagee);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain...");
 			Player p = PluginUtils.getNearestPlayer(damagee);
-			PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 0.667F);
+			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 0.667F);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Congratulations, you have proven yourself as a mighty warrior.");
 			}, 60);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 0.667F);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My strength slips away... I can see the light at the end of the tunnel.");
 			}, 120);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 0.667F);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Goodbye cruel world!  I hope to never see it again!");
 			}, 180);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
-				PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_AMBIENT, 1.0F, 0.667F);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			}, 240);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> dropLoot(damagee, damager), 340);
 			return false;
