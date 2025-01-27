@@ -1,5 +1,6 @@
 package mobs.hardmode.withers;
 
+import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.Plugin;
 import misc.PluginUtils;
@@ -79,6 +80,8 @@ public class MasterNecron implements CustomWither {
 			return false;
 		}
 
+		CustomMobs.updateWitherLordFight(true);
+
 		double hp = damagee.getHealth();
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
@@ -123,19 +126,19 @@ public class MasterNecron implements CustomWither {
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Foolish players!  You do not know who you are dealing with!");
-			}, 300);
+			}, 320);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I do not wish to fight, but you leave me no choice.");
-			}, 360);
+			}, 400);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Prepare to meet your ultimate demise.");
-			}, 420);
+			}, 480);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
 				new MasterWitherKing().onSpawn(PluginUtils.getNearestPlayer(damagee), wither);
-			}, 460);
+			}, 520);
 			return false;
 		}
 		return true;

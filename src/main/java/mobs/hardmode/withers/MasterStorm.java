@@ -145,6 +145,8 @@ public class MasterStorm implements CustomWither {
 			return false;
 		}
 
+		CustomMobs.updateWitherLordFight(true);
+
 		double hp = damagee.getHealth();
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {

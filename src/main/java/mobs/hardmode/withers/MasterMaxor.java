@@ -1,5 +1,6 @@
 package mobs.hardmode.withers;
 
+import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.Plugin;
 import misc.PluginUtils;
@@ -91,6 +92,8 @@ public class MasterMaxor implements CustomWither {
 		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
+
+		CustomMobs.updateWitherLordFight(true);
 
 		double hp = damagee.getHealth();
 

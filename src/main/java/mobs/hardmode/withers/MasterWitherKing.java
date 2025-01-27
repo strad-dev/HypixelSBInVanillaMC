@@ -245,6 +245,8 @@ public class MasterWitherKing implements CustomWither {
 			return false;
 		}
 
+		CustomMobs.updateWitherLordFight(true);
+
 		double hp = damagee.getHealth();
 		double minHealth = countHenchmenLeft() * 400;
 
@@ -269,25 +271,24 @@ public class MasterWitherKing implements CustomWither {
 			damagee.setHealth(1.0);
 			PluginUtils.changeName(damagee);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain...");
-			Player p = PluginUtils.getNearestPlayer(damagee);
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Congratulations, you have proven yourself as a mighty warrior.");
-			}, 60);
+			}, 80);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My strength slips away... I can see the light at the end of the tunnel.");
-			}, 120);
+			}, 160);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Goodbye cruel world!  I hope to never see it again!");
-			}, 180);
+			}, 240);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				damagee.remove();
-				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-			}, 240);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> dropLoot(damagee, damager), 340);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_DEATH, 1.0F, 1.0F);
+			}, 320);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> dropLoot(damagee, damager), 420);
 			return false;
 		}
 		return true;

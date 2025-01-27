@@ -1,5 +1,6 @@
 package mobs.hardmode.withers;
 
+import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.Plugin;
 import misc.PluginUtils;
@@ -50,6 +51,9 @@ public class MasterGoldor implements CustomWither {
 		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
+
+		CustomMobs.updateWitherLordFight(true);
+
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			PluginUtils.changeName(damagee);
 			return false;
