@@ -150,6 +150,7 @@ public class MasterStorm implements CustomWither {
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			PluginUtils.changeName(damagee);
 			if(damager instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
+				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Storm!", 0, 20, 0);
 			}
 			return false;
@@ -163,6 +164,7 @@ public class MasterStorm implements CustomWither {
 
 			Player p = PluginUtils.getNearestPlayer(damagee);
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You think you're funny?  Try surviving this!");
 
 			spawnMoreGuards(damagee);
@@ -198,6 +200,7 @@ public class MasterStorm implements CustomWither {
 			damagee.addScoreboardTag("Dead");
 			damagee.setHealth(1.0);
 			PluginUtils.changeName(damagee);
+			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I knew I should have prepared better.");
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

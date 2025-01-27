@@ -59,6 +59,7 @@ public class MasterGoldor implements CustomWither {
 			damagee.addScoreboardTag("Dead");
 			damagee.setHealth(1.0);
 			PluginUtils.changeName(damagee);
+			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": How did you break through my shield???");
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

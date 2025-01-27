@@ -252,11 +252,16 @@ public class MasterWitherKing implements CustomWither {
 			PluginUtils.changeName(damagee);
 			return false;
 		} else if(hp - originalDamage < minHealth && countHenchmenLeft() != 0) {
+			if(hp == minHealth) {
+				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
+				if(damager instanceof Player p) {
+					p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage " + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GREEN + "!", 0, 20, 0);
+				}
+			} else {
+				damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
+			}
 			damagee.setHealth(minHealth);
 			PluginUtils.changeName(damagee);
-			if(damager instanceof Player p) {
-				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage " + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GREEN + "!", 0, 20, 0);
-			}
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.addScoreboardTag("Invulnerable");

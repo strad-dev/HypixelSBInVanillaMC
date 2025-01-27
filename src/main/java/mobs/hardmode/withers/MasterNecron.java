@@ -84,16 +84,19 @@ public class MasterNecron implements CustomWither {
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			PluginUtils.changeName(damagee);
 			if(damager instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
+				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Necron!", 0, 20, 0);
 			}
 			return false;
 		} else if(damagee.getScoreboardTags().contains("1100Frenzy") && hp - originalDamage < 1100) {
 			frenzy(damagee, 1100);
 			PluginUtils.changeName(damagee);
+			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;
 		} else if(damagee.getScoreboardTags().contains("300Frenzy") && hp - originalDamage < 300) {
 			frenzy(damagee, 300);
 			PluginUtils.changeName(damagee);
+			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.setAI(false);
@@ -101,6 +104,7 @@ public class MasterNecron implements CustomWither {
 			damagee.addScoreboardTag("Dead");
 			damagee.setHealth(1.0);
 			PluginUtils.changeName(damagee);
+			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have destroyed us... but you have not destroyed our forefather.");
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {

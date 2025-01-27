@@ -98,6 +98,7 @@ public class MasterMaxor implements CustomWither {
 			if(damager instanceof Player p) {
 				if(p.getScoreboardTags().contains("HasCrystal")) {
 					damagee.removeScoreboardTag("Invulnerable");
+					damagee.removeScoreboardTag("InvulnerableReminder");
 					Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???");
 					List<EntityType> immune = new ArrayList<>();
 					immune.add(EntityType.WITHER_SKELETON);
@@ -106,6 +107,7 @@ public class MasterMaxor implements CustomWither {
 					PluginUtils.changeName(damagee);
 				} else {
 					if(!damagee.getScoreboardTags().contains("Dead")) {
+						damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 						p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Maxor!", 0, 20, 0);
 					}
 				}
@@ -119,10 +121,12 @@ public class MasterMaxor implements CustomWither {
 		} else if(damagee.getScoreboardTags().contains("600Crystal") && hp - originalDamage < 600) {
 			spawnCrystal(damagee, 600);
 			PluginUtils.changeName(damagee);
+			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;
 		} else if(damagee.getScoreboardTags().contains("300Crystal") && hp - originalDamage < 300) {
 			spawnCrystal(damagee, 300);
 			PluginUtils.changeName(damagee);
+			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.setAI(false);
@@ -130,6 +134,7 @@ public class MasterMaxor implements CustomWither {
 			damagee.addScoreboardTag("Dead");
 			damagee.setHealth(1.0);
 			PluginUtils.changeName(damagee);
+			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": HOW DID YOU DEFEAT ME?!?!?!");
 			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
