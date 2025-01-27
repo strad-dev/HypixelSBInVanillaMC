@@ -207,7 +207,7 @@ public class CustomDamage implements Listener {
 				List<EntityType> doNotKill = CustomItems.createList();
 				for(Entity entity : entities) {
 					if(!doNotKill.contains(entity.getType()) && !entity.equals(damager) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
-						customMobs(entity1, damager, e.getDamage() * 0.25 * level, DamageType.MELEE_SWEEP);
+						customMobs(entity1, damager, e.getDamage() * 0.125 * level, DamageType.MELEE_SWEEP);
 					}
 				}
 			}
