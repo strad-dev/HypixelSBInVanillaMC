@@ -28,6 +28,7 @@ public class CustomDamage implements Listener {
 	private static boolean isBlocking;
 	private static boolean flamingArrow;
 	private static int punchArrow = 0;
+	private static boolean isTermArrow;
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		isBlocking = damagee instanceof Player p && p.isBlocking();
@@ -302,6 +303,10 @@ public class CustomDamage implements Listener {
 					double z = oldVelocity.getZ();
 					if(type == DamageType.RANGED) {
 						factor *= 0.25;
+						if(isTermArrow) {
+							factor *= 0.5;
+							isTermArrow = false;
+						}
 					}
 
 					if(isBlocking) {
@@ -375,7 +380,12 @@ public class CustomDamage implements Listener {
 	@EventHandler
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
 		CustomDamage.e = e;
-		if(e.getEntity() instanceof LivingEntity entity) {
+		if(e.getEntity() instanceof EnderCrystal crystal && crystal.getScoreboardTags().contains("SkyblockBoss") && e.getDamager() instanceof Player p) {
+			crystal.remove();
+			p.addScoreboardTag("HasCrystal");
+			p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!");
+			e.setCancelled(true);
+		} else if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
 			if(entity.getHealth() > 0 && !entity.isDead()) {
 				DamageType type;
@@ -394,6 +404,7 @@ public class CustomDamage implements Listener {
 					double originalDamage;
 					if(e.getDamager() instanceof Arrow arrow && arrow.getScoreboardTags().contains("TerminatorArrow")) {
 						originalDamage = arrow.getDamage();
+						isTermArrow = true;
 					} else {
 						originalDamage = e.getDamage();
 					}
@@ -421,11 +432,6 @@ public class CustomDamage implements Listener {
 					customMobs(entity, damager, originalDamage, type);
 				}
 			}
-		} else if(e.getEntity() instanceof EnderCrystal crystal && crystal.getScoreboardTags().contains("SkyblockBoss") && e.getDamager() instanceof Player p) {
-			crystal.remove();
-			p.addScoreboardTag("HasCrystal");
-			p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!");
-			e.setCancelled(true);
 		}
 	}
 }

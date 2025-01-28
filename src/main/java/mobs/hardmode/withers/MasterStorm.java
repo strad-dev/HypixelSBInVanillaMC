@@ -62,7 +62,7 @@ public class MasterStorm implements CustomWither {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 580);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BOOM!", "", 0, 21, 0));
-			PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 300, immune);
+			PluginUtils.spawnTNT(e, e.getLocation(), 0, 64, 200, immune);
 			e.removeScoreboardTag("Survival1");
 			e.removeScoreboardTag("Invulnerable");
 			e.setAI(true);

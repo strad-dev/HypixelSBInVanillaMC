@@ -32,7 +32,7 @@ public class HolyIce implements AbilityItem {
 		lore.add("skyblock/combat/holy_ice");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Splash Yo Face " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Take " + ChatColor.GREEN + "75%" + ChatColor.GRAY + "less damage");
+		lore.add(ChatColor.GRAY + "Take " + ChatColor.GREEN + "75%" + ChatColor.GRAY + " less damage");
 		lore.add(ChatColor.GRAY + "for " + ChatColor.GREEN + "1" + ChatColor.GRAY + " second!");
 		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
 		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + COOLDOWN / 20 + "s");
