@@ -118,6 +118,10 @@ public class CustomDamage implements Listener {
 				finalDamage *= 0.9;
 			}
 
+			if(damagee.getScoreboardTags().contains("HolyIce")) {
+				finalDamage *= 0.25;
+			}
+
 			if(damager instanceof LivingEntity entity1) {
 				if(entity1.getScoreboardTags().contains("IceSprayed")) {
 					finalDamage *= 0.8;
