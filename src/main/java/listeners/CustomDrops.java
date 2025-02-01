@@ -7,7 +7,6 @@ import items.misc.IceSpray;
 import items.summonItems.*;
 import misc.Plugin;
 import misc.PluginUtils;
-import mobs.generic.InfuriatedWitherSkeleton;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -757,7 +756,9 @@ public class CustomDrops implements Listener {
 						sendRareDropMessage(p, "Wither Skeleton Skull");
 					} else {
 						if(random.nextDouble() < 0.03 * rngLootingBonus && p != null) {
-							new InfuriatedWitherSkeleton().onSpawn(p, skeleton);
+							item = HighlyInfuriatedWitherSkeletonSpawnEgg.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Highly Infuriated Wither Skeleton Spawn Egg");
 						}
 					}
 				}

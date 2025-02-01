@@ -2,7 +2,6 @@ package items.summonItems;
 
 import mobs.CustomMob;
 import mobs.generic.*;
-import org.bukkit.entity.LivingEntity;
 
 public interface SummonItem {
 	static CustomMob spawnABoss(String id) {
@@ -28,11 +27,12 @@ public interface SummonItem {
 			case "skyblock/summon/giant_flesh" -> {
 				return new Sadan();
 			}
+			case "skyblock/summon/wither_skeleton_spawn_egg" -> {
+				return new InfuriatedWitherSkeleton();
+			}
 			default -> {
 				return null;
 			}
 		}
 	}
-
-	void onRightClick(LivingEntity e);
 }

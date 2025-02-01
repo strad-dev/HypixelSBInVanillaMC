@@ -3,7 +3,6 @@ package items.summonItems;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -36,9 +35,5 @@ public class SuperiorRemnant implements SummonItem {
 		supRemnant.setItemMeta(data);
 
 		return supRemnant;
-	}
-
-	@Override
-	public void onRightClick(LivingEntity e) {
 	}
 }
