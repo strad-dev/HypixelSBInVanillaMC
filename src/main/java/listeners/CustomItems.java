@@ -118,6 +118,7 @@ public class CustomItems implements Listener {
 				}
 			}
 		}
+
 		try {
 			score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
 		} catch(Exception exception) {

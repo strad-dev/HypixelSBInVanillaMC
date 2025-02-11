@@ -1,9 +1,9 @@
 package items.summonItems;
 
 import items.AbilityItem;
-import misc.PluginUtils;
 import mobs.generic.InfuriatedWitherSkeleton;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
@@ -16,7 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HighlyInfuriatedWitherSkeletonSpawnEgg implements SummonItem, AbilityItem {
+public class HighlyInfuriatedWitherSkeletonSpawnEgg implements AbilityItem, SummonItem {
 	public static ItemStack getItem() {
 		ItemStack egg = new ItemStack(Material.WITHER_SKELETON_SPAWN_EGG);
 		egg.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
@@ -47,8 +47,11 @@ public class HighlyInfuriatedWitherSkeletonSpawnEgg implements SummonItem, Abili
 	@Override
 	public void onRightClick(Player p) {
 		WitherSkeleton skeleton = (WitherSkeleton) p.getWorld().spawnEntity(p.getLocation(), EntityType.WITHER_SKELETON);
-		new InfuriatedWitherSkeleton().onSpawn(p, skeleton);
-		PluginUtils.changeName(skeleton);
+		skeleton.setCustomName(new InfuriatedWitherSkeleton().onSpawn(p, skeleton));
+		skeleton.setCustomNameVisible(true);
+		if(p.getGameMode() != GameMode.CREATIVE) {
+			p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount() - 1);
+		}
 	}
 
 	@Override

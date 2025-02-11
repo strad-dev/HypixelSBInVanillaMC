@@ -129,7 +129,8 @@ public class GetOPItems implements CommandExecutor {
 							OmegaEgg.getItem(),
 							SpiderRelic.getItem(),
 							AtonedFlesh.getItem(),
-							GiantZombieFlesh.getItem());
+							GiantZombieFlesh.getItem(),
+							HighlyInfuriatedWitherSkeletonSpawnEgg.getItem());
 					sendMessage(commandSender, player, "Summon Items");
 					return true;
 				}

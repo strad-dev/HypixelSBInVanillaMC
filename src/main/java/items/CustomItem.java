@@ -1,6 +1,7 @@
 package items;
 
 import items.misc.*;
+import items.summonItems.HighlyInfuriatedWitherSkeletonSpawnEgg;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
 import org.bukkit.inventory.ItemStack;
@@ -51,6 +52,9 @@ public interface CustomItem {
 			}
 			case "skyblock/combat/holy_ice" -> {
 				return new HolyIce();
+			}
+			case "skyblock/summon/wither_skeleton_spawn_egg" -> {
+				return new HighlyInfuriatedWitherSkeletonSpawnEgg();
 			}
 			default -> {
 				return null;
