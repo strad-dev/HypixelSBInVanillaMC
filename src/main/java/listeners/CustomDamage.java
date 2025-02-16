@@ -35,7 +35,7 @@ public class CustomDamage implements Listener {
 
 		if(damager instanceof Projectile projectile) {
 			// stop stupidly annoying arrows
-			if(projectile instanceof Arrow arrow) {
+			if(projectile instanceof AbstractArrow arrow) {
 				if(arrow.getPierceLevel() == 0) {
 					arrow.remove();
 				} else {
@@ -400,9 +400,9 @@ public class CustomDamage implements Listener {
 					}
 				}
 
-				if(entity.getNoDamageTicks() == 0 || e.getDamager() instanceof Arrow) {
+				if(entity.getNoDamageTicks() == 0 || e.getDamager() instanceof AbstractArrow) {
 					double originalDamage;
-					if(e.getDamager() instanceof Arrow arrow && arrow.getScoreboardTags().contains("TerminatorArrow")) {
+					if(e.getDamager() instanceof AbstractArrow arrow && arrow.getScoreboardTags().contains("TerminatorArrow")) {
 						originalDamage = arrow.getDamage();
 						isTermArrow = true;
 					} else {

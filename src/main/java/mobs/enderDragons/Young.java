@@ -23,10 +23,9 @@ public class Young implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Holy Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		e.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
+		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Young Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		e.addScoreboardTag("YoungDragon");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The HOLY DRAGON has arrived to carry out Strad's bidding!");
+		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The YOUNG DRAGON has arrived to destroy nons 1 second faster!");
 		Bukkit.getLogger().info("The Young Dragon has been summoned!");
 		return name;
 	}
@@ -35,7 +34,7 @@ public class Young implements CustomDragon {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		Random random = new Random();
 		if(random.nextDouble() < 0.1) {
-			teleport(damagee, 32);
+			teleport(damagee, 16);
 		}
 
 		if(type == DamageType.RANGED) {
