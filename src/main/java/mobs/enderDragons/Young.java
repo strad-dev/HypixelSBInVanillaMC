@@ -3,6 +3,7 @@ package mobs.enderDragons;
 import listeners.DamageType;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -33,7 +34,7 @@ public class Young implements CustomDragon {
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		Random random = new Random();
-		if(random.nextDouble() < 0.1) {
+		if(random.nextDouble() < 0.1 && damagee.getLocation().distanceSquared(new Location(damagee.getWorld(), 0, 0, 0)) > 75) {
 			teleport(damagee, 16);
 		}
 
