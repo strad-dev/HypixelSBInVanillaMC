@@ -53,6 +53,9 @@ public interface CustomItem {
 			case "skyblock/combat/holy_ice" -> {
 				return new HolyIce();
 			}
+			case "skyblock/combat/bonzo_staff" -> {
+				return new BonzoStaff();
+			}
 			case "skyblock/summon/wither_skeleton_spawn_egg" -> {
 				return new HighlyInfuriatedWitherSkeletonSpawnEgg();
 			}

@@ -68,6 +68,7 @@ public class GetOPItems implements CommandExecutor {
 							DivanPickaxe.getItem(),
 							WandOfAtonement.getItem(),
 							HolyIce.getItem(),
+							BonzoStaff.getItem(),
 							new ItemStack(Material.GOLDEN_CARROT, 64),
 							WardenHelmet.getItem(),
 							WitherKingCrown.getItem(),
