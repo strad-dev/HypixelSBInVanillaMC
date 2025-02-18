@@ -78,7 +78,7 @@ public class AddRecipes {
 		claymoreRecipe.shape("NSN", "CDC", "NHN");
 		claymoreRecipe.setIngredient('S', new RecipeChoice.ExactChoice(stormSecrets));
 		claymoreRecipe.setIngredient('N', Material.NETHER_STAR);
-		claymoreRecipe.setIngredient('D', Material.NETHERITE_SWORD);
+		claymoreRecipe.setIngredient('D', Material.STONE_SWORD);
 		claymoreRecipe.setIngredient('H', new RecipeChoice.ExactChoice(gsRemnant));
 		claymoreRecipe.setIngredient('C', new RecipeChoice.ExactChoice(bigStone));
 
@@ -350,7 +350,7 @@ public class AddRecipes {
 	public static Recipe addFeatherFalling5Recipe(Plugin plugin) {
 		ItemStack featherFalling5 = new ItemStack(Material.ENCHANTED_BOOK);
 		EnchantmentStorageMeta meta = (EnchantmentStorageMeta) featherFalling5.getItemMeta();
-		meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
+		meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 4, true);
 		featherFalling5.setItemMeta(meta);
 
 		ItemStack featherFalling4 = new ItemStack(Material.ENCHANTED_BOOK);
