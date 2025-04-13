@@ -38,7 +38,7 @@ public class NonEntityDamage implements Listener {
 			boolean hasLastDamageTime = noDamageTimes.containsKey(entity);
 			long lastDamageTime = noDamageTimes.computeIfAbsent(entity, entity2 -> currentTime);
 
-			if(hasLastDamageTime && currentTime - lastDamageTime > 490 || type == DamageType.ABSOLUTE) {
+			if(hasLastDamageTime && currentTime - lastDamageTime > 490 || e.getCause().equals(EntityDamageEvent.DamageCause.KILL)) {
 				customMobs(entity, null, e.getDamage(), type);
 				noDamageTimes.put(entity, currentTime);
 			}
