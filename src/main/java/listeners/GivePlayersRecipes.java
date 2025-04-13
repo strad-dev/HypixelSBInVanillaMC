@@ -82,6 +82,7 @@ public class GivePlayersRecipes implements Listener {
 							case "skyblock/combat/wand_of_atonement" -> setItem(i, WandOfAtonement.getItem());
 							case "skyblock/combat/divan_pickaxe" -> setItem(i, DivanPickaxe.getItem());
 							case "skyblock/combat/holy_ice" -> setItem(i, HolyIce.getItem());
+							case "skyblock/combat/bonzo_staff" -> setItem(i, BonzoStaff.getItem());
 							case "skyblock/combat/dark_claymore" ->
 									setItem(i, Claymore.getItem(ench, item.getEnchantmentLevel(ench)));
 							case "skyblock/combat/warden_helmet" -> setItem(i, WardenHelmet.getItem());

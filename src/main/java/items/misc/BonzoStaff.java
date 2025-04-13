@@ -2,17 +2,17 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.WindCharge;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,8 @@ public class BonzoStaff implements AbilityItem {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Showtime " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Shoots Wind Charges that create an explosion that propels the player forward.");
+		lore.add(ChatColor.GRAY + "Shoots Wind Charges that create an");
+		lore.add(ChatColor.GRAY + "explosion that propels the player forward.");
 		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
 		lore.add("");
 		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
@@ -49,7 +50,13 @@ public class BonzoStaff implements AbilityItem {
 
 	@Override
 	public void onRightClick(Player p) {
-		p.getLocation().getWorld().spawnEntity(p.getLocation(), EntityType.WIND_CHARGE);
+		Location l = p.getLocation();
+		l.add(l.getDirection().setY(0).normalize().multiply(0.5));
+		l.add(0, 1.2, 0);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			WindCharge charge1 = (WindCharge) l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
+			WindCharge charge2 = (WindCharge) l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
+		}, 1);
 	}
 
 	@Override
