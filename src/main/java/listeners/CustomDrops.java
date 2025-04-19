@@ -702,7 +702,7 @@ public class CustomDrops implements Listener {
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[tag=WitherKingDragon]");
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[tag=GuardSkeleton]");
 					wither.getWorld().setThundering(false);
-					for(int i = 0; i < 1 * multiplier; i ++) {
+					for(int i = 0; i < 1 * multiplier; i++) {
 						if(random.nextDouble() < 0.04 * rngLootingBonus) {
 							item = MaxorSecrets.getItem();
 							world.dropItemNaturally(l, item);

@@ -20,7 +20,8 @@ public class WandOfAtonement implements AbilityItem {
 	private static final String COOLDOWN_TAG = "WandCooldown";
 	private static final int COOLDOWN = 100;
 
-	public static ItemStack getItem() {ItemStack wandOfAtonement = new ItemStack(Material.STICK);
+	public static ItemStack getItem() {
+		ItemStack wandOfAtonement = new ItemStack(Material.STICK);
 		wandOfAtonement.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = wandOfAtonement.getItemMeta();
@@ -55,6 +56,7 @@ public class WandOfAtonement implements AbilityItem {
 	public void onLeftClick(Player p) {
 
 	}
+
 	public int manaCost() {
 		return MANA_COST;
 	}

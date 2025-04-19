@@ -74,7 +74,8 @@ public class GivePlayersRecipes implements Listener {
 						}
 						switch(lore.getFirst()) {
 							case "skyblock/combat/aspect_of_the_void" -> setItem(i, AOTV.getItem());
-							case "skyblock/combat/scylla" -> setItem(i, Scylla.getItem(ench, item.getEnchantmentLevel(ench)));
+							case "skyblock/combat/scylla" ->
+									setItem(i, Scylla.getItem(ench, item.getEnchantmentLevel(ench)));
 							case "skyblock/combat/terminator" ->
 									setItem(i, Terminator.getItem(item.getEnchantmentLevel(Enchantment.POWER)));
 							case "skyblock/combat/ice_spray_wand" -> setItem(i, IceSpray.getItem());

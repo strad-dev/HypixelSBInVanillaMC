@@ -99,6 +99,7 @@ public class CustomMobs implements Listener {
 								wither.setTarget(PluginUtils.getNearestPlayer(wither));
 								wither.setCustomNameVisible(true);
 								wither.setPersistent(true);
+								wither.setRemoveWhenFarAway(false);
 								wither.addScoreboardTag("SkyblockBoss");
 							}
 						} else {
@@ -113,6 +114,7 @@ public class CustomMobs implements Listener {
 							dragon.setTarget(PluginUtils.getNearestPlayer(dragon));
 							dragon.setCustomNameVisible(true);
 							dragon.setPersistent(true);
+							dragon.setRemoveWhenFarAway(false);
 							dragon.addScoreboardTag("SkyblockBoss");
 						}
 					}

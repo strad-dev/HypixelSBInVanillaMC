@@ -52,6 +52,7 @@ public class WitherKing implements CustomWither {
 			dragon.addScoreboardTag("WitherKingDragon");
 			dragon.setTarget(p);
 			dragon.setPersistent(true);
+			e.setRemoveWhenFarAway(false);
 
 			p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Wither King summons His Dragon!");
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> teleportDragon(dragon, e), 300);

@@ -23,7 +23,15 @@ public enum DamageType {
 	 * Ranged Damage Type
 	 * ------------------
 	 * Used for all damage via Ranged Weapons (e.g. Bows, Tridents, Wither Skulls)
-	 * DOES NOT PROC INVULNERABILITY TICKS
+	 * Affected by: Armor, Toughness, Protection, Resistance
+	 * Knockback: Reduced
+	 * I-Frames: None
+	 */
+	RANGED_SPECIAL,
+	/*
+	 * Ranged Special Damage Type
+	 * ------------------
+	 * Used for custom Ranged damage from other sources (e.g. Terminator beam)
 	 * Affected by: Armor, Toughness, Protection, Resistance
 	 * Knockback: Reduced
 	 * I-Frames: None
@@ -89,7 +97,7 @@ public enum DamageType {
 	 */
 
 	public static String toString(DamageType type) {
-		switch (type) {
+		switch(type) {
 			case MELEE -> {
 				return "Melee Damage";
 			}

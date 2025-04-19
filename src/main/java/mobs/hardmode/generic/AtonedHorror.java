@@ -48,6 +48,7 @@ public class AtonedHorror implements CustomMob {
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		((Ageable) e).setAdult();
 		e.setPersistent(true);
+		e.setRemoveWhenFarAway(false);
 		return newName;
 	}
 

@@ -139,11 +139,11 @@ public class CustomDamage implements Listener {
 			}
 
 			// shield logic (for weirdos)
-			if(isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED)) {
+			if(isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL)) {
 				finalDamage *= 0.5;
 			}
 
-			if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
+			if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
 				finalDamage *= Math.max(0.25, 1 - armor * 0.0375);
 			}
@@ -222,7 +222,7 @@ public class CustomDamage implements Listener {
 
 			double absorption = damagee.getAbsorptionAmount();
 			double oldHealth = damagee.getHealth();
-			boolean doesDie = finalDamage >= oldHealth + absorption;
+			boolean doesDie = Math.ceil(finalDamage) >= Math.floor(oldHealth + absorption);
 
 			// fire aspect - should always apply
 			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
@@ -237,7 +237,7 @@ public class CustomDamage implements Listener {
 				if(damagee instanceof EnderDragon) {
 					damagee.teleport(new Location(damagee.getWorld(), 0.5, 70.0, 0.5));
 				}
-				if(type == DamageType.PLAYER_MAGIC || type == DamageType.MELEE_SWEEP || isBlocking) {
+				if(type == DamageType.PLAYER_MAGIC || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED_SPECIAL || isBlocking) {
 					if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
 						if(damagee instanceof Player p) {
 							if(p.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
@@ -285,7 +285,7 @@ public class CustomDamage implements Listener {
 				}
 
 				// apply knockback
-				if((type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED) && damager != null) {
+				if((type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) && damager != null) {
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
 					double enchantments = 1;
 					if(damager instanceof LivingEntity livingEntity) {
@@ -301,7 +301,7 @@ public class CustomDamage implements Listener {
 					double x = oldVelocity.getX();
 					double y = oldVelocity.getY();
 					double z = oldVelocity.getZ();
-					if(type == DamageType.RANGED) {
+					if(type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) {
 						factor *= 0.25;
 						if(isTermArrow) {
 							factor *= 0.5;

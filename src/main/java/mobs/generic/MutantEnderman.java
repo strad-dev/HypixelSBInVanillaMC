@@ -35,6 +35,7 @@ public class MutantEnderman implements CustomMob {
 		Bukkit.getLogger().info(p.getName() + " has summoned the Mutant Enderman.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		e.setPersistent(true);
+		e.setRemoveWhenFarAway(false);
 		return newName;
 	}
 

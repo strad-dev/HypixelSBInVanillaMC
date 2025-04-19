@@ -33,6 +33,7 @@ public class MasterMaxor implements CustomWither {
 		e.addScoreboardTag("600Crystal");
 		e.addScoreboardTag("300Crystal");
 		e.setPersistent(true);
+		e.setRemoveWhenFarAway(false);
 		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
 		PluginUtils.changeName(e);
 
@@ -57,7 +58,6 @@ public class MasterMaxor implements CustomWither {
 			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
 				l.setY(i + 2);
 				EnderCrystal crystal = (EnderCrystal) wither.getWorld().spawnEntity(l, EntityType.END_CRYSTAL);
-				crystal.setInvulnerable(true);
 				crystal.setCustomName(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Energy Crystal");
 				crystal.addScoreboardTag("SkyblockBoss");
 				if(which == 600) {

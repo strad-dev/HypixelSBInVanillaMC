@@ -39,6 +39,7 @@ public class MasterStorm implements CustomWither {
 		e.addScoreboardTag("Survival1");
 		e.addScoreboardTag("Survival2Trigger");
 		e.setPersistent(true);
+		e.setRemoveWhenFarAway(false);
 		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
 		PluginUtils.changeName(e);
 
@@ -134,7 +135,7 @@ public class MasterStorm implements CustomWither {
 				WitherSkull skullRight = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(-1, 1.5, 0), EntityType.WITHER_SKULL);
 				skullRight.setDirection(directionRight);
 				skullRight.setShooter(damagee);
-				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SHOOT);
+				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.0f);
 			}
 		}, i);
 	}
