@@ -72,7 +72,7 @@ public class AOTV implements AbilityItem {
 						p.setFallDistance(0);
 						p.teleport(newLocation);
 						p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
-					teleported = true;
+						teleported = true;
 					}
 					break;
 				}

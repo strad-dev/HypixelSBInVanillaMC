@@ -63,7 +63,7 @@ public class GetOPItems implements CommandExecutor {
 							Scylla.getItem(Enchantment.SHARPNESS, 0),
 							AOTV.getItem(),
 							IceSpray.getItem(),
-							Claymore.getItem(Enchantment.SHARPNESS,0),
+							Claymore.getItem(Enchantment.SHARPNESS, 0),
 							Terminator.getItem(0),
 							DivanPickaxe.getItem(),
 							WandOfAtonement.getItem(),

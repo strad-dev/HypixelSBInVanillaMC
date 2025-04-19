@@ -46,6 +46,7 @@ public class MasterWitherKing implements CustomWither {
 		e.addScoreboardTag("SoulUndefeated");
 		e.addScoreboardTag("MartialUndefeated");
 		e.setPersistent(true);
+		e.setRemoveWhenFarAway(false);
 		e.setAI(false);
 		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
 		teleport(e, 0);
@@ -116,6 +117,7 @@ public class MasterWitherKing implements CustomWither {
 		e.addScoreboardTag("GuardSkeleton");
 		e.addScoreboardTag("HardMode");
 		e.setPersistent(true);
+		e.setRemoveWhenFarAway(false);
 		switch(which) {
 			case "Power" -> {
 				e.addScoreboardTag("Power");
@@ -207,6 +209,7 @@ public class MasterWitherKing implements CustomWither {
 				e.addScoreboardTag("GuardSkeleton");
 				e.addScoreboardTag("HardMode");
 				e.setPersistent(true);
+				e.setRemoveWhenFarAway(false);
 			}
 			PluginUtils.playGlobalSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
 

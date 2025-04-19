@@ -44,6 +44,7 @@ public class InfuriatedWitherSkeleton implements CustomMob {
 		Bukkit.getLogger().info(p.getName() + " has found a Highly Infuriated Wither Skeleton!.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		e.setPersistent(true);
+		e.setRemoveWhenFarAway(false);
 		return newName;
 	}
 

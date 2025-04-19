@@ -14,7 +14,7 @@ import java.util.List;
 public class SoulWitherSkeleton implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of the Soul" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ ");
+		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of the Soul" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
 		PluginUtils.changeName(e);
 		e.addScoreboardTag("Soul");
 

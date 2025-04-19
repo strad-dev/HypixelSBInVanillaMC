@@ -53,6 +53,7 @@ public class Sadan implements CustomMob {
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		((Ageable) e).setAdult();
 		e.setPersistent(true);
+		e.setRemoveWhenFarAway(false);
 
 		Bukkit.getOnlinePlayers().forEach(p1 -> Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan")).addPlayer(p1));
 		Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setProgress(1.0);

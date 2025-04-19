@@ -38,6 +38,7 @@ public class MasterNecron implements CustomWither {
 		e.addScoreboardTag("1100Frenzy");
 		e.addScoreboardTag("300Frenzy");
 		e.setPersistent(true);
+		e.setRemoveWhenFarAway(false);
 		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
 		PluginUtils.changeName(e);
 
@@ -121,7 +122,7 @@ public class MasterNecron implements CustomWither {
 			}, 100);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC +  "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Who dares wake me from my slumber?");
+				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Who dares wake me from my slumber?");
 			}, 240);
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);

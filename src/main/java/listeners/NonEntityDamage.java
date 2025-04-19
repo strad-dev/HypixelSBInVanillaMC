@@ -22,8 +22,8 @@ public class NonEntityDamage implements Listener {
 			switch(e.getCause()) {
 				case THORNS -> type = DamageType.MELEE;
 				case POISON, WITHER -> type = DamageType.MAGIC;
-				case CONTACT, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION, SUFFOCATION ->
-						type = DamageType.ENVIRONMENTAL;
+				case CONTACT, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION,
+					 SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
 				case CUSTOM -> type = DamageType.IFRAME_ENVIRONMENTAL;
 				case FALL, FLY_INTO_WALL -> type = DamageType.FALL;
 				case CRAMMING, KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.ABSOLUTE;

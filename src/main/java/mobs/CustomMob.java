@@ -103,20 +103,22 @@ public interface CustomMob {
 
 	/**
 	 * Handles custom entity behavior when the mob is damaged
-	 * @param damagee the custom entity
-	 * @param damager the entity dealing damage
+	 *
+	 * @param damagee        the custom entity
+	 * @param damager        the entity dealing damage
 	 * @param originalDamage the original damage amount
-	 * @param type the originla damage type
+	 * @param type           the originla damage type
 	 * @return true if the original calculation can proceed; false if not
 	 */
 	boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
 
 	/**
 	 * Handles custom entity behavior when the mob deals damage
-	 * @param damagee the entity taking the damage
-	 * @param damager the custom entity
+	 *
+	 * @param damagee        the entity taking the damage
+	 * @param damager        the custom entity
 	 * @param originalDamage the original damage amount
-	 * @param type the originla damage type
+	 * @param type           the originla damage type
 	 * @return true if the original calculation can proceed; false if not
 	 */
 	boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);

@@ -56,6 +56,7 @@ public class WandOfRestoration implements AbilityItem {
 	public void onLeftClick(Player p) {
 
 	}
+
 	public int manaCost() {
 		return MANA_COST;
 	}

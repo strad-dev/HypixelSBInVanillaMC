@@ -144,7 +144,7 @@ public class Terminator implements AbilityItem {
 
 		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
 		p.addScoreboardTag("TerminatorCooldown");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("TerminatorCooldown"), 4L);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("TerminatorCooldown"), 5L);
 	}
 
 	@Override

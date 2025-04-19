@@ -58,7 +58,7 @@ public class PluginUtils {
 		for(int i = 0; i < playersInWorld.size(); i++) {
 			if(playersInWorld.get(i).getGameMode().equals(GameMode.SPECTATOR) && playersInWorld.size() > 1) {
 				playersInWorld.remove(i);
-				i --;
+				i--;
 			}
 		}
 		playersInWorld.sort(Comparator.comparingDouble(o -> o.getLocation().distanceSquared(location)));
@@ -88,7 +88,7 @@ public class PluginUtils {
 	/**
 	 * Notifies the player that they received a rare drop
 	 *
-	 * @param p	      The Player that received the drop
+	 * @param p       The Player that received the drop
 	 * @param message The name of the item
 	 */
 	public static void sendRareDropMessage(Player p, String message) {
@@ -122,7 +122,6 @@ public class PluginUtils {
 		if(origin.equals(destination)) {
 			v = l.getDirection();
 		} else {
-
 			Location destinationLocation = destination.getLocation().add(0, destination.getHeight() / 2, 0);
 			double x = destinationLocation.getX() - l.getX();
 			double y = destinationLocation.getY() - l.getY();
@@ -143,7 +142,7 @@ public class PluginUtils {
 			for(Entity entity : entities) {
 				if(entity instanceof LivingEntity temp && !damagedEntities.contains(entity)) {
 					damagedEntities.add(entity);
-					customMobs(temp, origin, damage, DamageType.RANGED);
+					customMobs(temp, origin, damage, DamageType.RANGED_SPECIAL);
 					pierce--;
 				}
 			}
@@ -248,6 +247,7 @@ public class PluginUtils {
 			e.addScoreboardTag("SkyblockBoss");
 			e.addScoreboardTag("GuardSkeleton");
 			e.setPersistent(true);
+			e.setRemoveWhenFarAway(false);
 		}
 		entity.getWorld().playSound(entity, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
 	}
