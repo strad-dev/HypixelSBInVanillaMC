@@ -31,26 +31,26 @@ public class Terminator implements AbilityItem {
 
 		String loreDamage;
 		switch(powerLevel) {
-			case 1 -> loreDamage = "3.25";
-			case 2 -> loreDamage = "3.5";
-			case 3 -> loreDamage = "3.75";
-			case 4 -> loreDamage = "4";
-			case 5 -> loreDamage = "4.25";
-			case 6 -> loreDamage = "4.5";
-			case 7 -> loreDamage = "5";
-			default -> loreDamage = "3";
+			case 1 -> loreDamage = "2.75";
+			case 2 -> loreDamage = "3";
+			case 3 -> loreDamage = "3.25";
+			case 4 -> loreDamage = "3.5";
+			case 5 -> loreDamage = "3.75";
+			case 6 -> loreDamage = "4";
+			case 7 -> loreDamage = "4.5";
+			default -> loreDamage = "2.5";
 		}
 
 		String salvationDamage;
 		switch(powerLevel) {
-			case 1 -> salvationDamage = "5.667";
-			case 2 -> salvationDamage = "6.333";
-			case 3 -> salvationDamage = "7";
-			case 4 -> salvationDamage = "7.667";
-			case 5 -> salvationDamage = "8.333";
-			case 6 -> salvationDamage = "9";
-			case 7 -> salvationDamage = "10";
-			default -> salvationDamage = "5";
+			case 1 -> salvationDamage = "4.5";
+			case 2 -> salvationDamage = "5";
+			case 3 -> salvationDamage = "5.5";
+			case 4 -> salvationDamage = "6";
+			case 5 -> salvationDamage = "6.5";
+			case 6 -> salvationDamage = "7";
+			case 7 -> salvationDamage = "8";
+			default -> salvationDamage = "4";
 		}
 
 		List<String> lore = new ArrayList<>();
@@ -124,19 +124,19 @@ public class Terminator implements AbilityItem {
 		Arrow middle = p.getWorld().spawnArrow(l, l.getDirection(), 3, 0.1F);
 		Arrow right = p.getWorld().spawnArrow(l, lRight.getDirection(), 3, 0.1F);
 
-		left.setDamage(3 + add);
+		left.setDamage(2.5 + add);
 		left.setPierceLevel(4);
 		left.setShooter(p);
 		left.setWeapon(p.getInventory().getItemInMainHand());
 		left.addScoreboardTag("TerminatorArrow");
 
-		middle.setDamage(3 + add);
+		middle.setDamage(2.5 + add);
 		middle.setPierceLevel(4);
 		middle.setShooter(p);
 		middle.setWeapon(p.getInventory().getItemInMainHand());
 		middle.addScoreboardTag("TerminatorArrow");
 
-		right.setDamage(3 + add);
+		right.setDamage(2.5 + add);
 		right.setPierceLevel(4);
 		right.setShooter(p);
 		right.setWeapon(p.getInventory().getItemInMainHand());
@@ -153,9 +153,9 @@ public class Terminator implements AbilityItem {
 			double powerBonus;
 			try {
 				int power = p.getInventory().getItem(p.getInventory().getHeldItemSlot()).getEnchantmentLevel(Enchantment.POWER);
-				powerBonus = power * 0.667;
+				powerBonus = power * 0.5;
 				if(power == 7) {
-					powerBonus += 0.331;
+					powerBonus += 0.5;
 				}
 			} catch(Exception exception) {
 				powerBonus = 0;
@@ -163,14 +163,14 @@ public class Terminator implements AbilityItem {
 
 			double strengthBonus;
 			try {
-				strengthBonus = 1.5 * p.getPotionEffect(PotionEffectType.STRENGTH).getAmplifier();
+				strengthBonus = p.getPotionEffect(PotionEffectType.STRENGTH).getAmplifier();
 			} catch(Exception exception) {
 				strengthBonus = 0;
 			}
 
 			// shoot the three arrows
 			double add = powerBonus + strengthBonus;
-			shootBeam(p, p, Color.RED, 64, 5, 5 + add);
+			shootBeam(p, p, Color.RED, 64, 5, 4.5 + add);
 			p.playSound(p.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 			p.addScoreboardTag("SalvationCooldown");
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("SalvationCooldown"), 19L);

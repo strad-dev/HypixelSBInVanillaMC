@@ -56,6 +56,12 @@ public interface CustomItem {
 			case "skyblock/combat/bonzo_staff" -> {
 				return new BonzoStaff();
 			}
+			case "skyblock/combat/tactical_insertion" -> {
+				return new TacticalInsertion();
+			}
+			case "skyblock/combat/gyro" -> {
+				return new GyrokineticWand();
+			}
 			case "skyblock/summon/wither_skeleton_spawn_egg" -> {
 				return new HighlyInfuriatedWitherSkeletonSpawnEgg();
 			}

@@ -58,6 +58,8 @@ public class GivePlayersRecipes implements Listener {
 		p.removeScoreboardTag("WandCooldown");
 		p.removeScoreboardTag("IceSprayCooldown");
 		p.removeScoreboardTag("IceCooldown");
+		p.removeScoreboardTag("TacCooldown");
+		p.removeScoreboardTag("GyroCooldown");
 
 		this.inventory = p.getInventory();
 		for(int i = 0; i < inventory.getSize(); i++) {
@@ -84,6 +86,8 @@ public class GivePlayersRecipes implements Listener {
 							case "skyblock/combat/divan_pickaxe" -> setItem(i, DivanPickaxe.getItem());
 							case "skyblock/combat/holy_ice" -> setItem(i, HolyIce.getItem());
 							case "skyblock/combat/bonzo_staff" -> setItem(i, BonzoStaff.getItem());
+							case "skyblock/combat/tactical_insertion" -> setItem(i, TacticalInsertion.getItem());
+							case "skyblock/combat/gyro" -> setItem(i, GyrokineticWand.getItem());
 							case "skyblock/combat/dark_claymore" ->
 									setItem(i, Claymore.getItem(ench, item.getEnchantmentLevel(ench)));
 							case "skyblock/combat/warden_helmet" -> setItem(i, WardenHelmet.getItem());
