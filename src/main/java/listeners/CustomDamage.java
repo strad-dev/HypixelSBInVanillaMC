@@ -222,7 +222,7 @@ public class CustomDamage implements Listener {
 
 			double absorption = damagee.getAbsorptionAmount();
 			double oldHealth = damagee.getHealth();
-			boolean doesDie = Math.ceil(finalDamage) >= Math.floor(oldHealth + absorption);
+			boolean doesDie = finalDamage >= oldHealth + absorption;
 
 			// fire aspect - should always apply
 			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
