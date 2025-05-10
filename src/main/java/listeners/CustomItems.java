@@ -2,6 +2,7 @@ package listeners;
 
 import items.AbilityItem;
 import items.CustomItem;
+import items.misc.AOTV;
 import misc.Plugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -136,31 +137,36 @@ public class CustomItems implements Listener {
 				item = null;
 			}
 			if(item != null) {
-				if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+				if(!(item instanceof AOTV)) {
 					e.setCancelled(true);
-					if(!p.getScoreboardTags().contains("AbilityCooldown")) {
-						if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
-							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
-							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-						} else if(p.getScoreboardTags().contains(item.cooldownTag())) {
-							p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
-							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-						} else {
-							item.onRightClick(p);
+				}
+				if(!p.getScoreboardTags().contains("AbilityCooldown")) {
+					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
+						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
+						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+					} else if(p.getScoreboardTags().contains(item.cooldownTag())) {
+						p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
+						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+					} else {
+						boolean applyCooldown = false;
+						if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
+							applyCooldown = item.onRightClick(p);
+						} else if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.PHYSICAL)) {
+							applyCooldown = item.onLeftClick(p);
+						}
+
+						if(applyCooldown) {
 							p.addScoreboardTag(item.cooldownTag());
 							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag(item.cooldownTag()), item.cooldown());
 
-							if(!p.getGameMode().equals(GameMode.CREATIVE)) {
-								Score score = CustomItems.currentScore();
-								score.setScore(score.getScore() - item.manaCost());
-							}
+						}
+
+						if(!p.getGameMode().equals(GameMode.CREATIVE)) {
+							Score score = CustomItems.currentScore();
+							score.setScore(score.getScore() - item.manaCost());
 						}
 						p.addScoreboardTag("AbilityCooldown");
 						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
-					}
-				} else if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.PHYSICAL)) {
-					if(!p.getScoreboardTags().contains("AbilityCooldown")) {
-						item.onLeftClick(p);
 					}
 				}
 			}

@@ -77,7 +77,7 @@ public class Terminator implements AbilityItem {
 	}
 
 	@Override
-	public void onRightClick(Player p) {
+	public boolean onRightClick(Player p) {
 		// you don't need arrows
 		p.getInventory().remove(Material.ARROW);
 		p.getInventory().remove(Material.TIPPED_ARROW);
@@ -143,12 +143,11 @@ public class Terminator implements AbilityItem {
 		right.addScoreboardTag("TerminatorArrow");
 
 		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
-		p.addScoreboardTag("TerminatorCooldown");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("TerminatorCooldown"), 5L);
+		return true;
 	}
 
 	@Override
-	public void onLeftClick(Player p) {
+	public boolean onLeftClick(Player p) {
 		if(!p.getScoreboardTags().contains("SalvationCooldown")) {
 			double powerBonus;
 			try {
@@ -174,7 +173,9 @@ public class Terminator implements AbilityItem {
 			p.playSound(p.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 			p.addScoreboardTag("SalvationCooldown");
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("SalvationCooldown"), 19L);
+			return true;
 		}
+		return false;
 	}
 
 	@Override

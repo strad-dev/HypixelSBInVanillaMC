@@ -5,9 +5,7 @@ import misc.Plugin;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.WindCharge;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -22,9 +20,9 @@ public class TacticalInsertion implements AbilityItem {
 	private static final int COOLDOWN = 400;
 
 	public static ItemStack getItem() {
-		ItemStack bonzoStaff = new ItemStack(Material.BLAZE_ROD);
+		ItemStack tac = new ItemStack(Material.BLAZE_ROD);
 
-		ItemMeta data = bonzoStaff.getItemMeta();
+		ItemMeta data = tac.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.DARK_PURPLE + "Tactical Insertion");
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "TacModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
@@ -45,35 +43,34 @@ public class TacticalInsertion implements AbilityItem {
 		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
 
 		data.setLore(lore);
-		bonzoStaff.setItemMeta(data);
+		tac.setItemMeta(data);
 
-		return bonzoStaff;
+		return tac;
 	}
 
 	@Override
-	public void onRightClick(Player p) {
+	public boolean onRightClick(Player p) {
 		Location l = p.getLocation();
-			p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.707107F);
-			p.playSound(p, Sound.ITEM_FLINTANDSTEEL_USE, 1.0F, 1.0F);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.793701F), 12);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.890899F), 24);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.943874F), 36);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 1F), 48);
+		p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.707107F);
+		p.playSound(p, Sound.ITEM_FLINTANDSTEEL_USE, 1.0F, 1.0F);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.793701F), 10);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.890899F), 20);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.943874F), 30);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 1F), 40);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 1.059463F), 50);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 0.50F);
+			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F);
 			p.teleport(l);
+			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.getWorld().spawnParticle(Particle.FLAME, p.getLocation(), 1000), 1);
 		}, 60);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 0.50F);
-		}, 63);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 0.50F);
-		}, 66);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F), 63);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F), 66);
+		return true;
 	}
 
 	@Override
-	public void onLeftClick(Player p) {
-
+	public boolean onLeftClick(Player p) {
+		return false;
 	}
 
 	@Override

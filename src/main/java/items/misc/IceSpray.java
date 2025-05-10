@@ -5,11 +5,14 @@ import listeners.CustomItems;
 import listeners.DamageType;
 import misc.Plugin;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -33,10 +36,14 @@ public class IceSpray implements AbilityItem {
 		ItemMeta data = iceSpray.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.GOLD + "Ice Spray Wand");
+		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "IceSprayWandModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
+		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
 		List<String> lore = new ArrayList<>();
 		lore.add("skyblock/combat/ice_spray_wand");
+		lore.add("");
+		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Ice Spray " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
 		lore.add(ChatColor.GRAY + "Produces a cone of ice in front");
@@ -57,7 +64,7 @@ public class IceSpray implements AbilityItem {
 	}
 
 	@Override
-	public void onRightClick(Player p) {
+	public boolean onRightClick(Player p) {
 		p.getWorld().spawnParticle(Particle.SNOWFLAKE, p.getLocation(), 1000);
 		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(p.getLocation(), 5, 5, 5);
 		List<EntityType> doNotKill = CustomItems.createList();
@@ -90,11 +97,12 @@ public class IceSpray implements AbilityItem {
 			p.sendMessage(ChatColor.RED + String.valueOf(alreadyDebuffed) + " enemies have already been debuffed.");
 		}
 		p.playSound(p, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.0F);
+		return true;
 	}
 
 	@Override
-	public void onLeftClick(Player p) {
-
+	public boolean onLeftClick(Player p) {
+		return false;
 	}
 
 	public int manaCost() {

@@ -48,7 +48,7 @@ public class BonzoStaff implements AbilityItem {
 	}
 
 	@Override
-	public void onRightClick(Player p) {
+	public boolean onRightClick(Player p) {
 		Location l = p.getLocation();
 		l.add(l.getDirection().setY(0).normalize().multiply(0.5));
 		l.add(0, 1.2, 0);
@@ -56,11 +56,12 @@ public class BonzoStaff implements AbilityItem {
 			WindCharge charge1 = (WindCharge) l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
 			WindCharge charge2 = (WindCharge) l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
 		}, 1);
+		return false;
 	}
 
 	@Override
-	public void onLeftClick(Player p) {
-
+	public boolean onLeftClick(Player p) {
+		return false;
 	}
 
 	@Override

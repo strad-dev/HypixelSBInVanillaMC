@@ -45,18 +45,19 @@ public class HighlyInfuriatedWitherSkeletonSpawnEgg implements AbilityItem, Summ
 	}
 
 	@Override
-	public void onRightClick(Player p) {
+	public boolean onRightClick(Player p) {
 		WitherSkeleton skeleton = (WitherSkeleton) p.getWorld().spawnEntity(p.getLocation(), EntityType.WITHER_SKELETON);
 		skeleton.setCustomName(new InfuriatedWitherSkeleton().onSpawn(p, skeleton));
 		skeleton.setCustomNameVisible(true);
 		if(p.getGameMode() != GameMode.CREATIVE) {
 			p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount() - 1);
 		}
+		return false;
 	}
 
 	@Override
-	public void onLeftClick(Player p) {
-
+	public boolean onLeftClick(Player p) {
+		return false;
 	}
 
 	@Override
