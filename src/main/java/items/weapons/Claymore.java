@@ -1,13 +1,16 @@
 package items.weapons;
 
 import items.AbilityItem;
+import misc.Plugin;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -23,9 +26,9 @@ public class Claymore implements AbilityItem {
 		ItemMeta data = claymore.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Dark Claymore");
-		AttributeModifier attackSpeed = new AttributeModifier(UUID.fromString("e51c72e7-2b0d-4064-8d7f-89133cfd4b8b"), "claymoreModifier", 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
-		AttributeModifier attackDamage = new AttributeModifier(UUID.fromString("25cc1a90-327d-4115-a912-869e883862f4"), "claymoreModifierDmg", 9, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
-		AttributeModifier attackRange = new AttributeModifier(UUID.fromString("95037a43-49c4-4d9e-93a7-49c50c59e811"), "claymoreModifierRange", 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
+		AttributeModifier attackSpeed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "claymoreModifier"), 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
+		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "claymoreModifierDmg"), 9, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
+		AttributeModifier attackRange = new AttributeModifier(new NamespacedKey(Plugin.getInstance(),  "claymoreModifierRange"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeed);
 		data.addAttributeModifier(Attribute.ENTITY_INTERACTION_RANGE, attackRange);
@@ -81,13 +84,13 @@ public class Claymore implements AbilityItem {
 	}
 
 	@Override
-	public void onRightClick(Player p) {
-
+	public boolean onRightClick(Player p) {
+		return false;
 	}
 
 	@Override
-	public void onLeftClick(Player p) {
-
+	public boolean onLeftClick(Player p) {
+		return false;
 	}
 
 	@Override

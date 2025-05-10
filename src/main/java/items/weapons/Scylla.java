@@ -9,7 +9,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,7 +20,6 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import static listeners.CustomDamage.customMobs;
 
@@ -33,8 +32,8 @@ public class Scylla implements AbilityItem {
 		ItemMeta data = scylla.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Hyperion");
-		AttributeModifier attackSpeed = new AttributeModifier(UUID.fromString("d818fcd7-a2f8-434a-bfc3-6a352185714b"), "scyllaModifier", 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
-		AttributeModifier attackDamage = new AttributeModifier(UUID.fromString("b1bda7a7-b3eb-43b3-9e91-2473e9004f79"), "scyllaModifierDmg", 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND);
+		AttributeModifier attackSpeed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "scyllaModifier"), 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
+		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "scyllaModifierDmg"), 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeed);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
@@ -97,7 +96,7 @@ public class Scylla implements AbilityItem {
 	}
 
 	@Override
-	public void onRightClick(Player p) {
+	public boolean onRightClick(Player p) {
 		Location originalLocation = p.getLocation().clone();
 		Location l = p.getLocation().clone();
 		l.add(0, 1.62, 0);
@@ -185,10 +184,12 @@ public class Scylla implements AbilityItem {
 			p.addScoreboardTag("WitherShield");
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("WitherShield"), 101);
 		}
+		return false;
 	}
 
 	@Override
-	public void onLeftClick(Player p) {
+	public boolean onLeftClick(Player p) {
+		return false;
 	}
 
 	public int manaCost() {

@@ -52,7 +52,7 @@ public class AOTV implements AbilityItem {
 	}
 
 	@Override
-	public void onRightClick(Player p) {
+	public boolean onRightClick(Player p) {
 		if(p.isSneaking()) {
 			Location l = p.getLocation();
 			l.add(0, 1.32, 0);
@@ -113,11 +113,12 @@ public class AOTV implements AbilityItem {
 			p.teleport(l);
 			p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 		}
+		return false;
 	}
 
 	@Override
-	public void onLeftClick(Player p) {
-
+	public boolean onLeftClick(Player p) {
+		return false;
 	}
 
 	public int manaCost() {

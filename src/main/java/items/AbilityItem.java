@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 
 public interface AbilityItem extends CustomItem {
 
-	void onRightClick(Player p);
+	boolean onRightClick(Player p);
 
-	void onLeftClick(Player p);
+	boolean onLeftClick(Player p);
 
 	int manaCost();
 
