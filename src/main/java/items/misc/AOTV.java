@@ -10,7 +10,6 @@ import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -55,7 +54,7 @@ public class AOTV implements AbilityItem {
 	public boolean onRightClick(Player p) {
 		if(p.isSneaking()) {
 			Location l = p.getLocation();
-			l.add(0, 1.32, 0);
+			l.add(0, 1.27, 0);
 			Vector v = l.getDirection();
 			v.setX(v.getX() / 10);
 			v.setY(v.getY() / 10);
@@ -74,12 +73,8 @@ public class AOTV implements AbilityItem {
 						p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
 						teleported = true;
 					}
-					break;
+					return teleported;
 				}
-			}
-			if(!teleported) {
-				Score score = p.getScoreboard().getObjective("Intelligence").getScore(p.getName());
-				score.setScore(score.getScore() + 1);
 			}
 		} else {
 			Location originalLocation = p.getLocation().clone();
@@ -106,12 +101,10 @@ public class AOTV implements AbilityItem {
 			if(!l.getBlock().isEmpty()) {
 				l.add(0, 1, 0);
 			}
-			if(!l.getBlock().isEmpty()) {
-				l.add(0, 1, 0);
-			}
 			p.setFallDistance(0);
 			p.teleport(l);
 			p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
+			return true;
 		}
 		return false;
 	}

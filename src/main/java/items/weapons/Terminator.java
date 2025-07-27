@@ -1,7 +1,6 @@
 package items.weapons;
 
 import items.AbilityItem;
-import misc.Plugin;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
@@ -18,8 +17,8 @@ import java.util.List;
 import static misc.PluginUtils.shootBeam;
 
 public class Terminator implements AbilityItem {
-	private static final String COOLDOWN_TAG = "TerminatorCooldown";
-	private static final int COOLDOWN = 4;
+	private static final String COOLDOWN_TAG = "SalvationCooldown";
+	private static final int COOLDOWN = 20;
 
 	public static ItemStack getItem(int powerLevel) {
 		ItemStack term = new ItemStack(Material.BOW);
@@ -84,10 +83,13 @@ public class Terminator implements AbilityItem {
 		p.getInventory().remove(Material.SPECTRAL_ARROW);
 
 		// setting the three arrows
-		Vector v = p.getLocation().getDirection();
+		double speed = p.getVelocity().length() * 20;
+		double offset = 1.0 + Math.max(0, (speed - 14.0) * 0.15);
+
+		Vector v = p.getLocation().getDirection().normalize().multiply(offset);
 		Location lLeft = p.getLocation();
 		lLeft.add(v);
-		lLeft.setYaw(lLeft.getYaw() - 5);
+		lLeft.setYaw(lLeft.getYaw() - 6);
 		lLeft.setY(lLeft.getY() + 1.62);
 
 		Location l = p.getLocation();
@@ -96,7 +98,7 @@ public class Terminator implements AbilityItem {
 
 		Location lRight = p.getLocation();
 		lRight.add(v);
-		lRight.setYaw(lRight.getYaw() + 5);
+		lRight.setYaw(lRight.getYaw() + 6);
 		lRight.setY(lRight.getY() + 1.62);
 
 		// calculate power and strength bonus
@@ -113,16 +115,16 @@ public class Terminator implements AbilityItem {
 
 		double strengthBonus;
 		try {
-			strengthBonus = 0.75 * p.getPotionEffect(PotionEffectType.STRENGTH).getAmplifier();
+			strengthBonus = 0.75 + 0.75 * p.getPotionEffect(PotionEffectType.STRENGTH).getAmplifier();
 		} catch(Exception exception) {
 			strengthBonus = 0;
 		}
 
 		// shoot the three arrows
 		double add = powerBonus + strengthBonus;
-		Arrow left = p.getWorld().spawnArrow(l, lLeft.getDirection(), 3, 0.1F);
-		Arrow middle = p.getWorld().spawnArrow(l, l.getDirection(), 3, 0.1F);
-		Arrow right = p.getWorld().spawnArrow(l, lRight.getDirection(), 3, 0.1F);
+		Arrow left = p.getWorld().spawnArrow(l, lLeft.getDirection(), 4, 0.1F);
+		Arrow middle = p.getWorld().spawnArrow(l, l.getDirection(), 4, 0.1F);
+		Arrow right = p.getWorld().spawnArrow(l, lRight.getDirection(), 4, 0.1F);
 
 		left.setDamage(2.5 + add);
 		left.setPierceLevel(4);
@@ -143,39 +145,34 @@ public class Terminator implements AbilityItem {
 		right.addScoreboardTag("TerminatorArrow");
 
 		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
-		return true;
+		return false;
 	}
 
 	@Override
 	public boolean onLeftClick(Player p) {
-		if(!p.getScoreboardTags().contains("SalvationCooldown")) {
-			double powerBonus;
-			try {
-				int power = p.getInventory().getItem(p.getInventory().getHeldItemSlot()).getEnchantmentLevel(Enchantment.POWER);
-				powerBonus = power * 0.5;
-				if(power == 7) {
-					powerBonus += 0.5;
-				}
-			} catch(Exception exception) {
-				powerBonus = 0;
+		double powerBonus;
+		try {
+			int power = p.getInventory().getItem(p.getInventory().getHeldItemSlot()).getEnchantmentLevel(Enchantment.POWER);
+			powerBonus = power * 0.5;
+			if(power == 7) {
+				powerBonus += 0.5;
 			}
-
-			double strengthBonus;
-			try {
-				strengthBonus = p.getPotionEffect(PotionEffectType.STRENGTH).getAmplifier();
-			} catch(Exception exception) {
-				strengthBonus = 0;
-			}
-
-			// shoot the three arrows
-			double add = powerBonus + strengthBonus;
-			shootBeam(p, p, Color.RED, 64, 5, 4.5 + add);
-			p.playSound(p.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
-			p.addScoreboardTag("SalvationCooldown");
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("SalvationCooldown"), 19L);
-			return true;
+		} catch(Exception exception) {
+			powerBonus = 0;
 		}
-		return false;
+
+		double strengthBonus;
+		try {
+			strengthBonus = 1 + p.getPotionEffect(PotionEffectType.STRENGTH).getAmplifier();
+		} catch(Exception exception) {
+			strengthBonus = 0;
+		}
+
+		// shoot the three arrows
+		double add = powerBonus + strengthBonus;
+		shootBeam(p, p, Color.RED, 64, 5, 4.5 + add);
+		p.playSound(p.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
+		return true;
 	}
 
 	@Override

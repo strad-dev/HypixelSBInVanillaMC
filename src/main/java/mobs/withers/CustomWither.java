@@ -26,7 +26,7 @@ public interface CustomWither extends CustomMob {
 				}
 			}
 		}
-		return null;
+		return new Default();
 	}
 
 	void whenShootingSkull(WitherSkull skull);
