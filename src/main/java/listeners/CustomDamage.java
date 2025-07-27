@@ -395,6 +395,7 @@ public class CustomDamage implements Listener {
 					case DRAGON_BREATH, MAGIC -> type = DamageType.MAGIC;
 					case FALLING_BLOCK -> type = DamageType.ENVIRONMENTAL;
 					case LIGHTNING -> type = DamageType.IFRAME_ENVIRONMENTAL;
+					case KILL -> type = DamageType.PLAYER_MAGIC; // this is so that the M7 TAS works
 					default -> {
 						return;
 					}

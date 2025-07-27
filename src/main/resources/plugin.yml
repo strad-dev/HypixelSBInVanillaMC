@@ -16,6 +16,9 @@ commands:
   resetwitherfight:
     description: Resets the status of the Wither Lords boss fight.  Useful if the boss was /kill'ed or otherwise dead in an unintended way.
     usage: /resetwitherfight
+  m7tasactivatewitherfight:
+    description: Utilized by the M7 TAS plugin to set the Wither Lords fight to active.  Also useful for admins to disable custom Withers (but why)
+    usage: /m7tasactivatewitherfight
 
 depend:
   - UltimateAdvancementAPI

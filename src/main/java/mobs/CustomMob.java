@@ -5,10 +5,7 @@ import mobs.enderDragons.*;
 import mobs.generic.*;
 import mobs.hardmode.withers.*;
 import mobs.withers.*;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Mob;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 
 import java.util.Set;
 
@@ -93,6 +90,10 @@ public interface CustomMob {
 			} else if(tags.contains("GuardSkeleton")) {
 				return new WitherKingSkeleton();
 			} else {
+				if(e instanceof Wither) {
+					// avoid null pointers on default withers
+					return new Default();
+				}
 				return null;
 			}
 		}

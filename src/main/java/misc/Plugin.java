@@ -7,10 +7,7 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
 import com.fren_gor.ultimateAdvancementAPI.events.PlayerLoadingCompletedEvent;
-import commands.GetOPItems;
-import commands.LocatePlayer;
-import commands.ResetWitherFight;
-import commands.Tell;
+import commands.*;
 import listeners.*;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -35,9 +32,10 @@ public class Plugin extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
-		Objects.requireNonNull(this.getCommand("locateplayer")).setExecutor((new LocatePlayer()));
-		Objects.requireNonNull(this.getCommand("w")).setExecutor((new Tell()));
-		Objects.requireNonNull(this.getCommand("resetwitherfight")).setExecutor((new ResetWitherFight()));
+		Objects.requireNonNull(this.getCommand("locateplayer")).setExecutor(new LocatePlayer());
+		Objects.requireNonNull(this.getCommand("w")).setExecutor(new Tell());
+		Objects.requireNonNull(this.getCommand("resetwitherfight")).setExecutor(new ResetWitherFight());
+		Objects.requireNonNull(this.getCommand("m7tasactivatewitherfight")).setExecutor(new ActivateWitherFight());
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
 		getServer().getPluginManager().registerEvents(new NonEntityDamage(), this);

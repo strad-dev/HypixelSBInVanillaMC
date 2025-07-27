@@ -10,6 +10,7 @@ import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +52,8 @@ public class TacticalInsertion implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		Location l = p.getLocation();
+		float yaw = l.getYaw();
+		float pitch = l.getPitch();
 		p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.707107F);
 		p.playSound(p, Sound.ITEM_FLINTANDSTEEL_USE, 1.0F, 1.0F);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.793701F), 10);
@@ -61,6 +64,7 @@ public class TacticalInsertion implements AbilityItem {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F);
 			p.teleport(l);
+			p.setVelocity(new Vector(0, 0, 0));
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.getWorld().spawnParticle(Particle.FLAME, p.getLocation(), 1000), 1);
 		}, 60);
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F), 63);

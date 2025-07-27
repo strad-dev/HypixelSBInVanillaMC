@@ -56,7 +56,7 @@ public class BonzoStaff implements AbilityItem {
 			WindCharge charge1 = (WindCharge) l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
 			WindCharge charge2 = (WindCharge) l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
 		}, 1);
-		return false;
+		return true;
 	}
 
 	@Override

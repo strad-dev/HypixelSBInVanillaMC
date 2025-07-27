@@ -184,7 +184,7 @@ public class Scylla implements AbilityItem {
 			p.addScoreboardTag("WitherShield");
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("WitherShield"), 101);
 		}
-		return false;
+		return true;
 	}
 
 	@Override

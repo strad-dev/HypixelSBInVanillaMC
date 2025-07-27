@@ -3,6 +3,8 @@ package listeners;
 import items.AbilityItem;
 import items.CustomItem;
 import items.misc.AOTV;
+import items.weapons.Scylla;
+import items.weapons.Terminator;
 import misc.Plugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -137,36 +139,36 @@ public class CustomItems implements Listener {
 				item = null;
 			}
 			if(item != null) {
-				if(!(item instanceof AOTV)) {
-					e.setCancelled(true);
-				}
-				if(!p.getScoreboardTags().contains("AbilityCooldown")) {
+				e.setCancelled(true);
+				if(!p.getScoreboardTags().contains("AbilityCooldown") || item instanceof Terminator) {
 					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
 						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
 						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
-					} else if(p.getScoreboardTags().contains(item.cooldownTag())) {
+					} else if(p.getScoreboardTags().contains(item.cooldownTag()) && !(item.cooldownTag().equals("SalvationCooldown") && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))) {
 						p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
 						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 					} else {
-						boolean applyCooldown = false;
-						if(e.getAction().equals(Action.RIGHT_CLICK_BLOCK) || e.getAction().equals(Action.RIGHT_CLICK_AIR)) {
-							applyCooldown = item.onRightClick(p);
-						} else if(e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.PHYSICAL)) {
-							applyCooldown = item.onLeftClick(p);
+						boolean abilitySuccessful = false;
+						if(e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
+							abilitySuccessful = item.onRightClick(p);
+						} else if(e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.PHYSICAL)) {
+							abilitySuccessful = item.onLeftClick(p);
 						}
 
-						if(applyCooldown) {
+						if(abilitySuccessful) {
+							if(!p.getGameMode().equals(GameMode.CREATIVE)) {
+								Score score = CustomItems.currentScore();
+								score.setScore(score.getScore() - item.manaCost());
+							}
 							p.addScoreboardTag(item.cooldownTag());
 							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag(item.cooldownTag()), item.cooldown());
-
+							p.addScoreboardTag("AbilityCooldown");
+							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 						}
-
-						if(!p.getGameMode().equals(GameMode.CREATIVE)) {
-							Score score = CustomItems.currentScore();
-							score.setScore(score.getScore() - item.manaCost());
-						}
-						p.addScoreboardTag("AbilityCooldown");
-						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
+					}
+				} else {
+					if(!(item instanceof AOTV) && !(item instanceof Scylla)) {
+						p.sendMessage(ChatColor.RED + "You are doing that too fast!");
 					}
 				}
 			}
