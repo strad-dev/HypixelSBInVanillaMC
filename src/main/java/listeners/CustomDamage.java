@@ -258,6 +258,7 @@ public class CustomDamage implements Listener {
 					} else {
 						if(damagee.getScoreboardTags().contains("TASWither")) {
 							damagee.setHealth(0.1);
+							PluginUtils.changeName(damagee);
 						} else {
 							damagee.setHealth(0.0);
 						}
@@ -267,6 +268,8 @@ public class CustomDamage implements Listener {
 					if(!damagee.getScoreboardTags().contains("TASWither")) {
 						e.setCancelled(false);
 						e.setDamage(20);
+					} else {
+						PluginUtils.changeName(damagee);
 					}
 				}
 				CustomDrops.loot(damagee, damager);
