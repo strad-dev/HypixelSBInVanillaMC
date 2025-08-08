@@ -256,12 +256,18 @@ public class CustomDamage implements Listener {
 						damagee.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 800, 0));
 						damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
 					} else {
-						damagee.setHealth(0.0);
+						if(damagee.getScoreboardTags().contains("TASWither")) {
+							damagee.setHealth(0.1);
+						} else {
+							damagee.setHealth(0.0);
+						}
 					}
 				} else {
-					e.setCancelled(false);
 					damagee.setHealth(0.1);
-					e.setDamage(20);
+					if(!damagee.getScoreboardTags().contains("TASWither")) {
+						e.setCancelled(false);
+						e.setDamage(20);
+					}
 				}
 				CustomDrops.loot(damagee, damager);
 			} else {
