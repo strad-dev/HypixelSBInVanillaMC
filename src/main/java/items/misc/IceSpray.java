@@ -65,8 +65,9 @@ public class IceSpray implements AbilityItem {
 
 	@Override
 	public boolean onRightClick(Player p) {
-		p.getWorld().spawnParticle(Particle.SNOWFLAKE, p.getLocation(), 1000);
-		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(p.getLocation(), 5, 5, 5);
+		Location l = p.getEyeLocation();
+		p.getWorld().spawnParticle(Particle.SNOWFLAKE, l, 1000);
+		List<Entity> entities = (List<Entity>) p.getWorld().getNearbyEntities(l, 6, 6, 6);
 		List<EntityType> doNotKill = CustomItems.createList();
 		int damage = 0;
 		int alreadyDebuffed = 0;

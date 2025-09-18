@@ -89,7 +89,7 @@ public class Terminator implements AbilityItem {
 		Vector v = p.getLocation().getDirection().normalize().multiply(offset);
 		Location lLeft = p.getLocation();
 		lLeft.add(v);
-		lLeft.setYaw(lLeft.getYaw() - 6);
+		lLeft.setYaw(lLeft.getYaw() - 5);
 		lLeft.setY(lLeft.getY() + 1.62);
 
 		Location l = p.getLocation();
@@ -98,7 +98,7 @@ public class Terminator implements AbilityItem {
 
 		Location lRight = p.getLocation();
 		lRight.add(v);
-		lRight.setYaw(lRight.getYaw() + 6);
+		lRight.setYaw(lRight.getYaw() + 5);
 		lRight.setY(lRight.getY() + 1.62);
 
 		// calculate power and strength bonus

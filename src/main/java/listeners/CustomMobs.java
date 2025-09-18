@@ -107,7 +107,7 @@ public class CustomMobs implements Listener {
 						}
 					}
 					case EnderDragon dragon -> {
-						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
+						if(!dragon.getScoreboardTags().contains("WitherKingDragon") && !isWitherLordFightActive) {
 							name = CustomDragon.spawnRandom().onSpawn(PluginUtils.getNearestPlayer(dragon), dragon);
 							dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 							dragon.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
