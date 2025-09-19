@@ -14,7 +14,7 @@ public class ArrowSounds implements Listener {
 	public void onArrowHitEntity(EntityDamageByEntityEvent e) {
 		if(e.getDamager() instanceof AbstractArrow a && !(a instanceof Trident)) {
 			if(a.getShooter() instanceof Player p) {
-				p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 1.0F, 0.79368752611448590621283707774885F);
+				p.playSound(p, Sound.ENTITY_ARROW_HIT_PLAYER, 0.75f, 0.79368752611448590621283707774885f);
 				if(e.getEntity() instanceof LivingEntity entity) {
 					entity.setNoDamageTicks(0);
 				}
