@@ -1,6 +1,7 @@
 package items.weapons;
 
 import items.AbilityItem;
+import misc.Plugin;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
@@ -9,9 +10,11 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static misc.PluginUtils.shootBeam;
@@ -83,23 +86,21 @@ public class Terminator implements AbilityItem {
 		p.getInventory().remove(Material.SPECTRAL_ARROW);
 
 		// setting the three arrows
-		double speed = p.getVelocity().length() * 20;
-		double offset = 1.0 + Math.max(0, (speed - 14.0) * 0.15);
+		Vector baseDirection = p.getLocation().getDirection().normalize();
+		Vector leftDirection = baseDirection.clone().rotateAroundY(Math.toRadians(-5));
+		Vector rightDirection = baseDirection.clone().rotateAroundY(Math.toRadians(5));
 
-		Vector v = p.getLocation().getDirection().normalize().multiply(offset);
-		Location lLeft = p.getLocation();
-		lLeft.add(v);
-		lLeft.setYaw(lLeft.getYaw() - 5);
-		lLeft.setY(lLeft.getY() + 1.62);
+		// Create spawn locations with proper yaw/pitch
+		Location baseSpawnLoc = p.getEyeLocation().add(baseDirection.clone());
 
-		Location l = p.getLocation();
-		l.add(v);
-		l.setY(l.getY() + 1.62);
+		Location leftSpawnLoc = baseSpawnLoc.clone();
+		leftSpawnLoc.setDirection(leftDirection);
 
-		Location lRight = p.getLocation();
-		lRight.add(v);
-		lRight.setYaw(lRight.getYaw() + 5);
-		lRight.setY(lRight.getY() + 1.62);
+		Location middleSpawnLoc = baseSpawnLoc.clone();
+		middleSpawnLoc.setDirection(baseDirection);
+
+		Location rightSpawnLoc = baseSpawnLoc.clone();
+		rightSpawnLoc.setDirection(rightDirection);
 
 		// calculate power and strength bonus
 		double powerBonus;
@@ -122,29 +123,43 @@ public class Terminator implements AbilityItem {
 
 		// shoot the three arrows
 		double add = powerBonus + strengthBonus;
-		Arrow left = p.getWorld().spawnArrow(l, lLeft.getDirection(), 4, 0.1F);
-		Arrow middle = p.getWorld().spawnArrow(l, l.getDirection(), 4, 0.1F);
-		Arrow right = p.getWorld().spawnArrow(l, lRight.getDirection(), 4, 0.1F);
+		Arrow left = p.getWorld().spawn(leftSpawnLoc, Arrow.class);
+		Arrow middle = p.getWorld().spawn(middleSpawnLoc, Arrow.class);
+		Arrow right = p.getWorld().spawn(rightSpawnLoc, Arrow.class);
 
-		left.setDamage(2.5 + add);
-		left.setPierceLevel(4);
-		left.setShooter(p);
-		left.setWeapon(p.getInventory().getItemInMainHand());
-		left.addScoreboardTag("TerminatorArrow");
+		double speed = 4.0; // Adjust as needed
+		Vector leftVel = leftDirection.multiply(speed);
+		Vector middleVel = baseDirection.multiply(speed);
+		Vector rightVel = rightDirection.multiply(speed);
 
-		middle.setDamage(2.5 + add);
-		middle.setPierceLevel(4);
-		middle.setShooter(p);
-		middle.setWeapon(p.getInventory().getItemInMainHand());
-		middle.addScoreboardTag("TerminatorArrow");
+		left.setVelocity(leftVel);
+		middle.setVelocity(middleVel);
+		right.setVelocity(rightVel);
 
-		right.setDamage(2.5 + add);
-		right.setPierceLevel(4);
-		right.setShooter(p);
-		right.setWeapon(p.getInventory().getItemInMainHand());
-		right.addScoreboardTag("TerminatorArrow");
+		for(Arrow arrow : Arrays.asList(left, middle, right)) {
+			arrow.setDamage(2.5 + add);
+			arrow.setPierceLevel(4);
+			arrow.setShooter(p);
+			arrow.setWeapon(p.getInventory().getItemInMainHand());
+			arrow.addScoreboardTag("TerminatorArrow");
+		}
 
-		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
+		new BukkitRunnable() {
+			int ticks = 0;
+			@Override
+			public void run() {
+				if (ticks >= 2 || left.isDead() || middle.isDead() || right.isDead()) {
+					this.cancel();
+					return;
+				}
+
+				left.setVelocity(leftVel);
+				middle.setVelocity(middleVel);
+				right.setVelocity(rightVel);
+
+				ticks++;
+			}
+		}.runTaskTimer(Plugin.getInstance(), 1L, 1L);
 		return false;
 	}
 
