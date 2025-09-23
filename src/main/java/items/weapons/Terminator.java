@@ -1,7 +1,13 @@
 package items.weapons;
 
 import items.AbilityItem;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
+import org.bukkit.craftbukkit.v1_21_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_21_R3.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -12,6 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static misc.PluginUtils.shootBeam;
@@ -82,26 +89,66 @@ public class Terminator implements AbilityItem {
 		p.getInventory().remove(Material.TIPPED_ARROW);
 		p.getInventory().remove(Material.SPECTRAL_ARROW);
 
-		// setting the three arrows
-		double speed = p.getVelocity().length() * 20;
-		double offset = 1.0 + Math.max(0, (speed - 14.0) * 0.15);
+		// Get NMS world and player
+		ServerLevel nmsWorld = ((CraftWorld) p.getWorld()).getHandle();
+		ServerPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
 
-		Vector v = p.getLocation().getDirection().normalize().multiply(offset);
-		Location lLeft = p.getLocation();
-		lLeft.add(v);
-		lLeft.setYaw(lLeft.getYaw() - 6);
-		lLeft.setY(lLeft.getY() + 1.62);
+		// Calculate directions
+		Vector baseDirection = p.getEyeLocation().getDirection().normalize();
+		Vector leftDirection = baseDirection.clone().rotateAroundY(Math.toRadians(-5));
+		Vector rightDirection = baseDirection.clone().rotateAroundY(Math.toRadians(5));
 
-		Location l = p.getLocation();
-		l.add(v);
-		l.setY(l.getY() + 1.62);
+		// Calculate spawn position
+		Location spawnLoc = p.getEyeLocation().add(baseDirection.clone());
 
-		Location lRight = p.getLocation();
-		lRight.add(v);
-		lRight.setYaw(lRight.getYaw() + 6);
-		lRight.setY(lRight.getY() + 1.62);
+		// Calculate rotations
+		float baseYaw = p.getEyeLocation().getYaw();
+		float basePitch = p.getEyeLocation().getPitch();
 
-		// calculate power and strength bonus
+		// Create NMS arrows directly
+		net.minecraft.world.entity.projectile.Arrow nmsLeft = new net.minecraft.world.entity.projectile.Arrow(EntityType.ARROW, nmsWorld);
+		net.minecraft.world.entity.projectile.Arrow nmsMiddle = new net.minecraft.world.entity.projectile.Arrow(EntityType.ARROW, nmsWorld);
+		net.minecraft.world.entity.projectile.Arrow nmsRight = new net.minecraft.world.entity.projectile.Arrow(EntityType.ARROW, nmsWorld);
+
+		// Set positions and rotations directly
+		nmsLeft.setPos(spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ());
+		nmsLeft.setYRot(baseYaw - 5f);
+		nmsLeft.setXRot(basePitch);
+
+		nmsMiddle.setPos(spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ());
+		nmsMiddle.setYRot(baseYaw);
+		nmsMiddle.setXRot(basePitch);
+
+		nmsRight.setPos(spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ());
+		nmsRight.setYRot(baseYaw + 5f);
+		nmsRight.setXRot(basePitch);
+
+		// Set velocities
+		double speed = 4.0;
+		Vec3 leftVel = new Vec3(leftDirection.getX() * speed, leftDirection.getY() * speed, leftDirection.getZ() * speed);
+		Vec3 middleVel = new Vec3(baseDirection.getX() * speed, baseDirection.getY() * speed, baseDirection.getZ() * speed);
+		Vec3 rightVel = new Vec3(rightDirection.getX() * speed, rightDirection.getY() * speed, rightDirection.getZ() * speed);
+
+		nmsLeft.setDeltaMovement(leftVel);
+		nmsMiddle.setDeltaMovement(middleVel);
+		nmsRight.setDeltaMovement(rightVel);
+
+		// Set other properties
+		nmsLeft.setOwner(nmsPlayer);
+		nmsMiddle.setOwner(nmsPlayer);
+		nmsRight.setOwner(nmsPlayer);
+
+		// Add to world
+		nmsWorld.addFreshEntity(nmsLeft);
+		nmsWorld.addFreshEntity(nmsMiddle);
+		nmsWorld.addFreshEntity(nmsRight);
+
+		// Get Bukkit wrappers for further modification
+		Arrow left = (Arrow) nmsLeft.getBukkitEntity();
+		Arrow middle = (Arrow) nmsMiddle.getBukkitEntity();
+		Arrow right = (Arrow) nmsRight.getBukkitEntity();
+
+		// Calculate bonuses
 		double powerBonus;
 		try {
 			int power = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.POWER);
@@ -120,31 +167,17 @@ public class Terminator implements AbilityItem {
 			strengthBonus = 0;
 		}
 
-		// shoot the three arrows
 		double add = powerBonus + strengthBonus;
-		Arrow left = p.getWorld().spawnArrow(l, lLeft.getDirection(), 4, 0.1F);
-		Arrow middle = p.getWorld().spawnArrow(l, l.getDirection(), 4, 0.1F);
-		Arrow right = p.getWorld().spawnArrow(l, lRight.getDirection(), 4, 0.1F);
 
-		left.setDamage(2.5 + add);
-		left.setPierceLevel(4);
-		left.setShooter(p);
-		left.setWeapon(p.getInventory().getItemInMainHand());
-		left.addScoreboardTag("TerminatorArrow");
+		// Set Bukkit properties
+		for(Arrow arrow : Arrays.asList(left, middle, right)) {
+			arrow.setDamage(2.5 + add);
+			arrow.setPierceLevel(4);
+			arrow.setShooter(p);
+			arrow.setWeapon(p.getInventory().getItemInMainHand());
+			arrow.addScoreboardTag("TerminatorArrow");
+		}
 
-		middle.setDamage(2.5 + add);
-		middle.setPierceLevel(4);
-		middle.setShooter(p);
-		middle.setWeapon(p.getInventory().getItemInMainHand());
-		middle.addScoreboardTag("TerminatorArrow");
-
-		right.setDamage(2.5 + add);
-		right.setPierceLevel(4);
-		right.setShooter(p);
-		right.setWeapon(p.getInventory().getItemInMainHand());
-		right.addScoreboardTag("TerminatorArrow");
-
-		p.playSound(p, Sound.ENTITY_ARROW_SHOOT, 1, 1);
 		return false;
 	}
 

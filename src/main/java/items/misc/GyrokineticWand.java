@@ -3,19 +3,23 @@ package items.misc;
 import items.AbilityItem;
 import misc.Plugin;
 import org.bukkit.*;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class GyrokineticWand implements AbilityItem {
 	private static final int MANA_COST = 50;
@@ -89,8 +93,12 @@ public class GyrokineticWand implements AbilityItem {
 			double x = rift.getX() + Math.cos(angle) * 10;
 			double z = rift.getZ() + Math.sin(angle) * 10;
 
-			// Find highest block at x,z and place falling block 0.05 above it
-			double y = rift.getWorld().getHighestBlockAt((int) x, (int) z).getLocation().getY() + 0.05;
+			// Find the next air block going upwards from the requested location
+			double y = rift.getY();
+			while (!Objects.requireNonNull(rift.getWorld()).getBlockAt((int) x, (int) y, (int) z).getType().isAir() && y < rift.getWorld().getMaxHeight()) {
+				y++;
+			}
+			y += 0.05; // Place falling block 0.05 above the air block
 			Location blockLoc = new Location(rift.getWorld(), x, Math.max(y, rift.getY()), z);
 
 			Material blockType = blockTypes[(int) (Math.random() * blockTypes.length)];
@@ -211,7 +219,13 @@ public class GyrokineticWand implements AbilityItem {
 					Location targetLoc = currentPos.toLocation(rift.getWorld());
 
 					// Ensure minimum height above ground
-					double minY = rift.getWorld().getHighestBlockAt(targetLoc.getBlockX(), targetLoc.getBlockZ()).getLocation().getY() + 0.05;
+					// Find the next air block going upwards from the requested location
+					double minY = rift.getY();
+					while (!Objects.requireNonNull(rift.getWorld()).getBlockAt(targetLoc.getBlockX(), (int) minY, targetLoc.getBlockY()).getType().isAir() && minY < rift.getWorld().getMaxHeight()) {
+						minY++;
+					}
+					minY += 0.05; // Place falling block 0.05 above the air block
+					targetLoc.setY(Math.max(targetLoc.getY(), minY));
 					targetLoc.setY(Math.max(targetLoc.getY(), minY));
 
 					// Calculate velocity vector based on distance to target with increased speed
@@ -242,7 +256,7 @@ public class GyrokineticWand implements AbilityItem {
 							double x = (rift.getX() - entityLoc.getX()) / 5;
 							double y = (rift.getY() - entityLoc.getY()) / 5;
 							double z = (rift.getZ() - entityLoc.getZ()) / 5;
-							entity.setVelocity(new org.bukkit.util.Vector(x, y, z));
+							entity.setVelocity(new Vector(x, y, z));
 						} else { // Next 2.5 seconds - keep at rift
 							entity.teleport(rift);
 						}
