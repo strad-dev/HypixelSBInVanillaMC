@@ -11,8 +11,8 @@ import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R3.entity.CraftEnderDragon;
+import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftEnderDragon;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -108,10 +108,6 @@ public class CustomDamage implements Listener {
 
 		if((damagee instanceof Player p && (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR)) || (damagee instanceof Wither wither && wither.getInvulnerabilityTicks() > 0)) {
 			doContinue = false;
-		}
-
-		if(damagee.getScoreboardTags().contains("TASWither") && (damagee instanceof Wither wither && wither.getInvulnerabilityTicks() > 0)) {
-			return;
 		}
 
 		if(type == DamageType.ABSOLUTE || doContinue) {
@@ -293,21 +289,12 @@ public class CustomDamage implements Listener {
 							damagee.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 800, 0));
 							damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
 						} else {
-							if(damagee.getScoreboardTags().contains("TASWither")) {
-								damagee.setHealth(0.1);
-								PluginUtils.changeName(damagee);
-							} else {
-								damagee.setHealth(0.0);
-							}
+							damagee.setHealth(0.0);
 						}
 					} else {
 						damagee.setHealth(0.1);
-						if(!damagee.getScoreboardTags().contains("TASWither")) {
-							e.setCancelled(false);
-							e.setDamage(20);
-						} else {
-							PluginUtils.changeName(damagee);
-						}
+						e.setCancelled(false);
+						e.setDamage(20);
 					}
 				}
 				CustomDrops.loot(damagee, damager);

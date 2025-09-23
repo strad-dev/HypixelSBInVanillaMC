@@ -1,10 +1,12 @@
 package items.armor;
 
+import misc.Plugin;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,10 +22,10 @@ public class NecronElytra implements Armor {
 		ItemMeta data = necronElytra.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Necron's Elytra");
-		AttributeModifier damage = new AttributeModifier(UUID.fromString("636ece54-f65c-4275-8ab7-916a1a1056ca"), "necronElytraDamage", 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
-		AttributeModifier armor = new AttributeModifier(UUID.fromString("92166a58-d64d-465b-9810-3f8966f33566"), "necronElytraArmor", 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
-		AttributeModifier toughness = new AttributeModifier(UUID.fromString("e0f20d73-639a-4530-937e-c7f298b268ec"), "necronElytraToughness", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
-		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("2855bb5e-6e64-4dea-a5c1-63725ec18c9a"), "necronElytraAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.CHEST);
+		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraArmor"), 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
+		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraToughness"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
+		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);
 		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
