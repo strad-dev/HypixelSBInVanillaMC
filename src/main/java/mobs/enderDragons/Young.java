@@ -35,11 +35,6 @@ public class Young implements CustomDragon {
 		if(random.nextDouble() < 0.1 && damagee.getLocation().distanceSquared(new Location(damagee.getWorld(), 0, 0, 0)) > 75) {
 			teleport(damagee, 16);
 		}
-
-		if(type == DamageType.RANGED) {
-			calculateFinalDamage(damagee, damager, originalDamage / 3, DamageType.RANGED);
-			return false;
-		}
 		return true;
 	}
 

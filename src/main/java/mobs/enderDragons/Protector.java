@@ -28,10 +28,6 @@ public class Protector implements CustomDragon {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		if(type == DamageType.RANGED) {
-			calculateFinalDamage(damagee, damager, originalDamage / 3, DamageType.RANGED);
-			return false;
-		}
 		return true;
 	}
 
