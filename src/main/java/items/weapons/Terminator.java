@@ -94,16 +94,16 @@ public class Terminator implements AbilityItem {
 		ServerPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
 
 		// Calculate directions
-		Vector baseDirection = p.getLocation().getDirection().normalize();
+		Vector baseDirection = p.getEyeLocation().getDirection().normalize();
 		Vector leftDirection = baseDirection.clone().rotateAroundY(Math.toRadians(-5));
 		Vector rightDirection = baseDirection.clone().rotateAroundY(Math.toRadians(5));
 
 		// Calculate spawn position
-		Location spawnLoc = p.getEyeLocation().add(baseDirection.clone().multiply(1.5));
+		Location spawnLoc = p.getEyeLocation().add(baseDirection.clone());
 
 		// Calculate rotations
-		float baseYaw = p.getLocation().getYaw();
-		float basePitch = p.getLocation().getPitch();
+		float baseYaw = p.getEyeLocation().getYaw();
+		float basePitch = p.getEyeLocation().getPitch();
 
 		// Create NMS arrows directly
 		net.minecraft.world.entity.projectile.Arrow nmsLeft = new net.minecraft.world.entity.projectile.Arrow(EntityType.ARROW, nmsWorld);
