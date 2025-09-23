@@ -1,10 +1,12 @@
 package items.armor;
 
+import misc.Plugin;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,11 +22,11 @@ public class WardenHelmet implements Armor {
 		ItemMeta data = wardenHelmet.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Warden Helmet");
-		AttributeModifier damage = new AttributeModifier(UUID.fromString("4b5a478b-3b58-42ab-917d-8194a1a6d679"), "wardenHelmetDamage", 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
-		AttributeModifier armor = new AttributeModifier(UUID.fromString("b9f30162-1921-4cc6-ad60-91cc43234ba3"), "wardenHelmetArmor", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
-		AttributeModifier toughness = new AttributeModifier(UUID.fromString("c1474682-574f-472c-a611-62da34f6e1f1"), "wardenHelmetToughness", 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
-		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("4e16c033-3349-4fb7-a0c6-0fac98ef6c6a"), "wardenHelmetAntiKB", 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HEAD);
-		AttributeModifier speed = new AttributeModifier(UUID.fromString("f15d0a37-e366-4c5a-982d-57995d036a6c"), "wardenHelmetSpeed", -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HEAD);
+		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetArmor"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
+		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetToughness"), 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
+		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
+		AttributeModifier speed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetSpeed"), -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.HEAD);
 		data.addAttributeModifier(Attribute.MOVEMENT_SPEED, speed);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);

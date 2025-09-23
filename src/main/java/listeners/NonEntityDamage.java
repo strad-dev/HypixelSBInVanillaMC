@@ -39,9 +39,6 @@ public class NonEntityDamage implements Listener {
 			long lastDamageTime = noDamageTimes.computeIfAbsent(entity, entity2 -> currentTime);
 
 			if(hasLastDamageTime && currentTime - lastDamageTime > 490 || e.getCause().equals(EntityDamageEvent.DamageCause.KILL)) {
-				if(entity.getScoreboardTags().contains("TASWither")) {
-					return;
-				}
 				customMobs(entity, null, e.getDamage(), type);
 				noDamageTimes.put(entity, currentTime);
 			}

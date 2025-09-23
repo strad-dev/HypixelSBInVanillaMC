@@ -1,10 +1,12 @@
 package items.armor;
 
+import misc.Plugin;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,12 +22,12 @@ public class MaxorBoots implements Armor {
 		ItemMeta data = maxorBoots.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Maxor's Boots");
-		AttributeModifier damage = new AttributeModifier(UUID.fromString("c5be199a-6b3f-4860-b7b8-36e45fef60a3"), "maxorBootsDamage", 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
-		AttributeModifier armor = new AttributeModifier(UUID.fromString("d8fe7972-aa27-42b4-aa5a-9eac4fb3b608"), "maxorBootsArmor", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
-		AttributeModifier toughness = new AttributeModifier(UUID.fromString("f3058f46-630f-4cb5-8682-1141c5317e47"), "maxorBootsToughness", 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
-		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("0c759c56-bd52-41a4-803f-f15275e61e4c"), "maxorBootsAntiKB", 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
-		AttributeModifier speed = new AttributeModifier(UUID.fromString("02307a42-a70a-4e55-a915-a71264f7455d"), "maxorBootsSpeed", 3, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.FEET);
-		AttributeModifier antiFall = new AttributeModifier(UUID.fromString("02307a42-a70a-4e55-a915-a71264f7455d"), "maxorBootsAntiFall", -0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.FEET);
+		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsArmor"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
+		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsToughness"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
+		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
+		AttributeModifier speed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsSpeed"), 3, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.FEET);
+		AttributeModifier antiFall = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsAntiFall"), -0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
 		data.addAttributeModifier(Attribute.MOVEMENT_SPEED, speed);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);

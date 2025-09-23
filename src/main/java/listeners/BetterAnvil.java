@@ -1,20 +1,15 @@
 package listeners;
 
-/*
- * Code obtained from EnchBook plugin
- * Github: https://github.com/ShaneBeee/EnchBook
- */
-
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
-import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.view.AnvilView;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,11 +19,11 @@ public class BetterAnvil implements Listener {
 	public void onPrepareAnvil(PrepareAnvilEvent e) {
 		List<HumanEntity> viewers = e.getViewers();
 		if(viewers.isEmpty()) return;
+		AnvilView view = e.getView();
 
-		AnvilInventory inventory = e.getInventory();
-		inventory.setMaximumRepairCost(50);
-		ItemStack FIRST_ITEM = inventory.getItem(0);
-		ItemStack SECOND_ITEM = inventory.getItem(1);
+		view.setMaximumRepairCost(50);
+		ItemStack FIRST_ITEM = view.getItem(0);
+		ItemStack SECOND_ITEM = view.getItem(1);
 
 		if((FIRST_ITEM == null) || (SECOND_ITEM == null)) return;
 
@@ -47,8 +42,8 @@ public class BetterAnvil implements Listener {
 					}
 				}
 				e.setResult(result);
-				if(inventory.getRepairCost() > 50) {
-					inventory.setRepairCost(50);
+				if(view.getRepairCost() > 50) {
+					view.setRepairCost(50);
 				}
 			}
 		}

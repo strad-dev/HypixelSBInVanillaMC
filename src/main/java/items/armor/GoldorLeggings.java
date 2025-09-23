@@ -1,10 +1,13 @@
 package items.armor;
 
+import misc.Plugin;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -20,10 +23,10 @@ public class GoldorLeggings implements Armor {
 		ItemMeta data = goldorLeggings.getItemMeta();
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Goldor's Leggings");
-		AttributeModifier damage = new AttributeModifier(UUID.fromString("dc60c4c3-18ee-4e60-a580-7e3604e720e9"), "goldorLeggingsDamage", 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
-		AttributeModifier armor = new AttributeModifier(UUID.fromString("80b8389f-f018-48c9-b3c0-c576bce5520a"), "goldorLeggingsArmor", 6, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
-		AttributeModifier toughness = new AttributeModifier(UUID.fromString("307e9660-858e-4ba3-9e60-2e0debf02345"), "goldorLeggingsToughness", 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
-		AttributeModifier antiKB = new AttributeModifier(UUID.fromString("e4fd0260-7d71-4881-b47b-4c1bc68ac440"), "goldorLeggingsAntiKB", 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.LEGS);
+		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsArmor"), 6, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
+		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsToughness"), 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
+		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);
 		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
