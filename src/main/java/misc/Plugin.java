@@ -43,7 +43,7 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new KeepEnchantsOnCraft(), this);
 		getServer().getPluginManager().registerEvents(new NoArrows(), this);
 		getServer().getPluginManager().registerEvents(new ArrowSounds(), this);
-		getServer().getPluginManager().registerEvents(new NoArrowsOnGround(), this);
+		getServer().getPluginManager().registerEvents(new ArrowMechanicsHandler(), this);
 		getServer().getPluginManager().registerEvents(new CustomMobs(), this);
 		getServer().getPluginManager().registerEvents(new CustomDrops(), this);
 		getServer().getPluginManager().registerEvents(new EditSkull(), this);

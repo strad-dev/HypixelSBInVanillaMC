@@ -5,8 +5,14 @@ import misc.PluginUtils;
 import mobs.CustomMob;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.v1_21_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_21_R3.entity.CraftEnderDragon;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -20,6 +26,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
 
@@ -99,8 +106,12 @@ public class CustomDamage implements Listener {
 			// continue
 		}
 
-		if(damagee instanceof Player p && (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR)) {
+		if((damagee instanceof Player p && (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR)) || (damagee instanceof Wither wither && wither.getInvulnerabilityTicks() > 0)) {
 			doContinue = false;
+		}
+
+		if(damagee.getScoreboardTags().contains("TASWither") && (damagee instanceof Wither wither && wither.getInvulnerabilityTicks() > 0)) {
+			return;
 		}
 
 		if(type == DamageType.ABSOLUTE || doContinue) {
@@ -234,34 +245,70 @@ public class CustomDamage implements Listener {
 			}
 
 			if(doesDie) {
-				if(damagee instanceof EnderDragon) {
-					damagee.teleport(new Location(damagee.getWorld(), 0.5, 70.0, 0.5));
-				}
-				if(type == DamageType.PLAYER_MAGIC || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED_SPECIAL || isBlocking) {
-					if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
-						if(damagee instanceof Player p) {
-							if(p.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
-								p.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
-							} else if(p.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
-								p.getEquipment().setItemInOffHand(new ItemStack(Material.AIR));
-							}
-							p.sendTitle(ChatColor.BOLD + "" + ChatColor.YELLOW + "\uD83D\uDC7C", ChatColor.DARK_GREEN + "Totem of Undying Used!", 5, 30, 5);
-						}
-						damagee.getWorld().playSound(damagee, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
-						damagee.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, damagee.getLocation(), 1024);
+				if(damagee instanceof EnderDragon dragon) {
+					if(!(dragon instanceof CraftEnderDragon)) return;
 
-						damagee.setHealth(1.0);
-						damagee.getActivePotionEffects().forEach(effect -> damagee.removePotionEffect(effect.getType()));
-						damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 900, 1));
-						damagee.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 800, 0));
-						damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
-					} else {
-						damagee.setHealth(0.0);
+					net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon =
+							((CraftEnderDragon) dragon).getHandle();
+
+					// Stop all movement immediately
+					nmsDragon.setDeltaMovement(Vec3.ZERO); // Stop velocity
+
+					// Force death state
+					nmsDragon.setHealth(0.0f);
+
+					// Set death time to 1 to start animation immediately
+					try {
+						Field deathTimeField = nmsDragon.getClass().getDeclaredField("dragonDeathTime");
+						deathTimeField.setAccessible(true);
+						deathTimeField.setInt(nmsDragon, 1);
+					} catch(Exception e) {
+						// Fallback to damage
+						Bukkit.getLogger().warning("Failed to force Dragon death animation.");
+						ServerLevel worldServer = ((CraftWorld) dragon.getWorld()).getHandle();
+						DamageSource damageSource = nmsDragon.damageSources().generic();
+						EnderDragonPart dragonPart = nmsDragon.head;
+						nmsDragon.hurt(worldServer, dragonPart, damageSource, Float.MAX_VALUE);
+					}
+					if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
+						PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 					}
 				} else {
-					e.setCancelled(false);
-					damagee.setHealth(0.1);
-					e.setDamage(20);
+					if(type == DamageType.PLAYER_MAGIC || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED_SPECIAL || isBlocking) {
+						if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
+							if(damagee instanceof Player p) {
+								if(p.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
+									p.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
+								} else if(p.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
+									p.getEquipment().setItemInOffHand(new ItemStack(Material.AIR));
+								}
+								p.sendTitle(ChatColor.BOLD + "" + ChatColor.YELLOW + "\uD83D\uDC7C", ChatColor.DARK_GREEN + "Totem of Undying Used!", 5, 30, 5);
+							}
+							damagee.getWorld().playSound(damagee, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
+							damagee.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, damagee.getLocation(), 1024);
+
+							damagee.setHealth(1.0);
+							damagee.getActivePotionEffects().forEach(effect -> damagee.removePotionEffect(effect.getType()));
+							damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 900, 1));
+							damagee.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 800, 0));
+							damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
+						} else {
+							if(damagee.getScoreboardTags().contains("TASWither")) {
+								damagee.setHealth(0.1);
+								PluginUtils.changeName(damagee);
+							} else {
+								damagee.setHealth(0.0);
+							}
+						}
+					} else {
+						damagee.setHealth(0.1);
+						if(!damagee.getScoreboardTags().contains("TASWither")) {
+							e.setCancelled(false);
+							e.setDamage(20);
+						} else {
+							PluginUtils.changeName(damagee);
+						}
+					}
 				}
 				CustomDrops.loot(damagee, damager);
 			} else {
