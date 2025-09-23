@@ -9,7 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -238,9 +241,9 @@ public class MasterStorm implements CustomWither {
 			return false;
 		}
 		if(damager.getScoreboardTags().contains("Survival1")) {
-			customMobs(PluginUtils.getNearestPlayer(damagee), damagee, 12, DamageType.RANGED);
+			Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(damager, damagee, EntityDamageEvent.DamageCause.PROJECTILE, DamageSource.builder(org.bukkit.damage.DamageType.WITHER_SKULL).build(), 18));
 		} else if(damager.getScoreboardTags().contains("Survival2")) {
-			customMobs(PluginUtils.getNearestPlayer(damagee), damagee, 18, DamageType.RANGED);
+			Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(damager, damagee, EntityDamageEvent.DamageCause.PROJECTILE, DamageSource.builder(org.bukkit.damage.DamageType.WITHER_SKULL).build(), 18));
 		}
 		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
 		return true;

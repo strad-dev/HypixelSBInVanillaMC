@@ -27,15 +27,6 @@ public enum DamageType {
 	 * Knockback: Reduced
 	 * I-Frames: None
 	 */
-	RANGED_SPECIAL,
-	/*
-	 * Ranged Special Damage Type
-	 * ------------------
-	 * Used for custom Ranged damage from other sources (e.g. Terminator beam)
-	 * Affected by: Armor, Toughness, Protection, Resistance
-	 * Knockback: Reduced
-	 * I-Frames: None
-	 */
 	MAGIC,
 	/*
 	 * Magic Damage Type

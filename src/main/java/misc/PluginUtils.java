@@ -1,12 +1,14 @@
 package misc;
 
-import listeners.CustomDamage;
-import listeners.DamageType;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -14,8 +16,6 @@ import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
 import java.util.*;
-
-import static listeners.CustomDamage.customMobs;
 
 public class PluginUtils {
 	/**
@@ -142,7 +142,7 @@ public class PluginUtils {
 			for(Entity entity : entities) {
 				if(entity instanceof LivingEntity temp && !damagedEntities.contains(entity)) {
 					damagedEntities.add(entity);
-					customMobs(temp, origin, damage, DamageType.RANGED_SPECIAL);
+					Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(origin, temp, EntityDamageEvent.DamageCause.PROJECTILE, DamageSource.builder(org.bukkit.damage.DamageType.ARROW).build(), damage));
 					pierce--;
 				}
 			}
@@ -167,7 +167,7 @@ public class PluginUtils {
 			List<Entity> entities = (List<Entity>) l.getWorld().getNearbyEntities(l, radius, radius, radius);
 			for(Entity entity : entities) {
 				if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-					CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
+					Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(spawner, entity1, EntityDamageEvent.DamageCause.KILL, DamageSource.builder(DamageType.EXPLOSION).build(), damage));
 				}
 			}
 			spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), (int) Math.pow(radius, 3), radius, radius / 2.0, radius);
@@ -181,7 +181,7 @@ public class PluginUtils {
 				List<Entity> entities = tnt.getNearbyEntities(radius, radius, radius);
 				for(Entity entity : entities) {
 					if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-						CustomDamage.customMobs(entity1, tnt, damage, DamageType.PLAYER_MAGIC);
+						Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(spawner, entity1, EntityDamageEvent.DamageCause.KILL, DamageSource.builder(DamageType.EXPLOSION).build(), damage));
 					}
 				}
 				tnt.remove();

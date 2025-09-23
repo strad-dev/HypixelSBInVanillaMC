@@ -7,11 +7,14 @@ import misc.Plugin;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.damage.DamageSource;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -80,7 +83,7 @@ public class IceSpray implements AbilityItem {
 					alreadyDebuffed++;
 				} else {
 					damage += 1;
-					customMobs(entity1, p, 1, DamageType.PLAYER_MAGIC);
+					Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(p, entity1, EntityDamageEvent.DamageCause.KILL, DamageSource.builder(org.bukkit.damage.DamageType.INDIRECT_MAGIC).build(), 1));
 					entity1.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 101, 3));
 					entity1.addScoreboardTag("IceSprayed");
 					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> entity1.removeScoreboardTag("IceSprayed"), 101L);
