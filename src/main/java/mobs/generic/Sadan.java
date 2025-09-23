@@ -2,12 +2,15 @@ package mobs.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
+import misc.BossBarManager;
 import misc.Plugin;
 import misc.PluginUtils;
 import mobs.CustomMob;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EntityEquipment;
@@ -54,10 +57,7 @@ public class Sadan implements CustomMob {
 		((Ageable) e).setAdult();
 		e.setPersistent(true);
 		e.setRemoveWhenFarAway(false);
-
-		Bukkit.getOnlinePlayers().forEach(p1 -> Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan")).addPlayer(p1));
-		Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setProgress(1.0);
-		Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setTitle(newName + " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 600 + "/" + 600);
+		BossBarManager.createBossBar(e, BarColor.RED, BarStyle.SOLID);
 		return newName;
 	}
 
