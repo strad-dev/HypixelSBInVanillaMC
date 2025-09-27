@@ -34,7 +34,9 @@ public class PowerWitherSkeleton implements CustomMob {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		PluginUtils.spawnTNT(damager, damagee.getLocation(), 20, 6, 10, new ArrayList<>());
+		if(!type.equals(DamageType.PLAYER_MAGIC)) {
+			PluginUtils.spawnTNT(damager, damagee.getLocation(), 20, 6, 10, new ArrayList<>());
+		}
 		return true;
 	}
 }

@@ -1,6 +1,5 @@
 package mobs.generic;
 
-import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.PluginUtils;
 import mobs.CustomMob;
@@ -39,11 +38,11 @@ public class meloGnorI implements CustomMob {
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		if(type == DamageType.MELEE) {
-			if(damager instanceof LivingEntity entity1) {
+			if(damager instanceof LivingEntity) {
 				if(originalDamage > 10.0) {
 					if(damagee.getHealth() + (originalDamage - 10.0) > 200) {
 						damagee.setHealth(200);
-						CustomDamage.calculateFinalDamage(entity1, damagee, (originalDamage - 10) / 2, DamageType.MELEE); // damager takes 50% of their original damage, -10
+						PluginUtils.dealCustomDamage(damagee, damager, (originalDamage - 10) / 2, false);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt is at full health and has REFLECTED " + (originalDamage - 10) / 2 + " Damage back to you!");
 					} else {
 						damagee.setHealth(damagee.getHealth() + (originalDamage - 10.0));
@@ -56,7 +55,7 @@ public class meloGnorI implements CustomMob {
 				} else {
 					Random random = new Random();
 					if(random.nextDouble() < 0.15) {
-						CustomDamage.calculateFinalDamage(entity1, damagee, 20, DamageType.MELEE);
+						PluginUtils.dealCustomDamage(damagee, damager, 20f, false);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The meloG norI becomes enraged and deals extra damage to you!");
 					} else if(random.nextDouble() < 0.25) {
 						damagee.teleport(damager);

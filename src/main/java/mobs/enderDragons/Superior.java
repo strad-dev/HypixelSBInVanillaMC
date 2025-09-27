@@ -12,7 +12,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Objects;
 import java.util.Random;
 
-import static listeners.CustomDamage.calculateFinalDamage;
 import static listeners.CustomMobs.spawnLightning;
 
 public class Superior implements CustomDragon {
@@ -45,7 +44,9 @@ public class Superior implements CustomDragon {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 3, DamageType.RANGED);
+		if(!type.equals(DamageType.PLAYER_MAGIC)) {
+			PluginUtils.dealCustomDamage(damagee, damager, 3f, false);
+		}
 		return true;
 	}
 }

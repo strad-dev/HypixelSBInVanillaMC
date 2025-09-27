@@ -1,6 +1,5 @@
 package mobs.generic;
 
-import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.PluginUtils;
 import mobs.CustomMob;
@@ -43,10 +42,11 @@ public class VoidgloomSeraph implements CustomMob {
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		Random random = new Random();
-		if(damager instanceof LivingEntity entity1) {
+		if(damager instanceof LivingEntity) {
 			if(random.nextDouble() < 0.15) {
 				damager.teleport(damagee);
-				CustomDamage.calculateFinalDamage(entity1, damagee, 10, DamageType.MELEE);
+
+				PluginUtils.dealCustomDamage(damagee, damager, 10f, false);
 				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Voidgloom Seraph's Dark Magic has caused you to teleport to it!  It also deals extra damage to you!");
 			}
 		}

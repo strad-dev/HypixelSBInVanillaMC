@@ -9,16 +9,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.damage.DamageSource;
 import org.bukkit.entity.*;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static listeners.CustomDamage.customMobs;
 import static misc.PluginUtils.teleport;
 
 public class MasterStorm implements CustomWither {
@@ -240,10 +236,13 @@ public class MasterStorm implements CustomWither {
 		if(damagee instanceof Wither || damagee instanceof WitherSkeleton) {
 			return false;
 		}
-		if(damager.getScoreboardTags().contains("Survival1")) {
-			Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(damager, damagee, EntityDamageEvent.DamageCause.PROJECTILE, DamageSource.builder(org.bukkit.damage.DamageType.WITHER_SKULL).build(), 18));
-		} else if(damager.getScoreboardTags().contains("Survival2")) {
-			Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(damager, damagee, EntityDamageEvent.DamageCause.PROJECTILE, DamageSource.builder(org.bukkit.damage.DamageType.WITHER_SKULL).build(), 18));
+
+		if(!type.equals(DamageType.PLAYER_MAGIC)) {
+			if(damager.getScoreboardTags().contains("Survival1")) {
+				PluginUtils.dealCustomDamage(damagee, damager, 12f, false);
+			} else if(damager.getScoreboardTags().contains("Survival2")) {
+				PluginUtils.dealCustomDamage(damagee, damager, 18f, false);
+			}
 		}
 		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
 		return true;

@@ -1,9 +1,7 @@
 package mobs.generic;
 
-import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.BossBarManager;
-import misc.Plugin;
 import misc.PluginUtils;
 import mobs.CustomMob;
 import org.bukkit.*;
@@ -65,26 +63,27 @@ public class Sadan implements CustomMob {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		if(!(damager instanceof FallingBlock)) {
 			Random random = new Random();
-			if(damager instanceof LivingEntity entity && random.nextDouble() < 0.5) {
-				switch(random.nextInt(4)) {
+			if(damager instanceof LivingEntity && random.nextDouble() < 0.25) {
+				switch(random.nextInt(7)) {
 					case 0 -> {
 						damager.teleport(damager.getLocation().subtract(0, 3, 0));
-						CustomDamage.calculateFinalDamage(entity, damagee, 10, DamageType.MAGIC);
+						PluginUtils.dealCustomDamage(damagee, damager, 20f, false);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan has stomped you into the ground!");
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 0.5F);
 					}
-					case 1 -> {
+					case 1, 2 -> {
 						shootBeam(damagee, damager, Color.RED, 32, 1, 20);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan has shot you with Laser Eyes!");
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 					}
-					case 2 -> {
+					case 3, 4 -> {
 						damagee.swingMainHand();
-						CustomDamage.calculateFinalDamage(entity, damagee, 20, DamageType.MELEE);
+
+						PluginUtils.dealCustomDamage(damagee, damager, 20f, true);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan attacks you violently with his Diamond Sword!");
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
 					}
-					case 3 -> {
+					case 5, 6 -> {
 						Block b = damager.getLocation().add(0, 20, 0).getBlock();
 						if(b.getType().equals(Material.AIR)) {
 							b.setType(Material.DAMAGED_ANVIL);

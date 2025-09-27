@@ -70,7 +70,9 @@ public class AtonedHorror implements CustomMob {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		PluginUtils.spawnTNT(damager, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
+		if(type != DamageType.PLAYER_MAGIC) {
+			PluginUtils.spawnTNT(damager, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
+		}
 		return true;
 	}
 }
