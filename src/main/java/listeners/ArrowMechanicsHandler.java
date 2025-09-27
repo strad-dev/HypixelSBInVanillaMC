@@ -1,12 +1,7 @@
 package listeners;
 
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.EnderDragonPart;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -47,6 +42,7 @@ public class ArrowMechanicsHandler implements Listener {
 		if (isDragonHit) {
 			// Consume all pierce levels so the arrow stops after hitting the first part
 			arrow.setPierceLevel(0);
+			arrow.remove();
 
 			// Optional: You could also remove the arrow entirely after a short delay
 			// to ensure it doesn't continue flying

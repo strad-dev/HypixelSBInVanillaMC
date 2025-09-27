@@ -14,9 +14,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Criteria;
@@ -38,7 +35,6 @@ public class Plugin extends JavaPlugin {
 		Objects.requireNonNull(this.getCommand("m7tasactivatewitherfight")).setExecutor(new ActivateWitherFight());
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
-		getServer().getPluginManager().registerEvents(new NonEntityDamage(), this);
 		getServer().getPluginManager().registerEvents(new BetterAnvil(), this);
 		getServer().getPluginManager().registerEvents(new KeepEnchantsOnCraft(), this);
 		getServer().getPluginManager().registerEvents(new NoArrows(), this);
@@ -98,14 +94,6 @@ public class Plugin extends JavaPlugin {
 		} catch(Exception exception) {
 			Objects.requireNonNull(getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence");
 			getLogger().info("Deteced Intelligence.");
-		}
-
-		try {
-			Objects.requireNonNull(getServer().getBossBar(new NamespacedKey(this, "sadan"))).getPlayers().clear();
-			getLogger().info("Detected Sadan Bossbar");
-		} catch(Exception exception) {
-			getServer().createBossBar(new NamespacedKey(this, "sadan"), "Sadan", BarColor.RED, BarStyle.SOLID);
-			getLogger().info("Could not find Sadan Bossbar.  Adding to Bossbars.");
 		}
 
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 100L);

@@ -98,8 +98,7 @@ public class Scylla implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		Location originalLocation = p.getLocation().clone();
-		Location l = p.getLocation().clone();
-		l.add(0, 1.62, 0);
+		Location l = p.getEyeLocation();
 		Vector v = l.getDirection();
 		v.setX(v.getX() / 10);
 		v.setY(v.getY() / 10);
@@ -117,10 +116,7 @@ public class Scylla implements AbilityItem {
 				break;
 			}
 		}
-		l.subtract(0, 1.62, 0);
-		if(!l.getBlock().isEmpty()) {
-			l.add(0, 1, 0);
-		}
+		l.subtract(0, 1, 0);
 		if(!l.getBlock().isEmpty()) {
 			l.add(0, 1, 0);
 		}

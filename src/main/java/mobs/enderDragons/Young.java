@@ -9,7 +9,6 @@ import org.bukkit.util.Vector;
 
 import java.util.Random;
 
-import static listeners.CustomDamage.calculateFinalDamage;
 import static misc.PluginUtils.teleport;
 
 public class Young implements CustomDragon {
