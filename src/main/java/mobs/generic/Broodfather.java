@@ -1,6 +1,5 @@
 package mobs.generic;
 
-import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.PluginUtils;
 import mobs.CustomMob;
@@ -41,7 +40,7 @@ public class Broodfather implements CustomMob {
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		teleport(damagee, 12);
-		CustomDamage.calculateFinalDamage(damagee, damager, 1, DamageType.ABSOLUTE);
+		PluginUtils.dealCustomDamage(damager, damagee, 1f, true);
 		return false;
 	}
 

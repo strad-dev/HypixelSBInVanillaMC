@@ -6,8 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 
-import static listeners.CustomDamage.calculateFinalDamage;
-
 public class Strong implements CustomDragon {
 	@Override
 	public void whenShootingFireball(DragonFireball fireball) {
@@ -30,7 +28,9 @@ public class Strong implements CustomDragon {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 6, DamageType.RANGED);
+		if(!type.equals(DamageType.PLAYER_MAGIC)) {
+			PluginUtils.dealCustomDamage(damagee, damager, 6f, false);
+		}
 		return true;
 	}
 }

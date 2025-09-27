@@ -13,7 +13,6 @@ import org.bukkit.entity.*;
 
 import java.util.Random;
 
-import static listeners.CustomDamage.calculateFinalDamage;
 import static listeners.CustomMobs.spawnLightning;
 import static misc.PluginUtils.teleport;
 
@@ -87,8 +86,9 @@ public class WitherKing implements CustomWither {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
-		calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 6, DamageType.RANGED);
+		if(!type.equals(DamageType.PLAYER_MAGIC)) {
+			PluginUtils.dealCustomDamage(damagee, damager, 6f, false);
+		}
 		return true;
 	}
 

@@ -16,7 +16,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static listeners.CustomDamage.calculateFinalDamage;
 import static misc.PluginUtils.teleport;
 
 public class MasterNecron implements CustomWither {
@@ -147,7 +146,9 @@ public class MasterNecron implements CustomWither {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		calculateFinalDamage(damagee, damager, 6, DamageType.RANGED);
+		if(!type.equals(DamageType.PLAYER_MAGIC)) {
+			PluginUtils.dealCustomDamage(damagee, damager, 6f, false);
+		}
 		return true;
 	}
 

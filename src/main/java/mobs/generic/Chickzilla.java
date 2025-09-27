@@ -1,6 +1,5 @@
 package mobs.generic;
 
-import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.PluginUtils;
 import mobs.CustomMob;
@@ -36,9 +35,9 @@ public class Chickzilla implements CustomMob {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		if(damager instanceof LivingEntity damager1) {
+		if(damager instanceof LivingEntity && type != DamageType.PLAYER_MAGIC) {
+			PluginUtils.dealCustomDamage(damagee, damager, originalDamage / 2, false);
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Chickzilla has REFLECTED " + originalDamage / 2 + " Damage back to you!");
-			CustomDamage.calculateFinalDamage(damager1, damagee, originalDamage / 2, DamageType.MELEE); // damager takes 50% of their original damage
 		}
 		return true;
 	}
