@@ -1,4 +1,4 @@
-package mobs.generic;
+package mobs.hardmode.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;

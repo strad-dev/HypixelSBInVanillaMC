@@ -8,6 +8,8 @@ import org.bukkit.entity.*;
 
 import java.util.Objects;
 
+import static listeners.CustomDamage.calculateFinalDamage;
+
 public class Old implements CustomDragon {
 	@Override
 	public void whenShootingFireball(DragonFireball fireball) {

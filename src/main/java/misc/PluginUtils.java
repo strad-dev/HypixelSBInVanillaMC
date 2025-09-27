@@ -1,15 +1,14 @@
 package misc;
 
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftLivingEntity;
+import org.bukkit.damage.DamageSource;
+import org.bukkit.damage.DamageType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -143,18 +142,7 @@ public class PluginUtils {
 			for(Entity entity : entities) {
 				if(entity instanceof LivingEntity temp && !damagedEntities.contains(entity)) {
 					damagedEntities.add(entity);
-					net.minecraft.world.entity.Entity nmsAttacker = ((CraftEntity) origin).getHandle();
-					net.minecraft.world.entity.LivingEntity nmsVictim = ((CraftLivingEntity) temp).getHandle();
-					ServerLevel level = ((CraftWorld) temp.getWorld()).getHandle();
-					net.minecraft.world.damagesource.DamageSource rangedSource;
-					if(nmsAttacker instanceof net.minecraft.world.entity.LivingEntity livingAttacker) {
-						rangedSource = nmsVictim.damageSources().mobProjectile(null, livingAttacker);
-					} else {
-						rangedSource = nmsVictim.damageSources().generic();
-					}
-
-					// Apply the damage
-					nmsVictim.hurtServer(level, rangedSource, (float) damage);
+					Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(origin, temp, EntityDamageEvent.DamageCause.PROJECTILE, DamageSource.builder(org.bukkit.damage.DamageType.ARROW).build(), damage));
 					pierce--;
 				}
 			}
@@ -162,42 +150,6 @@ public class PluginUtils {
 			world.spawnParticle(Particle.DUST, l, 1, particle);
 			l.add(v);
 		}
-	}
-
-	/**
-	 * Apply custom damage using NMS hurtServer with proper damage source attribution
-	 * @param attacker The entity dealing the damage (for attribution)
-	 * @param victim The entity receiving the damage
-	 * @param damage The amount of damage to deal
-	 * @param consideredMelee Whether this is a direct attack (true) or ability/magic (false)
-	 */
-	public static void dealCustomDamage(Entity attacker, Entity victim, double damage, boolean consideredMelee) {
-		if (attacker == null || victim == null || damage <= 0) return;
-
-		// Get NMS entities
-		net.minecraft.world.entity.Entity nmsAttacker = ((CraftEntity) attacker).getHandle();
-		net.minecraft.world.entity.Entity nmsVictim = ((CraftEntity) victim).getHandle();
-		ServerLevel level = ((CraftWorld) victim.getWorld()).getHandle();
-
-		// Choose damage source based on consideredMelee parameter
-		net.minecraft.world.damagesource.DamageSource damageSource;
-
-		if (consideredMelee) {
-			// Use normal attack damage source (triggers ENTITY_ATTACK -> MELEE)
-			if (nmsAttacker instanceof ServerPlayer player) {
-				damageSource = nmsVictim.damageSources().playerAttack(player);
-			} else if (nmsAttacker instanceof net.minecraft.world.entity.LivingEntity living) {
-				damageSource = nmsVictim.damageSources().mobAttack(living);
-			} else {
-				damageSource = nmsVictim.damageSources().generic();
-			}
-		} else {
-			// Use explosion damage source (triggers ENTITY_EXPLOSION -> PLAYER_MAGIC)
-			damageSource = nmsVictim.damageSources().explosion(null, nmsAttacker);
-		}
-
-		// Apply the damage
-		nmsVictim.hurtServer(level, damageSource, (float) damage);
 	}
 
 	/**
@@ -215,7 +167,7 @@ public class PluginUtils {
 			List<Entity> entities = (List<Entity>) l.getWorld().getNearbyEntities(l, radius, radius, radius);
 			for(Entity entity : entities) {
 				if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-					PluginUtils.dealCustomDamage(spawner, entity1, damage, false);
+					Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(spawner, entity1, EntityDamageEvent.DamageCause.KILL, DamageSource.builder(DamageType.EXPLOSION).build(), damage));
 				}
 			}
 			spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), (int) Math.pow(radius, 3), radius, radius / 2.0, radius);
@@ -223,14 +175,13 @@ public class PluginUtils {
 		} else {
 			TNTPrimed tnt = (TNTPrimed) l.getWorld().spawnEntity(l, EntityType.TNT);
 			tnt.setFuseTicks(fuse + 20);
-			tnt.addScoreboardTag("SkyblockTNT");
 			spawner.getWorld().playSound(spawner.getLocation(), Sound.ENTITY_TNT_PRIMED, 2.0F, 1.0F);
 
 			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 				List<Entity> entities = tnt.getNearbyEntities(radius, radius, radius);
 				for(Entity entity : entities) {
 					if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-						PluginUtils.dealCustomDamage(spawner, entity1, damage, false);
+						Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(spawner, entity1, EntityDamageEvent.DamageCause.KILL, DamageSource.builder(DamageType.EXPLOSION).build(), damage));
 					}
 				}
 				tnt.remove();

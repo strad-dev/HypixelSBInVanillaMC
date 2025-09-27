@@ -2,8 +2,8 @@ package items.weapons;
 
 import items.AbilityItem;
 import listeners.CustomItems;
+import listeners.DamageType;
 import misc.Plugin;
-import misc.PluginUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -11,8 +11,11 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.craftbukkit.v1_21_R4.entity.CraftEntity;
+import org.bukkit.damage.DamageSource;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -24,6 +27,8 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static listeners.CustomDamage.customMobs;
 
 public class Scylla implements AbilityItem {
 	private static final int MANA_COST = 12;
@@ -153,9 +158,15 @@ public class Scylla implements AbilityItem {
 				net.minecraft.world.entity.EntityType<?> entityType = nmsEntity.getType();
 
 				// Create tag key
-				TagKey<net.minecraft.world.entity.EntityType<?>> tagKeySmite = TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse("minecraft:sensitive_to_smite"));
+				TagKey<net.minecraft.world.entity.EntityType<?>> tagKeySmite = TagKey.create(
+						Registries.ENTITY_TYPE,
+						ResourceLocation.parse("minecraft:sensitive_to_smite")
+				);
 				// Create tag key
-				TagKey<net.minecraft.world.entity.EntityType<?>> tagKeyBane = TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.parse("minecraft:sensitive_to_bane_of_arthropods"));
+				TagKey<net.minecraft.world.entity.EntityType<?>> tagKeyBane = TagKey.create(
+						Registries.ENTITY_TYPE,
+						ResourceLocation.parse("minecraft:sensitive_to_bane_of_arthropods")
+				);
 
 				double tempDamage = targetDamage;
 				if(entity1 instanceof Wither) {
@@ -168,7 +179,7 @@ public class Scylla implements AbilityItem {
 					tempDamage += bane * 2.5;
 				}
 				tempDamage = Math.ceil(tempDamage * 0.51);
-				PluginUtils.dealCustomDamage(p, entity1, tempDamage, false);
+				Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(p, entity1, EntityDamageEvent.DamageCause.KILL, DamageSource.builder(org.bukkit.damage.DamageType.INDIRECT_MAGIC).build(), tempDamage));
 				damaged += 1;
 				damage += tempDamage;
 			}
