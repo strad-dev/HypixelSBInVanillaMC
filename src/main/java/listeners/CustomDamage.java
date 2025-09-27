@@ -5,30 +5,22 @@ import misc.PluginUtils;
 import mobs.CustomMob;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.phys.Vec3;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_21_R4.entity.CraftEnderDragon;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
@@ -36,9 +28,7 @@ import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.WeakHashMap;
 
 public class CustomDamage implements Listener {
 	private static EntityDamageEvent e;
@@ -47,7 +37,7 @@ public class CustomDamage implements Listener {
 	private static int punchArrow = 0;
 	private static boolean isTermArrow;
 
-	private static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		isBlocking = damagee instanceof Player p && p.isBlocking();
 
 		if(damager instanceof Projectile projectile) {
@@ -156,11 +146,11 @@ public class CustomDamage implements Listener {
 			}
 
 			// shield logic (for weirdos)
-			if(isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED)) {
+			if(isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL)) {
 				finalDamage *= 0.5;
 			}
 
-			if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
+			if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
 				finalDamage *= Math.max(0.25, 1 - armor * 0.0375);
 			}
@@ -229,7 +219,6 @@ public class CustomDamage implements Listener {
 				List<EntityType> doNotKill = CustomItems.createList();
 				for(Entity entity : entities) {
 					if(!doNotKill.contains(entity.getType()) && !entity.equals(damager) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
-						Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(damager, entity1, EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK, org.bukkit.damage.DamageSource.builder(org.bukkit.damage.DamageType.BAD_RESPAWN_POINT).build(), e.getDamage() * 0.125 * level));
 						customMobs(entity1, damager, e.getDamage() * 0.125 * level, DamageType.MELEE_SWEEP);
 					}
 				}
@@ -242,10 +231,16 @@ public class CustomDamage implements Listener {
 			double oldHealth = damagee.getHealth();
 			boolean doesDie = finalDamage >= oldHealth + absorption;
 
+			// fire aspect - should always apply
+			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
+				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
+				damagee.setFireTicks(level * 80);
+			} else if(flamingArrow) {
+				damagee.setFireTicks(100);
+				flamingArrow = false;
+			}
+
 			if(doesDie) {
-				damagee.setHealth(0.1);
-				e.setCancelled(false);
-				e.setDamage(20);
 				if(damagee instanceof EnderDragon dragon) {
 					if(!(dragon instanceof CraftEnderDragon)) return;
 
@@ -254,6 +249,9 @@ public class CustomDamage implements Listener {
 
 					// Stop all movement immediately
 					nmsDragon.setDeltaMovement(Vec3.ZERO); // Stop velocity
+
+					// Force death state
+					nmsDragon.setHealth(0.0f);
 
 					// Set death time to 1 to start animation immediately
 					try {
@@ -271,18 +269,36 @@ public class CustomDamage implements Listener {
 					if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
 						PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 					}
+				} else {
+					if(type == DamageType.PLAYER_MAGIC || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED_SPECIAL || isBlocking) {
+						if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
+							if(damagee instanceof Player p) {
+								if(p.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
+									p.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
+								} else if(p.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
+									p.getEquipment().setItemInOffHand(new ItemStack(Material.AIR));
+								}
+								p.sendTitle(ChatColor.BOLD + "" + ChatColor.YELLOW + "\uD83D\uDC7C", ChatColor.DARK_GREEN + "Totem of Undying Used!", 5, 30, 5);
+							}
+							damagee.getWorld().playSound(damagee, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
+							damagee.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, damagee.getLocation(), 1024);
+
+							damagee.setHealth(1.0);
+							damagee.getActivePotionEffects().forEach(effect -> damagee.removePotionEffect(effect.getType()));
+							damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 900, 1));
+							damagee.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 800, 0));
+							damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
+						} else {
+							damagee.setHealth(0.0);
+						}
+					} else {
+						damagee.setHealth(0.1);
+						e.setCancelled(false);
+						e.setDamage(20);
+					}
 				}
 				CustomDrops.loot(damagee, damager);
 			} else {
-				// fire aspect - should always apply
-				if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
-					int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
-					damagee.setFireTicks(level * 80);
-				} else if(flamingArrow) {
-					damagee.setFireTicks(100);
-					flamingArrow = false;
-				}
-
 				// absorption
 				if(finalDamage > absorption) {
 					damagee.setAbsorptionAmount(0.0);
@@ -294,9 +310,6 @@ public class CustomDamage implements Listener {
 
 				// damage
 				damagee.setHealth(oldHealth - finalDamage);
-
-				triggerNonLethalAdvancements(damagee, damager, e.getDamage(), finalDamage, type, isBlocking);
-
 				if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.IFRAME_ENVIRONMENTAL) {
 					damagee.setNoDamageTicks(9);
 				}
@@ -306,7 +319,7 @@ public class CustomDamage implements Listener {
 				}
 
 				// apply knockback
-				if((type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED) && damager != null) {
+				if((type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) && damager != null) {
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
 					double enchantments = 1;
 					if(damager instanceof LivingEntity livingEntity) {
@@ -322,7 +335,7 @@ public class CustomDamage implements Listener {
 					double x = oldVelocity.getX();
 					double y = oldVelocity.getY();
 					double z = oldVelocity.getZ();
-					if(type == DamageType.RANGED) {
+					if(type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) {
 						factor *= 0.25;
 						if(isTermArrow) {
 							factor *= 0.5;
@@ -380,61 +393,18 @@ public class CustomDamage implements Listener {
 
 				// change nametag health
 				PluginUtils.changeName(damagee);
+
+				// update bossbar if applicable
+				try {
+					if(Objects.requireNonNull(damagee.getCustomName()).contains("Sadan")) {
+						Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setProgress(damagee.getHealth() / 600);
+						Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setTitle(damagee.getCustomName());
+					}
+				} catch(Exception exception) {
+					// nothing here lol
+				}
 			}
 		}
-	}
-
-	private static void triggerNonLethalAdvancements(LivingEntity victim, Entity damager,
-													 double originalDamage, double finalDamage,
-													 DamageType type, boolean blocked) {
-		DamageSource source = createDamageSource(victim, damager, type);
-
-		// Player hurt entity advancement
-		if(damager instanceof Player player) {
-			ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-			net.minecraft.world.entity.Entity nmsVictim = ((CraftEntity) victim).getHandle();
-
-			CriteriaTriggers.PLAYER_HURT_ENTITY.trigger(
-					serverPlayer,
-					nmsVictim,
-					source,
-					(float) originalDamage,
-					(float) finalDamage,
-					blocked
-			);
-		}
-
-		// Entity hurt player advancement
-		if(victim instanceof Player player) {
-			ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-
-			CriteriaTriggers.ENTITY_HURT_PLAYER.trigger(
-					serverPlayer,
-					source,
-					(float) originalDamage,
-					(float) finalDamage,
-					blocked
-			);
-		}
-	}
-
-	// You'll also need the createDamageSource helper:
-	private static DamageSource createDamageSource(LivingEntity victim, Entity damager, DamageType type) {
-		net.minecraft.world.entity.Entity nmsDamager = damager != null ? ((CraftEntity) damager).getHandle() : null;
-		var sources = ((CraftLivingEntity) victim).getHandle().damageSources();
-
-		return switch(type) {
-			case RANGED ->
-					damager instanceof Player ? sources.arrow(null, nmsDamager) : sources.mobProjectile(nmsDamager, (net.minecraft.world.entity.LivingEntity) nmsDamager);
-			case MAGIC, PLAYER_MAGIC ->
-					sources.indirectMagic(nmsDamager, nmsDamager);
-			case FALL ->
-					sources.fall();
-			case ABSOLUTE ->
-					sources.genericKill();
-			default ->
-					damager instanceof Player ? sources.playerAttack((ServerPlayer)nmsDamager) : sources.mobAttack((net.minecraft.world.entity.LivingEntity) nmsDamager);
-		};
 	}
 
 	public static void setEvent(EntityDamageEvent e) {
@@ -455,18 +425,11 @@ public class CustomDamage implements Listener {
 				DamageType type;
 				switch(e.getCause()) {
 					case BLOCK_EXPLOSION, ENTITY_ATTACK, ENTITY_EXPLOSION, THORNS -> type = DamageType.MELEE;
-					case ENTITY_SWEEP_ATTACK -> {
-						if(e.getDamageSource().getDamageType().equals(org.bukkit.damage.DamageType.BAD_RESPAWN_POINT)) {
-							type = DamageType.MELEE_SWEEP;
-						} else {
-							return;
-						}
-					}
 					case PROJECTILE, SONIC_BOOM -> type = DamageType.RANGED;
 					case DRAGON_BREATH, MAGIC -> type = DamageType.MAGIC;
 					case FALLING_BLOCK -> type = DamageType.ENVIRONMENTAL;
 					case LIGHTNING -> type = DamageType.IFRAME_ENVIRONMENTAL;
-					case KILL -> type = DamageType.PLAYER_MAGIC; // this is so that custom calls work
+					case KILL -> type = DamageType.PLAYER_MAGIC; // this is so that the M7 TAS works
 					default -> {
 						return;
 					}
@@ -488,9 +451,9 @@ public class CustomDamage implements Listener {
 								Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
 								if(score.getScore() < 2500) {
 									score.setScore(score.getScore() + 1);
-									p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500"));
+									p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500"));
 								} else {
-									p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE"));
+									p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE"));
 								}
 							} catch(Exception exception) {
 								Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
@@ -505,78 +468,5 @@ public class CustomDamage implements Listener {
 				}
 			}
 		}
-	}
-
-	private final Map<LivingEntity, Long> noDamageTimes = new WeakHashMap<>();
-
-	@EventHandler
-	public void onEntityDamage(EntityDamageEvent e) {
-		if(e.getEntity() instanceof LivingEntity entity) {
-			e.setCancelled(true);
-			DamageType type;
-			switch(e.getCause()) {
-				case THORNS -> type = DamageType.MELEE;
-				case POISON, WITHER -> type = DamageType.MAGIC;
-				case CAMPFIRE, CONTACT, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION,
-					 SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
-				case CUSTOM -> type = DamageType.IFRAME_ENVIRONMENTAL;
-				case FALL, FLY_INTO_WALL -> type = DamageType.FALL;
-				case CRAMMING, KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.ABSOLUTE;
-				default -> {
-					return;
-				}
-			}
-
-			CustomDamage.setEvent(e);
-
-			long currentTime = System.currentTimeMillis();
-			boolean hasLastDamageTime = noDamageTimes.containsKey(entity);
-			long lastDamageTime = noDamageTimes.computeIfAbsent(entity, entity2 -> currentTime);
-
-			if(hasLastDamageTime && currentTime - lastDamageTime > 490 || e.getCause().equals(EntityDamageEvent.DamageCause.KILL)) {
-				customMobs(entity, null, e.getDamage(), type);
-				noDamageTimes.put(entity, currentTime);
-				if (entity instanceof Player player && !entity.isDead()) {
-					triggerEnvironmentalDamageAdvancements(player, e.getCause(), e.getDamage(), e.getFinalDamage());
-				}
-			}
-
-			if(entity.isDead()) {
-				entity.remove();
-			}
-		}
-	}
-
-	private void triggerEnvironmentalDamageAdvancements(Player player, EntityDamageEvent.DamageCause cause,
-														double originalDamage, double finalDamage) {
-		ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-
-		// Create appropriate damage source based on cause
-		DamageSource source = switch(cause) {
-			case FIRE, FIRE_TICK -> serverPlayer.damageSources().inFire();
-			case LAVA -> serverPlayer.damageSources().lava();
-			case DROWNING -> serverPlayer.damageSources().drown();
-			case FALL -> serverPlayer.damageSources().fall();
-			case VOID -> serverPlayer.damageSources().fellOutOfWorld();
-			case WITHER -> serverPlayer.damageSources().wither();
-			case STARVATION -> serverPlayer.damageSources().starve();
-			case FREEZE -> serverPlayer.damageSources().freeze();
-			case SUFFOCATION -> serverPlayer.damageSources().inWall();
-			default -> serverPlayer.damageSources().generic();
-		};
-
-		// Trigger entity_hurt_player for environmental damage
-		CriteriaTriggers.ENTITY_HURT_PLAYER.trigger(
-				serverPlayer,
-				source,
-				(float) originalDamage,
-				(float) finalDamage,
-				false  // Environmental damage isn't blocked
-		);
-	}
-
-	@EventHandler
-	public void onEntityDeath(EntityDeathEvent e) {
-		noDamageTimes.remove(e.getEntity());
 	}
 }

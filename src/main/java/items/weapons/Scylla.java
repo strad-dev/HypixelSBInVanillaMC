@@ -4,18 +4,11 @@ import items.AbilityItem;
 import listeners.CustomItems;
 import listeners.DamageType;
 import misc.Plugin;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftEntity;
-import org.bukkit.damage.DamageSource;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -154,32 +147,16 @@ public class Scylla implements AbilityItem {
 		}
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
-				net.minecraft.world.entity.Entity nmsEntity = ((CraftEntity) entity).getHandle();
-				net.minecraft.world.entity.EntityType<?> entityType = nmsEntity.getType();
-
-				// Create tag key
-				TagKey<net.minecraft.world.entity.EntityType<?>> tagKeySmite = TagKey.create(
-						Registries.ENTITY_TYPE,
-						ResourceLocation.parse("minecraft:sensitive_to_smite")
-				);
-				// Create tag key
-				TagKey<net.minecraft.world.entity.EntityType<?>> tagKeyBane = TagKey.create(
-						Registries.ENTITY_TYPE,
-						ResourceLocation.parse("minecraft:sensitive_to_bane_of_arthropods")
-				);
-
 				double tempDamage = targetDamage;
 				if(entity1 instanceof Wither) {
-					tempDamage += 4;
-				}
-				if(entityType.is(tagKeySmite)) {
+					tempDamage += 4 + smite * 2.5;
+				} else if(entity1 instanceof Zombie || entity1 instanceof AbstractSkeleton || entity1 instanceof SkeletonHorse || entity1 instanceof ZombieHorse || entity1 instanceof Phantom || entity1 instanceof Zoglin) {
 					tempDamage += smite * 2.5;
-				}
-				if(entityType.is(tagKeyBane)) {
+				} else if(entity1 instanceof Spider || entity1 instanceof Bee || entity1 instanceof Silverfish || entity1 instanceof Endermite) {
 					tempDamage += bane * 2.5;
 				}
 				tempDamage = Math.ceil(tempDamage * 0.51);
-				Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(p, entity1, EntityDamageEvent.DamageCause.KILL, DamageSource.builder(org.bukkit.damage.DamageType.INDIRECT_MAGIC).build(), tempDamage));
+				customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC);
 				damaged += 1;
 				damage += tempDamage;
 			}

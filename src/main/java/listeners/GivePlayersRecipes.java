@@ -10,7 +10,6 @@ import items.weapons.Claymore;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
 import misc.AddRecipes;
-import misc.BossBarManager;
 import misc.Plugin;
 import org.bukkit.ChatColor;
 import org.bukkit.enchantments.Enchantment;
@@ -44,7 +43,6 @@ public class GivePlayersRecipes implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
-		BossBarManager.addPlayerToActiveBars(p);
 		p.discoverRecipes(AddRecipes.returnRecipes(Plugin.getInstance()));
 		p.sendMessage(" " + ChatColor.BLUE + ChatColor.BOLD + ChatColor.MAGIC + "E" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " Hypixel SkyBlock in Vanilla Minecraft Plugin " + ChatColor.MAGIC + "E" + ChatColor.RESET + "\n" +
 				ChatColor.BLACK + "---" + ChatColor.DARK_BLUE + "---" + ChatColor.DARK_GREEN + "---" + ChatColor.DARK_AQUA + "---" + ChatColor.DARK_RED + "---" + ChatColor.DARK_PURPLE + "---" + ChatColor.GOLD + "---" + ChatColor.GRAY + "---" +
