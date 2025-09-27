@@ -11,16 +11,17 @@ import commands.*;
 import listeners.*;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
-import org.bukkit.entity.Explosive;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.Score;
 
-import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings({"unused"})
@@ -37,6 +38,7 @@ public class Plugin extends JavaPlugin {
 		Objects.requireNonNull(this.getCommand("m7tasactivatewitherfight")).setExecutor(new ActivateWitherFight());
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
+		getServer().getPluginManager().registerEvents(new NonEntityDamage(), this);
 		getServer().getPluginManager().registerEvents(new BetterAnvil(), this);
 		getServer().getPluginManager().registerEvents(new KeepEnchantsOnCraft(), this);
 		getServer().getPluginManager().registerEvents(new NoArrows(), this);
@@ -106,13 +108,13 @@ public class Plugin extends JavaPlugin {
 			getLogger().info("Could not find Sadan Bossbar.  Adding to Bossbars.");
 		}
 
-		Bukkit.getScheduler().runTaskLater(getInstance(), this::passiveIntel, 100L);
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 100L);
 	}
 
 	public void passiveIntel() {
 		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
 			try {
-				Score score = Objects.requireNonNull(Objects.requireNonNull(getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
+				Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
 				if(score.getScore() < 2500) {
 					score.setScore(score.getScore() + 1);
 					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500"));
@@ -130,10 +132,6 @@ public class Plugin extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		List<World> worlds = getInstance().getServer().getWorlds();
-		for(World world : worlds) {
-			world.getEntities().removeIf(entity -> entity instanceof Explosive && entity.getScoreboardTags().contains("SkyblockTNT"));
-		}
 		getLogger().info("Stopped SkyBlock in Vanilla!");
 	}
 

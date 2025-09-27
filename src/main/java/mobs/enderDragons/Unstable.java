@@ -7,6 +7,7 @@ import org.bukkit.entity.*;
 
 import java.util.Random;
 
+import static listeners.CustomDamage.calculateFinalDamage;
 import static listeners.CustomMobs.spawnLightning;
 
 public class Unstable implements CustomDragon {

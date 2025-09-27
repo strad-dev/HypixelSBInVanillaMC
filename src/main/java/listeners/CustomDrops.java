@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.List;
 import java.util.Random;
 
 import static misc.PluginUtils.sendRareDropMessage;
@@ -66,7 +67,7 @@ public class CustomDrops implements Listener {
 				item = new ItemStack(Material.ARROW);
 				item.setAmount(random.nextInt(3 + lootingLevel));
 				world.dropItemNaturally(l, item);
-				if(random.nextDouble() < 0.5 * rngLootingBonus) {
+				if(random.nextDouble() < 0.5 * lootingLevel) {
 					Arrow arrow = (Arrow) new ItemStack(Material.ARROW);
 					arrow.addCustomEffect(new PotionEffect(PotionEffectType.POISON, 100, 0), true);
 					world.dropItemNaturally(l, (ItemStack) arrow);
@@ -838,7 +839,6 @@ public class CustomDrops implements Listener {
 			case null, default -> {
 			}
 		}
-
 	}
 
 	@EventHandler
@@ -847,10 +847,11 @@ public class CustomDrops implements Listener {
 		if(died instanceof Player || died instanceof ArmorStand || died instanceof AbstractHorse) {
 			return;
 		}
-		e.getDrops().clear();
+		List<ItemStack> drops = e.getDrops();
+		drops.clear();
 		e.setDroppedExp(e.getDroppedExp() * 2);
 		if(died.getScoreboardTags().contains("SkyblockBoss")) {
-			e.setDroppedExp((int) Math.floor(e.getDroppedExp() * 12.5));
+			e.setDroppedExp(e.getDroppedExp() * 25);
 		}
 	}
 }

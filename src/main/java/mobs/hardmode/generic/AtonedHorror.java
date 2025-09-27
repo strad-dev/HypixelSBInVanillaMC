@@ -1,4 +1,4 @@
-package mobs.generic;
+package mobs.hardmode.generic;
 
 import listeners.DamageType;
 import misc.PluginUtils;
@@ -60,9 +60,7 @@ public class AtonedHorror implements CustomMob {
 			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
 		}
 		if(type == DamageType.PLAYER_MAGIC) {
-			if(damager instanceof Player p) {
-				p.sendTitle("", ChatColor.YELLOW + "You cannot deal " + DamageType.toString(type) + " to the Atoned Horror.", 0, 20, 0);
-			}
+			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + DamageType.toString(type) + " damage to the Atoned Horror.");
 			return false;
 		}
 		return true;
@@ -70,7 +68,7 @@ public class AtonedHorror implements CustomMob {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		PluginUtils.spawnTNT(damager, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
+		PluginUtils.spawnTNT(damager, damagee.getLocation(), 30, 5, 20, new ArrayList<>());
 		return true;
 	}
 }

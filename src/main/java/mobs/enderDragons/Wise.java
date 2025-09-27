@@ -5,6 +5,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 
+import static listeners.CustomDamage.calculateFinalDamage;
+
 public class Wise implements CustomDragon {
 	@Override
 	public void whenShootingFireball(DragonFireball fireball) {

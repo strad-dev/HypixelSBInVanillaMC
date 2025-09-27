@@ -1,4 +1,4 @@
-package mobs.generic;
+package mobs.hardmode.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
@@ -66,9 +66,7 @@ public class meloGnorI implements CustomMob {
 				}
 			}
 		} else {
-			if(damager instanceof Player p) {
-				p.sendTitle("", ChatColor.YELLOW + "You cannot deal " + DamageType.toString(type) + " to the meloG norI.", 0, 20, 0);
-			}
+			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You cannot deal " + DamageType.toString(type) + " damage to the meloG norI.");
 			damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 		}
 		return false;

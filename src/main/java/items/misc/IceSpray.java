@@ -2,16 +2,19 @@ package items.misc;
 
 import items.AbilityItem;
 import listeners.CustomItems;
+import listeners.DamageType;
 import misc.Plugin;
-import misc.PluginUtils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.damage.DamageSource;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -21,6 +24,8 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static listeners.CustomDamage.customMobs;
 
 public class IceSpray implements AbilityItem {
 	private static final int MANA_COST = 8;
@@ -49,8 +54,7 @@ public class IceSpray implements AbilityItem {
 		lore.add(ChatColor.RED + "1" + ChatColor.GRAY + " damage to enemies and");
 		lore.add(ChatColor.GRAY + "slows them down for " + ChatColor.GREEN + "5");
 		lore.add(ChatColor.GRAY + "seconds!  Frozen enemies take");
-		lore.add(ChatColor.RED + "+10%" + ChatColor.GRAY + " increased damage");
-		lore.add(ChatColor.GRAY + "and deal " + ChatColor.RED + "20%" + ChatColor.GRAY + " less damage!");
+		lore.add(ChatColor.RED + "+10%" + ChatColor.GRAY + " increased damage!");
 		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
 		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + COOLDOWN / 20 + "s");
 		lore.add("");
@@ -79,7 +83,7 @@ public class IceSpray implements AbilityItem {
 					alreadyDebuffed++;
 				} else {
 					damage += 1;
-					PluginUtils.dealCustomDamage(p, entity1, 1f, false);
+					Bukkit.getPluginManager().callEvent(new EntityDamageByEntityEvent(p, entity1, EntityDamageEvent.DamageCause.KILL, DamageSource.builder(org.bukkit.damage.DamageType.INDIRECT_MAGIC).build(), 1));
 					entity1.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 101, 3));
 					entity1.addScoreboardTag("IceSprayed");
 					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> entity1.removeScoreboardTag("IceSprayed"), 101L);

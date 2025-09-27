@@ -1,7 +1,8 @@
-package mobs.enderDragons;
+package mobs.hardmode.enderDragons;
 
 import listeners.DamageType;
 import misc.PluginUtils;
+import mobs.enderDragons.CustomDragon;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
@@ -40,6 +41,10 @@ public class Superior implements CustomDragon {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+		if(type == DamageType.RANGED) {
+			calculateFinalDamage(damagee, damager, originalDamage / 3, DamageType.RANGED);
+			return false;
+		}
 		return true;
 	}
 
