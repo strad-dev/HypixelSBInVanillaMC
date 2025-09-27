@@ -13,6 +13,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -844,14 +845,90 @@ public class CustomDrops implements Listener {
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent e) {
 		LivingEntity died = e.getEntity();
+		if(e instanceof PlayerDeathEvent playerDeath) {
+			playerDeath.setDeathMessage("");
+			return;
+		}
 		if(died instanceof Player || died instanceof ArmorStand || died instanceof AbstractHorse) {
 			return;
 		}
 		List<ItemStack> drops = e.getDrops();
 		drops.clear();
-		e.setDroppedExp(e.getDroppedExp() * 2);
+		e.setDroppedExp(calculateMobXP(died));
 		if(died.getScoreboardTags().contains("SkyblockBoss")) {
-			e.setDroppedExp(e.getDroppedExp() * 25);
+			e.setDroppedExp(e.getDroppedExp() * 10);
 		}
+	}
+
+	@EventHandler
+	public void onPlayerDeath(PlayerDeathEvent e) {
+		if(e.getDeathMessage().contains(" died")) {
+			e.setDeathMessage("");
+		}
+	}
+
+	public static int calculateMobXP(LivingEntity mob) {
+		return switch(mob.getType()) {
+			// Hostile Mobs - 5 XP
+			case ZOMBIE, HUSK, ZOMBIE_VILLAGER, DROWNED -> 5;
+			case SKELETON, STRAY, WITHER_SKELETON -> 5;
+			case CREEPER -> 5;
+			case SPIDER, CAVE_SPIDER -> 5;
+			case ENDERMAN -> 5;
+			case WITCH -> 5;
+			case SILVERFISH -> 5;
+			case ENDERMITE -> 5;
+			case GUARDIAN, ELDER_GUARDIAN, BLAZE -> 10;
+			case SHULKER -> 5;
+			case VEX -> 3;
+			case VINDICATOR, EVOKER, PILLAGER, RAVAGER -> 5;
+			case PHANTOM -> 5;
+			case GHAST -> 5;
+			case MAGMA_CUBE -> mob instanceof MagmaCube m ? m.getSize() : 4;
+			case SLIME -> mob instanceof Slime s ? s.getSize() : 4;
+			case ZOMBIFIED_PIGLIN, PIGLIN, PIGLIN_BRUTE -> 5;
+			case HOGLIN, ZOGLIN -> 5;
+			case STRIDER -> 5;
+			case WARDEN -> 5;
+
+			// Bosses - Special XP
+			case ENDER_DRAGON -> 12000;
+			case WITHER -> 50;
+
+			// Neutral Mobs - 1-3 XP
+			case WOLF, POLAR_BEAR -> 1;
+			case BEE -> 1;
+			case PANDA -> 1;
+			case LLAMA, TRADER_LLAMA -> 1;
+			case DOLPHIN -> 1;
+			case IRON_GOLEM -> 0; // Iron golems don't drop XP naturally
+			case SNOW_GOLEM -> 0; // Snow golems don't drop XP
+
+			// Ocean Mobs
+			case COD, SALMON, TROPICAL_FISH, PUFFERFISH -> 1;
+			case SQUID, GLOW_SQUID -> 1;
+
+			// Farm Animals - 1-3 XP
+			case COW, SHEEP, PIG, CHICKEN -> 1;
+			case HORSE, DONKEY, MULE, SKELETON_HORSE, ZOMBIE_HORSE -> 1;
+			case RABBIT -> 1;
+			case OCELOT, CAT -> 1;
+			case PARROT -> 1;
+			case TURTLE -> 1;
+			case FOX -> 1;
+			case GOAT -> 1;
+			case AXOLOTL -> 1;
+			case FROG -> 1;
+			case TADPOLE -> 1;
+			case CAMEL -> 1;
+			case SNIFFER -> 1;
+			case ARMADILLO -> 1;
+
+			// Special Cases
+			case VILLAGER -> 0; // Villagers don't drop XP when killed
+			case WANDERING_TRADER -> 0; // Wandering traders don't drop XP
+
+			default -> 0; // Entities that don't drop XP (like armor stands, boats, etc.)
+		};
 	}
 }

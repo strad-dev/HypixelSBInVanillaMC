@@ -112,11 +112,7 @@ public class PluginUtils {
 	public static void shootBeam(Entity origin, Entity destination, Color color, long distance, long pierce, double damage) {
 		Location l = origin.getLocation();
 		if(origin instanceof LivingEntity entity) {
-			try {
-				l.add(0, Objects.requireNonNull(entity.getAttribute(Attribute.SCALE)).getValue() * 1.62, 0);
-			} catch(Exception exception) {
-				l.add(0, 1.62, 0);
-			}
+			l = entity.getEyeLocation();
 		}
 		Vector v;
 		if(origin.equals(destination)) {

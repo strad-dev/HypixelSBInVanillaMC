@@ -5,11 +5,13 @@ import misc.Plugin;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
@@ -53,33 +55,12 @@ public class AOTV implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		if(p.isSneaking()) {
-			Location l = p.getLocation();
-			l.add(0, 1.27, 0);
-			Vector v = l.getDirection();
-			v.setX(v.getX() / 10);
-			v.setY(v.getY() / 10);
-			v.setZ(v.getZ() / 10);
-			boolean teleported = false;
-			for(int i = 0; i < 610; i++) {
-				l.add(v);
-				if(l.getBlock().getType().isSolid()) {
-					Location newLocation = l.add(0, 1, 0).getBlock().getLocation();
-					if(l.getBlock().isEmpty() && l.add(0, 1, 0).getBlock().isEmpty()) {
-						newLocation.setYaw(l.getYaw());
-						newLocation.setPitch(l.getPitch());
-						newLocation.add(0.5, 0, 0.5);
-						p.setFallDistance(0);
-						p.teleport(newLocation);
-						p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
-						teleported = true;
-					}
-					return teleported;
-				}
-			}
+			RayTraceResult result = p.rayTraceBlocks(61);
+			Block b = result.getHitBlock();
+			p.teleport(b.getLocation().add(0.5, 0, 0.5));
 		} else {
 			Location originalLocation = p.getLocation().clone();
-			Location l = p.getLocation().clone();
-			l.add(0, 1.62, 0);
+			Location l = p.getEyeLocation().clone();
 			Vector v = l.getDirection();
 			v.setX(v.getX() / 10);
 			v.setY(v.getY() / 10);
@@ -97,7 +78,7 @@ public class AOTV implements AbilityItem {
 					break;
 				}
 			}
-			l.subtract(0, 1.62, 0);
+			l.subtract(0, 1, 0);
 			if(!l.getBlock().isEmpty()) {
 				l.add(0, 1, 0);
 			}

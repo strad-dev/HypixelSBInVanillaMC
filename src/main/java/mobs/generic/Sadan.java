@@ -2,12 +2,14 @@ package mobs.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
-import misc.Plugin;
+import misc.BossBarManager;
 import misc.PluginUtils;
 import mobs.CustomMob;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarStyle;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.EntityEquipment;
@@ -54,10 +56,7 @@ public class Sadan implements CustomMob {
 		((Ageable) e).setAdult();
 		e.setPersistent(true);
 		e.setRemoveWhenFarAway(false);
-
-		Bukkit.getOnlinePlayers().forEach(p1 -> Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan")).addPlayer(p1));
-		Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setProgress(1.0);
-		Objects.requireNonNull(Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan"))).setTitle(newName + " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 600 + "/" + 600);
+		BossBarManager.createBossBar(e, BarColor.RED, BarStyle.SOLID);
 		return newName;
 	}
 
@@ -69,7 +68,7 @@ public class Sadan implements CustomMob {
 				switch(random.nextInt(4)) {
 					case 0 -> {
 						damager.teleport(damager.getLocation().subtract(0, 3, 0));
-						CustomDamage.calculateFinalDamage(entity, damagee, 10, DamageType.MAGIC);
+						CustomDamage.customMobs(entity, damagee, 10, DamageType.MAGIC);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan has stomped you into the ground!");
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 0.5F);
 					}
@@ -80,7 +79,7 @@ public class Sadan implements CustomMob {
 					}
 					case 2 -> {
 						damagee.swingMainHand();
-						CustomDamage.calculateFinalDamage(entity, damagee, 20, DamageType.MELEE);
+						CustomDamage.customMobs(entity, damagee, 20, DamageType.MELEE);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan attacks you violently with his Diamond Sword!");
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
 					}
