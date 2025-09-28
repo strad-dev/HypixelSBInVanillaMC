@@ -243,6 +243,11 @@ public class CustomDamage implements Listener {
 
 	private static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
 		if(type != DamageType.ABSOLUTE) {
+			// bonus damage to withers from hyperion
+			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && p.getInventory().getItemInMainHand().hasItemMeta() && p.getInventory().getItemInMainHand().getItemMeta().hasLore() && p.getInventory().getItemInMainHand().getItemMeta().getLore().getFirst().equals("skyblock/combat/scylla")) {
+				finalDamage += 4;
+			}
+
 			// ice spray logic
 			if(damagee.getScoreboardTags().contains("IceSprayed")) {
 				finalDamage *= 1.1;
@@ -260,11 +265,6 @@ public class CustomDamage implements Listener {
 				if(entity1.getScoreboardTags().contains("IceSprayed")) {
 					finalDamage *= 0.8;
 				}
-			}
-
-			// bonus damage to withers from hyperion
-			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && p.getInventory().getItemInMainHand().hasItemMeta() && p.getInventory().getItemInMainHand().getItemMeta().hasLore() && p.getInventory().getItemInMainHand().getItemMeta().getLore().getFirst().equals("skyblock/combat/scylla")) {
-				finalDamage += 4;
 			}
 
 			// shield logic (for weirdos)

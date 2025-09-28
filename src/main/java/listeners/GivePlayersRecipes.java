@@ -62,6 +62,8 @@ public class GivePlayersRecipes implements Listener {
 		p.removeScoreboardTag("IceCooldown");
 		p.removeScoreboardTag("TacCooldown");
 		p.removeScoreboardTag("GyroCooldown");
+		p.removeScoreboardTag("WitherShield");
+		p.removeScoreboardTag("HolyIce");
 
 		this.inventory = p.getInventory();
 		for(int i = 0; i < inventory.getSize(); i++) {
