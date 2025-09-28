@@ -56,8 +56,21 @@ public class AOTV implements AbilityItem {
 	public boolean onRightClick(Player p) {
 		if(p.isSneaking()) {
 			RayTraceResult result = p.rayTraceBlocks(61);
-			Block b = result.getHitBlock();
-			p.teleport(b.getLocation().add(0.5, 0, 0.5));
+			if(result == null) {
+				return false;
+			} else {
+				Block b = result.getHitBlock();
+				Location l = b.getLocation().add(0.5, 1, 0.5);
+				if(l.getBlock().getType().isSolid() || l.clone().add(0, 1, 0).getBlock().getType().isSolid()) {
+					return false;
+				}
+				l.setYaw(p.getEyeLocation().getYaw());
+				l.setPitch(p.getEyeLocation().getPitch());
+				p.setFallDistance(0);
+				p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
+				p.teleport(l);
+				return true;
+			}
 		} else {
 			Location originalLocation = p.getLocation().clone();
 			Location l = p.getEyeLocation().clone();
@@ -78,7 +91,7 @@ public class AOTV implements AbilityItem {
 					break;
 				}
 			}
-			l.subtract(0, 1, 0);
+			l.subtract(0, 1.62, 0);
 			if(!l.getBlock().isEmpty()) {
 				l.add(0, 1, 0);
 			}
@@ -87,7 +100,6 @@ public class AOTV implements AbilityItem {
 			p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 			return true;
 		}
-		return false;
 	}
 
 	@Override

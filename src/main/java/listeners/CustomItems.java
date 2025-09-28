@@ -139,7 +139,9 @@ public class CustomItems implements Listener {
 				item = null;
 			}
 			if(item != null) {
-				e.setCancelled(true);
+				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && item instanceof AOTV)) {
+					e.setCancelled(true);
+				}
 				if(!p.getScoreboardTags().contains("AbilityCooldown") || item instanceof Terminator) {
 					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
 						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
