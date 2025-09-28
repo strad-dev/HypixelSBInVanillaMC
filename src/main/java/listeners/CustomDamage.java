@@ -15,7 +15,7 @@ import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
-import net.minecraft.world.entity.projectile.windcharge.WindCharge;
+import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
@@ -389,7 +389,13 @@ public class CustomDamage implements Listener {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 				} else {
-					damagee.setHealth(0.0);
+					if(damagee instanceof Villager villager) {
+						villager.zombify();
+						PluginUtils.changeName(villager);
+					} else {
+						CustomDrops.loot(damagee, damager);
+						damagee.setHealth(0.0);
+					}
 					if(damagee instanceof Player p) {
 						if(data.e != null) {
 							DamageSource damageSource = convertBukkitDamageSource(data.e.getDamageSource(), p);
@@ -450,7 +456,6 @@ public class CustomDamage implements Listener {
 						PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 					}
 				}
-				CustomDrops.loot(damagee, damager);
 			} else {
 				// absorption
 				if(finalDamage > absorption) {
@@ -929,7 +934,7 @@ public class CustomDamage implements Listener {
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.WIND_CHARGE) {
-			if(nmsDirectEntity instanceof WindCharge windCharge) {
+			if(nmsDirectEntity instanceof AbstractWindCharge windCharge) {
 				if(nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
 					return sources.windCharge(windCharge, living);
 				}

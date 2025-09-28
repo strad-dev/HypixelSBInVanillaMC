@@ -7,17 +7,26 @@ import items.misc.IceSpray;
 import items.summonItems.*;
 import misc.Plugin;
 import misc.PluginUtils;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.OminousBottleAmplifier;
 import org.bukkit.*;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
+import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BannerMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -448,11 +457,37 @@ public class CustomDrops implements Listener {
 				}
 			}
 			case Pillager pillager -> {
-				if(pillager.getInventory().contains(Material.WHITE_BANNER)) {
-					item = new ItemStack(Material.OMINOUS_BOTTLE);
-					world.dropItemNaturally(l, item);
+				if(pillager.getEquipment().getHelmet() != null && pillager.getEquipment().getHelmet().getType().equals(Material.WHITE_BANNER)) {
+					Raid activeRaid = pillager.getRaid();
+					if(activeRaid == null) {
+						item = new ItemStack(Material.OMINOUS_BOTTLE);
+						int randomLevel = random.nextInt(5);
+						net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+						nmsStack.set(DataComponents.OMINOUS_BOTTLE_AMPLIFIER, new OminousBottleAmplifier(randomLevel));
+						item = CraftItemStack.asBukkitCopy(nmsStack);
+						world.dropItemNaturally(l, item);
+					}
+					item = new ItemStack(Material.WHITE_BANNER);
+					BannerMeta meta = (BannerMeta) item.getItemMeta();
 
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "give @a white_banner[banner_patterns=[{pattern:rhombus,color:cyan},{pattern:stripe_bottom,color:light_gray},{pattern:stripe_center,color:gray},{pattern:half_horizontal,color:light_gray},{pattern:stripe_middle,color:black},{pattern:half_horizontal,color:light_gray},{pattern:circle,color:light_gray},{pattern:border,color:black}],custom_name='[\"\",{\"text\":\"Ominous Banner\",\"italic\":false,\"color\":\"gold\"}]',hide_additional_tooltip={}]");
+					// Add all the banner patterns in the correct order
+					meta.addPattern(new Pattern(DyeColor.CYAN, PatternType.RHOMBUS));
+					meta.addPattern(new Pattern(DyeColor.LIGHT_GRAY, PatternType.STRIPE_BOTTOM));
+					meta.addPattern(new Pattern(DyeColor.GRAY, PatternType.STRIPE_CENTER));
+					meta.addPattern(new Pattern(DyeColor.LIGHT_GRAY, PatternType.HALF_HORIZONTAL));
+					meta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_MIDDLE));
+					meta.addPattern(new Pattern(DyeColor.LIGHT_GRAY, PatternType.HALF_HORIZONTAL));
+					meta.addPattern(new Pattern(DyeColor.LIGHT_GRAY, PatternType.CIRCLE));
+					meta.addPattern(new Pattern(DyeColor.BLACK, PatternType.BORDER));
+
+					// Set custom name (gold color, not italic)
+					meta.setDisplayName(ChatColor.GOLD + "" + ChatColor.ITALIC + "Ominous Banner");
+
+					// Hide additional tooltip
+					meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+
+					item.setItemMeta(meta);
+					world.dropItemNaturally(l, item);
 				}
 			}
 			// no drops
