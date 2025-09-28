@@ -2,12 +2,14 @@ package listeners;
 
 import items.AbilityItem;
 import items.CustomItem;
-import items.misc.AOTV;
+import items.misc.*;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
 import misc.Plugin;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.core.Holder;
+import net.minecraft.network.syncher.SynchedEntityData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -139,7 +141,7 @@ public class CustomItems implements Listener {
 				item = null;
 			}
 			if(item != null) {
-				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && item instanceof AOTV)) {
+				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && (item instanceof Scylla || item instanceof AOTV || item instanceof BonzoStaff || item instanceof HolyIce || item instanceof IceSpray || item instanceof WandOfAtonement || item instanceof WandOfRestoration))) {
 					e.setCancelled(true);
 				}
 				if(!p.getScoreboardTags().contains("AbilityCooldown") || item instanceof Terminator) {
