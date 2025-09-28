@@ -14,12 +14,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class BossBarManager {
 	private static final Map<UUID, ManagedBossBar> activeBossBars = new HashMap<>();
 	private static final double DEFAULT_VISIBILITY_RANGE = 64.0;
 
 	public static UUID createBossBar(LivingEntity entity, BarColor color, BarStyle style) {
-		if (hasBossBar(entity)) {
+		if(hasBossBar(entity)) {
 			removeBossBar(entity);
 		}
 
@@ -41,7 +42,7 @@ public class BossBarManager {
 
 	public static void removeBossBar(LivingEntity entity) {
 		ManagedBossBar bar = activeBossBars.remove(entity.getUniqueId());
-		if (bar != null) {
+		if(bar != null) {
 			bar.cleanup();
 		}
 	}
@@ -58,7 +59,7 @@ public class BossBarManager {
 
 	public static void addPlayerToActiveBars(Player player) {
 		activeBossBars.values().forEach(bar -> {
-			if (bar.bossBar != null && bar.shouldBeVisible(player)) {
+			if(bar.bossBar != null && bar.shouldBeVisible(player)) {
 				bar.bossBar.addPlayer(player);
 			}
 		});
@@ -80,28 +81,24 @@ public class BossBarManager {
 			this.bossBar.setProgress(1.0);
 
 			// Add all nearby players
-			for (Player player : Bukkit.getOnlinePlayers()) {
-				if (shouldBeVisible(player)) {
+			for(Player player : Bukkit.getOnlinePlayers()) {
+				if(shouldBeVisible(player)) {
 					bossBar.addPlayer(player);
 				}
 			}
 		}
 
 		private String buildTitle() {
-			String name = entity.getCustomName() != null ?
-					entity.getCustomName() : entity.getName();
-			int health = (int) entity.getHealth();
-			int max = (int) maxHealth;
 
 			// The name already has formatting, just append health
-			return name + " §c❤ §e" + health + "/" + max;
+			return entity.getCustomName() != null ? entity.getCustomName() : entity.getName();
 		}
 
 		void start() {
 			updateTask = new BukkitRunnable() {
 				@Override
 				public void run() {
-					if (entity.isDead() || !entity.isValid()) {
+					if(entity.isDead() || !entity.isValid()) {
 						BossBarManager.removeBossBar(entity);
 						cancel();
 						return;
@@ -123,28 +120,27 @@ public class BossBarManager {
 			bossBar.setProgress(progress);
 
 			// Update player visibility
-			for (Player player : Bukkit.getOnlinePlayers()) {
+			for(Player player : Bukkit.getOnlinePlayers()) {
 				boolean shouldSee = shouldBeVisible(player);
 				boolean currentlySees = bossBar.getPlayers().contains(player);
 
-				if (shouldSee && !currentlySees) {
+				if(shouldSee && !currentlySees) {
 					bossBar.addPlayer(player);
-				} else if (!shouldSee && currentlySees) {
+				} else if(!shouldSee && currentlySees) {
 					bossBar.removePlayer(player);
 				}
 			}
 		}
 
 		boolean shouldBeVisible(Player player) {
-			return player.getWorld().equals(entity.getWorld()) &&
-					player.getLocation().distance(entity.getLocation()) <= DEFAULT_VISIBILITY_RANGE;
+			return player.getWorld().equals(entity.getWorld()) && player.getLocation().distance(entity.getLocation()) <= DEFAULT_VISIBILITY_RANGE;
 		}
 
 		void cleanup() {
-			if (updateTask != null) {
+			if(updateTask != null) {
 				updateTask.cancel();
 			}
-			if (bossBar != null) {
+			if(bossBar != null) {
 				bossBar.removeAll();
 			}
 		}

@@ -116,7 +116,7 @@ public class Scylla implements AbilityItem {
 				break;
 			}
 		}
-		l.subtract(0, 1, 0);
+		l.subtract(0, 1.62, 0);
 		if(!l.getBlock().isEmpty()) {
 			l.add(0, 1, 0);
 		}

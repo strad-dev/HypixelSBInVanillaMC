@@ -9,11 +9,14 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
+import net.minecraft.world.entity.projectile.windcharge.WindCharge;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -122,6 +125,7 @@ public class CustomDamage implements Listener {
 							LightningStrike lightning = world.strikeLightning(damagee.getLocation());
 							this.lightningInvolved = true;
 							this.lightningBolt = ((CraftLightningStrike) lightning).getHandle();
+							damager.getWorld().playSound(damager, Sound.ITEM_TRIDENT_THUNDER, 1f, 1f);
 						}
 					}
 				} else if(projectile instanceof AbstractArrow arrow) {
@@ -164,6 +168,7 @@ public class CustomDamage implements Listener {
 
 	private static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(damager instanceof Projectile projectile) {
+			originalDamage = data.originalDamage;
 			// stop stupidly annoying arrows
 			if(projectile instanceof Trident trident) {
 				handleTridentHit(trident, data);
@@ -225,7 +230,6 @@ public class CustomDamage implements Listener {
 
 		if((damagee instanceof Player p && (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR)) || (damagee instanceof Wither wither && wither.getInvulnerabilityTicks() > 0)) {
 			doContinue = false;
-			data.e.setCancelled(true);
 		}
 
 		if(type == DamageType.ABSOLUTE || doContinue) {
@@ -356,53 +360,11 @@ public class CustomDamage implements Listener {
 				damagee.setFireTicks(100);
 			}
 
-			DamageSource nmsSource;
-			if(data.e != null) {
-				nmsSource = convertBukkitDamageSource(data.e.getDamageSource(), damagee);
-			} else {
-				org.bukkit.damage.DamageType bukkitType = switch(type) {
-					case MELEE -> org.bukkit.damage.DamageType.MOB_ATTACK;
-					case MELEE_SWEEP -> org.bukkit.damage.DamageType.PLAYER_ATTACK;
-					case RANGED -> org.bukkit.damage.DamageType.ARROW;
-					case RANGED_SPECIAL -> org.bukkit.damage.DamageType.SONIC_BOOM;
-					case MAGIC, PLAYER_MAGIC -> org.bukkit.damage.DamageType.MAGIC;
-					case ENVIRONMENTAL -> org.bukkit.damage.DamageType.FALLING_BLOCK;
-					case IFRAME_ENVIRONMENTAL -> org.bukkit.damage.DamageType.ON_FIRE;
-					case FALL -> org.bukkit.damage.DamageType.FALL;
-					case ABSOLUTE -> org.bukkit.damage.DamageType.GENERIC_KILL;
-				};
-				nmsSource = convertBukkitDamageSource(org.bukkit.damage.DamageSource.builder(bukkitType).build(), damagee);
+			if(damager instanceof Player && damager.getFallDistance() > 0 && type == DamageType.MELEE) {
+				damagee.getWorld().spawnParticle(Particle.CRIT, damagee.getLocation().add(0, (damagee.getHeight() / 2), 0), 128);
 			}
 
 			if(doesDie) {
-				if(damagee instanceof EnderDragon dragon) {
-					if(!(dragon instanceof CraftEnderDragon)) return;
-
-					net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon = ((CraftEnderDragon) dragon).getHandle();
-
-					// Stop all movement immediately
-					nmsDragon.setDeltaMovement(Vec3.ZERO); // Stop velocity
-
-					// Force death state
-					nmsDragon.setHealth(0.0f);
-
-					// Set death time to 1 to start animation immediately
-					try {
-						Field deathTimeField = nmsDragon.getClass().getDeclaredField("dragonDeathTime");
-						deathTimeField.setAccessible(true);
-						deathTimeField.setInt(nmsDragon, 1);
-					} catch(Exception e) {
-						// Fallback to damage
-						Bukkit.getLogger().warning("Failed to force Dragon death animation.");
-						ServerLevel worldServer = ((CraftWorld) dragon.getWorld()).getHandle();
-						DamageSource damageSource = nmsDragon.damageSources().generic();
-						EnderDragonPart dragonPart = nmsDragon.head;
-						nmsDragon.hurt(worldServer, dragonPart, damageSource, Float.MAX_VALUE);
-					}
-					if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-						PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
-					}
-				}
 				if(type != DamageType.ABSOLUTE && (damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING))) {
 					if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
 						damagee.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
@@ -418,13 +380,14 @@ public class CustomDamage implements Listener {
 						CriteriaTriggers.USED_TOTEM.trigger(serverPlayer, nmsTotem);
 					}
 					damagee.getWorld().playSound(damagee, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
-					damagee.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, damagee.getLocation(), 1024);
+					damagee.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, damagee.getLocation(), 512);
 
 					damagee.setHealth(1.0);
 					damagee.getActivePotionEffects().forEach(effect -> damagee.removePotionEffect(effect.getType()));
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 900, 1));
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 800, 0));
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
+					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 				} else {
 					damagee.setHealth(0.0);
 					if(damagee instanceof Player p) {
@@ -457,8 +420,36 @@ public class CustomDamage implements Listener {
 							}
 						}
 					}
+					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
 				}
-				triggerAllRelevantAdvancements(damagee, damager, nmsSource, data.originalDamage, finalDamage, data.isBlocking, true, data);
+				if(damagee instanceof EnderDragon dragon) {
+					if(!(dragon instanceof CraftEnderDragon)) return;
+
+					net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon = ((CraftEnderDragon) dragon).getHandle();
+
+					// Stop all movement immediately
+					nmsDragon.setDeltaMovement(Vec3.ZERO); // Stop velocity
+
+					// Force death state
+					nmsDragon.setHealth(0.0f);
+
+					// Set death time to 1 to start animation immediately
+					try {
+						Field deathTimeField = nmsDragon.getClass().getDeclaredField("dragonDeathTime");
+						deathTimeField.setAccessible(true);
+						deathTimeField.setInt(nmsDragon, 1);
+					} catch(Exception e) {
+						// Fallback to damage
+						Bukkit.getLogger().warning("Failed to force Dragon death animation.");
+						ServerLevel worldServer = ((CraftWorld) dragon.getWorld()).getHandle();
+						DamageSource damageSource = nmsDragon.damageSources().generic();
+						EnderDragonPart dragonPart = nmsDragon.head;
+						nmsDragon.hurt(worldServer, dragonPart, damageSource, Float.MAX_VALUE);
+					}
+					if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
+						PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
+					}
+				}
 				CustomDrops.loot(damagee, damager);
 			} else {
 				// absorption
@@ -551,19 +542,45 @@ public class CustomDamage implements Listener {
 					damagee.setVelocity(new Vector(x, y, z));
 				}
 
-				triggerAllRelevantAdvancements(damagee, damager, nmsSource, data.originalDamage, finalDamage, data.isBlocking, false, data);
 
 				// change nametag health
 				PluginUtils.changeName(damagee);
+				triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 			}
 		}
 	}
 
-	private static void triggerAllRelevantAdvancements(LivingEntity victim, Entity attacker, DamageSource nmsSource, double originalDamage, double finalDamage, boolean wasBlocked, boolean wasKilled, DamageData data) {
+	private static void triggerAllRelevantAdvancements(LivingEntity victim, Entity attacker, DamageType type, double originalDamage, double finalDamage, boolean wasBlocked, boolean wasKilled, DamageData data) {
+		DamageSource nmsSource;
+		Entity causingEntity;
+		if(data.e != null) {
+			causingEntity = data.e.getDamageSource().getCausingEntity();
+			nmsSource = convertBukkitDamageSource(data.e.getDamageSource(), victim);
+		} else {
+			org.bukkit.damage.DamageType bukkitType = switch(type) {
+				case MELEE -> org.bukkit.damage.DamageType.MOB_ATTACK;
+				case MELEE_SWEEP -> org.bukkit.damage.DamageType.PLAYER_ATTACK;
+				case RANGED -> org.bukkit.damage.DamageType.ARROW;
+				case RANGED_SPECIAL -> org.bukkit.damage.DamageType.SONIC_BOOM;
+				case MAGIC, PLAYER_MAGIC -> org.bukkit.damage.DamageType.MAGIC;
+				case ENVIRONMENTAL -> org.bukkit.damage.DamageType.FALLING_BLOCK;
+				case IFRAME_ENVIRONMENTAL -> org.bukkit.damage.DamageType.ON_FIRE;
+				case FALL -> org.bukkit.damage.DamageType.FALL;
+				case ABSOLUTE -> org.bukkit.damage.DamageType.GENERIC_KILL;
+			};
+			causingEntity = attacker;
+			nmsSource = convertBukkitDamageSource(org.bukkit.damage.DamageSource.builder(bukkitType).build(), victim);
+		}
 
-		if(attacker instanceof Player player) {
-			ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+		if(attacker instanceof Player || causingEntity instanceof Player) {
+			ServerPlayer serverPlayer;
+			if(causingEntity instanceof Player p) {
+				serverPlayer = ((CraftPlayer) p).getHandle();
+			} else {
+				serverPlayer = ((CraftPlayer) attacker).getHandle();
+			}
 			net.minecraft.world.entity.LivingEntity nmsVictim = ((CraftLivingEntity) victim).getHandle();
+
 
 			if(wasKilled) {
 				// 2. PLAYER_KILLED_ENTITY - Main kill advancement
@@ -582,15 +599,14 @@ public class CustomDamage implements Listener {
 					CriteriaTriggers.LIGHTNING_STRIKE.trigger(serverPlayer, data.lightningBolt, victims);
 				}
 
-				// 12. CHANNELED_LIGHTNING - Trident channeling
-				if(data.isTridentAttack && data.tridentChanneling && data.lightningInvolved) {
-					List<net.minecraft.world.entity.LivingEntity> victims = List.of(nmsVictim);
-					CriteriaTriggers.CHANNELED_LIGHTNING.trigger(serverPlayer, victims);
-				}
+			}
+			// 1. PLAYER_HURT_ENTITY - Non-lethal damage
+			CriteriaTriggers.PLAYER_HURT_ENTITY.trigger(serverPlayer, nmsVictim, nmsSource, (float) originalDamage, (float) finalDamage, wasBlocked);
 
-			} else {
-				// 1. PLAYER_HURT_ENTITY - Non-lethal damage
-				CriteriaTriggers.PLAYER_HURT_ENTITY.trigger(serverPlayer, nmsVictim, nmsSource, (float) originalDamage, (float) finalDamage, wasBlocked);
+			// 12. CHANNELED_LIGHTNING - Trident channeling
+			if(data.isTridentAttack && data.tridentChanneling && data.lightningInvolved) {
+				List<net.minecraft.world.entity.LivingEntity> victims = List.of(nmsVictim);
+				CriteriaTriggers.CHANNELED_LIGHTNING.trigger(serverPlayer, victims);
 			}
 		}
 
@@ -610,6 +626,94 @@ public class CustomDamage implements Listener {
 				CriteriaTriggers.ENTITY_HURT_PLAYER.trigger(serverPlayer, nmsSource, (float) originalDamage, (float) finalDamage, wasBlocked);
 			}
 		}
+		updatePlayerStatistics(victim, attacker, causingEntity, type, finalDamage, wasKilled);
+	}
+
+	private static void updatePlayerStatistics(LivingEntity victim, Entity attacker, Entity causingEntity, DamageType type, double finalDamage, boolean wasKilled) {
+		// Player as attacker statistics
+		Player attackingPlayer = null;
+		if(causingEntity instanceof Player) {
+			attackingPlayer = (Player) causingEntity;
+		} else if(attacker instanceof Player) {
+			attackingPlayer = (Player) attacker;
+		}
+
+		if(attackingPlayer != null) {
+			ServerPlayer serverPlayer = ((CraftPlayer) attackingPlayer).getHandle();
+
+			// Damage dealt
+			serverPlayer.awardStat(Stats.DAMAGE_DEALT, Math.round((float) finalDamage * 10));
+
+			if(wasKilled) {
+				// Mob kills
+				serverPlayer.awardStat(Stats.MOB_KILLS);
+
+				// Specific entity kills
+				net.minecraft.world.entity.EntityType<?> entityType = getEntityType(victim);
+				if(entityType != null) {
+					serverPlayer.awardStat(Stats.ENTITY_KILLED.get(entityType));
+				}
+
+				// Player kills (if victim is player)
+				if(victim instanceof Player) {
+					serverPlayer.awardStat(Stats.PLAYER_KILLS);
+				}
+			}
+
+			// Weapon-specific statistics
+			updateWeaponStatistics(serverPlayer, attacker, type);
+		}
+
+		// Player as victim statistics
+		if(victim instanceof Player player) {
+			ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+
+			// Damage taken
+			serverPlayer.awardStat(Stats.DAMAGE_TAKEN, Math.round((float) finalDamage * 10));
+
+			if(wasKilled) {
+				// Deaths
+				serverPlayer.awardStat(Stats.DEATHS);
+
+				// Death by specific entity
+				if(attacker != null) {
+					net.minecraft.world.entity.EntityType<?> entityType = getEntityType(attacker);
+					if(entityType != null) {
+						serverPlayer.awardStat(Stats.ENTITY_KILLED_BY.get(entityType));
+					}
+				}
+			}
+		}
+	}
+
+	private static void updateWeaponStatistics(ServerPlayer player, Entity attacker, DamageType type) {
+		net.minecraft.world.item.ItemStack weapon = player.getMainHandItem();
+
+		switch(type) {
+			case RANGED -> {
+				if(attacker instanceof org.bukkit.entity.Arrow) {
+					// Bow/Crossbow usage
+					if(weapon.getItem() == Items.BOW) {
+						player.awardStat(Stats.ITEM_USED.get(Items.BOW));
+					} else if(weapon.getItem() == Items.CROSSBOW) {
+						player.awardStat(Stats.ITEM_USED.get(Items.CROSSBOW));
+					}
+				} else if(attacker instanceof org.bukkit.entity.Trident) {
+					player.awardStat(Stats.ITEM_USED.get(Items.TRIDENT));
+				}
+			}
+
+			case MELEE, MELEE_SWEEP -> {
+				// Melee weapon usage
+				if(!weapon.isEmpty()) {
+					player.awardStat(Stats.ITEM_USED.get(weapon.getItem()));
+				}
+			}
+		}
+	}
+
+	private static net.minecraft.world.entity.EntityType<?> getEntityType(Entity entity) {
+		return ((CraftEntity) entity).getHandle().getType();
 	}
 
 	private static boolean isSculkCatalystNearby(Location location) {
@@ -675,24 +779,17 @@ public class CustomDamage implements Listener {
 				convertToSculk(targetBlock, random);
 
 				// Play sculk spread sound
-				world.playSound(spreadLocation, Sound.BLOCK_SCULK_CATALYST_BLOOM, 0.8f,
-						random.nextFloat() * 0.4f + 0.8f);
+				world.playSound(spreadLocation, Sound.BLOCK_SCULK_CATALYST_BLOOM, 0.8f, random.nextFloat() * 0.4f + 0.8f);
 
 				// Spawn particles
-				world.spawnParticle(Particle.SCULK_SOUL, spreadLocation.add(0.5, 0.5, 0.5),
-						1, 0.25, 0.25, 0.25, 0.05);
+				world.spawnParticle(Particle.SCULK_SOUL, spreadLocation.add(0.5, 0.5, 0.5), 1, 0.25, 0.25, 0.25, 0.05);
 			}
 		}
 	}
 
 	private static boolean canConvertToSculk(Block block) {
 		Material type = block.getType();
-		return type == Material.STONE || type == Material.COBBLESTONE ||
-				type == Material.DEEPSLATE || type == Material.DIRT ||
-				type == Material.GRASS_BLOCK || type == Material.GRAVEL ||
-				type == Material.SAND || type == Material.CLAY ||
-				type.name().contains("TERRACOTTA") ||
-				type == Material.AIR; // Can place sculk in air
+		return type == Material.STONE || type == Material.COBBLESTONE || type == Material.DEEPSLATE || type == Material.DIRT || type == Material.GRASS_BLOCK || type == Material.GRAVEL || type == Material.SAND || type == Material.CLAY || type.name().contains("TERRACOTTA") || type == Material.AIR; // Can place sculk in air
 	}
 
 	private static void convertToSculk(Block block, Random random) {
@@ -715,7 +812,6 @@ public class CustomDamage implements Listener {
 	}
 
 	private static DamageSource convertBukkitDamageSource(org.bukkit.damage.DamageSource bukkitSource, LivingEntity victim) {
-
 		DamageSources sources = ((CraftLivingEntity) victim).getHandle().damageSources();
 
 		org.bukkit.damage.DamageType damageType = bukkitSource.getDamageType();
@@ -725,8 +821,127 @@ public class CustomDamage implements Listener {
 		net.minecraft.world.entity.Entity nmsDirectEntity = directEntity != null ? ((CraftEntity) directEntity).getHandle() : null;
 		net.minecraft.world.entity.Entity nmsCausingEntity = causingEntity != null ? ((CraftEntity) causingEntity).getHandle() : null;
 
-		// Complete mapping of all damage types
-		if(damageType == org.bukkit.damage.DamageType.IN_FIRE) {
+		// Handle entity-based damage types first with proper fallbacks
+		if(damageType == org.bukkit.damage.DamageType.PLAYER_ATTACK) {
+			if(nmsCausingEntity instanceof ServerPlayer player) {
+				return sources.playerAttack(player);
+			}
+			// Fallback if causing entity isn't a ServerPlayer
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.MOB_ATTACK) {
+			if(nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
+				return sources.mobAttack(living);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.ARROW) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.AbstractArrow arrow) {
+				return sources.arrow(arrow, nmsCausingEntity);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.FIREBALL) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.Fireball fireball) {
+				return sources.fireball(fireball, nmsCausingEntity);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.UNATTRIBUTED_FIREBALL) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.Fireball fireball) {
+				return sources.fireball(fireball, nmsCausingEntity);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.TRIDENT) {
+			return sources.trident(nmsDirectEntity, nmsCausingEntity);
+
+		} else if(damageType == org.bukkit.damage.DamageType.THORNS) {
+			if(nmsCausingEntity != null) {
+				return sources.thorns(nmsCausingEntity);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.EXPLOSION) {
+			return sources.explosion(null, nmsCausingEntity);
+
+		} else if(damageType == org.bukkit.damage.DamageType.PLAYER_EXPLOSION) {
+			return sources.explosion(nmsCausingEntity, nmsCausingEntity);
+
+		} else if(damageType == org.bukkit.damage.DamageType.MOB_PROJECTILE) {
+			if(nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
+				return sources.mobProjectile(nmsDirectEntity, living);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.FIREWORKS) {
+			if(nmsDirectEntity instanceof FireworkRocketEntity firework) {
+				return sources.fireworks(firework, nmsCausingEntity);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.WITHER_SKULL) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.WitherSkull witherSkull) {
+				return sources.witherSkull(witherSkull, nmsCausingEntity);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.THROWN) {
+			return sources.thrown(nmsDirectEntity, nmsCausingEntity);
+
+		} else if(damageType == org.bukkit.damage.DamageType.INDIRECT_MAGIC) {
+			return sources.indirectMagic(nmsDirectEntity, nmsCausingEntity);
+
+		} else if(damageType == org.bukkit.damage.DamageType.FALLING_BLOCK) {
+			if(nmsDirectEntity != null) {
+				return sources.fallingBlock(nmsDirectEntity);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.FALLING_ANVIL) {
+			if(nmsDirectEntity != null) {
+				return sources.anvil(nmsDirectEntity);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.FALLING_STALACTITE) {
+			if(nmsDirectEntity != null) {
+				return sources.fallingStalactite(nmsDirectEntity);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.STING) {
+			if(nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
+				return sources.sting(living);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.MOB_ATTACK_NO_AGGRO) {
+			if(nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
+				return sources.noAggroMobAttack(living);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.SONIC_BOOM) {
+			if(nmsCausingEntity != null) {
+				return sources.sonicBoom(nmsCausingEntity);
+			}
+			return sources.generic();
+
+		} else if(damageType == org.bukkit.damage.DamageType.WIND_CHARGE) {
+			if(nmsDirectEntity instanceof WindCharge windCharge) {
+				if(nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
+					return sources.windCharge(windCharge, living);
+				}
+				return sources.windCharge(windCharge, null);
+			}
+			return sources.generic();
+		}
+
+		// Simple damage types (no entity requirements)
+		else if(damageType == org.bukkit.damage.DamageType.BAD_RESPAWN_POINT) {
+			return sources.badRespawnPointExplosion(new Vec3(0, 0, 0));
+		} else if(damageType == org.bukkit.damage.DamageType.IN_FIRE) {
 			return sources.inFire();
 		} else if(damageType == org.bukkit.damage.DamageType.LIGHTNING_BOLT) {
 			return sources.lightningBolt();
@@ -772,83 +987,31 @@ public class CustomDamage implements Listener {
 			return sources.outOfBorder();
 		} else if(damageType == org.bukkit.damage.DamageType.GENERIC_KILL) {
 			return sources.genericKill();
+		} else if(damageType == org.bukkit.damage.DamageType.ENDER_PEARL) {
+			return sources.enderPearl();
 		}
 
-		// Entity-based damage types
-		else if(damageType == org.bukkit.damage.DamageType.ARROW) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.AbstractArrow arrow) {
-				return sources.arrow(arrow, nmsCausingEntity);
-			}
-			return sources.generic();
-		} else if(damageType == org.bukkit.damage.DamageType.TRIDENT) {
-			return sources.trident(nmsDirectEntity, nmsCausingEntity);
-		} else if(damageType == org.bukkit.damage.DamageType.MOB_ATTACK && nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
-			return sources.mobAttack(living);
-		} else if(damageType == org.bukkit.damage.DamageType.PLAYER_ATTACK && nmsCausingEntity instanceof ServerPlayer player) {
-			return sources.playerAttack(player);
-		} else if(damageType == org.bukkit.damage.DamageType.THORNS && nmsCausingEntity != null) {
-			return sources.thorns(nmsCausingEntity);
-		} else if(damageType == org.bukkit.damage.DamageType.EXPLOSION) {
-			return sources.explosion(null, nmsCausingEntity);
-		} else if(damageType == org.bukkit.damage.DamageType.MOB_PROJECTILE && nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
-			return sources.mobProjectile(nmsDirectEntity, living);
-		} else if(damageType == org.bukkit.damage.DamageType.FIREWORKS) {
-			if(nmsDirectEntity instanceof FireworkRocketEntity firework) {
-				return sources.fireworks(firework, nmsCausingEntity);
-			}
-			return sources.generic();
-		} else if(damageType == org.bukkit.damage.DamageType.FIREBALL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.Fireball fireball) {
-				return sources.fireball(fireball, nmsCausingEntity);
-			}
-			return sources.generic();
-		} else if(damageType == org.bukkit.damage.DamageType.UNATTRIBUTED_FIREBALL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.Fireball fireball) {
-				return sources.fireball(fireball, nmsCausingEntity);
-			}
-			return sources.generic();
-		} else if(damageType == org.bukkit.damage.DamageType.WITHER_SKULL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.WitherSkull witherSkull) {
-				return sources.witherSkull(witherSkull, nmsCausingEntity);
-			}
-			return sources.generic();
-		} else if(damageType == org.bukkit.damage.DamageType.THROWN) {
-			return sources.thrown(nmsDirectEntity, nmsCausingEntity);
-		} else if(damageType == org.bukkit.damage.DamageType.INDIRECT_MAGIC) {
-			return sources.indirectMagic(nmsDirectEntity, nmsCausingEntity);
-		} else if(damageType == org.bukkit.damage.DamageType.FALLING_BLOCK && nmsDirectEntity != null) {
-			return sources.fallingBlock(nmsDirectEntity);
-		} else if(damageType == org.bukkit.damage.DamageType.FALLING_ANVIL && nmsDirectEntity != null) {
-			return sources.anvil(nmsDirectEntity);
-		} else if(damageType == org.bukkit.damage.DamageType.FALLING_STALACTITE && nmsDirectEntity != null) {
-			return sources.fallingStalactite(nmsDirectEntity);
-		} else if(damageType == org.bukkit.damage.DamageType.STING && nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
-			return sources.sting(living);
-		} else if(damageType == org.bukkit.damage.DamageType.MOB_ATTACK_NO_AGGRO && nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
-			return sources.noAggroMobAttack(living);
-		} else if(damageType == org.bukkit.damage.DamageType.PLAYER_EXPLOSION && nmsCausingEntity instanceof ServerPlayer player) {
-			return sources.explosion(player, player);
-		} else if(damageType == org.bukkit.damage.DamageType.SONIC_BOOM && nmsCausingEntity != null) {
-			return sources.sonicBoom(nmsCausingEntity);
-		} else if(damageType == org.bukkit.damage.DamageType.BAD_RESPAWN_POINT) {
-			return sources.badRespawnPointExplosion(new Vec3(0, 0, 0));
-		}
-
-		// Fallback for any unmapped or new damage types
+		// Fallback for any unmapped damage types
 		else {
 			System.err.println("Unmapped damage type: " + damageType);
+			System.err.println("Causing entity: " + (causingEntity != null ? causingEntity.getType() : "null"));
+			System.err.println("Direct entity: " + (directEntity != null ? directEntity.getType() : "null"));
 			return sources.generic();
 		}
 	}
 
 	@EventHandler
 	public void onEntityDamageByEntity(EntityDamageByEntityEvent e) {
-		if(e.getEntity() instanceof EnderCrystal crystal && crystal.getScoreboardTags().contains("SkyblockBoss") && e.getDamager() instanceof Player p) {
-			crystal.remove();
-			p.addScoreboardTag("HasCrystal");
-			p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!");
+		if(e.getEntity() instanceof EnderCrystal crystal && crystal.getScoreboardTags().contains("SkyblockBoss")) {
 			e.setCancelled(true);
+			if(e.getDamager() instanceof Player p) {
+				crystal.remove();
+				p.addScoreboardTag("HasCrystal");
+				p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!");
+			}
+
 		} else if(e.getEntity() instanceof LivingEntity entity) {
+			e.setCancelled(true);
 			if(!entity.isDead()) {
 				DamageType type;
 				switch(e.getCause()) {
@@ -883,10 +1046,7 @@ public class CustomDamage implements Listener {
 					}
 
 					Entity damager = e.getDamager();
-					e.setCancelled(true);
 					customMobs(entity, damager, e.getDamage(), type, new DamageData(e));
-				} else {
-					e.setCancelled(true);
 				}
 			}
 		}
