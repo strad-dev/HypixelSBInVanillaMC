@@ -52,7 +52,9 @@ public class HolyIce implements AbilityItem {
 
 	@Override
 	public boolean onRightClick(Player p) {
-		p.getWorld().spawnParticle(Particle.DRIPPING_WATER, p.getLocation(), 1000);
+		p.addScoreboardTag("HolyIce");
+		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("HolyIce"), 20);
+		p.getWorld().spawnParticle(Particle.DRIPPING_WATER, p.getEyeLocation(), 1000);
 		p.playSound(p, Sound.ENTITY_PLAYER_SPLASH_HIGH_SPEED, 0.5F, 1.0F);
 		return true;
 	}
