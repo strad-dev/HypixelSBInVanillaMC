@@ -52,7 +52,7 @@ public class CustomMobs implements Listener {
 			// Hard Mode will apply if any player in a 64-block radius of the mob has the effect
 			hardMode = p.hasPotionEffect(PotionEffectType.BAD_OMEN);
 			if(!hardMode) {
-				for(Player p2 : Plugin.getInstance().getServer().getOnlinePlayers()) {
+				for(Player p2 : e.getEntity().getWorld().getPlayers()) {
 					if(p2.getLocation().distanceSquared(e.getLocation()) <= 4096 && p2.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
 						hardMode = true;
 						break;
