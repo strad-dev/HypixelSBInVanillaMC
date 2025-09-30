@@ -61,6 +61,9 @@ public class CustomMobs implements Listener {
 			}
 		}
 		if(e.getEntity() instanceof LivingEntity entity) {
+			if(!(entity instanceof Player)) {
+				entity.setCanPickupItems(false);
+			}
 			String name = "";
 
 			// MAXOR, STORM, GOLDOR, NECRON
