@@ -136,7 +136,7 @@ public class CustomMining implements Listener {
 				}
 				case ANCIENT_DEBRIS -> {
 					e.setCancelled(true);
-					item = new ItemStack(Material.ANCIENT_DEBRIS);
+					item = new ItemStack(Material.NETHERITE_SCRAP);
 					if(fortune == 4) {
 						item.setAmount(2);
 					}

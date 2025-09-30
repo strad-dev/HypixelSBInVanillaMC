@@ -389,7 +389,7 @@ public class CustomDamage implements Listener {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 				} else {
-					if(damagee instanceof Villager villager) {
+					if(damagee instanceof Villager villager && damager instanceof Zombie) {
 						villager.zombify();
 						PluginUtils.changeName(villager);
 					} else {
@@ -1020,7 +1020,7 @@ public class CustomDamage implements Listener {
 			if(!entity.isDead()) {
 				DamageType type;
 				switch(e.getCause()) {
-					case BLOCK_EXPLOSION, ENTITY_ATTACK, ENTITY_EXPLOSION, THORNS -> type = DamageType.MELEE;
+					case ENTITY_ATTACK, ENTITY_EXPLOSION, THORNS -> type = DamageType.MELEE;
 					case PROJECTILE, SONIC_BOOM -> type = DamageType.RANGED;
 					case DRAGON_BREATH, MAGIC -> type = DamageType.MAGIC;
 					case FALLING_BLOCK -> type = DamageType.ENVIRONMENTAL;
@@ -1065,7 +1065,7 @@ public class CustomDamage implements Listener {
 			e.setCancelled(true);
 			DamageType type;
 			switch(e.getCause()) {
-				case THORNS -> type = DamageType.MELEE;
+				case BLOCK_EXPLOSION, THORNS -> type = DamageType.MELEE;
 				case POISON, WITHER -> type = DamageType.MAGIC;
 				case CONTACT, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION,
 					 SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
