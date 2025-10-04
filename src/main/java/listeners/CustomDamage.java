@@ -272,12 +272,19 @@ public class CustomDamage implements Listener {
 				finalDamage *= 0.5;
 			}
 
+			double breach = 0;
+			if(damagee.getItemInUse().containsEnchantment(Enchantment.BREACH)) {
+				breach = damagee.getItemInUse().getEnchantmentLevel(Enchantment.BREACH);
+			}
+
 			if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
+				armor *= 1 - breach * 0.125;
 				finalDamage *= Math.max(0.25, 1 - armor * 0.0375);
 			}
 
 			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR_TOUGHNESS)).getValue() - 8, 0); // only toughness values of 9 or more will give damage reduction
+			toughness *= 1 - breach * 0.125;
 			finalDamage *= Math.max(0.2, 1 - toughness * 0.1);
 
 			double resistance = 0;
@@ -362,6 +369,10 @@ public class CustomDamage implements Listener {
 
 			if(damager instanceof Player && damager.getFallDistance() > 0 && type == DamageType.MELEE) {
 				damagee.getWorld().spawnParticle(Particle.CRIT, damagee.getLocation().add(0, (damagee.getHeight() / 2), 0), 128);
+			}
+
+			if(damager instanceof Player p && (p.getItemInUse().containsEnchantment(Enchantment.SHARPNESS) || p.getItemInUse().containsEnchantment(Enchantment.SMITE) || p.getItemInUse().containsEnchantment(Enchantment.BANE_OF_ARTHROPODS) || p.getItemInUse().containsEnchantment(Enchantment.FIRE_ASPECT) || p.getItemInUse().containsEnchantment(Enchantment.KNOCKBACK) || p.getItemInUse().containsEnchantment(Enchantment.POWER) || p.getItemInUse().containsEnchantment(Enchantment.PUNCH) || p.getItemInUse().containsEnchantment(Enchantment.FLAME) || p.getItemInUse().containsEnchantment(Enchantment.PIERCING) || p.getItemInUse().containsEnchantment(Enchantment.IMPALING) || p.getItemInUse().containsEnchantment(Enchantment.DENSITY) || p.getItemInUse().containsEnchantment(Enchantment.BREACH) || p.getItemInUse().containsEnchantment(Enchantment.WIND_BURST))) {
+				damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, damagee.getLocation().add(0, (damagee.getHeight() / 2), 0), Math.min((int) (data.originalDamage * 16), 128));
 			}
 
 			if(doesDie) {
