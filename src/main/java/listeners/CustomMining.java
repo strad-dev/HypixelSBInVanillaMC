@@ -41,9 +41,6 @@ public class CustomMining implements Listener {
 					} else {
 						item = new ItemStack(Material.COBBLED_DEEPSLATE);
 					}
-					if(fortune == 4) {
-						item.setAmount(2);
-					}
 					if(dropDouble) {
 						item.setAmount(item.getAmount() + 1);
 					}
@@ -137,9 +134,6 @@ public class CustomMining implements Listener {
 				case ANCIENT_DEBRIS -> {
 					e.setCancelled(true);
 					item = new ItemStack(Material.NETHERITE_SCRAP);
-					if(fortune == 4) {
-						item.setAmount(2);
-					}
 					if(dropDouble) {
 						item.setAmount(item.getAmount() + 1);
 					}
