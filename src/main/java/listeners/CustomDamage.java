@@ -368,11 +368,15 @@ public class CustomDamage implements Listener {
 			}
 
 			if(damager instanceof Player && damager.getFallDistance() > 0 && type == DamageType.MELEE) {
-				damagee.getWorld().spawnParticle(Particle.CRIT, damagee.getLocation().add(0, (damagee.getHeight() / 2), 0), 128);
+				damagee.getWorld().spawnParticle(Particle.CRIT, damagee.getLocation().add(0, (damagee.getHeight() / 2), 0), 80);
 			}
 
 			if(damager instanceof Player p && (p.getItemInUse().containsEnchantment(Enchantment.SHARPNESS) || p.getItemInUse().containsEnchantment(Enchantment.SMITE) || p.getItemInUse().containsEnchantment(Enchantment.BANE_OF_ARTHROPODS) || p.getItemInUse().containsEnchantment(Enchantment.FIRE_ASPECT) || p.getItemInUse().containsEnchantment(Enchantment.KNOCKBACK) || p.getItemInUse().containsEnchantment(Enchantment.POWER) || p.getItemInUse().containsEnchantment(Enchantment.PUNCH) || p.getItemInUse().containsEnchantment(Enchantment.FLAME) || p.getItemInUse().containsEnchantment(Enchantment.PIERCING) || p.getItemInUse().containsEnchantment(Enchantment.IMPALING) || p.getItemInUse().containsEnchantment(Enchantment.DENSITY) || p.getItemInUse().containsEnchantment(Enchantment.BREACH) || p.getItemInUse().containsEnchantment(Enchantment.WIND_BURST))) {
-				damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, damagee.getLocation().add(0, (damagee.getHeight() / 2), 0), Math.min((int) (data.originalDamage * 16), 128));
+				damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, damagee.getLocation().add(0, (damagee.getHeight() / 2), 0), Math.min((int) (data.originalDamage * 8), 80));
+			}
+
+			if(damager instanceof Player p && p.getItemInUse().containsEnchantment(Enchantment.WIND_BURST) && p.getFallDistance() >= 1.5) {
+				// TODO implement wind burst mechanics
 			}
 
 			if(doesDie) {
