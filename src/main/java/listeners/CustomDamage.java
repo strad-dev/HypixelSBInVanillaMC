@@ -273,8 +273,8 @@ public class CustomDamage implements Listener {
 			}
 
 			double breach = 0;
-			if(damagee.getItemInUse().containsEnchantment(Enchantment.BREACH)) {
-				breach = damagee.getItemInUse().getEnchantmentLevel(Enchantment.BREACH);
+			if(damager instanceof LivingEntity entity && entity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.BREACH)) {
+				breach = entity.getItemInUse().getEnchantmentLevel(Enchantment.BREACH);
 			}
 
 			if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
@@ -367,16 +367,31 @@ public class CustomDamage implements Listener {
 				damagee.setFireTicks(100);
 			}
 
-			if(damager instanceof Player && damager.getFallDistance() > 0 && type == DamageType.MELEE) {
-				damagee.getWorld().spawnParticle(Particle.CRIT, damagee.getLocation().add(0, (damagee.getHeight() / 2), 0), 80);
-			}
+			if(damager instanceof Player p) {
+				Location particleLoc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
+				ItemStack weapon = p.getEquipment().getItemInMainHand();
+				boolean isCrit = p.getFallDistance() > 0 && type == DamageType.MELEE;
 
-			if(damager instanceof Player p && (p.getItemInUse().containsEnchantment(Enchantment.SHARPNESS) || p.getItemInUse().containsEnchantment(Enchantment.SMITE) || p.getItemInUse().containsEnchantment(Enchantment.BANE_OF_ARTHROPODS) || p.getItemInUse().containsEnchantment(Enchantment.FIRE_ASPECT) || p.getItemInUse().containsEnchantment(Enchantment.KNOCKBACK) || p.getItemInUse().containsEnchantment(Enchantment.POWER) || p.getItemInUse().containsEnchantment(Enchantment.PUNCH) || p.getItemInUse().containsEnchantment(Enchantment.FLAME) || p.getItemInUse().containsEnchantment(Enchantment.PIERCING) || p.getItemInUse().containsEnchantment(Enchantment.IMPALING) || p.getItemInUse().containsEnchantment(Enchantment.DENSITY) || p.getItemInUse().containsEnchantment(Enchantment.BREACH) || p.getItemInUse().containsEnchantment(Enchantment.WIND_BURST))) {
-				damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, damagee.getLocation().add(0, (damagee.getHeight() / 2), 0), Math.min((int) (data.originalDamage * 8), 80));
-			}
+				// Critical hit particles
+				if(isCrit) {
+					damagee.getWorld().spawnParticle(Particle.CRIT, particleLoc, 80);
+				}
 
-			if(damager instanceof Player p && p.getItemInUse().containsEnchantment(Enchantment.WIND_BURST) && p.getFallDistance() >= 1.5) {
-				// TODO implement wind burst mechanics
+				// Enchanted hit particles
+				if(!weapon.getEnchantments().isEmpty()) {
+					damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, particleLoc,
+							Math.min((int) (data.originalDamage * 8), 80));
+				}
+
+				// Damage Indicator particles
+				if(data.originalDamage > 2) {
+					damagee.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, particleLoc, (int) (data.originalDamage / 2));
+				}
+
+				// Wind Burst mechanics
+				if(weapon.containsEnchantment(Enchantment.WIND_BURST) && p.getFallDistance() >= 1.5) {
+					// TODO implement wind burst mechanics
+				}
 			}
 
 			if(doesDie) {

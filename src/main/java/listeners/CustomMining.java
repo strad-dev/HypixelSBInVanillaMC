@@ -33,6 +33,7 @@ public class CustomMining implements Listener {
 			int fortune = itemInHand.getItemMeta().getEnchantLevel(Enchantment.FORTUNE);
 			double fortuneMulti = 1 + 0.25 * fortune;
 			ItemStack item;
+			Location dropLocation = e.getBlock().getLocation().add(0.5, 0.5, 0.5);
 			switch(b.getType()) {
 				case STONE, DEEPSLATE -> {
 					e.setCancelled(true);
@@ -44,32 +45,32 @@ public class CustomMining implements Listener {
 					if(dropDouble) {
 						item.setAmount(item.getAmount() + 1);
 					}
-					world.dropItemNaturally(l, item);
+					world.dropItemNaturally(dropLocation, item);
 					if(random.nextDouble() < 0.001 * fortuneMulti) {
 						world.dropItemNaturally(l, ConcentratedStone.getItem());
 						sendRareDropMessage(p, "Concentrated Stone");
 					}
-					e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
+					e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
 				}
 				case COAL_ORE, DEEPSLATE_COAL_ORE -> {
 					if(dropDouble) {
 						item = new ItemStack(Material.COAL);
 						item.setAmount(random.nextInt(fortune + 1) + 1);
-						world.dropItemNaturally(l, item);
+						world.dropItemNaturally(dropLocation, item);
 					}
 				}
 				case COPPER_ORE, DEEPSLATE_COPPER_ORE -> {
 					if(dropDouble) {
 						item = new ItemStack(Material.RAW_COPPER);
 						item.setAmount(random.nextInt((fortune + 1) * 4) + 2);
-						world.dropItemNaturally(l, item);
+						world.dropItemNaturally(dropLocation, item);
 					}
 				}
 				case LAPIS_ORE, DEEPSLATE_LAPIS_ORE -> {
 					if(dropDouble) {
 						item = new ItemStack(Material.LAPIS_LAZULI);
 						item.setAmount(random.nextInt((fortune + 1) * 6) + 4);
-						world.dropItemNaturally(l, item);
+						world.dropItemNaturally(dropLocation, item);
 					}
 					if(random.nextDouble() < 0.0025 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedLapis.getItem());
@@ -80,7 +81,7 @@ public class CustomMining implements Listener {
 					if(dropDouble) {
 						item = new ItemStack(Material.RAW_IRON);
 						item.setAmount(random.nextInt(fortune + 1) + 1);
-						world.dropItemNaturally(l, item);
+						world.dropItemNaturally(dropLocation, item);
 					}
 					if(random.nextDouble() < 0.0025 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedIron.getItem());
@@ -91,7 +92,7 @@ public class CustomMining implements Listener {
 					if(dropDouble) {
 						item = new ItemStack(Material.RAW_GOLD);
 						item.setAmount(random.nextInt(fortune + 1) + 1);
-						world.dropItemNaturally(l, item);
+						world.dropItemNaturally(dropLocation, item);
 					}
 					if(random.nextDouble() < 0.0025 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedGold.getItem());
@@ -102,7 +103,7 @@ public class CustomMining implements Listener {
 					if(dropDouble) {
 						item = new ItemStack(Material.REDSTONE);
 						item.setAmount(random.nextInt(fortune + 2) + 4);
-						world.dropItemNaturally(l, item);
+						world.dropItemNaturally(dropLocation, item);
 					}
 					if(random.nextDouble() < 0.0025 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedIron.getItem());
@@ -113,7 +114,7 @@ public class CustomMining implements Listener {
 					if(dropDouble) {
 						item = new ItemStack(Material.DIAMOND);
 						item.setAmount(random.nextInt(fortune + 1) + 1);
-						world.dropItemNaturally(l, item);
+						world.dropItemNaturally(dropLocation, item);
 					}
 					if(random.nextDouble() < 0.005 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedDiamond.getItem());
@@ -124,7 +125,7 @@ public class CustomMining implements Listener {
 					if(dropDouble) {
 						item = new ItemStack(Material.EMERALD);
 						item.setAmount(random.nextInt(fortune + 1) + 1);
-						world.dropItemNaturally(l, item);
+						world.dropItemNaturally(dropLocation, item);
 					}
 					if(random.nextDouble() < 0.005 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedEmerald.getItem());
@@ -137,17 +138,17 @@ public class CustomMining implements Listener {
 					if(dropDouble) {
 						item.setAmount(item.getAmount() + 1);
 					}
-					world.dropItemNaturally(l, item);
+					world.dropItemNaturally(dropLocation, item);
 					if(random.nextDouble() < 0.005 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedNetherite.getItem());
 						sendRareDropMessage(p, "Refined Netherite");
 					}
-					e.getBlock().getWorld().getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
+					e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
 				}
 				case OBSIDIAN -> {
 					if(dropDouble) {
 						item = new ItemStack(Material.OBSIDIAN);
-						world.dropItemNaturally(l, item);
+						world.dropItemNaturally(dropLocation, item);
 					}
 				}
 			}
