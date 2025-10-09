@@ -336,7 +336,6 @@ public class CustomDamage implements Listener {
 		dealDamage(damagee, damager, finalDamage, type, data);
 	}
 
-	@SuppressWarnings("DuplicateExpressions")
 	private static void dealDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
 		if(finalDamage > 0) {
 
@@ -379,8 +378,7 @@ public class CustomDamage implements Listener {
 
 				// Enchanted hit particles
 				if(!weapon.getEnchantments().isEmpty()) {
-					damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, particleLoc,
-							Math.min((int) (data.originalDamage * 8), 80));
+					damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, particleLoc, Math.min((int) (data.originalDamage * 8), 80));
 				}
 
 				// Damage Indicator particles
@@ -510,6 +508,7 @@ public class CustomDamage implements Listener {
 				if((type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) && damager != null) {
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
 					double enchantments = 1;
+
 					if(damager instanceof LivingEntity livingEntity) {
 						if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK) && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
 							enchantments += 0.66667 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
@@ -517,11 +516,14 @@ public class CustomDamage implements Listener {
 							enchantments += 0.66667 * data.punchArrow;
 						}
 					}
+
 					double factor = 0.33333 * antiKB * enchantments;
-					Vector oldVelocity = damagee.getVelocity();
-					double x = oldVelocity.getX();
-					double y = oldVelocity.getY();
-					double z = oldVelocity.getZ();
+
+					// Apply type-specific modifiers
+					if(damager.getFallDistance() > 0) {
+						factor *= 1.5;
+					}
+
 					if(type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) {
 						factor *= 0.25;
 						if(data.isTermArrow) {
@@ -533,48 +535,21 @@ public class CustomDamage implements Listener {
 						factor *= 0.5;
 					}
 
-					if(damagee instanceof Player && !(damager instanceof Player)) {
-						double rawYaw = damagee.getLocation().getYaw();
-						double yaw = Math.toRadians(rawYaw);
-						if(rawYaw <= -90) {
-							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y = 0.2 * antiKB;
-							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
-						} else if(rawYaw >= 90) {
-							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y = 0.2 * antiKB;
-							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
-						} else if(rawYaw < 0) {
-							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y = 0.2 * antiKB;
-							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
-						} else if(rawYaw >= 0) {
-							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y = 0.2 * antiKB;
-							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
-						}
-					} else {
-						double rawYaw = damager.getLocation().getYaw();
-						double yaw = Math.toRadians(rawYaw);
-						if(rawYaw <= -90) {
-							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y = 0.2 * antiKB;
-							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
-						} else if(rawYaw >= 90) {
-							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y = 0.2 * antiKB;
-							z += factor * damager.getVelocity().getZ() + -1 * factor * Math.abs(Math.cos(yaw));
-						} else if(rawYaw < 0) {
-							x += factor * damager.getVelocity().getX() + factor * Math.abs(Math.sin(yaw));
-							y = 0.2 * antiKB;
-							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
-						} else if(rawYaw >= 0) {
-							x += factor * damager.getVelocity().getX() + -1 * factor * Math.abs(Math.sin(yaw));
-							y = 0.2 * antiKB;
-							z += factor * damager.getVelocity().getZ() + factor * Math.abs(Math.cos(yaw));
-						}
+					// Calculate knockback direction from damager to damagee
+					Vector knockbackDir = damagee.getLocation().toVector().subtract(damager.getLocation().toVector());
+
+					// Normalize horizontal direction only (preserve Y=0 for horizontal KB)
+					double horizontalDist = Math.sqrt(knockbackDir.getX() * knockbackDir.getX() + knockbackDir.getZ() * knockbackDir.getZ());
+					if(horizontalDist > 0) {
+						knockbackDir.setX(knockbackDir.getX() / horizontalDist);
+						knockbackDir.setZ(knockbackDir.getZ() / horizontalDist);
 					}
-					damagee.setVelocity(new Vector(x, y, z));
+
+					// Apply knockback
+					Vector oldVelocity = damagee.getVelocity();
+					Vector newVelocity = new Vector(oldVelocity.getX() + knockbackDir.getX() * factor + factor * damager.getVelocity().getX(), 0.2 * antiKB, oldVelocity.getZ() + knockbackDir.getZ() * factor + factor * damager.getVelocity().getZ());
+
+					damagee.setVelocity(newVelocity);
 				}
 
 
