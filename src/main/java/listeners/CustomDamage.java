@@ -14,6 +14,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.item.Items;
@@ -457,31 +458,42 @@ public class CustomDamage implements Listener {
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
 				}
 				if(damagee instanceof EnderDragon dragon) {
-					if(!(dragon instanceof CraftEnderDragon)) return;
+					if(type == DamageType.FALL) {
+						if(!(dragon instanceof CraftEnderDragon)) return;
 
-					net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon = ((CraftEnderDragon) dragon).getHandle();
+						net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon = ((CraftEnderDragon) dragon).getHandle();
 
-					// Stop all movement immediately
-					nmsDragon.setDeltaMovement(Vec3.ZERO); // Stop velocity
+						// Force death state
+						nmsDragon.setHealth(0.0f);
 
-					// Force death state
-					nmsDragon.setHealth(0.0f);
+						// set status to dying
+						nmsDragon.getPhaseManager().setPhase(EnderDragonPhase.DYING);
 
-					// Set death time to 1 to start animation immediately
-					try {
-						Field deathTimeField = nmsDragon.getClass().getDeclaredField("dragonDeathTime");
-						deathTimeField.setAccessible(true);
-						deathTimeField.setInt(nmsDragon, 1);
-					} catch(Exception e) {
-						// Fallback to damage
-						Bukkit.getLogger().warning("Failed to force Dragon death animation.");
-						ServerLevel worldServer = ((CraftWorld) dragon.getWorld()).getHandle();
-						DamageSource damageSource = nmsDragon.damageSources().generic();
-						EnderDragonPart dragonPart = nmsDragon.head;
-						nmsDragon.hurt(worldServer, dragonPart, damageSource, Float.MAX_VALUE);
-					}
-					if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-						PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
+						// Stop all movement immediately
+						nmsDragon.setDeltaMovement(Vec3.ZERO);
+
+						// Set death time to 1 to start animation immediately
+						try {
+							dragon.damage(1000);
+							Field deathTimeField = nmsDragon.getClass().getDeclaredField("dragonDeathTime");
+							deathTimeField.setAccessible(true);
+							deathTimeField.setInt(nmsDragon, 1);
+						} catch(Exception e) {
+							// Fallback to damage
+							Bukkit.getLogger().warning("Failed to force Dragon death animation.");
+							ServerLevel worldServer = ((CraftWorld) dragon.getWorld()).getHandle();
+							DamageSource damageSource = nmsDragon.damageSources().generic();
+							EnderDragonPart dragonPart = nmsDragon.head;
+							nmsDragon.hurt(worldServer, dragonPart, damageSource, Float.MAX_VALUE);
+						}
+						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
+							PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
+						}
+					} else {
+						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+							dragon.setHealth(0.1f);
+							customMobs(dragon, null, data.originalDamage, DamageType.FALL);
+						}, 1);
 					}
 				}
 			} else {
