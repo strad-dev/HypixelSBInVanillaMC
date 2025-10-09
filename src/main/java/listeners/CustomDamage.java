@@ -521,7 +521,7 @@ public class CustomDamage implements Listener {
 
 					// Apply type-specific modifiers
 					if(damager.getFallDistance() > 0) {
-						factor *= 1.5;
+						factor *= 1.2;
 					}
 
 					if(type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) {
