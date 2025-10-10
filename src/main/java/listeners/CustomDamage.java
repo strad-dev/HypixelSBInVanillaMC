@@ -423,31 +423,6 @@ public class CustomDamage implements Listener {
 						villager.zombify();
 						PluginUtils.changeName(villager);
 					} else {
-						// set killer to damager
-						if(damager instanceof Player player) {
-							if(damagee instanceof CraftLivingEntity craftEntity) {
-								net.minecraft.world.entity.LivingEntity nmsEntity = craftEntity.getHandle();
-								net.minecraft.world.entity.player.Player nmsPlayer = ((CraftPlayer) player).getHandle();
-
-								// Set the killer
-								nmsEntity.setLastHurtByPlayer(nmsPlayer, 100);
-
-								// Also set combat tracker for death message
-								nmsEntity.getCombatTracker().recordDamage(nmsEntity.damageSources().playerAttack(nmsPlayer), (float) damagee.getHealth());
-							}
-						} else if(damager instanceof LivingEntity livingDamager) {
-							if(damagee instanceof CraftLivingEntity craftEntity) {
-								net.minecraft.world.entity.LivingEntity nmsEntity = craftEntity.getHandle();
-								net.minecraft.world.entity.LivingEntity nmsDamager = ((CraftLivingEntity) livingDamager).getHandle();
-
-								// Set last damager (for mob kills)
-								nmsEntity.setLastHurtByMob(nmsDamager);
-
-								// Record in combat tracker
-								nmsEntity.getCombatTracker().recordDamage(nmsEntity.damageSources().mobAttack(nmsDamager), (float) damagee.getHealth());
-							}
-						}
-
 						CustomDrops.loot(damagee, damager);
 
 						// handle ender dragons specially
