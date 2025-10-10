@@ -486,6 +486,10 @@ public class CustomDamage implements Listener {
 								PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 							}
 							dragon.setSilent(true);
+							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+								ExperienceOrb orb = (ExperienceOrb) dragon.getWorld().spawnEntity(dragon.getLocation(), EntityType.EXPERIENCE_ORB);
+								orb.setExperience(64000);
+							}, 200);
 						} else {
 							damagee.setHealth(0.0);
 						}
@@ -542,10 +546,17 @@ public class CustomDamage implements Listener {
 					((Mob) damagee).setTarget((LivingEntity) damager);
 				}
 
-				// apply knockback
+				// special ender dragon knockback to make zero- and one-cycling possible
 				if(damagee instanceof EnderDragon dragon && data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
-					dragon.setVelocity(new Vector(0, 0.25, 0));
+					Vector v = dragon.getVelocity();
+					if(dragon.getPhase() == EnderDragon.Phase.LAND_ON_PORTAL) {
+						dragon.setVelocity(new Vector(v.getX(), 0.25, v.getZ()));
+					} else {
+						dragon.setVelocity(new Vector(v.getX(), 0.333333, v.getZ()));
+					}
 				}
+
+				// apply knockback
 				if(isPhysicalHit && damager != null) {
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
 					double enchantments = 1;
