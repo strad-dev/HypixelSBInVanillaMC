@@ -22,11 +22,9 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
-import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -890,8 +888,21 @@ public class CustomDrops implements Listener {
 		List<ItemStack> drops = e.getDrops();
 		drops.clear();
 		e.setDroppedExp(calculateMobXP(died));
+
+		Player p;
+		if(e.getEntity().getKiller() != null) {
+			p = e.getEntity().getKiller();
+		} else {
+			p = PluginUtils.getNearestPlayer(died);
+			if(p != null && p.getLocation().distance(died.getLocation()) > 16) {
+				p = null;
+			}
+		}
+
 		if(died.getScoreboardTags().contains("SkyblockBoss")) {
 			e.setDroppedExp(e.getDroppedExp() * 10);
+		} else if(p == null) {
+			e.setDroppedExp(0);
 		}
 	}
 
