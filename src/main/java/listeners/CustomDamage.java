@@ -486,6 +486,9 @@ public class CustomDamage implements Listener {
 								PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 							}
 							dragon.setSilent(true);
+							if(damager == null) {
+								damager = PluginUtils.getNearestPlayer(dragon);
+							}
 							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 								ExperienceOrb orb = (ExperienceOrb) dragon.getWorld().spawnEntity(dragon.getLocation(), EntityType.EXPERIENCE_ORB);
 								orb.setExperience(64000);
@@ -554,10 +557,9 @@ public class CustomDamage implements Listener {
 					} else {
 						dragon.setVelocity(new Vector(v.getX(), 0.333333, v.getZ()));
 					}
-				}
-
+					damager = PluginUtils.getNearestPlayer(dragon);
+				} else if(isPhysicalHit && damager != null) {
 				// apply knockback
-				if(isPhysicalHit && damager != null) {
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
 					double enchantments = 1;
 
@@ -603,7 +605,6 @@ public class CustomDamage implements Listener {
 
 					damagee.setVelocity(newVelocity);
 				}
-
 
 				// change nametag health
 				PluginUtils.changeName(damagee);
