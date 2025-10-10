@@ -7,13 +7,13 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
 import net.minecraft.world.entity.LightningBolt;
-import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.boss.enderdragon.phases.DragonDeathPhase;
+import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
@@ -22,7 +22,6 @@ import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_21_R4.entity.*;
 import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -31,6 +30,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
@@ -367,6 +367,7 @@ public class CustomDamage implements Listener {
 				damagee.setFireTicks(100);
 			}
 
+			boolean isPhysicalHit = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL;
 			if(damager instanceof Player p) {
 				Location particleLoc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
 				ItemStack weapon = p.getEquipment().getItemInMainHand();
@@ -378,13 +379,13 @@ public class CustomDamage implements Listener {
 				}
 
 				// Enchanted hit particles
-				if(!weapon.getEnchantments().isEmpty()) {
+				if(!weapon.getEnchantments().isEmpty() && isPhysicalHit) {
 					damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, particleLoc, Math.min((int) (data.originalDamage * 8), 80));
 				}
 
 				// Damage Indicator particles
-				if(data.originalDamage > 2) {
-					damagee.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, particleLoc, (int) (data.originalDamage / 2));
+				if(data.originalDamage > 2 && isPhysicalHit) {
+					damagee.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, particleLoc, Math.min((int) (data.originalDamage / 2), 32));
 				}
 
 				// Wind Burst mechanics
@@ -422,8 +423,72 @@ public class CustomDamage implements Listener {
 						villager.zombify();
 						PluginUtils.changeName(villager);
 					} else {
+						// set killer to damager
+						if(damager instanceof Player player) {
+							if(damagee instanceof CraftLivingEntity craftEntity) {
+								net.minecraft.world.entity.LivingEntity nmsEntity = craftEntity.getHandle();
+								net.minecraft.world.entity.player.Player nmsPlayer = ((CraftPlayer) player).getHandle();
+
+								// Set the killer
+								nmsEntity.setLastHurtByPlayer(nmsPlayer, 100);
+
+								// Also set combat tracker for death message
+								nmsEntity.getCombatTracker().recordDamage(nmsEntity.damageSources().playerAttack(nmsPlayer), (float) damagee.getHealth());
+							}
+						} else if(damager instanceof LivingEntity livingDamager) {
+							if(damagee instanceof CraftLivingEntity craftEntity) {
+								net.minecraft.world.entity.LivingEntity nmsEntity = craftEntity.getHandle();
+								net.minecraft.world.entity.LivingEntity nmsDamager = ((CraftLivingEntity) livingDamager).getHandle();
+
+								// Set last damager (for mob kills)
+								nmsEntity.setLastHurtByMob(nmsDamager);
+
+								// Record in combat tracker
+								nmsEntity.getCombatTracker().recordDamage(nmsEntity.damageSources().mobAttack(nmsDamager), (float) damagee.getHealth());
+							}
+						}
+
 						CustomDrops.loot(damagee, damager);
-						damagee.setHealth(0.0);
+
+						// handle ender dragons specially
+						if(damagee instanceof EnderDragon dragon) {
+							if(!(dragon instanceof CraftEnderDragon)) return;
+							net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon = ((CraftEnderDragon) dragon).getHandle();
+							nmsDragon.getPhaseManager().setPhase(EnderDragonPhase.DYING);
+							DragonPhaseInstance phase = nmsDragon.getPhaseManager().getCurrentPhase();
+
+							// force dragon's target location to its location
+							if(phase instanceof DragonDeathPhase deathPhase) {
+								try {
+									Field targetField = DragonDeathPhase.class.getDeclaredField("targetLocation");
+									targetField.setAccessible(true);
+									Location l = dragon.getLocation();
+									targetField.set(deathPhase, new Vec3(l.getX(), l.getY(), l.getZ()));
+
+								} catch(Exception e) {
+									e.printStackTrace();
+								}
+							}
+
+							nmsDragon.setDeltaMovement(Vec3.ZERO);
+							nmsDragon.setHealth(1.0F);
+
+							// Set death time to 1 to start animation immediately
+							try {
+								Field deathTimeField = nmsDragon.getClass().getDeclaredField("dragonDeathTime");
+								deathTimeField.setAccessible(true);
+								deathTimeField.setInt(nmsDragon, 1);
+							} catch(Exception e) {
+								// Fallback
+								Bukkit.getLogger().warning("Failed to force Dragon death animation.");
+							}
+							if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
+								PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
+							}
+							dragon.setSilent(true);
+						} else {
+							damagee.setHealth(0.0);
+						}
 					}
 					if(damagee instanceof Player p) {
 						if(data.e != null) {
@@ -457,45 +522,6 @@ public class CustomDamage implements Listener {
 					}
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
 				}
-				if(damagee instanceof EnderDragon dragon) {
-					if(type == DamageType.FALL) {
-						if(!(dragon instanceof CraftEnderDragon)) return;
-
-						net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon = ((CraftEnderDragon) dragon).getHandle();
-
-						// Force death state
-						nmsDragon.setHealth(0.0f);
-
-						// set status to dying
-						nmsDragon.getPhaseManager().setPhase(EnderDragonPhase.DYING);
-
-						// Stop all movement immediately
-						nmsDragon.setDeltaMovement(Vec3.ZERO);
-
-						// Set death time to 1 to start animation immediately
-						try {
-							dragon.damage(1000);
-							Field deathTimeField = nmsDragon.getClass().getDeclaredField("dragonDeathTime");
-							deathTimeField.setAccessible(true);
-							deathTimeField.setInt(nmsDragon, 1);
-						} catch(Exception e) {
-							// Fallback to damage
-							Bukkit.getLogger().warning("Failed to force Dragon death animation.");
-							ServerLevel worldServer = ((CraftWorld) dragon.getWorld()).getHandle();
-							DamageSource damageSource = nmsDragon.damageSources().generic();
-							EnderDragonPart dragonPart = nmsDragon.head;
-							nmsDragon.hurt(worldServer, dragonPart, damageSource, Float.MAX_VALUE);
-						}
-						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-							PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
-						}
-					} else {
-						Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-							dragon.setHealth(0.1f);
-							customMobs(dragon, null, data.originalDamage, DamageType.FALL);
-						}, 1);
-					}
-				}
 			} else {
 				// absorption
 				if(finalDamage > absorption) {
@@ -517,7 +543,10 @@ public class CustomDamage implements Listener {
 				}
 
 				// apply knockback
-				if((type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) && damager != null) {
+				if(damagee instanceof EnderDragon dragon && data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
+					dragon.setVelocity(new Vector(0, 0.25, 0));
+				}
+				if(isPhysicalHit && damager != null) {
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
 					double enchantments = 1;
 
@@ -1100,7 +1129,7 @@ public class CustomDamage implements Listener {
 			}
 			long lastDamageTime = noDamageTimes.get(entity);
 
-			if(currentTime - lastDamageTime > 490 || e.getCause().equals(EntityDamageEvent.DamageCause.KILL)) {
+			if(currentTime - lastDamageTime > 490 || e.getCause().equals(DamageCause.KILL)) {
 				customMobs(entity, null, e.getDamage(), type, new DamageData(e));
 				noDamageTimes.put(entity, currentTime);
 			}
