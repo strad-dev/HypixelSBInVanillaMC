@@ -51,7 +51,7 @@ public class GivePlayersRecipes implements Listener {
 				ChatColor.DARK_GRAY + "---" + ChatColor.BLUE + "---" + ChatColor.GREEN + "---" + ChatColor.AQUA + "---" + ChatColor.RED + "---" + ChatColor.LIGHT_PURPLE + "---" + ChatColor.YELLOW + "---" + ChatColor.WHITE + "---\n" +
 				ChatColor.RESET + ChatColor.AQUA + ChatColor.BOLD + "GITHUB: " + ChatColor.RESET + "https://github.com/strad-dev/HypixelSBInVanillaMC \n\n" +
 				ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + "DISCORD: " + ChatColor.RESET + "https://discord.gg/gNfPwa8 \n\n" +
-				ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + "YOUTUBE PLAYLIST: " + ChatColor.RESET + "https://www.youtube.com/playlist?list=PLbM7AgwT4xmHo3ySkIA4jIEgvn8TzLQb0 \n\n" +
+				ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + "YOUTUBE: " + ChatColor.RESET + "https://www.youtube.com/@Stradivarius_Violin \n\n" +
 				ChatColor.RESET + ChatColor.YELLOW + "Found a bug?  Have a suggestion?  Make a ticket in the Github or contact stradivariusviolin on Discord.");
 		p.removeScoreboardTag("AbilityCooldown");
 		p.removeScoreboardTag("TerminatorCooldown");
