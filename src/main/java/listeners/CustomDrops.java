@@ -899,7 +899,6 @@ public class CustomDrops implements Listener {
 			}
 		}
 
-		System.out.println(died.getScoreboardTags());
 		if(died.getScoreboardTags().contains("SkyblockBoss")) {
 			e.setDroppedExp(e.getDroppedExp() * 10);
 		} else if(p == null) {
