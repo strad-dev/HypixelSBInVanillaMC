@@ -471,6 +471,8 @@ public class CustomDamage implements Listener {
 						} else {
 							damagee.setHealth(0.0);
 						}
+
+
 					}
 					if(damagee instanceof Player p) {
 						if(data.e != null) {
@@ -500,6 +502,14 @@ public class CustomDamage implements Listener {
 							} else if(type == DamageType.ABSOLUTE) {
 								Bukkit.broadcastMessage(p.getName() + " fell out of the world");
 							}
+						}
+					}
+
+					// handle raid mechanics
+					if(damagee instanceof Raider raider && raider.isDead()) {
+						Raid raid = raider.getRaid();
+						if(raid != null && damager instanceof Player player) {
+							raid.getHeroes().add(player.getUniqueId());
 						}
 					}
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
