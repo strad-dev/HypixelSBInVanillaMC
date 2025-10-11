@@ -6,7 +6,9 @@ import mobs.CustomMob;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
@@ -17,11 +19,13 @@ import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
+import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_21_R4.entity.*;
 import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -368,6 +372,7 @@ public class CustomDamage implements Listener {
 			}
 
 			boolean isPhysicalHit = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL;
+			// handle particles and wind burst
 			if(damager instanceof Player p) {
 				Location particleLoc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
 				ItemStack weapon = p.getEquipment().getItemInMainHand();
@@ -391,6 +396,32 @@ public class CustomDamage implements Listener {
 				// Wind Burst mechanics
 				if(weapon.containsEnchantment(Enchantment.WIND_BURST) && p.getFallDistance() >= 1.5) {
 					// TODO implement wind burst mechanics
+				}
+			}
+
+			// handle raid mechanics
+			if(damagee instanceof Raider raider) {
+				net.minecraft.world.entity.raid.Raider nmsRaider = ((CraftRaider) raider).getHandle();
+				net.minecraft.world.entity.raid.Raid nmsRaid = nmsRaider.getCurrentRaid();
+
+				if(nmsRaid != null) {
+					if(damager instanceof Player player) {
+						ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+						nmsRaid.addHeroOfTheVillage(nmsPlayer);
+					}
+				} else {
+					ServerLevel world = ((CraftWorld) raider.getWorld()).getHandle();
+					Raids raids = world.getRaids();
+
+					BlockPos pos = new BlockPos(raider.getLocation().getBlockX(), raider.getLocation().getBlockY(), raider.getLocation().getBlockZ());
+					net.minecraft.world.entity.raid.Raid raidAtPos = raids.getNearbyRaid(pos, 128);
+
+					if(raidAtPos != null) {
+						if(damager instanceof Player player) {
+							ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+							raidAtPos.addHeroOfTheVillage(nmsPlayer);
+						}
+					}
 				}
 			}
 
@@ -502,14 +533,6 @@ public class CustomDamage implements Listener {
 							} else if(type == DamageType.ABSOLUTE) {
 								Bukkit.broadcastMessage(p.getName() + " fell out of the world");
 							}
-						}
-					}
-
-					// handle raid mechanics
-					if(damagee instanceof Raider raider && raider.isDead()) {
-						Raid raid = raider.getRaid();
-						if(raid != null && damager instanceof Player player) {
-							raid.getHeroes().add(player.getUniqueId());
 						}
 					}
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
