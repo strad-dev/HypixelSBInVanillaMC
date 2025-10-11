@@ -450,6 +450,7 @@ public class CustomDamage implements Listener {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 				} else {
+					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
 					if(damagee instanceof Villager villager && damager instanceof Zombie) {
 						villager.zombify();
 						PluginUtils.changeName(villager);
@@ -502,9 +503,9 @@ public class CustomDamage implements Listener {
 						} else {
 							damagee.setHealth(0.0);
 						}
-
-
 					}
+
+					// player death messages
 					if(damagee instanceof Player p) {
 						if(data.e != null) {
 							DamageSource damageSource = convertBukkitDamageSource(data.e.getDamageSource(), p);
@@ -535,7 +536,6 @@ public class CustomDamage implements Listener {
 							}
 						}
 					}
-					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
 				}
 			} else {
 				// absorption
@@ -567,7 +567,7 @@ public class CustomDamage implements Listener {
 					}
 					damager = PluginUtils.getNearestPlayer(dragon);
 				} else if(isPhysicalHit && damager != null) {
-				// apply knockback
+					// apply knockback
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
 					double enchantments = 1;
 
