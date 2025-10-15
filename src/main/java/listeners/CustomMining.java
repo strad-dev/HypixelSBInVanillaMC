@@ -106,7 +106,7 @@ public class CustomMining implements Listener {
 						world.dropItemNaturally(dropLocation, item);
 					}
 					if(random.nextDouble() < 0.0025 * fortuneMulti) {
-						world.dropItemNaturally(l, RefinedIron.getItem());
+						world.dropItemNaturally(l, RefinedRedstone.getItem());
 						sendRareDropMessage(p, "Refined Redstone");
 					}
 				}
