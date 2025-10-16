@@ -350,7 +350,7 @@ public class AddRecipes {
 	public static Recipe addFeatherFalling5Recipe(Plugin plugin) {
 		ItemStack featherFalling5 = new ItemStack(Material.ENCHANTED_BOOK);
 		EnchantmentStorageMeta meta = (EnchantmentStorageMeta) featherFalling5.getItemMeta();
-		meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 4, true);
+		meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
 		featherFalling5.setItemMeta(meta);
 
 		ItemStack featherFalling4 = new ItemStack(Material.ENCHANTED_BOOK);

@@ -134,8 +134,9 @@ public class CustomMining implements Listener {
 				}
 				case ANCIENT_DEBRIS -> {
 					e.setCancelled(true);
-					item = new ItemStack(Material.NETHERITE_SCRAP);
+					item = new ItemStack(Material.ANCIENT_DEBRIS);
 					if(dropDouble) {
+						item = new ItemStack(Material.NETHERITE_SCRAP);
 						item.setAmount(item.getAmount() + 1);
 					}
 					world.dropItemNaturally(dropLocation, item);

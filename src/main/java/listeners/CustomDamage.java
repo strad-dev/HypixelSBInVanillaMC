@@ -83,18 +83,19 @@ public class CustomDamage implements Listener {
 							this.lightningBolt = ((CraftLightningStrike) lightning).getHandle();
 						}
 					}
-				} else if(projectile instanceof AbstractArrow arrow) {
-					if(arrow.getWeapon().containsEnchantment(Enchantment.FLAME)) {
-						this.flamingArrow = true;
-					}
+				} else //noinspection ConstantValue
+					if(projectile instanceof AbstractArrow arrow && arrow.getWeapon() != null) {
+						if(arrow.getWeapon().containsEnchantment(Enchantment.FLAME)) {
+							this.flamingArrow = true;
+						}
 
-					if(arrow.getWeapon().containsEnchantment(Enchantment.PUNCH)) {
-						this.punchArrow = arrow.getWeapon().getEnchantmentLevel(Enchantment.PUNCH);
-					}
+						if(arrow.getWeapon().containsEnchantment(Enchantment.PUNCH)) {
+							this.punchArrow = arrow.getWeapon().getEnchantmentLevel(Enchantment.PUNCH);
+						}
 
-					if(arrow.getScoreboardTags().contains("TerminatorArrow")) {
-						this.isTermArrow = true;
-						this.originalDamage = arrow.getDamage();
+						if(arrow.getScoreboardTags().contains("TerminatorArrow")) {
+							this.isTermArrow = true;
+							this.originalDamage = arrow.getDamage();
 					}
 				}
 			}
