@@ -8,6 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -18,6 +19,8 @@ import java.util.*;
 import static listeners.CustomDamage.customMobs;
 
 public class PluginUtils {
+	private static final Random random = new Random();
+
 	/**
 	 * Updates the HP display of the given entity.
 	 *
@@ -246,5 +249,17 @@ public class PluginUtils {
 			e.setRemoveWhenFarAway(false);
 		}
 		entity.getWorld().playSound(entity, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
+	}
+
+	public static void damageItem(ItemStack item, int damage) {
+		if(item.hasItemMeta() && item.getItemMeta() instanceof Damageable d) {
+			double finalDamage = ((double) damage) / (double) (d.getEnchantLevel(Enchantment.UNBREAKING) + 1);
+			int guaranteedDamage = (int) finalDamage;
+			if(finalDamage % 1 > random.nextDouble()) {
+				guaranteedDamage ++;
+			}
+			d.setDamage(d.getDamage() + guaranteedDamage);
+			item.setItemMeta(d);
+		}
 	}
 }
