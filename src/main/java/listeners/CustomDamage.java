@@ -96,8 +96,8 @@ public class CustomDamage implements Listener {
 						if(arrow.getScoreboardTags().contains("TerminatorArrow")) {
 							this.isTermArrow = true;
 							this.originalDamage = arrow.getDamage();
+						}
 					}
-				}
 			}
 
 			if(e.getDamager() instanceof LightningStrike lightning) {
@@ -283,7 +283,8 @@ public class CustomDamage implements Listener {
 				breach = entity.getItemInUse().getEnchantmentLevel(Enchantment.BREACH);
 			}
 
-			if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
+			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
+			if(affectedByArmor) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
 				armor *= 1 - breach * 0.125;
 				finalDamage *= Math.max(0.25, 1 - armor * 0.0375);
@@ -294,48 +295,53 @@ public class CustomDamage implements Listener {
 			finalDamage *= Math.max(0.2, 1 - toughness * 0.1);
 
 			double resistance = 0;
-			try {
-				resistance = Objects.requireNonNull(damagee.getPotionEffect(PotionEffectType.RESISTANCE)).getAmplifier() + 1;
-			} catch(Exception exception) {
-				// continue
+			if(damagee.hasPotionEffect(PotionEffectType.RESISTANCE)) {
+				resistance = damagee.getPotionEffect(PotionEffectType.RESISTANCE).getAmplifier() + 1;
 			}
 			finalDamage *= Math.max(0.0, 1 - resistance * 0.2);
 
 			// get prot levels
 			double prots = 0;
 			EntityEquipment eq = damagee.getEquipment();
-			assert eq != null;
-			try {
-				prots += Objects.requireNonNull(eq.getHelmet()).getEnchantmentLevel(Enchantment.PROTECTION);
-			} catch(Exception exception) {
-				// continue
-			}
+			if(eq != null) {
+				ItemStack helmet = eq.getHelmet();
+				ItemStack chestplate = eq.getChestplate();
+				ItemStack pants = eq.getLeggings();
+				ItemStack boots = eq.getBoots();
 
-			try {
-				prots += Objects.requireNonNull(eq.getChestplate()).getEnchantmentLevel(Enchantment.PROTECTION);
-			} catch(Exception exception) {
-				// continue
-			}
+				if(helmet != null) {
+					prots += helmet.getEnchantmentLevel(Enchantment.PROTECTION);
+					if(affectedByArmor) {
+						PluginUtils.damageItem(helmet, (int) (data.originalDamage / 20));
+					}
+				}
 
-			try {
-				prots += Objects.requireNonNull(eq.getLeggings()).getEnchantmentLevel(Enchantment.PROTECTION);
-			} catch(Exception exception) {
-				// continue
-			}
+				if(chestplate != null) {
+					prots += chestplate.getEnchantmentLevel(Enchantment.PROTECTION);
+					if(affectedByArmor) {
+						PluginUtils.damageItem(chestplate, (int) (data.originalDamage / 20));
+					}
+				}
 
-			try {
-				prots += Objects.requireNonNull(eq.getBoots()).getEnchantmentLevel(Enchantment.PROTECTION);
-			} catch(Exception exception) {
-				// continue
-			}
-			finalDamage *= Math.max(0.5, 1 - prots * 0.025);
+				if(pants != null) {
+					prots += pants.getEnchantmentLevel(Enchantment.PROTECTION);
+					if(affectedByArmor) {
+						PluginUtils.damageItem(pants, (int) (data.originalDamage / 20));
+					}
+				}
 
-			if(type == DamageType.FALL) {
-				try {
-					double featherFalling = Objects.requireNonNull(eq.getBoots()).getEnchantmentLevel(Enchantment.FEATHER_FALLING);
-					finalDamage *= Math.max(0.5, (1 - featherFalling * 0.1) * damagee.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).getValue());
-				} catch(Exception exception) {
-					// continue
+				if(boots != null) {
+					prots += boots.getEnchantmentLevel(Enchantment.PROTECTION);
+					if(affectedByArmor) {
+						PluginUtils.damageItem(boots, (int) (data.originalDamage / 20));
+					}
+				}
+
+				finalDamage *= Math.max(0.5, 1 - prots * 0.025);
+
+				if(type == DamageType.FALL) {
+					double featherFalling = boots.getEnchantmentLevel(Enchantment.FEATHER_FALLING);
+					finalDamage *= Math.floor(Math.max(0.5, (1 - featherFalling * 0.1) * damagee.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).getValue()));
 				}
 			}
 		}
