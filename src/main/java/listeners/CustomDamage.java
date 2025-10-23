@@ -312,28 +312,28 @@ public class CustomDamage implements Listener {
 				if(helmet != null) {
 					prots += helmet.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, helmet, Math.min(1, (int) (data.originalDamage / 33.33)));
+						PluginUtils.damageItem(damagee, helmet, Math.max(1, (int) (data.originalDamage / 33.33)));
 					}
 				}
 
 				if(chestplate != null) {
 					prots += chestplate.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, chestplate, Math.min(1, (int) (data.originalDamage / 12.5)));
+						PluginUtils.damageItem(damagee, chestplate, Math.max(1, (int) (data.originalDamage / 12.5)));
 					}
 				}
 
 				if(pants != null) {
 					prots += pants.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, pants, Math.min(1, (int) (data.originalDamage / 16.67)));
+						PluginUtils.damageItem(damagee, pants, Math.max(1, (int) (data.originalDamage / 16.67)));
 					}
 				}
 
 				if(boots != null) {
 					prots += boots.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, boots, Math.min(1, (int) (data.originalDamage / 33.33)));
+						PluginUtils.damageItem(damagee, boots, Math.max(1, (int) (data.originalDamage / 33.33)));
 					}
 				}
 
