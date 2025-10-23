@@ -312,28 +312,28 @@ public class CustomDamage implements Listener {
 				if(helmet != null) {
 					prots += helmet.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, helmet, (int) (data.originalDamage / 20));
+						PluginUtils.damageItem(damagee, helmet, Math.min(1, (int) (data.originalDamage / 33.33)));
 					}
 				}
 
 				if(chestplate != null) {
 					prots += chestplate.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, chestplate, (int) (data.originalDamage / 20));
+						PluginUtils.damageItem(damagee, chestplate, Math.min(1, (int) (data.originalDamage / 12.5)));
 					}
 				}
 
 				if(pants != null) {
 					prots += pants.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, pants, (int) (data.originalDamage / 20));
+						PluginUtils.damageItem(damagee, pants, Math.min(1, (int) (data.originalDamage / 16.67)));
 					}
 				}
 
 				if(boots != null) {
 					prots += boots.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, boots, (int) (data.originalDamage / 20));
+						PluginUtils.damageItem(damagee, boots, Math.min(1, (int) (data.originalDamage / 33.33)));
 					}
 				}
 
@@ -404,9 +404,13 @@ public class CustomDamage implements Listener {
 				}
 
 				// Wind Burst mechanics
+				//noinspection StatementWithEmptyBody
 				if(weapon.containsEnchantment(Enchantment.WIND_BURST) && p.getFallDistance() >= 1.5) {
 					// TODO implement wind burst mechanics
 				}
+
+				// damage weapon
+				PluginUtils.damageItem(p, weapon, 1);
 			}
 
 			// handle raid mechanics
