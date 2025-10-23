@@ -52,7 +52,7 @@ public class CustomMining implements Listener {
 						sendRareDropMessage(p, "Concentrated Stone");
 					}
 					e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
-					PluginUtils.damageItem(item, 1);
+					PluginUtils.damageItem(p, item, 1);
 				}
 				case COAL_ORE, DEEPSLATE_COAL_ORE -> {
 					if(dropDouble) {
@@ -141,7 +141,7 @@ public class CustomMining implements Listener {
 						item.setAmount(item.getAmount() + 1);
 						world.dropItemNaturally(dropLocation, item);
 						e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
-						PluginUtils.damageItem(item, 1);
+						PluginUtils.damageItem(p, item, 1);
 					}
 					if(random.nextDouble() < 0.005 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedNetherite.getItem());
