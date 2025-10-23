@@ -312,28 +312,28 @@ public class CustomDamage implements Listener {
 				if(helmet != null) {
 					prots += helmet.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(helmet, (int) (data.originalDamage / 20));
+						PluginUtils.damageItem(damagee, helmet, (int) (data.originalDamage / 20));
 					}
 				}
 
 				if(chestplate != null) {
 					prots += chestplate.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(chestplate, (int) (data.originalDamage / 20));
+						PluginUtils.damageItem(damagee, chestplate, (int) (data.originalDamage / 20));
 					}
 				}
 
 				if(pants != null) {
 					prots += pants.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(pants, (int) (data.originalDamage / 20));
+						PluginUtils.damageItem(damagee, pants, (int) (data.originalDamage / 20));
 					}
 				}
 
 				if(boots != null) {
 					prots += boots.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(boots, (int) (data.originalDamage / 20));
+						PluginUtils.damageItem(damagee, boots, (int) (data.originalDamage / 20));
 					}
 				}
 
@@ -341,7 +341,10 @@ public class CustomDamage implements Listener {
 
 				if(type == DamageType.FALL) {
 					double featherFalling = boots.getEnchantmentLevel(Enchantment.FEATHER_FALLING);
-					finalDamage *= Math.floor(Math.max(0.5, (1 - featherFalling * 0.1) * damagee.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).getValue()));
+					finalDamage *= Math.max(0.5, (1 - featherFalling * 0.1) * damagee.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).getValue());
+					if(finalDamage < 1) {
+						finalDamage = 0;
+					}
 				}
 			}
 		}
