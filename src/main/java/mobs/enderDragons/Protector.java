@@ -17,7 +17,7 @@ public class Protector implements CustomDragon {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Protector Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR_TOUGHNESS)).setBaseValue(13.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR_TOUGHNESS)).setBaseValue(12.0);
 		e.addScoreboardTag("ProtectorDragon");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The PROTECTOR DRAGON has arrived to protect the End from Nons!");
 		Bukkit.getLogger().info("The Protector Dragon has been summoned!");

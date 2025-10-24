@@ -287,7 +287,7 @@ public class CustomDamage implements Listener {
 			if(affectedByArmor) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
 				armor *= 1 - breach * 0.125;
-				finalDamage *= Math.max(0.25, 1 - armor * 0.0375);
+				finalDamage *= Math.max(0.2, 1 - armor * 0.04);
 			}
 
 			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR_TOUGHNESS)).getValue() - 8, 0); // only toughness values of 9 or more will give damage reduction
@@ -1075,8 +1075,12 @@ public class CustomDamage implements Listener {
 			return sources.genericKill();
 		} else if(damageType == org.bukkit.damage.DamageType.ENDER_PEARL) {
 			return sources.enderPearl();
+		} else if(damageType == org.bukkit.damage.DamageType.SPIT) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.LlamaSpit spit) {
+				return sources.spit(spit, (net.minecraft.world.entity.LivingEntity) nmsCausingEntity);
+			}
+			return sources.generic();
 		}
-
 		// Fallback for any unmapped damage types
 		else {
 			System.err.println("Unmapped damage type: " + damageType);

@@ -30,7 +30,7 @@ public class Strong implements CustomDragon {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 6, DamageType.RANGED);
+		calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 4, DamageType.RANGED);
 		return true;
 	}
 }

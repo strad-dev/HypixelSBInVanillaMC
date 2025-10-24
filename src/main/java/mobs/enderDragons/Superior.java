@@ -27,10 +27,9 @@ public class Superior implements CustomDragon {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Superior Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(300.0);
-		e.setHealth(300.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR)).setBaseValue(6.25);
-		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.875);
+		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(250.0);
+		e.setHealth(250.0);
+		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR)).setBaseValue(5);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
 		e.addScoreboardTag("SuperiorDragon");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The SUPERIOR DRAGON has arrived to utterly destroy you!");

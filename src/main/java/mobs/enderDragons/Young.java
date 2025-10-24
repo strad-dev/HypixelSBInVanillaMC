@@ -31,7 +31,7 @@ public class Young implements CustomDragon {
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		Random random = new Random();
-		if(random.nextDouble() < 0.1 && damagee.getLocation().distanceSquared(new Location(damagee.getWorld(), 0, 0, 0)) > 75) {
+		if(random.nextDouble() < 0.05 && damagee.getLocation().distanceSquared(new Location(damagee.getWorld(), 0, 60, 0)) > 75) {
 			teleport(damagee, 16);
 		}
 		return true;
