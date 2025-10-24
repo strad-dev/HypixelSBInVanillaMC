@@ -188,14 +188,13 @@ public class CustomDamage implements Listener {
 				}
 			}
 
-			if(!data.isBlocking) {
-				if(projectile instanceof SpectralArrow) {
-					damagee.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 0));
-				}
-				if(projectile instanceof Arrow a && a.hasCustomEffects()) {
-					damagee.addPotionEffects(a.getCustomEffects());
-				}
+			if(projectile instanceof SpectralArrow) {
+				damagee.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 0));
 			}
+			if(projectile instanceof Arrow a && a.hasCustomEffects()) {
+				damagee.addPotionEffects(a.getCustomEffects());
+			}
+
 			if(projectile.getShooter() instanceof LivingEntity temp) {
 				damager = temp;
 			}
