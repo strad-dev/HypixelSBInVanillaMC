@@ -191,6 +191,7 @@ public class CustomDamage implements Listener {
 			if(projectile instanceof SpectralArrow) {
 				damagee.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, 200, 0));
 			}
+
 			if(projectile instanceof Arrow a && a.hasCustomEffects()) {
 				damagee.addPotionEffects(a.getCustomEffects());
 			}
