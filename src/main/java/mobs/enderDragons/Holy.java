@@ -5,6 +5,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Objects;
 
@@ -17,10 +19,10 @@ public class Holy implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Young Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(2.00);
+		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Holy Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		e.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
 		e.addScoreboardTag("HolyDragon");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The YOUNG DRAGON has arrived to practise yeeting Nons into the Void!");
+		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The HOLY DRAGON has arrived to cleanse the world of evil!");
 		Bukkit.getLogger().info("The Holy Dragon has been summoned!");
 
 		return name;
