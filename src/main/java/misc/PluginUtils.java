@@ -267,7 +267,7 @@ public class PluginUtils {
 				int newDamage = d.getDamage() + guaranteedDamage;
 				int maxDurability = item.getType().getMaxDurability();
 
-				if(newDamage >= maxDurability) {
+				if(newDamage >= maxDurability && maxDurability != 0) {
 					if(user instanceof Player p) {
 						// Fire the break event for advancements
 						PlayerItemBreakEvent breakEvent = new PlayerItemBreakEvent(p, item.clone());
