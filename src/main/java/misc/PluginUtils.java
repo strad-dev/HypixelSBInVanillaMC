@@ -257,7 +257,8 @@ public class PluginUtils {
 	}
 
 	public static void damageItem(Entity user, ItemStack item, int damage) {
-		if(item.getItemMeta() instanceof Damageable d && !d.isUnbreakable()) {
+		int maxDurability = item.getType().getMaxDurability();
+		if(item.getItemMeta() instanceof Damageable d && !d.isUnbreakable() && maxDurability != 0) {
 			if(!(user instanceof Player p) || (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE)) {
 				double finalDamage = ((double) damage) / (double) (d.getEnchantLevel(Enchantment.UNBREAKING) + 1);
 				int guaranteedDamage = (int) finalDamage;
@@ -265,9 +266,8 @@ public class PluginUtils {
 					guaranteedDamage++;
 				}
 				int newDamage = d.getDamage() + guaranteedDamage;
-				int maxDurability = item.getType().getMaxDurability();
 
-				if(newDamage >= maxDurability && maxDurability != 0) {
+				if(newDamage >= maxDurability) {
 					if(user instanceof Player p) {
 						// Fire the break event for advancements
 						PlayerItemBreakEvent breakEvent = new PlayerItemBreakEvent(p, item.clone());
