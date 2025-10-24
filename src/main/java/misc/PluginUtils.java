@@ -2,11 +2,16 @@ package misc;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
+import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.potion.PotionEffect;
@@ -259,8 +264,43 @@ public class PluginUtils {
 				if(finalDamage % 1 > random.nextDouble()) {
 					guaranteedDamage++;
 				}
-				d.setDamage(d.getDamage() + guaranteedDamage);
-				item.setItemMeta(d);
+				int newDamage = d.getDamage() + guaranteedDamage;
+				int maxDurability = item.getType().getMaxDurability();
+
+				if(newDamage >= maxDurability) {
+					if(user instanceof Player p) {
+						// Fire the break event for advancements
+						PlayerItemBreakEvent breakEvent = new PlayerItemBreakEvent(p, item.clone());
+						Bukkit.getPluginManager().callEvent(breakEvent);
+
+						// Update statistics
+						p.incrementStatistic(Statistic.BREAK_ITEM, item.getType());
+
+						// Play break sound and show animation manually
+						p.playSound(p.getLocation(), Sound.ENTITY_ITEM_BREAK, 1.0f, 1.0f);
+
+						// advancements
+						ServerPlayer serverPlayer = ((CraftPlayer) p).getHandle();
+						net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+						nmsItem.setDamageValue(maxDurability);
+						CriteriaTriggers.ITEM_DURABILITY_CHANGED.trigger(serverPlayer, nmsItem, maxDurability);
+					}
+
+					// Remove the item
+					item.setAmount(0);
+				} else {
+					// advancements
+					if(user instanceof Player p) {
+						ServerPlayer serverPlayer = ((CraftPlayer) p).getHandle();
+						net.minecraft.world.item.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+						nmsItem.setDamageValue(newDamage);
+						CriteriaTriggers.ITEM_DURABILITY_CHANGED.trigger(serverPlayer, nmsItem, newDamage);
+					}
+
+					// Item survives
+					d.setDamage(newDamage);
+					item.setItemMeta(d);
+				}
 			}
 		}
 	}
