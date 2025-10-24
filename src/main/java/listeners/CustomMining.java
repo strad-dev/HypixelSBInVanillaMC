@@ -37,22 +37,22 @@ public class CustomMining implements Listener {
 			Location dropLocation = e.getBlock().getLocation().add(0.5, 0.5, 0.5);
 			switch(b.getType()) {
 				case STONE, DEEPSLATE -> {
-					e.setCancelled(true);
-					if(b.getType().equals(Material.STONE)) {
-						item = new ItemStack(Material.COBBLESTONE);
-					} else {
-						item = new ItemStack(Material.COBBLED_DEEPSLATE);
-					}
 					if(dropDouble) {
-						item.setAmount(item.getAmount() + 1);
+						e.setCancelled(true);
+						if(b.getType().equals(Material.STONE)) {
+							item = new ItemStack(Material.COBBLESTONE);
+						} else {
+							item = new ItemStack(Material.COBBLED_DEEPSLATE);
+						}
+						item.setAmount(2);
+						world.dropItemNaturally(dropLocation, item);
+						e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
+						PluginUtils.damageItem(p, itemInHand, 1); // *technically* this isnt needed becuase only divan pick can drop double
 					}
-					world.dropItemNaturally(dropLocation, item);
 					if(random.nextDouble() < 0.001 * fortuneMulti) {
 						world.dropItemNaturally(l, ConcentratedStone.getItem());
 						sendRareDropMessage(p, "Concentrated Stone");
 					}
-					e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
-					PluginUtils.damageItem(p, item, 1);
 				}
 				case COAL_ORE, DEEPSLATE_COAL_ORE -> {
 					if(dropDouble) {
@@ -141,7 +141,7 @@ public class CustomMining implements Listener {
 						item.setAmount(item.getAmount() + 1);
 						world.dropItemNaturally(dropLocation, item);
 						e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
-						PluginUtils.damageItem(p, item, 1);
+						PluginUtils.damageItem(p, itemInHand, 1); // see comment in stone section
 					}
 					if(random.nextDouble() < 0.005 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedNetherite.getItem());

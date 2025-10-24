@@ -453,6 +453,7 @@ public class CustomDamage implements Listener {
 						ItemStack totemStack = new ItemStack(Material.TOTEM_OF_UNDYING);
 						net.minecraft.world.item.ItemStack nmsTotem = CraftItemStack.asNMSCopy(totemStack);
 						CriteriaTriggers.USED_TOTEM.trigger(serverPlayer, nmsTotem);
+						serverPlayer.awardStat(Stats.ITEM_USED.get(nmsTotem.getItem()));
 					}
 					damagee.getWorld().playSound(damagee, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
 					damagee.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, damagee.getLocation(), 512);
