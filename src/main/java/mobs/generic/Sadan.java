@@ -68,7 +68,7 @@ public class Sadan implements CustomMob {
 				switch(random.nextInt(7)) {
 					case 0 -> {
 						damager.teleport(damager.getLocation().subtract(0, 3, 0));
-						CustomDamage.customMobs(entity, damagee, 10, DamageType.MAGIC);
+						CustomDamage.customMobs(entity, damagee, 20, DamageType.MELEE);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan has stomped you into the ground!");
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 0.5F);
 					}

@@ -19,7 +19,7 @@ public class CustomChestLoot implements Listener {
 	public void onLootGenerate(LootGenerateEvent e) {
 		Random random = new Random();
 		if(e.getInventoryHolder() instanceof Chest chest) {
-			if(random.nextDouble() < 0.005) {
+			if(random.nextDouble() < 0.005) { // 0.5%
 				chest.getBlockInventory().addItem(EnchantmentUpgrader.getItem());
 			} else if(random.nextDouble() < 0.01) { // 0.5%
 				ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
