@@ -465,6 +465,11 @@ public class CustomDamage implements Listener {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 				} else {
+					if(damagee instanceof EnderDragon dragon && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
+						if(damager == null) {
+							damager = PluginUtils.getNearestPlayer(dragon);
+						}
+					}
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
 					if(damagee instanceof Villager villager && damager instanceof Zombie) {
 						villager.zombify();
@@ -508,9 +513,6 @@ public class CustomDamage implements Listener {
 								PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 							}
 							dragon.setSilent(true);
-							if(damager == null) {
-								damager = PluginUtils.getNearestPlayer(dragon);
-							}
 							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
 								ExperienceOrb orb = (ExperienceOrb) dragon.getWorld().spawnEntity(dragon.getLocation(), EntityType.EXPERIENCE_ORB);
 								orb.setExperience(64000);

@@ -21,7 +21,6 @@ public class BetterAnvil implements Listener {
 		if(viewers.isEmpty()) return;
 		AnvilView view = e.getView();
 
-		view.setMaximumRepairCost(50);
 		ItemStack FIRST_ITEM = view.getItem(0);
 		ItemStack SECOND_ITEM = view.getItem(1);
 
@@ -42,10 +41,12 @@ public class BetterAnvil implements Listener {
 					}
 				}
 				e.setResult(result);
-				if(view.getRepairCost() > 50) {
-					view.setRepairCost(50);
-				}
 			}
+		}
+
+		view.setMaximumRepairCost(50);
+		if(view.getRepairCost() > 50) {
+			view.setRepairCost(50);
 		}
 	}
 
