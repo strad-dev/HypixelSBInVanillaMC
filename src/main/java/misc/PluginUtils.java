@@ -256,11 +256,11 @@ public class PluginUtils {
 		entity.getWorld().playSound(entity, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
 	}
 
-	public static void damageItem(Entity user, ItemStack item, int damage) {
+	public static void damageItem(Entity user, ItemStack item, double damage) {
 		int maxDurability = item.getType().getMaxDurability();
 		if(item.getItemMeta() instanceof Damageable d && !d.isUnbreakable() && maxDurability != 0) {
 			if(!(user instanceof Player p) || (p.getGameMode() == GameMode.SURVIVAL || p.getGameMode() == GameMode.ADVENTURE)) {
-				double finalDamage = ((double) damage) / (double) (d.getEnchantLevel(Enchantment.UNBREAKING) + 1);
+				double finalDamage = damage / (double) (d.getEnchantLevel(Enchantment.UNBREAKING) + 1);
 				int guaranteedDamage = (int) finalDamage;
 				if(finalDamage % 1 > random.nextDouble()) {
 					guaranteedDamage++;
