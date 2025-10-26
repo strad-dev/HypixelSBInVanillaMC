@@ -283,24 +283,39 @@ public class CustomDamage implements Listener {
 				breach = entity.getItemInUse().getEnchantmentLevel(Enchantment.BREACH);
 			}
 
+			// Attribute.ARMOR reduces damage taken by 4% per level, up to 15 points (-60%)
+			// Examples
+			// Iron Armor (15 points) reduces damage by 60%
+			// Diamond Armor (20 points) also reduces damage by 60%
+			// 3/4 Diamond + Elytra (12 points) reduces damage by 48%
 			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
 			if(affectedByArmor) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
 				armor *= 1 - breach * 0.125;
-				finalDamage *= Math.max(0.2, 1 - armor * 0.04);
+				finalDamage *= Math.max(0.4, 1 - armor * 0.04);
 			}
 
-			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR_TOUGHNESS)).getValue() - 8, 0); // only toughness values of 9 or more will give damage reduction
+			// Attribute.ARMOR_TOUGHNESS further reduces damage taken by 5% per level, up to 16 points (-80%)
+			// Examples
+			// Iron Armor (0 toughness) does not work here
+			// Diamond Armor (8 toughness) reduces damage by 40%
+			// Netherite Armor (12 toughness) reduces damage by 60%
+			// 3/4 Netherite + Elytra (9 toughness) reduces damage by 45%
+			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR_TOUGHNESS)).getValue(), 0);
 			toughness *= 1 - breach * 0.125;
-			finalDamage *= Math.max(0.2, 1 - toughness * 0.1);
+			finalDamage *= Math.max(0.2, 1 - toughness * 0.05);
 
+			// The Resistance status effect reduces damage by 20% per level.
+			// At level 5 and higher, the damagee is immune to damage.
 			double resistance = 0;
 			if(damagee.hasPotionEffect(PotionEffectType.RESISTANCE)) {
 				resistance = damagee.getPotionEffect(PotionEffectType.RESISTANCE).getAmplifier() + 1;
 			}
 			finalDamage *= Math.max(0.0, 1 - resistance * 0.2);
 
-			// get prot levels
+			// The Protection enchantment reduces damage taken by 2.5% per level.
+			// A full set of Protection IV armor reduces damage by 40%
+			// A full set of Protection V armor reduces damage by 50%
 			double prots = 0;
 			EntityEquipment eq = damagee.getEquipment();
 			if(eq != null) {
@@ -353,7 +368,6 @@ public class CustomDamage implements Listener {
 
 	private static void dealDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
 		if(finalDamage > 0) {
-
 			// sweeping edge
 			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.SWEEPING_EDGE)) {
 				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SWEEPING_EDGE);
