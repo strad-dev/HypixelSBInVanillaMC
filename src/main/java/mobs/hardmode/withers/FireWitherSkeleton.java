@@ -1,8 +1,9 @@
 package mobs.hardmode.withers;
 
 import listeners.DamageType;
+import misc.DamageData;
 import misc.Plugin;
-import misc.PluginUtils;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,7 +21,7 @@ public class FireWitherSkeleton implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Fire" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
-		PluginUtils.changeName(e);
+		Utils.changeName(e);
 		e.addScoreboardTag("Fire");
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
@@ -38,17 +39,17 @@ public class FireWitherSkeleton implements CustomMob {
 			if(b.getType() != Material.AIR) {
 				b.setType(Material.FIRE);
 			}
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> walkOnFire(e), 5);
+			Utils.scheduleTask(() -> walkOnFire(e), 5);
 		}
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(damagee.getHealth() - originalDamage < 1) {
 			List<EntityType> immune = new ArrayList<>();
 			immune.add(EntityType.WITHER_SKELETON);
 			immune.add(EntityType.WITHER);
-			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
+			Utils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
 			MasterWitherKing.defeatHenchman("Fire");
 			damagee.remove();
 			return false;
@@ -57,7 +58,7 @@ public class FireWitherSkeleton implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 }

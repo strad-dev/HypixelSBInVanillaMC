@@ -1,7 +1,7 @@
 package listeners;
 
 import items.summonItems.SummonItem;
-import misc.PluginUtils;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -47,7 +47,7 @@ public class CustomItemUses implements Listener {
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???.");
 				List<EntityType> immune = new ArrayList<>();
 				immune.add(EntityType.WITHER_SKELETON);
-				PluginUtils.spawnTNT(wither, wither.getLocation(), 0, 8, 10, immune);
+				Utils.spawnTNT(wither, wither.getLocation(), 0, 8, 10, immune);
 				p.removeScoreboardTag("HasCrystal");
 			}
 			case Mob entity when e.getHand().equals(EquipmentSlot.HAND) -> {

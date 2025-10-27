@@ -2,7 +2,8 @@ package mobs.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -28,7 +29,7 @@ public class VoidgloomSeraph implements CustomMob {
 		Objects.requireNonNull(e.getAttribute(Attribute.ATTACK_DAMAGE)).setBaseValue(25.0);
 		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.6);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(PluginUtils.getNearestPlayer(e));
+		e.setTarget(Utils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("Voidgloom");
@@ -41,7 +42,7 @@ public class VoidgloomSeraph implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		Random random = new Random();
 		if(damager instanceof LivingEntity entity1) {
 			if(random.nextDouble() < 0.15) {
@@ -54,7 +55,7 @@ public class VoidgloomSeraph implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 }

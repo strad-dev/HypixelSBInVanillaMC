@@ -1,7 +1,7 @@
 package listeners;
 
 import items.ingredients.mining.*;
-import misc.PluginUtils;
+import misc.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Random;
 
-import static misc.PluginUtils.sendRareDropMessage;
+import static misc.Utils.sendRareDropMessage;
 
 public class CustomMining implements Listener {
 	@EventHandler
@@ -47,7 +47,7 @@ public class CustomMining implements Listener {
 						item.setAmount(2);
 						world.dropItemNaturally(dropLocation, item);
 						e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
-						PluginUtils.damageItem(p, itemInHand, 1); // *technically* this isnt needed becuase only divan pick can drop double
+						Utils.damageItem(p, itemInHand, 1); // *technically* this isnt needed becuase only divan pick can drop double
 					}
 					if(random.nextDouble() < 0.001 * fortuneMulti) {
 						world.dropItemNaturally(l, ConcentratedStone.getItem());
@@ -141,7 +141,7 @@ public class CustomMining implements Listener {
 						item.setAmount(item.getAmount() + 1);
 						world.dropItemNaturally(dropLocation, item);
 						e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
-						PluginUtils.damageItem(p, itemInHand, 1); // see comment in stone section
+						Utils.damageItem(p, itemInHand, 1); // see comment in stone section
 					}
 					if(random.nextDouble() < 0.005 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedNetherite.getItem());

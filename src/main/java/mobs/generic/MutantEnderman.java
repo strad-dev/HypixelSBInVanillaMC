@@ -1,7 +1,8 @@
 package mobs.generic;
 
 import listeners.DamageType;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -27,7 +28,7 @@ public class MutantEnderman implements CustomMob {
 		Objects.requireNonNull(e.getAttribute(Attribute.ATTACK_DAMAGE)).setBaseValue(20.0);
 		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.45);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(PluginUtils.getNearestPlayer(e));
+		e.setTarget(Utils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("MutantEnderman");
@@ -40,7 +41,7 @@ public class MutantEnderman implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		Random random = new Random();
 		if(random.nextDouble() < 0.15) {
 			damager.teleport(damagee);
@@ -50,7 +51,7 @@ public class MutantEnderman implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 }

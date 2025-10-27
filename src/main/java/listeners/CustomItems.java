@@ -6,10 +6,9 @@ import items.misc.*;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
 import misc.Plugin;
+import misc.Utils;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.core.Holder;
-import net.minecraft.network.syncher.SynchedEntityData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -165,9 +164,9 @@ public class CustomItems implements Listener {
 								score.setScore(score.getScore() - item.manaCost());
 							}
 							p.addScoreboardTag(item.cooldownTag());
-							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag(item.cooldownTag()), item.cooldown());
+							Utils.scheduleTask(() -> p.removeScoreboardTag(item.cooldownTag()), item.cooldown());
 							p.addScoreboardTag("AbilityCooldown");
-							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
+							Utils.scheduleTask(() -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 						}
 					}
 				} else {

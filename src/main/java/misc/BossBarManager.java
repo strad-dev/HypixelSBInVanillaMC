@@ -133,7 +133,7 @@ public class BossBarManager {
 		}
 
 		boolean shouldBeVisible(Player player) {
-			return player.getWorld().equals(entity.getWorld()) && player.getLocation().distance(entity.getLocation()) <= DEFAULT_VISIBILITY_RANGE;
+			return player.getWorld().equals(entity.getWorld()) && player.getLocation().distanceSquared(entity.getLocation()) <= Math.pow(DEFAULT_VISIBILITY_RANGE, 2);
 		}
 
 		void cleanup() {

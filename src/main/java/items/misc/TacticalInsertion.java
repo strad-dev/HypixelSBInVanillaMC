@@ -2,6 +2,7 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
+import misc.Utils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -56,19 +57,19 @@ public class TacticalInsertion implements AbilityItem {
 		float pitch = l.getPitch();
 		p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.707107F);
 		p.playSound(p, Sound.ITEM_FLINTANDSTEEL_USE, 1.0F, 1.0F);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.793701F), 10);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.890899F), 20);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.943874F), 30);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 1F), 40);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 1.059463F), 50);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+		Utils.scheduleTask(() -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.793701F), 10);
+		Utils.scheduleTask(() -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.890899F), 20);
+		Utils.scheduleTask(() -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.943874F), 30);
+		Utils.scheduleTask(() -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 1F), 40);
+		Utils.scheduleTask(() -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 1.059463F), 50);
+		Utils.scheduleTask(() -> {
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F);
 			p.teleport(l);
 			p.setVelocity(new Vector(0, 0, 0));
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.getWorld().spawnParticle(Particle.FLAME, p.getLocation(), 1000), 1);
+			Utils.scheduleTask(() -> p.getWorld().spawnParticle(Particle.FLAME, p.getLocation(), 1000), 1);
 		}, 60);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F), 63);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F), 66);
+		Utils.scheduleTask(() -> p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F), 63);
+		Utils.scheduleTask(() -> p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 1.0F), 66);
 		return true;
 	}
 

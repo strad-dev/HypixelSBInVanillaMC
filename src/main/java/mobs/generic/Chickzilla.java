@@ -2,7 +2,8 @@ package mobs.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,7 +22,7 @@ public class Chickzilla implements CustomMob {
 		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(1000.0);
 		e.setHealth(1000.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(PluginUtils.getNearestPlayer(e));
+		e.setTarget(Utils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("Chickzilla");
@@ -35,7 +36,7 @@ public class Chickzilla implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(damager instanceof LivingEntity damager1) {
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Chickzilla has REFLECTED " + originalDamage / 2 + " Damage back to you!");
 			CustomDamage.calculateFinalDamage(damager1, damagee, originalDamage / 2, DamageType.MELEE); // damager takes 50% of their original damage
@@ -44,7 +45,7 @@ public class Chickzilla implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 }

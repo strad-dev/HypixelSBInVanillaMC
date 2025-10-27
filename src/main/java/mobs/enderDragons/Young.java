@@ -1,6 +1,7 @@
 package mobs.enderDragons;
 
 import listeners.DamageType;
+import misc.DamageData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -9,7 +10,7 @@ import org.bukkit.util.Vector;
 
 import java.util.Random;
 
-import static misc.PluginUtils.teleport;
+import static misc.Utils.teleport;
 
 public class Young implements CustomDragon {
 	@Override
@@ -29,7 +30,7 @@ public class Young implements CustomDragon {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		Random random = new Random();
 		if(random.nextDouble() < 0.05 && damagee.getLocation().distanceSquared(new Location(damagee.getWorld(), 0, 60, 0)) > 75) {
 			teleport(damagee, 16);
@@ -38,7 +39,7 @@ public class Young implements CustomDragon {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 }

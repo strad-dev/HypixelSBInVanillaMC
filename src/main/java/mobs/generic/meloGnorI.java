@@ -2,7 +2,8 @@ package mobs.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,7 +24,7 @@ public class meloGnorI implements CustomMob {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "meloG norI" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(PluginUtils.getNearestPlayer(e));
+		e.setTarget(Utils.getNearestPlayer(e));
 		e.setHealth(200.0);
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
@@ -37,7 +38,7 @@ public class meloGnorI implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(type == DamageType.MELEE) {
 			if(damager instanceof LivingEntity entity1) {
 				if(originalDamage > 10.0) {
@@ -47,7 +48,7 @@ public class meloGnorI implements CustomMob {
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt is at full health and has REFLECTED " + (originalDamage - 10) / 2 + " Damage back to you!");
 					} else {
 						damagee.setHealth(damagee.getHealth() + (originalDamage - 10.0));
-						PluginUtils.changeName(damagee);
+						Utils.changeName(damagee);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt has HEALED ITSELF by " + (originalDamage - 10.0) + " HP!");
 					}
 					damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
@@ -75,7 +76,7 @@ public class meloGnorI implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 }

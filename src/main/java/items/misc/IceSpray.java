@@ -4,6 +4,7 @@ import items.AbilityItem;
 import listeners.CustomItems;
 import listeners.DamageType;
 import misc.Plugin;
+import misc.Utils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -83,7 +84,7 @@ public class IceSpray implements AbilityItem {
 					customMobs(entity1, p, 1, DamageType.PLAYER_MAGIC);
 					entity1.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 101, 3));
 					entity1.addScoreboardTag("IceSprayed");
-					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> entity1.removeScoreboardTag("IceSprayed"), 101L);
+					Utils.scheduleTask(() -> entity1.removeScoreboardTag("IceSprayed"), 101L);
 					if(entity1 instanceof Player enemy) {
 						enemy.sendTitle(ChatColor.AQUA + "" + ChatColor.BOLD + "❄ ❅ ❆", ChatColor.BLUE + "Brrrr...", 0, 101, 0);
 						enemy.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + p.getName() + " has Ice Sprayed you for 5 seconds!");

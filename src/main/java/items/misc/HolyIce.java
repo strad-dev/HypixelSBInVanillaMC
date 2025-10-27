@@ -2,6 +2,7 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
+import misc.Utils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -53,7 +54,7 @@ public class HolyIce implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		p.addScoreboardTag("HolyIce");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("HolyIce"), 20);
+		Utils.scheduleTask(() -> p.removeScoreboardTag("HolyIce"), 20);
 		p.getWorld().spawnParticle(Particle.DRIPPING_WATER, p.getEyeLocation(), 1000);
 		p.playSound(p, Sound.ENTITY_PLAYER_SPLASH_HIGH_SPEED, 0.5F, 1.0F);
 		return true;

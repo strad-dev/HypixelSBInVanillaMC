@@ -1,6 +1,7 @@
 package mobs.withers;
 
 import listeners.DamageType;
+import misc.DamageData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
@@ -10,7 +11,7 @@ import org.bukkit.util.Vector;
 import java.util.Objects;
 import java.util.Random;
 
-import static misc.PluginUtils.teleport;
+import static misc.Utils.teleport;
 
 public class Maxor implements CustomWither {
 	@Override
@@ -25,7 +26,7 @@ public class Maxor implements CustomWither {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
@@ -38,7 +39,7 @@ public class Maxor implements CustomWither {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 

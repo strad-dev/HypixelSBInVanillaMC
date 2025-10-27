@@ -2,8 +2,9 @@ package mobs.withers;
 
 import listeners.CustomMobs;
 import listeners.DamageType;
+import misc.DamageData;
 import misc.Plugin;
-import misc.PluginUtils;
+import misc.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -15,7 +16,7 @@ import java.util.Random;
 
 import static listeners.CustomDamage.calculateFinalDamage;
 import static listeners.CustomMobs.spawnLightning;
-import static misc.PluginUtils.teleport;
+import static misc.Utils.teleport;
 
 public class WitherKing implements CustomWither {
 	@Override
@@ -37,7 +38,7 @@ public class WitherKing implements CustomWither {
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "A giant rumble occurs.  The ground beneath you cracks and crumbles as a mysterious being emerges.  Could it be?  No...  He had been sleeping for centuries!  How could He b- *mic cuts off*");
 		Bukkit.getLogger().info("The WITHER KING has been summoned!");
 
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+		Utils.scheduleTask(() -> {
 			spawnLightning(e, 128);
 			e.getWorld().createExplosion(e.getLocation(), 10);
 
@@ -55,7 +56,7 @@ public class WitherKing implements CustomWither {
 			e.setRemoveWhenFarAway(false);
 
 			p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Wither King summons His Dragon!");
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> teleportDragon(dragon, e), 300);
+			Utils.scheduleTask(() -> teleportDragon(dragon, e), 300);
 		}, 200);
 
 		return newName;
@@ -63,15 +64,15 @@ public class WitherKing implements CustomWither {
 
 	public void teleportDragon(EnderDragon dragon, Mob e) {
 		if(!dragon.isDead()) {
-			Player p = PluginUtils.getNearestPlayer(e);
+			Player p = Utils.getNearestPlayer(e);
 			dragon.teleport(p);
 			p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Wither King's Dragon teleports itself to you!");
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> teleportDragon(dragon, e), 300);
+			Utils.scheduleTask(() -> teleportDragon(dragon, e), 300);
 		}
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
@@ -86,9 +87,9 @@ public class WitherKing implements CustomWither {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
-		calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 6, DamageType.RANGED);
+		calculateFinalDamage(damagee, Utils.getNearestPlayer(damagee), 6, DamageType.RANGED);
 		return true;
 	}
 
@@ -97,7 +98,7 @@ public class WitherKing implements CustomWither {
 		Random random = new Random();
 		if(random.nextDouble() < 0.1) {
 			CustomMobs.spawnLightning(skull, 64);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> CustomMobs.spawnLightning(skull, 64), 20L);
+			Utils.scheduleTask(() -> CustomMobs.spawnLightning(skull, 64), 20L);
 		}
 	}
 
@@ -119,7 +120,7 @@ public class WitherKing implements CustomWither {
 	private static void spawnSkeletons(Entity damager) {
 		if(damager instanceof LivingEntity entity) {
 			Location l = entity.getLocation();
-			PluginUtils.spawnGuards(entity, 15);
+			Utils.spawnGuards(entity, 15);
 			entity.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Wither King summons His Guards to defend Him!");
 			l.getWorld().playSound(l, Sound.ITEM_GOAT_HORN_SOUND_2, 2.0F, 1.0F);
 		}

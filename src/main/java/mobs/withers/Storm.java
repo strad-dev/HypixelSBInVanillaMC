@@ -2,7 +2,9 @@ package mobs.withers;
 
 import listeners.CustomMobs;
 import listeners.DamageType;
+import misc.DamageData;
 import misc.Plugin;
+import misc.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
@@ -20,17 +22,17 @@ public class Storm implements CustomWither {
 		e.getWorld().setWeatherDuration(1000000);
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "STORM, most explosive Wither in the universe, has come to smite you with his Lightning!");
 		Bukkit.getLogger().info("Storm has been summoned!");
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnLightning(e, 64), 200);
+		Utils.scheduleTask(() -> spawnLightning(e, 64), 200);
 		return newName;
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return (((Wither) damagee).getInvulnerabilityTicks() == 0 || type == DamageType.ABSOLUTE) && type != DamageType.IFRAME_ENVIRONMENTAL;
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		Random random = new Random();
 		if(random.nextBoolean()) {
 			damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);

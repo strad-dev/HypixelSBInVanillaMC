@@ -2,8 +2,9 @@ package mobs.hardmode.withers;
 
 import listeners.CustomMobs;
 import listeners.DamageType;
+import misc.DamageData;
 import misc.Plugin;
-import misc.PluginUtils;
+import misc.Utils;
 import mobs.withers.CustomWither;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -15,15 +16,15 @@ import java.util.List;
 import java.util.Random;
 
 public class MasterMaxor implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		//noinspection DuplicatedCode
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
-		PluginUtils.spawnTNT(e, e.getLocation(), 0, 32, 50, immune);
-		PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN);
+		Utils.spawnTNT(e, e.getLocation(), 0, 32, 50, immune);
+		Utils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN);
 
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(800.0);
 		e.setHealth(800.0);
@@ -35,17 +36,17 @@ public class MasterMaxor implements CustomWither {
 		e.setPersistent(true);
 		e.setRemoveWhenFarAway(false);
 		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		PluginUtils.changeName(e);
+		Utils.changeName(e);
 
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 300);
+		Utils.scheduleTask(() -> spawnGuards(e), 300);
 
 		return name;
 	}
 
 	private void spawnGuards(Mob e) {
 		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-			PluginUtils.spawnGuards(e, 2);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> spawnGuards(e), 300);
+			Utils.spawnGuards(e, 2);
+			Utils.scheduleTask(() -> spawnGuards(e), 300);
 		}
 	}
 
@@ -62,9 +63,9 @@ public class MasterMaxor implements CustomWither {
 				crystal.addScoreboardTag("SkyblockBoss");
 				if(which == 600) {
 					wither.removeScoreboardTag("600Crystal");
-					PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+					Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": HAHAHA!  GOOD LUCK GETTING AROUND MY TRICKS!");
-					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+					Utils.scheduleTask(() -> {
 						if(wither.getScoreboardTags().contains("Invulnerable") && wither.getScoreboardTags().contains("300Crystal")) {
 							Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": ARE YOU REALLY THIS BAD?!  CAN YOU NOT SEE EXPLOSIVES AROUND YOU?!");
 						}
@@ -72,12 +73,12 @@ public class MasterMaxor implements CustomWither {
 					wither.setHealth(600.0);
 				} else {
 					wither.removeScoreboardTag("300Crystal");
-					PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+					Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": IF YOU FAIL ONCE, YOU SHOULD SIMPLY TRY AGAIN!");
 					wither.setHealth(300.0);
 				}
 				wither.addScoreboardTag("Invulnerable");
-				Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> wither.addScoreboardTag("InvulnerableReminder"), 60L);
+				Utils.scheduleTask(() -> wither.addScoreboardTag("InvulnerableReminder"), 60L);
 				Bukkit.broadcastMessage(ChatColor.YELLOW + "An Energy Crystal has spawned!  Maybe it is useful?");
 				return;
 			}
@@ -88,7 +89,7 @@ public class MasterMaxor implements CustomWither {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
@@ -105,9 +106,9 @@ public class MasterMaxor implements CustomWither {
 					Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???");
 					List<EntityType> immune = new ArrayList<>();
 					immune.add(EntityType.WITHER_SKELETON);
-					PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 8, 10, immune);
+					Utils.spawnTNT(damagee, damagee.getLocation(), 0, 8, 10, immune);
 					p.removeScoreboardTag("HasCrystal");
-					PluginUtils.changeName(damagee);
+					Utils.changeName(damagee);
 				} else {
 					if(!damagee.getScoreboardTags().contains("Dead")) {
 						damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
@@ -116,19 +117,19 @@ public class MasterMaxor implements CustomWither {
 				}
 			}
 			if(damagee.getScoreboardTags().contains("InvulnerableReminder") && !damagee.getScoreboardTags().contains("Dead")) {
-				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": YOUR WEAK, PUNY ATTACKS CANNOT GET AROUND MY TRICKS!");
 				damagee.removeScoreboardTag("InvulnerableReminder");
 			}
 			return false;
 		} else if(damagee.getScoreboardTags().contains("600Crystal") && hp - originalDamage < 600) {
 			spawnCrystal(damagee, 600);
-			PluginUtils.changeName(damagee);
+			Utils.changeName(damagee);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;
 		} else if(damagee.getScoreboardTags().contains("300Crystal") && hp - originalDamage < 300) {
 			spawnCrystal(damagee, 300);
-			PluginUtils.changeName(damagee);
+			Utils.changeName(damagee);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;
 		} else if(hp - originalDamage < 1) {
@@ -136,30 +137,30 @@ public class MasterMaxor implements CustomWither {
 			damagee.addScoreboardTag("Invulnerable");
 			damagee.addScoreboardTag("Dead");
 			damagee.setHealth(1.0);
-			PluginUtils.changeName(damagee);
+			Utils.changeName(damagee);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": HOW DID YOU DEFEAT ME?!?!?!");
-			PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+			Utils.scheduleTask(() -> {
+				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": THIS IS ONLY THE BEGINNING!!!");
 			}, 60);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			Utils.scheduleTask(() -> {
 				damagee.remove();
-				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_DEATH);
-				PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 32, 50, new ArrayList<>());
+				Utils.playGlobalSound(Sound.ENTITY_WITHER_DEATH);
+				Utils.spawnTNT(damagee, damagee.getLocation(), 0, 32, 50, new ArrayList<>());
 			}, 100);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+			Utils.scheduleTask(() -> {
+				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": It seems that you have defeated my brother.");
 			}, 240);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-				PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+			Utils.scheduleTask(() -> {
+				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": No worries, the party is just getting started!");
 			}, 300);
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new MasterStorm().onSpawn(PluginUtils.getNearestPlayer(damagee), wither);
+				new MasterStorm().onSpawn(Utils.getNearestPlayer(damagee), wither);
 			}, 340);
 			return false;
 		}
@@ -167,7 +168,7 @@ public class MasterMaxor implements CustomWither {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 

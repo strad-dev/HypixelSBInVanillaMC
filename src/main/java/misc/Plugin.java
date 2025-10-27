@@ -120,7 +120,7 @@ public class Plugin extends JavaPlugin {
 			getLogger().info("Deteced Intelligence.");
 		}
 
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 100L);
+		Utils.scheduleTask(this::passiveIntel, 100L);
 	}
 
 	public void passiveIntel() {
@@ -139,7 +139,7 @@ public class Plugin extends JavaPlugin {
 				return;
 			}
 		}
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), this::passiveIntel, 100L);
+		Utils.scheduleTask(this::passiveIntel, 100L);
 	}
 
 	@Override
