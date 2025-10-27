@@ -4,6 +4,7 @@ import listeners.DamageType;
 import misc.DamageData;
 import mobs.enderDragons.*;
 import mobs.generic.*;
+import mobs.hardmode.PrimalDragon;
 import mobs.hardmode.withers.*;
 import mobs.withers.*;
 import org.bukkit.entity.*;
@@ -78,6 +79,8 @@ public interface CustomMob {
 				return new Young();
 			} else if(tags.contains("WitherKingDragon")) {
 				return new WitherKingDragon();
+			} else if(tags.contains("PrimalDragon")) {
+				return new PrimalDragon();
 			} else if(tags.contains("Power")) {
 				return new PowerWitherSkeleton();
 			} else if(tags.contains("Fire")) {
