@@ -1,7 +1,8 @@
 package mobs.enderDragons;
 
 import listeners.DamageType;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
@@ -24,13 +25,13 @@ public class Strong implements CustomDragon {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 4, DamageType.RANGED);
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
+		calculateFinalDamage(damagee, Utils.getNearestPlayer(damagee), 4, DamageType.RANGED);
 		return true;
 	}
 }

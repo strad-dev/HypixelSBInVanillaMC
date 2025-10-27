@@ -2,7 +2,8 @@ package mobs.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -17,7 +18,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Objects;
 
-import static misc.PluginUtils.teleport;
+import static misc.Utils.teleport;
 
 public class Broodfather implements CustomMob {
 	@Override
@@ -26,7 +27,7 @@ public class Broodfather implements CustomMob {
 		e.setHealth(16.0);
 		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.75);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(PluginUtils.getNearestPlayer(e));
+		e.setTarget(Utils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("Broodfather");
@@ -39,14 +40,14 @@ public class Broodfather implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		teleport(damagee, 12);
 		CustomDamage.calculateFinalDamage(damagee, damager, 1, DamageType.ABSOLUTE);
 		return false;
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 }

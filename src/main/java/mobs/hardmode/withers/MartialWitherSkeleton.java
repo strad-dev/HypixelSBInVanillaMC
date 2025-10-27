@@ -1,7 +1,8 @@
 package mobs.hardmode.withers;
 
 import listeners.DamageType;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,7 +18,7 @@ public class MartialWitherSkeleton implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Martial Arts" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
-		PluginUtils.changeName(e);
+		Utils.changeName(e);
 		e.addScoreboardTag("Martial");
 
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
@@ -29,12 +30,12 @@ public class MartialWitherSkeleton implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(damagee.getHealth() - originalDamage < 1) {
 			List<EntityType> immune = new ArrayList<>();
 			immune.add(EntityType.WITHER_SKELETON);
 			immune.add(EntityType.WITHER);
-			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
+			Utils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
 			MasterWitherKing.defeatHenchman("Martial");
 			damagee.remove();
 			return false;
@@ -43,7 +44,7 @@ public class MartialWitherSkeleton implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 }

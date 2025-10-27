@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static misc.PluginUtils.shootBeam;
+import static misc.Utils.shootBeam;
 
 public class Terminator implements AbilityItem {
 	private static final String COOLDOWN_TAG = "SalvationCooldown";

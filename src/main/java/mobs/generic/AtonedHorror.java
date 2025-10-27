@@ -1,7 +1,8 @@
 package mobs.generic;
 
 import listeners.DamageType;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -39,7 +40,7 @@ public class AtonedHorror implements CustomMob {
 		Objects.requireNonNull(e.getAttribute(Attribute.ATTACK_DAMAGE)).setBaseValue(8.0);
 		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(PluginUtils.getNearestPlayer(e));
+		e.setTarget(Utils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("AtonedHorror");
@@ -53,11 +54,11 @@ public class AtonedHorror implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		Random random = new Random();
 		if(random.nextDouble() < 0.15) {
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Atoned Horror becomes enraged and summons an extra TNT!");
-			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
+			Utils.spawnTNT(damagee, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
 		}
 		if(type == DamageType.PLAYER_MAGIC) {
 			if(damager instanceof Player p) {
@@ -69,8 +70,8 @@ public class AtonedHorror implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		PluginUtils.spawnTNT(damager, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
+		Utils.spawnTNT(damager, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
 		return true;
 	}
 }

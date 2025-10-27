@@ -4,6 +4,7 @@ import items.AbilityItem;
 import listeners.CustomItems;
 import listeners.DamageType;
 import misc.Plugin;
+import misc.Utils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -171,14 +172,14 @@ public class Scylla implements AbilityItem {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 101, 2));
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 0.65F);
 			Location finalL = l;
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> { // convert to healing after 5 seconds
+			Utils.scheduleTask(() -> { // convert to healing after 5 seconds
 				p.setHealth(Math.min(p.getHealth() + (p.getAbsorptionAmount() / 2), p.getAttribute(Attribute.MAX_HEALTH).getValue()));
 				p.playSound(finalL, Sound.ENTITY_PLAYER_LEVELUP, 2.0F, 2.0F);
 			}, 101L);
 		}
 		if(!p.getScoreboardTags().contains("WitherShield")) { // reduced damage
 			p.addScoreboardTag("WitherShield");
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("WitherShield"), 101);
+			Utils.scheduleTask(() -> p.removeScoreboardTag("WitherShield"), 101);
 		}
 		return true;
 	}

@@ -1,6 +1,7 @@
 package mobs;
 
 import listeners.DamageType;
+import misc.DamageData;
 import mobs.enderDragons.*;
 import mobs.generic.*;
 import mobs.hardmode.withers.*;
@@ -108,10 +109,11 @@ public interface CustomMob {
 	 * @param damagee        the custom entity
 	 * @param damager        the entity dealing damage
 	 * @param originalDamage the original damage amount
-	 * @param type           the originla damage type
+	 * @param type           the original damage type
+	 * @param data			 extra data associated with the damage
 	 * @return true if the original calculation can proceed; false if not
 	 */
-	boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
+	boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data);
 
 	/**
 	 * Handles custom entity behavior when the mob deals damage
@@ -119,8 +121,9 @@ public interface CustomMob {
 	 * @param damagee        the entity taking the damage
 	 * @param damager        the custom entity
 	 * @param originalDamage the original damage amount
-	 * @param type           the originla damage type
+	 * @param type           the original damage type
+	 * @param data			 extra data associated with the damage
 	 * @return true if the original calculation can proceed; false if not
 	 */
-	boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
+	boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data);
 }

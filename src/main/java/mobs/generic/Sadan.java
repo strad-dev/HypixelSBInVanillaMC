@@ -3,7 +3,8 @@ package mobs.generic;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.BossBarManager;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -21,7 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.Objects;
 import java.util.Random;
 
-import static misc.PluginUtils.shootBeam;
+import static misc.Utils.shootBeam;
 
 public class Sadan implements CustomMob {
 	@Override
@@ -46,7 +47,7 @@ public class Sadan implements CustomMob {
 		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.125);
 		Objects.requireNonNull(e.getAttribute(Attribute.SCALE)).setBaseValue(6.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(PluginUtils.getNearestPlayer(e));
+		e.setTarget(Utils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("Sadan");
@@ -61,7 +62,7 @@ public class Sadan implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(!(damager instanceof FallingBlock)) {
 			Random random = new Random();
 			if(damager instanceof LivingEntity entity && random.nextDouble() < 0.5) {
@@ -98,7 +99,7 @@ public class Sadan implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 }

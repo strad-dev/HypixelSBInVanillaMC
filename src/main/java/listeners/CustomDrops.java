@@ -6,7 +6,7 @@ import items.ingredients.witherLords.*;
 import items.misc.IceSpray;
 import items.summonItems.*;
 import misc.Plugin;
-import misc.PluginUtils;
+import misc.Utils;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.OminousBottleAmplifier;
 import org.bukkit.*;
@@ -28,7 +28,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.List;
 import java.util.Random;
 
-import static misc.PluginUtils.sendRareDropMessage;
+import static misc.Utils.sendRareDropMessage;
 
 @SuppressWarnings({"DataFlowIssue"})
 public class CustomDrops implements Listener {
@@ -43,8 +43,8 @@ public class CustomDrops implements Listener {
 				// do nothing
 			}
 		} else {
-			p = PluginUtils.getNearestPlayer(died);
-			if(p != null && p.getLocation().distance(died.getLocation()) > 16) {
+			p = Utils.getNearestPlayer(died);
+			if(p != null && p.getLocation().distanceSquared(died.getLocation()) > 256) {
 				p = null;
 			}
 		}
@@ -893,8 +893,8 @@ public class CustomDrops implements Listener {
 		if(e.getEntity().getKiller() != null) {
 			p = e.getEntity().getKiller();
 		} else {
-			p = PluginUtils.getNearestPlayer(died);
-			if(p != null && p.getLocation().distance(died.getLocation()) > 16) {
+			p = Utils.getNearestPlayer(died);
+			if(p != null && p.getLocation().distanceSquared(died.getLocation()) > 256) {
 				p = null;
 			}
 		}

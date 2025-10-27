@@ -1,7 +1,8 @@
 package listeners;
 
+import misc.DamageData;
 import misc.Plugin;
-import misc.PluginUtils;
+import misc.Utils;
 import mobs.CustomMob;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -13,7 +14,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
-import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonDeathPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
@@ -47,115 +47,6 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 public class CustomDamage implements Listener {
-	private static class DamageData {
-		public EntityDamageEvent e;
-		public boolean isBlocking;
-		public boolean flamingArrow = false;
-		public int punchArrow = 0;
-		public boolean isTermArrow = false;
-		public double originalDamage;
-		public boolean lightningInvolved = false;
-		public LightningBolt lightningBolt = null;
-		public boolean isTridentAttack = false;
-		public boolean tridentChanneling = false;
-		public Trident trident = null;
-
-		public DamageData(EntityDamageByEntityEvent e) {
-			this.originalDamage = e.getDamage();
-			this.e = e;
-			this.isBlocking = e.getEntity() instanceof Player p && p.isBlocking();
-			if(e.getDamager() instanceof Projectile projectile) {
-				// stop stupidly annoying arrows
-				if(projectile instanceof Trident temp) {
-					this.isTridentAttack = true;
-					this.trident = temp;
-					ItemStack tridentItem = trident.getItem();
-					if(tridentItem.containsEnchantment(Enchantment.CHANNELING)) {
-						this.tridentChanneling = true;
-
-						// Check if conditions are right for channeling
-						LivingEntity target = (LivingEntity) e.getEntity();
-						World world = target.getWorld();
-						if(world.hasStorm() && world.getHighestBlockYAt(target.getLocation()) <= target.getLocation().getBlockY()) {
-							// Strike lightning
-							LightningStrike lightning = world.strikeLightning(target.getLocation());
-							this.lightningInvolved = true;
-							this.lightningBolt = ((CraftLightningStrike) lightning).getHandle();
-						}
-					}
-				} else //noinspection ConstantValue
-					if(projectile instanceof AbstractArrow arrow && arrow.getWeapon() != null) {
-						if(arrow.getWeapon().containsEnchantment(Enchantment.FLAME)) {
-							this.flamingArrow = true;
-						}
-
-						if(arrow.getWeapon().containsEnchantment(Enchantment.PUNCH)) {
-							this.punchArrow = arrow.getWeapon().getEnchantmentLevel(Enchantment.PUNCH);
-						}
-
-						if(arrow.getScoreboardTags().contains("TerminatorArrow")) {
-							this.isTermArrow = true;
-							this.originalDamage = arrow.getDamage();
-						}
-					}
-			}
-
-			if(e.getDamager() instanceof LightningStrike lightning) {
-				this.lightningInvolved = true;
-				this.lightningBolt = ((CraftLightningStrike) lightning).getHandle();
-			}
-		}
-
-		public DamageData(EntityDamageEvent e) {
-			this.originalDamage = e.getDamage();
-			this.e = e;
-			this.isBlocking = e.getEntity() instanceof Player p && p.isBlocking();
-		}
-
-		public DamageData(LivingEntity damagee, Entity damager, double originalDamage) {
-			this.originalDamage = originalDamage;
-			this.isBlocking = damagee instanceof Player p && p.isBlocking();
-			if(damager instanceof Projectile projectile) {
-				// stop stupidly annoying arrows
-				if(projectile instanceof Trident temp) {
-					this.isTridentAttack = true;
-					this.trident = temp;
-					ItemStack tridentItem = trident.getItem();
-					if(tridentItem.containsEnchantment(Enchantment.CHANNELING)) {
-						this.tridentChanneling = true;
-
-						// Check if conditions are right for channeling
-						World world = damagee.getWorld();
-						if(world.hasStorm() && world.getHighestBlockYAt(damagee.getLocation()) <= damagee.getLocation().getBlockY()) {
-							// Strike lightning
-							LightningStrike lightning = world.strikeLightning(damagee.getLocation());
-							this.lightningInvolved = true;
-							this.lightningBolt = ((CraftLightningStrike) lightning).getHandle();
-							damager.getWorld().playSound(damager, Sound.ITEM_TRIDENT_THUNDER, 1f, 1f);
-						}
-					}
-				} else if(projectile instanceof AbstractArrow arrow) {
-					if(arrow.getWeapon().containsEnchantment(Enchantment.FLAME)) {
-						this.flamingArrow = true;
-					}
-
-					if(arrow.getWeapon().containsEnchantment(Enchantment.PUNCH)) {
-						this.punchArrow = arrow.getWeapon().getEnchantmentLevel(Enchantment.PUNCH);
-					}
-
-					if(arrow.getScoreboardTags().contains("TerminatorArrow")) {
-						this.isTermArrow = true;
-						this.originalDamage = arrow.getDamage();
-					}
-				}
-			}
-
-			if(damager instanceof LightningStrike lightning) {
-				this.lightningInvolved = true;
-				this.lightningBolt = ((CraftLightningStrike) lightning).getHandle();
-			}
-		}
-	}
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		customMobs(damagee, damager, originalDamage, type, new DamageData(damagee, damager, originalDamage));
@@ -172,7 +63,7 @@ public class CustomDamage implements Listener {
 		}
 	}
 
-	private static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
+	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(damager instanceof Projectile projectile) {
 			originalDamage = data.originalDamage;
 			// stop stupidly annoying arrows
@@ -184,7 +75,7 @@ public class CustomDamage implements Listener {
 				} else {
 					arrow.setPierceLevel(arrow.getPierceLevel() - 1);
 					Vector arrowSpeed = arrow.getVelocity();
-					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> arrow.setVelocity(arrowSpeed), 1L);
+					Utils.scheduleTask(() -> arrow.setVelocity(arrowSpeed), 1L);
 				}
 			}
 
@@ -209,12 +100,12 @@ public class CustomDamage implements Listener {
 
 			// this section controls when bosses are damaged
 			if(damageeMob != null) {
-				doContinue = damageeMob.whenDamaged(damagee, damager, originalDamage, type);
+				doContinue = damageeMob.whenDamaged(damagee, damager, originalDamage, type, data);
 			}
 
 			// this section controls when bosses deal damage
 			if(damagerMob != null) {
-				doContinue = damagerMob.whenDamaging(damagee, damager, originalDamage, type);
+				doContinue = damagerMob.whenDamaging(damagee, damager, originalDamage, type, data);
 			}
 			if(!data.isBlocking) {
 				switch(damager) {
@@ -247,7 +138,7 @@ public class CustomDamage implements Listener {
 		calculateFinalDamage(damagee, damager, finalDamage, type, new DamageData(damagee, damager, finalDamage));
 	}
 
-	private static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
+	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
 		if(type != DamageType.ABSOLUTE) {
 			// bonus damage to withers from hyperion
 			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && p.getInventory().getItemInMainHand().hasItemMeta() && p.getInventory().getItemInMainHand().getItemMeta().hasLore() && p.getInventory().getItemInMainHand().getItemMeta().getLore().getFirst().equals("skyblock/combat/scylla")) {
@@ -327,28 +218,28 @@ public class CustomDamage implements Listener {
 				if(helmet != null) {
 					prots += helmet.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, helmet, Math.max(0.25, data.originalDamage / 33.33));
+						Utils.damageItem(damagee, helmet, Math.max(0.25, data.originalDamage / 33.33));
 					}
 				}
 
 				if(chestplate != null) {
 					prots += chestplate.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, chestplate, Math.max(0.25, data.originalDamage / 12.5));
+						Utils.damageItem(damagee, chestplate, Math.max(0.25, data.originalDamage / 12.5));
 					}
 				}
 
 				if(pants != null) {
 					prots += pants.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, pants, Math.max(0.25, data.originalDamage / 16.67));
+						Utils.damageItem(damagee, pants, Math.max(0.25, data.originalDamage / 16.67));
 					}
 				}
 
 				if(boots != null) {
 					prots += boots.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, boots, Math.max(0.25, data.originalDamage / 33.33));
+						Utils.damageItem(damagee, boots, Math.max(0.25, data.originalDamage / 33.33));
 					}
 				}
 
@@ -424,7 +315,7 @@ public class CustomDamage implements Listener {
 				}
 
 				// damage weapon
-				PluginUtils.damageItem(p, weapon, 1);
+				Utils.damageItem(p, weapon, 1);
 			}
 
 			// handle raid mechanics
@@ -481,13 +372,13 @@ public class CustomDamage implements Listener {
 				} else {
 					if(damagee instanceof EnderDragon dragon && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
 						if(damager == null) {
-							damager = PluginUtils.getNearestPlayer(dragon);
+							damager = Utils.getNearestPlayer(dragon);
 						}
 					}
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
 					if(damagee instanceof Villager villager && damager instanceof Zombie) {
 						villager.zombify();
-						PluginUtils.changeName(villager);
+						Utils.changeName(villager);
 					} else {
 						CustomDrops.loot(damagee, damager);
 
@@ -524,10 +415,10 @@ public class CustomDamage implements Listener {
 								Bukkit.getLogger().warning("Failed to force Dragon death animation.");
 							}
 							if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-								PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
+								Utils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 							}
 							dragon.setSilent(true);
-							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+							Utils.scheduleTask(() -> {
 								ExperienceOrb orb = (ExperienceOrb) dragon.getWorld().spawnEntity(dragon.getLocation(), EntityType.EXPERIENCE_ORB);
 								orb.setExperience(64000);
 							}, 200);
@@ -596,7 +487,7 @@ public class CustomDamage implements Listener {
 					} else {
 						dragon.setVelocity(new Vector(v.getX(), 0.333333, v.getZ()));
 					}
-					damager = PluginUtils.getNearestPlayer(dragon);
+					damager = Utils.getNearestPlayer(dragon);
 				} else if(isPhysicalHit && damager != null) {
 					// apply knockback
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
@@ -646,7 +537,7 @@ public class CustomDamage implements Listener {
 				}
 
 				// change nametag health
-				PluginUtils.changeName(damagee);
+				Utils.changeName(damagee);
 				triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 			}
 		}
