@@ -202,9 +202,11 @@ public class PrimalDragon implements CustomDragon {
 			}
 		}
 		if(type == DamageType.PLAYER_MAGIC) {
-			if(!damagee.getScoreboardTags().contains("400Trigger")) { // 600 to 401 hp
+			if(damagee.getScoreboardTags().contains("600Trigger")) {
+				return originalDamage;
+			} else if(damagee.getScoreboardTags().contains("400Trigger")) { // 600 to 401 hp
 				return originalDamage * 0.5;
-			} else if(!damagee.getScoreboardTags().contains("200Trigger")) { // 400 to 201 hp
+			} else if(damagee.getScoreboardTags().contains("200Trigger")) { // 400 to 201 hp
 				return originalDamage * 0.25;
 			} else { // 200 to dead
 				return originalDamage * 0.1;
@@ -271,14 +273,15 @@ public class PrimalDragon implements CustomDragon {
 	private static void extremeTNTRainPlayer(EnderDragon dragon) {
 		Utils.scheduleTask(() -> {
 			if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
-				Location l = dragon.getLocation();
-				l.setY(Utils.highestBlock(l));
-				if(notPerching(dragon)) {
-					Utils.spawnTNT(dragon, l, 15, 6, 30, new ArrayList<>());
-				} else {
-					Utils.spawnTNT(dragon, l, 15, 6, 12, new ArrayList<>());
+				Player p = Utils.getNearestPlayer(dragon);
+				if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
+					if(notPerching(dragon)) {
+						Utils.spawnTNT(dragon, p.getLocation(), 15, 6, 30, new ArrayList<>());
+					} else {
+						Utils.spawnTNT(dragon, p.getLocation(), 15, 6, 12, new ArrayList<>());
+					}
 				}
-				tntRain(dragon);
+				extremeTNTRainPlayer(dragon);
 			}
 		}, notPerching(dragon) ? 50 : 80);
 	}
@@ -290,7 +293,7 @@ public class PrimalDragon implements CustomDragon {
 					if(notPerching(dragon)) {
 						if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead() && dragon.getScoreboardTags().contains("400Trigger")) {
 							Player p = Utils.getNearestPlayer(dragon);
-							if(p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
+							if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
 								DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(dragon.getLocation().subtract(0, 3, 0), EntityType.DRAGON_FIREBALL);
 								Vector direction = p.getLocation().add(0, 1, 0).subtract(fireball.getLocation()).toVector().normalize();
 								fireball.setVelocity(direction.multiply(0.1));
@@ -310,7 +313,7 @@ public class PrimalDragon implements CustomDragon {
 					if(notPerching(dragon)) {
 						if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead() && dragon.getScoreboardTags().contains("200Trigger")) {
 							Player p = Utils.getNearestPlayer(dragon);
-							if(p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
+							if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
 								DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(dragon.getLocation().subtract(0, 3, 0), EntityType.DRAGON_FIREBALL);
 								Vector direction = p.getLocation().add(0, 1, 0).subtract(fireball.getLocation()).toVector().normalize();
 								fireball.setVelocity(direction.multiply(0.1));
@@ -330,7 +333,7 @@ public class PrimalDragon implements CustomDragon {
 					if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
 						if(notPerching(dragon)) {
 							Player p = Utils.getNearestPlayer(dragon);
-							if(p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
+							if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
 								DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(dragon.getLocation().subtract(0, 3, 0), EntityType.DRAGON_FIREBALL);
 								Vector direction = p.getLocation().add(0, 1, 0).subtract(fireball.getLocation()).toVector().normalize();
 								fireball.setVelocity(direction.multiply(0.1));
@@ -345,7 +348,7 @@ public class PrimalDragon implements CustomDragon {
 						} else {
 							Utils.scheduleTask(() -> {
 								for(Player p : dragon.getWorld().getPlayers()) {
-									if(p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
+									if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
 										DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(p.getLocation().add(0, 40, 0), EntityType.DRAGON_FIREBALL);
 										fireball.setDirection(new Vector(0, -0.2, 0));
 										p.playSound(dragon, Sound.ENTITY_ENDER_DRAGON_SHOOT, 1.0f, 1.0f);
@@ -391,7 +394,7 @@ public class PrimalDragon implements CustomDragon {
 	private static void spawnZealots(EnderDragon dragon, boolean spawnBruiser) {
 		Player p = Utils.getNearestPlayer(dragon);
 		Location spawnLoc;
-		if(p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
+		if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
 			spawnLoc = Utils.randomLocation(p.getLocation(), 16);
 		} else {
 			spawnLoc = dragon.getLocation().clone();

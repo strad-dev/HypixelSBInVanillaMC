@@ -185,12 +185,12 @@ public class Utils {
 				List<Entity> entities = tnt.getNearbyEntities(radius, radius, radius);
 				for(Entity entity : entities) {
 					if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-						CustomDamage.customMobs(entity1, tnt, damage, DamageType.PLAYER_MAGIC);
+						CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
 					}
 				}
+				tnt.getWorld().spawnParticle(Particle.EXPLOSION, tnt.getLocation(), Math.min((int) Math.pow(radius, 3), 65536), radius, radius / 2.0, radius);
+				tnt.getWorld().playSound(tnt.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 0.6F);
 				tnt.remove();
-				spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), Math.min((int) Math.pow(radius, 3), 65536), radius, radius / 2.0, radius);
-				spawner.getWorld().playSound(spawner.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 0.6F);
 			}, fuse);
 		}
 	}

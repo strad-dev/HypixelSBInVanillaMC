@@ -56,6 +56,11 @@ public class WandOfRestoration implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 26, 2));
 		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);

@@ -1,6 +1,6 @@
 package items.weapons;
 
-import items.AbilityItem;
+import items.CustomItem;
 import misc.Plugin;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -8,7 +8,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Claymore implements AbilityItem {
+public class Claymore implements CustomItem {
 	public static ItemStack getItem(Enchantment ench, int enchLevel) {
 		ItemStack claymore = new ItemStack(Material.STONE_SWORD);
 
@@ -79,30 +78,5 @@ public class Claymore implements AbilityItem {
 		claymore.setItemMeta(data);
 
 		return claymore;
-	}
-
-	@Override
-	public boolean onRightClick(Player p) {
-		return false;
-	}
-
-	@Override
-	public boolean onLeftClick(Player p) {
-		return false;
-	}
-
-	@Override
-	public int manaCost() {
-		return 0;
-	}
-
-	@Override
-	public String cooldownTag() {
-		return "";
-	}
-
-	@Override
-	public int cooldown() {
-		return 0;
 	}
 }

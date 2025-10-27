@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
  */
 
 public interface AbilityItem extends CustomItem {
+	boolean hasLeftClickAbility();
 
 	boolean onRightClick(Player p);
 
