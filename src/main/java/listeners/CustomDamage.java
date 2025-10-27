@@ -370,7 +370,7 @@ public class CustomDamage implements Listener {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 				} else {
-					if(damagee instanceof EnderDragon dragon && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
+					if(damagee instanceof EnderDragon dragon && data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
 						if(damager == null) {
 							damager = Utils.getNearestPlayer(dragon);
 						}

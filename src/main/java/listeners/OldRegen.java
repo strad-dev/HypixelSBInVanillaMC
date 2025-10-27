@@ -5,9 +5,7 @@ package listeners;
  * Github: https://github.com/kernitus/BukkitOldCombatMechanics/tree/master
  */
 
-import misc.Plugin;
 import misc.Utils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;

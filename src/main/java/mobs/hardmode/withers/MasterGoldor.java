@@ -3,7 +3,6 @@ package mobs.hardmode.withers;
 import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.DamageData;
-import misc.Plugin;
 import misc.Utils;
 import mobs.withers.CustomWither;
 import org.bukkit.Bukkit;
