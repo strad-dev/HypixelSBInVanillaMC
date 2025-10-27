@@ -97,6 +97,11 @@ public class Scylla implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		Location originalLocation = p.getLocation().clone();
 		Location l = p.getEyeLocation();

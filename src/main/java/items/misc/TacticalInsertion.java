@@ -51,6 +51,11 @@ public class TacticalInsertion implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		Location l = p.getLocation();
 		float yaw = l.getYaw();

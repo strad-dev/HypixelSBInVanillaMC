@@ -140,16 +140,20 @@ public class CustomItems implements Listener {
 				item = null;
 			}
 			if(item != null) {
-				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && (item instanceof Scylla || item instanceof AOTV || item instanceof BonzoStaff || item instanceof HolyIce || item instanceof IceSpray || item instanceof WandOfAtonement || item instanceof WandOfRestoration))) {
+				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
 					e.setCancelled(true);
 				}
 				if(!p.getScoreboardTags().contains("AbilityCooldown") || item instanceof Terminator) {
 					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
+							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						}
 					} else if(p.getScoreboardTags().contains(item.cooldownTag()) && !(item.cooldownTag().equals("SalvationCooldown") && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))) {
-						p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
+							p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						}
 					} else {
 						boolean abilitySuccessful = false;
 						if(e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {

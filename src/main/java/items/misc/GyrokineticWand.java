@@ -56,6 +56,11 @@ public class GyrokineticWand implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return true;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		return false;
 	}

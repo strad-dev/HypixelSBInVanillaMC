@@ -52,6 +52,11 @@ public class BonzoStaff implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		Location l = p.getLocation();
 		l.add(l.getDirection().setY(0).normalize().multiply(0.5));

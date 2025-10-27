@@ -52,6 +52,11 @@ public class HolyIce implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		p.addScoreboardTag("HolyIce");
 		Utils.scheduleTask(() -> p.removeScoreboardTag("HolyIce"), 20);

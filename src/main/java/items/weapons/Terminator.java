@@ -83,6 +83,11 @@ public class Terminator implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return true;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		// you don't need arrows
 		p.getInventory().remove(Material.ARROW);

@@ -65,6 +65,11 @@ public class IceSpray implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		Location l = p.getEyeLocation();
 		p.getWorld().spawnParticle(Particle.SNOWFLAKE, l, 1000);
