@@ -6,6 +6,7 @@ import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
@@ -225,8 +226,18 @@ public class Utils {
 	public static Location randomLocation(Location center, int radius) {
 		Vector added = new Vector(random.nextInt(radius * 2 + 1) - radius, 0, random.nextInt(radius * 2 + 1) - radius);
 		Location newLoc = center.clone().add(added);
-		newLoc.setY(center.getWorld().getHighestBlockYAt(center));
+		newLoc.setY(highestBlock(center));
 		return newLoc;
+	}
+
+	public static int highestBlock(Location l) {
+		for(int i = 319; i > -64; i--) {
+			Block b = l.getWorld().getBlockAt((int) l.getX(), i, (int) l.getZ());
+			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
+				return i + 1;
+			}
+		}
+		return -64;
 	}
 
 	public static void spawnGuards(LivingEntity entity, int num) {

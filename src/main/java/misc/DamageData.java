@@ -39,7 +39,7 @@ public class DamageData {
 					// Check if conditions are right for channeling
 					LivingEntity target = (LivingEntity) e.getEntity();
 					World world = target.getWorld();
-					if(world.hasStorm() && world.getHighestBlockYAt(target.getLocation()) <= target.getLocation().getBlockY()) {
+					if(world.hasStorm() && Utils.highestBlock(target.getLocation()) <= target.getLocation().getBlockY()) {
 						// Strike lightning
 						LightningStrike lightning = world.strikeLightning(target.getLocation());
 						this.lightningInvolved = true;
@@ -89,7 +89,7 @@ public class DamageData {
 
 					// Check if conditions are right for channeling
 					World world = damagee.getWorld();
-					if(world.hasStorm() && world.getHighestBlockYAt(damagee.getLocation()) <= damagee.getLocation().getBlockY()) {
+					if(world.hasStorm() && Utils.highestBlock(damagee.getLocation()) <= damagee.getLocation().getBlockY()) {
 						// Strike lightning
 						LightningStrike lightning = world.strikeLightning(damagee.getLocation());
 						this.lightningInvolved = true;

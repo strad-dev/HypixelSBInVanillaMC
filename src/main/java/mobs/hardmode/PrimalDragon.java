@@ -202,9 +202,9 @@ public class PrimalDragon implements CustomDragon {
 			}
 		}
 		if(type == DamageType.PLAYER_MAGIC) {
-			if(!damagee.getScoreboardTags().contains("600Trigger")) { // 600 to 401 hp
+			if(!damagee.getScoreboardTags().contains("400Trigger")) { // 600 to 401 hp
 				return originalDamage * 0.5;
-			} else if(!damagee.getScoreboardTags().contains("400Trigger")) { // 400 to 201 hp
+			} else if(!damagee.getScoreboardTags().contains("200Trigger")) { // 400 to 201 hp
 				return originalDamage * 0.25;
 			} else { // 200 to dead
 				return originalDamage * 0.1;
@@ -220,14 +220,10 @@ public class PrimalDragon implements CustomDragon {
 					if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead() && dragon.getScoreboardTags().contains("600Trigger")) {
 						if(notPerching(dragon)) {
 							Location l = dragon.getLocation();
-							l.setY(l.getWorld().getHighestBlockYAt(l));
+							l.setY(Utils.highestBlock(l));
 							Utils.spawnTNT(dragon, l, 30, 6, 10, new ArrayList<>());
 						}
-						Utils.scheduleTask(() -> {
-							if(dragon.getScoreboardTags().contains("600Trigger")) {
-								tntRain(dragon);
-							}
-						}, 40);
+						tntRain(dragon);
 					}
 				}, 40);
 			} else if(dragon.getScoreboardTags().contains("400Trigger")) { // 600 to 401 hp
@@ -235,14 +231,10 @@ public class PrimalDragon implements CustomDragon {
 					if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead() && dragon.getScoreboardTags().contains("400Trigger")) {
 						if(notPerching(dragon)) {
 							Location l = dragon.getLocation();
-							l.setY(l.getWorld().getHighestBlockYAt(l));
+							l.setY(Utils.highestBlock(l));
 							Utils.spawnTNT(dragon, l, 20, 6, 20, new ArrayList<>());
 						}
-						Utils.scheduleTask(() -> {
-							if(dragon.getScoreboardTags().contains("400Trigger")) {
-								tntRain(dragon);
-							}
-						}, 40);
+						tntRain(dragon);
 					}
 				}, 40);
 			} else if(dragon.getScoreboardTags().contains("200Trigger")) { // 400 to 201 hp
@@ -250,14 +242,10 @@ public class PrimalDragon implements CustomDragon {
 					if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead() && dragon.getScoreboardTags().contains("200Trigger")) {
 						if(notPerching(dragon)) {
 							Location l = dragon.getLocation();
-							l.setY(l.getWorld().getHighestBlockYAt(l));
+							l.setY(Utils.highestBlock(l));
 							Utils.spawnTNT(dragon, l, 15, 6, 25, new ArrayList<>());
 						}
-						Utils.scheduleTask(() -> {
-							if(dragon.getScoreboardTags().contains("200Trigger")) {
-								tntRain(dragon);
-							}
-						}, 30);
+						tntRain(dragon);
 					}
 				}, 30);
 			} else { // Extreme TNT Rain (200 hp to dead)
@@ -265,45 +253,34 @@ public class PrimalDragon implements CustomDragon {
 					if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
 						if(notPerching(dragon)) {
 							Location l = dragon.getLocation();
-							l.setY(l.getWorld().getHighestBlockYAt(l));
+							l.setY(Utils.highestBlock(l));
 							Utils.spawnTNT(dragon, l, 15, 6, 30, new ArrayList<>());
-							Utils.scheduleTask(() -> {
-								if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
-									tntRain(dragon);
-								}
-							}, 20);
+							tntRain(dragon);
 						} else {
-							Utils.scheduleTask(() -> {
-								for(Location l : PERCHED_TNT_RAIN_LOCATIONS) {
-									Utils.spawnTNT(dragon, l, 15, 6, 12, new ArrayList<>());
-								}
-								Utils.scheduleTask(() -> {
-									if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
-										tntRain(dragon);
-									}
-								}, 30);
-							}, 30);
+							for(Location l : PERCHED_TNT_RAIN_LOCATIONS) {
+								Utils.spawnTNT(dragon, l, 15, 6, 12, new ArrayList<>());
+							}
+							tntRain(dragon);
 						}
 					}
-				}, 20);
+				}, notPerching(dragon) ? 20 : 30);
 			}
 		}
 	}
 
 	private static void extremeTNTRainPlayer(EnderDragon dragon) {
-		if(notPerching(dragon)) {
-			Player p = Utils.getNearestPlayer(dragon);
-			if(p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
-				Utils.spawnTNT(dragon, p.getLocation(), 30, 6, 12, new ArrayList<>());
+		Utils.scheduleTask(() -> {
+			if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
+				Location l = dragon.getLocation();
+				l.setY(Utils.highestBlock(l));
+				if(notPerching(dragon)) {
+					Utils.spawnTNT(dragon, l, 15, 6, 30, new ArrayList<>());
+				} else {
+					Utils.spawnTNT(dragon, l, 15, 6, 12, new ArrayList<>());
+				}
+				tntRain(dragon);
 			}
-			Utils.scheduleTask(() -> extremeTNTRainPlayer(dragon), 50);
-		} else {
-			Player p = Utils.getNearestPlayer(dragon);
-			if(p.getLocation().distanceSquared(dragon.getLocation()) < 16384) {
-				Utils.spawnTNT(dragon, p.getLocation(), 40, 4, 8, new ArrayList<>());
-			}
-			Utils.scheduleTask(() -> extremeTNTRainPlayer(dragon), 80);
-		}
+		}, notPerching(dragon) ? 50 : 80);
 	}
 
 	private static void fireballSpam(EnderDragon dragon) {
@@ -418,7 +395,7 @@ public class PrimalDragon implements CustomDragon {
 			spawnLoc = Utils.randomLocation(p.getLocation(), 16);
 		} else {
 			spawnLoc = dragon.getLocation().clone();
-			spawnLoc.setY(dragon.getWorld().getHighestBlockYAt(spawnLoc));
+			spawnLoc.setY(Utils.highestBlock(spawnLoc));
 		}
 		for(int i = 0; i < 2; i++) {
 			Enderman enderman = (Enderman) dragon.getWorld().spawnEntity(spawnLoc, EntityType.ENDERMAN);
@@ -455,7 +432,7 @@ public class PrimalDragon implements CustomDragon {
 			Utils.scheduleTask(() -> {
 				if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
 					Location spawnLoc = Utils.randomLocation(new Location(dragon.getWorld(), 0, 64, 0), 32);
-					spawnLoc.setY(dragon.getWorld().getHighestBlockYAt(spawnLoc) + 15 + random.nextInt(11));
+					spawnLoc.setY(Utils.highestBlock(spawnLoc) + 15 + random.nextInt(11));
 					dragon.getWorld().spawnEntity(spawnLoc, EntityType.END_CRYSTAL);
 					dragon.setHealth(dragon.getHealth() + 10);
 					Utils.scheduleTask(() -> theFinalTrick(dragon), 600);
