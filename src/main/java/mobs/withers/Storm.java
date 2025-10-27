@@ -3,7 +3,6 @@ package mobs.withers;
 import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.DamageData;
-import misc.Plugin;
 import misc.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

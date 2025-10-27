@@ -2,10 +2,8 @@ package mobs.hardmode.withers;
 
 import listeners.DamageType;
 import misc.DamageData;
-import misc.Plugin;
 import misc.Utils;
 import mobs.CustomMob;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 

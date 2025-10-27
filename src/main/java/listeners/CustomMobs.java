@@ -1,6 +1,5 @@
 package listeners;
 
-import misc.Plugin;
 import misc.Utils;
 import mobs.enderDragons.CustomDragon;
 import mobs.hardmode.PrimalDragon;
@@ -57,12 +56,10 @@ public class CustomMobs implements Listener {
 				for(Player p2 : e.getEntity().getWorld().getPlayers()) {
 					if(p2.getLocation().distanceSquared(e.getLocation()) <= 4096 && p2.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
 						hardMode = true;
-						p2.removePotionEffect(PotionEffectType.BAD_OMEN);
+						p = p2;
 						break;
 					}
 				}
-			} else {
-				p.removePotionEffect(PotionEffectType.BAD_OMEN);
 			}
 		}
 		if(e.getEntity() instanceof LivingEntity entity) {
@@ -78,6 +75,7 @@ public class CustomMobs implements Listener {
 						wither.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 						if(!isWitherLordFightActive) {
 							if(hardMode) {
+								p.removePotionEffect(PotionEffectType.BAD_OMEN);
 								Utils.scheduleTask(wither::remove, 1);
 								Utils.scheduleTask(() -> {
 									Wither wither2 = (Wither) wither.getWorld().spawnEntity(wither.getLocation(), EntityType.WITHER);
@@ -117,6 +115,7 @@ public class CustomMobs implements Listener {
 					case EnderDragon dragon -> {
 						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
 							if(hardMode) {
+								p.removePotionEffect(PotionEffectType.BAD_OMEN);
 								new PrimalDragon().onSpawn(p, dragon);
 							} else {
 								name = CustomDragon.spawnRandom().onSpawn(Utils.getNearestPlayer(dragon), dragon);
