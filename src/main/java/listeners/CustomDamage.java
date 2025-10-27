@@ -480,14 +480,16 @@ public class CustomDamage implements Listener {
 				}
 
 				// special ender dragon knockback to make zero- and one-cycling possible
-				if(damagee instanceof EnderDragon dragon && data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
-					Vector v = dragon.getVelocity();
-					if(dragon.getPhase() == EnderDragon.Phase.LAND_ON_PORTAL) {
-						dragon.setVelocity(new Vector(v.getX(), 0.25, v.getZ()));
-					} else {
-						dragon.setVelocity(new Vector(v.getX(), 0.333333, v.getZ()));
+				if(damagee instanceof EnderDragon dragon) {
+					if(data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
+						Vector v = dragon.getVelocity();
+						if(dragon.getPhase() == EnderDragon.Phase.LAND_ON_PORTAL) {
+							dragon.setVelocity(new Vector(v.getX(), 0.25, v.getZ()));
+						} else {
+							dragon.setVelocity(new Vector(v.getX(), 0.333333, v.getZ()));
+						}
+						damager = Utils.getNearestPlayer(dragon);
 					}
-					damager = Utils.getNearestPlayer(dragon);
 				} else if(isPhysicalHit && damager != null) {
 					// apply knockback
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();

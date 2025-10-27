@@ -32,7 +32,7 @@ public class PrimalDragon implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		FREEZE_LOCATION = new Location(e.getWorld(), 0.5, 80, 0.5);
+		FREEZE_LOCATION = new Location(e.getWorld(), 0.5, 70, 0.5);
 		PERCHED_TNT_RAIN_LOCATIONS[0] = new Location(e.getWorld(), 3.5, 62, 0.5);
 		PERCHED_TNT_RAIN_LOCATIONS[1] = new Location(e.getWorld(), 2.5, 62, 2.5);
 		PERCHED_TNT_RAIN_LOCATIONS[2] = new Location(e.getWorld(), 0.5, 62, 3.5);
@@ -54,7 +54,7 @@ public class PrimalDragon implements CustomDragon {
 		e.addScoreboardTag("200Trigger");
 		e.setPersistent(true);
 		e.setRemoveWhenFarAway(false);
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The STRONG DRAGON has arrived to pulverize you!");
+		e.setSilent(true);
 		Bukkit.getLogger().info("The Primal Dragon has been summoned!");
 
 		e.teleport(new Location(e.getWorld(), 0, 80, 0));
@@ -64,6 +64,8 @@ public class PrimalDragon implements CustomDragon {
 		Utils.scheduleTask(() -> dialogue("You will never survive what's coming, and will finally pay the price!"), 180);
 		Utils.scheduleTask(() -> {
 			e.setAI(true);
+			e.setSilent(false);
+			e.removeScoreboardTag("Invulnerable");
 			Utils.spawnTNT(e, FREEZE_LOCATION, 0, 128, 50, new ArrayList<>());
 		}, 240);
 		return name;
@@ -84,9 +86,12 @@ public class PrimalDragon implements CustomDragon {
 			return false;
 		} else if(dragon.getScoreboardTags().contains("800Trigger") && hp - actualDamage < 800) {
 			Utils.changeName(dragon);
+			dragon.teleport(FREEZE_LOCATION);
+			dragon.addScoreboardTag("Invulnerable");
+			dragon.removeScoreboardTag("800Trigger");
 			dragon.setHealth(800);
 			dragon.setAI(false);
-			dragon.teleport(FREEZE_LOCATION);
+			dragon.setSilent(true);
 			dialogue("Still think it's easy?");
 			Utils.scheduleTask(() -> dialogue("Try running from my TNT!"), 60);
 			Utils.scheduleTask(() -> {
@@ -95,13 +100,17 @@ public class PrimalDragon implements CustomDragon {
 				dragon.setPhase(EnderDragon.Phase.CIRCLING);
 				Utils.spawnTNT(dragon, FREEZE_LOCATION, 0, 128, 100, new ArrayList<>());
 				tntRain(dragon);
+				dragon.setSilent(false);
 			}, 120);
 			return false;
 		} else if(dragon.getScoreboardTags().contains("600Trigger") && hp - actualDamage < 600) {
 			Utils.changeName(dragon);
+			dragon.teleport(FREEZE_LOCATION);
+			dragon.addScoreboardTag("Invulnerable");
+			dragon.removeScoreboardTag("600Trigger");
 			dragon.setHealth(600);
 			dragon.setAI(false);
-			dragon.teleport(FREEZE_LOCATION);
+			dragon.setSilent(true);
 			dialogue("I am amazed you survived that.");
 			Utils.scheduleTask(() -> dialogue("Good luck with this one!"), 60);
 			Utils.scheduleTask(() -> {
@@ -111,13 +120,17 @@ public class PrimalDragon implements CustomDragon {
 				Utils.spawnTNT(dragon, FREEZE_LOCATION, 0, 128, 150, new ArrayList<>());
 				tntRain(dragon);
 				fireballSpam(dragon);
+				dragon.setSilent(false);
 			}, 120);
 			return false;
 		} else if(dragon.getScoreboardTags().contains("400Trigger") && hp - actualDamage < 400) {
 			Utils.changeName(dragon);
+			dragon.teleport(FREEZE_LOCATION);
+			dragon.addScoreboardTag("Invulnerable");
+			dragon.removeScoreboardTag("400Trigger");
 			dragon.setHealth(400);
 			dragon.setAI(false);
-			dragon.teleport(FREEZE_LOCATION);
+			dragon.setSilent(true);
 			dialogue("It seems that I cannot take you on alone.");
 			Utils.scheduleTask(() -> dialogue("Fortunately, I have made a few friends here!"), 60);
 			Utils.scheduleTask(() -> {
@@ -128,13 +141,17 @@ public class PrimalDragon implements CustomDragon {
 				tntRain(dragon);
 				fireballSpam(dragon);
 				summonZealots(dragon);
+				dragon.setSilent(false);
 			}, 120);
 			return false;
 		} else if(dragon.getScoreboardTags().contains("200Trigger") && hp - actualDamage < 200) {
 			Utils.changeName(dragon);
+			dragon.teleport(FREEZE_LOCATION);
+			dragon.addScoreboardTag("Invulnerable");
+			dragon.removeScoreboardTag("200Trigger");
 			dragon.setHealth(200);
 			dragon.setAI(false);
-			dragon.teleport(FREEZE_LOCATION);
+			dragon.setSilent(true);
 			dialogue("Enough!  I did not want to do this, but you leave me no choice!");
 			Utils.scheduleTask(() -> dialogue("I have held back, hoping that you would see the error in your ways."), 60);
 			Utils.scheduleTask(() -> dialogue("I was wrong.  Prepare to face my true power."), 120);
@@ -149,6 +166,7 @@ public class PrimalDragon implements CustomDragon {
 				fireballSpam(dragon);
 				summonZealots(dragon);
 				theFinalTrick(dragon);
+				dragon.setSilent(false);
 			}, 240);
 			return false;
 		} else if(hp - actualDamage <= 0) {

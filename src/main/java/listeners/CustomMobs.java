@@ -116,7 +116,7 @@ public class CustomMobs implements Listener {
 						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
 							if(hardMode) {
 								p.removePotionEffect(PotionEffectType.BAD_OMEN);
-								new PrimalDragon().onSpawn(p, dragon);
+								name = new PrimalDragon().onSpawn(p, dragon);
 							} else {
 								name = CustomDragon.spawnRandom().onSpawn(Utils.getNearestPlayer(dragon), dragon);
 								dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
