@@ -35,41 +35,43 @@ public class PrimalDragon implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		FREEZE_LOCATION = new Location(e.getWorld(), 0.5, 70, 0.5);
-		PERCHED_TNT_RAIN_LOCATIONS[0] = new Location(e.getWorld(), 3.5, 62, 0.5);
-		PERCHED_TNT_RAIN_LOCATIONS[1] = new Location(e.getWorld(), 2.5, 62, 2.5);
-		PERCHED_TNT_RAIN_LOCATIONS[2] = new Location(e.getWorld(), 0.5, 62, 3.5);
-		PERCHED_TNT_RAIN_LOCATIONS[3] = new Location(e.getWorld(), -1.5, 62, 2.5);
-		PERCHED_TNT_RAIN_LOCATIONS[4] = new Location(e.getWorld(), -2.5, 62, 0.5);
-		PERCHED_TNT_RAIN_LOCATIONS[5] = new Location(e.getWorld(), -1.5, 62, -1.5);
-		PERCHED_TNT_RAIN_LOCATIONS[6] = new Location(e.getWorld(), 0.5, 62, -2.5);
-		PERCHED_TNT_RAIN_LOCATIONS[7] = new Location(e.getWorld(), 2.5, 62, -1.5);
-		Utils.scheduleTask(() -> e.setAI(false), 2);
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000.0);
-		e.setHealth(1000.0);
-		e.addScoreboardTag("PrimalDragon");
-		e.addScoreboardTag("HardMode");
-		e.addScoreboardTag("SkyblockBoss");
-		e.addScoreboardTag("Invulnerable");
-		e.addScoreboardTag("800Trigger");
-		e.addScoreboardTag("600Trigger");
-		e.addScoreboardTag("400Trigger");
-		e.addScoreboardTag("200Trigger");
-		e.setPersistent(true);
-		e.setRemoveWhenFarAway(false);
-		e.setSilent(true);
+		EnderDragon dragon = (EnderDragon) e;
+		FREEZE_LOCATION = new Location(dragon.getWorld(), 0.5, 70, 0.5);
+		PERCHED_TNT_RAIN_LOCATIONS[0] = new Location(dragon.getWorld(), 3.5, 62, 0.5);
+		PERCHED_TNT_RAIN_LOCATIONS[1] = new Location(dragon.getWorld(), 2.5, 62, 2.5);
+		PERCHED_TNT_RAIN_LOCATIONS[2] = new Location(dragon.getWorld(), 0.5, 62, 3.5);
+		PERCHED_TNT_RAIN_LOCATIONS[3] = new Location(dragon.getWorld(), -1.5, 62, 2.5);
+		PERCHED_TNT_RAIN_LOCATIONS[4] = new Location(dragon.getWorld(), -2.5, 62, 0.5);
+		PERCHED_TNT_RAIN_LOCATIONS[5] = new Location(dragon.getWorld(), -1.5, 62, -1.5);
+		PERCHED_TNT_RAIN_LOCATIONS[6] = new Location(dragon.getWorld(), 0.5, 62, -2.5);
+		PERCHED_TNT_RAIN_LOCATIONS[7] = new Location(dragon.getWorld(), 2.5, 62, -1.5);
+		Utils.scheduleTask(() -> dragon.setAI(false), 2);
+		dragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000.0);
+		dragon.setHealth(1000.0);
+		dragon.addScoreboardTag("PrimalDragon");
+		dragon.addScoreboardTag("HardMode");
+		dragon.addScoreboardTag("SkyblockBoss");
+		dragon.addScoreboardTag("Invulnerable");
+		dragon.addScoreboardTag("800Trigger");
+		dragon.addScoreboardTag("600Trigger");
+		dragon.addScoreboardTag("400Trigger");
+		dragon.addScoreboardTag("200Trigger");
+		dragon.setPersistent(true);
+		dragon.setRemoveWhenFarAway(false);
+		dragon.setSilent(true);
 		Bukkit.getLogger().info("The Primal Dragon has been summoned!");
 
-		e.teleport(FREEZE_LOCATION);
+		dragon.teleport(FREEZE_LOCATION);
 		dialogue("For centuries, I have seen my kind be easily killed off one by one.");
 		Utils.scheduleTask(() -> dialogue("Swords, bows, maces.  Even beds, somehow, have made quick work of them."), 60);
 		Utils.scheduleTask(() -> dialogue("But it all ends here.  I have been slowly gaining power to avenge them."), 120);
 		Utils.scheduleTask(() -> dialogue("You will never survive what's coming, and will finally pay the price!"), 180);
 		Utils.scheduleTask(() -> {
-			e.setAI(true);
-			e.setSilent(false);
-			e.removeScoreboardTag("Invulnerable");
-			Utils.spawnTNT(e, FREEZE_LOCATION, 0, 128, 50, new ArrayList<>());
+			dragon.setAI(true);
+			dragon.setSilent(false);
+			dragon.removeScoreboardTag("Invulnerable");
+			dragon.setPhase(EnderDragon.Phase.CIRCLING);
+			Utils.spawnTNT(dragon, FREEZE_LOCATION, 0, 128, 50, new ArrayList<>());
 		}, 240);
 		return name;
 	}
@@ -97,11 +99,11 @@ public class PrimalDragon implements CustomDragon {
 			}
 			return false;
 		} else if(dragon.getScoreboardTags().contains("800Trigger") && hp - actualDamage < 800) {
+			dragon.setHealth(800);
 			Utils.changeName(dragon);
 			dragon.teleport(FREEZE_LOCATION);
 			dragon.addScoreboardTag("Invulnerable");
 			dragon.removeScoreboardTag("800Trigger");
-			dragon.setHealth(800);
 			Utils.scheduleTask(() -> dragon.setAI(false), 2);
 			dragon.setSilent(true);
 			dialogue("Still think it's easy?");
@@ -116,11 +118,11 @@ public class PrimalDragon implements CustomDragon {
 			}, 120);
 			return false;
 		} else if(dragon.getScoreboardTags().contains("600Trigger") && hp - actualDamage < 600) {
+			dragon.setHealth(600);
 			Utils.changeName(dragon);
 			dragon.teleport(FREEZE_LOCATION);
 			dragon.addScoreboardTag("Invulnerable");
 			dragon.removeScoreboardTag("600Trigger");
-			dragon.setHealth(600);
 			Utils.scheduleTask(() -> dragon.setAI(false), 2);
 			dragon.setSilent(true);
 			dialogue("I am amazed you survived that.");
@@ -136,11 +138,11 @@ public class PrimalDragon implements CustomDragon {
 			}, 120);
 			return false;
 		} else if(dragon.getScoreboardTags().contains("400Trigger") && hp - actualDamage < 400) {
+			dragon.setHealth(400);
 			Utils.changeName(dragon);
 			dragon.teleport(FREEZE_LOCATION);
 			dragon.addScoreboardTag("Invulnerable");
 			dragon.removeScoreboardTag("400Trigger");
-			dragon.setHealth(400);
 			Utils.scheduleTask(() -> dragon.setAI(false), 2);
 			dragon.setSilent(true);
 			dialogue("It seems that I cannot take you on alone.");
@@ -157,11 +159,11 @@ public class PrimalDragon implements CustomDragon {
 			}, 120);
 			return false;
 		} else if(dragon.getScoreboardTags().contains("200Trigger") && hp - actualDamage < 200) {
+			dragon.setHealth(200);
 			Utils.changeName(dragon);
 			dragon.teleport(FREEZE_LOCATION);
 			dragon.addScoreboardTag("Invulnerable");
 			dragon.removeScoreboardTag("200Trigger");
-			dragon.setHealth(200);
 			Utils.scheduleTask(() -> dragon.setAI(false), 2);
 			dragon.setSilent(true);
 			dialogue("Enough!  I did not want to do this, but you leave me no choice!");
@@ -318,7 +320,7 @@ public class PrimalDragon implements CustomDragon {
 			} else if(phase.equals("final")) {
 				// Perched fireballs only in final phase
 				dropFireballsOnAllPlayers(dragon);
-				scheduleNextFireball(dragon, 160);
+				scheduleNextFireball(dragon, 120);
 			}
 		}, delay);
 	}
@@ -336,9 +338,9 @@ public class PrimalDragon implements CustomDragon {
 	private static void shootFireballAtNearestPlayer(EnderDragon dragon) {
 		Player p = Utils.getNearestPlayer(dragon);
 		if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
-			DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(dragon.getLocation().subtract(0, p.getLocation().getY() > dragon.getLocation().getY() ? 3 : -3, 0), EntityType.DRAGON_FIREBALL);
-			Vector direction = p.getLocation().add(0, 1, 0).subtract(fireball.getLocation()).toVector().normalize();
-			fireball.setVelocity(direction.multiply(0.1));
+			Vector direction = p.getLocation().add(0, 1, 0).subtract(dragon.getLocation()).toVector().normalize();
+			DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(dragon.getLocation().add(direction.clone().multiply(5)), EntityType.DRAGON_FIREBALL);
+			fireball.setVelocity(direction.clone().multiply(0.1));
 			fireball.setDirection(direction);
 			p.playSound(dragon, Sound.ENTITY_ENDER_DRAGON_SHOOT, 1.0f, 1.0f);
 		}
