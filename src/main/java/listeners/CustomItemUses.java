@@ -44,7 +44,7 @@ public class CustomItemUses implements Listener {
 			}
 			case Wither wither when wither.getScoreboardTags().contains("Maxor") && p.getScoreboardTags().contains("HasCrystal") -> {
 				wither.removeScoreboardTag("Invulnerable");
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???.");
+				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???.");
 				List<EntityType> immune = new ArrayList<>();
 				immune.add(EntityType.WITHER_SKELETON);
 				Utils.spawnTNT(wither, wither.getLocation(), 0, 8, 10, immune);

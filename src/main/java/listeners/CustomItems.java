@@ -145,7 +145,7 @@ public class CustomItems implements Listener {
 				}
 				if(!p.getScoreboardTags().contains("AbilityCooldown") || item instanceof Terminator) {
 					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
+						if(!((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && !item.hasLeftClickAbility())) {
 							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
 							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 						}

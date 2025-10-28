@@ -188,7 +188,7 @@ public class MasterWitherKing implements CustomWither {
 			int health = 150 - countHenchmenLeft() * 10;
 			for(int i = 0; i < 4 - countHenchmenLeft() / 2; i++) {
 				WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
-				e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + health);
+				e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + health);
 				ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 				sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 5);
 				ItemStack shield = new ItemStack(Material.SHIELD);
