@@ -2,7 +2,7 @@ package listeners;
 
 import items.AbilityItem;
 import items.CustomItem;
-import items.misc.*;
+import items.misc.AOTV;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
 import misc.Plugin;
@@ -179,7 +179,11 @@ public class CustomItems implements Listener {
 					}
 				}
 			}
-			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
+			if(score.getScore() < 2500) {
+				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
+			} else {
+				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE"));
+			}
 		}
 	}
 }

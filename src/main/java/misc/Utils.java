@@ -3,6 +3,7 @@ package misc;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -320,5 +321,16 @@ public class Utils {
 	
 	public static void scheduleTask(Runnable task, long delay) {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), task, delay);
+	}
+
+	/**
+	 * Sends a packet to every player on the server.
+	 *
+	 * @param pkt Packet to send
+	 */
+	public static void broadcastPacket(Packet<?> pkt) {
+		for(Player p : Bukkit.getOnlinePlayers()) {
+			((CraftPlayer) p).getHandle().connection.send(pkt);
+		}
 	}
 }

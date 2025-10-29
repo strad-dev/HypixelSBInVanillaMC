@@ -5,11 +5,16 @@ import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
 import mobs.enderDragons.CustomDragon;
+import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
+import net.minecraft.world.entity.PositionMoveRotation;
+import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftEnderDragon;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -18,10 +23,12 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 
 public class PrimalDragon implements CustomDragon {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Primal Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 	private static Location FREEZE_LOCATION;
+	private static PositionMoveRotation NMS_FREEZE_LOCATION;
 	private static final Location[] PERCHED_TNT_RAIN_LOCATIONS = new Location[8];
 	private static final Random random = new Random();
 	private static final int PERCH_MAX_DAMAGE = 50;
@@ -37,6 +44,11 @@ public class PrimalDragon implements CustomDragon {
 	public String onSpawn(Player p, Mob e) {
 		EnderDragon dragon = (EnderDragon) e;
 		FREEZE_LOCATION = new Location(dragon.getWorld(), 0.5, 70, 0.5);
+		NMS_FREEZE_LOCATION = new PositionMoveRotation(new Vec3(0.5, 70, 0.5), // position
+				Vec3.ZERO, // delta movement (we handle this separately)
+				0, // yaw
+				0  // pitch
+		);
 		PERCHED_TNT_RAIN_LOCATIONS[0] = new Location(dragon.getWorld(), 3.5, 62, 0.5);
 		PERCHED_TNT_RAIN_LOCATIONS[1] = new Location(dragon.getWorld(), 2.5, 62, 2.5);
 		PERCHED_TNT_RAIN_LOCATIONS[2] = new Location(dragon.getWorld(), 0.5, 62, 3.5);
@@ -45,7 +57,7 @@ public class PrimalDragon implements CustomDragon {
 		PERCHED_TNT_RAIN_LOCATIONS[5] = new Location(dragon.getWorld(), -1.5, 62, -1.5);
 		PERCHED_TNT_RAIN_LOCATIONS[6] = new Location(dragon.getWorld(), 0.5, 62, -2.5);
 		PERCHED_TNT_RAIN_LOCATIONS[7] = new Location(dragon.getWorld(), 2.5, 62, -1.5);
-		Utils.scheduleTask(() -> dragon.setAI(false), 2);
+		dragon.setPhase(EnderDragon.Phase.HOVER);
 		dragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000.0);
 		dragon.setHealth(1000.0);
 		dragon.addScoreboardTag("PrimalDragon");
@@ -90,7 +102,7 @@ public class PrimalDragon implements CustomDragon {
 		} else {
 			perchedDamageAccumulated = 0;
 		}
-		if(dragon.getScoreboardTags().contains("Invulnerable")) {
+		if(dragon.getScoreboardTags().contains("Invulnerable") || dragon.getScoreboardTags().contains("Dead")) {
 			if(damager instanceof Player p) {
 				if(!dragon.getScoreboardTags().contains("Dead")) {
 					dragon.getWorld().playSound(dragon, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
@@ -99,13 +111,7 @@ public class PrimalDragon implements CustomDragon {
 			}
 			return false;
 		} else if(dragon.getScoreboardTags().contains("800Trigger") && hp - actualDamage < 800) {
-			dragon.setHealth(800);
-			Utils.changeName(dragon);
-			dragon.teleport(FREEZE_LOCATION);
-			dragon.addScoreboardTag("Invulnerable");
-			dragon.removeScoreboardTag("800Trigger");
-			Utils.scheduleTask(() -> dragon.setAI(false), 2);
-			dragon.setSilent(true);
+			freezeDragon(dragon, 800);
 			dialogue("Still think it's easy?");
 			Utils.scheduleTask(() -> dialogue("Try running from my fireballs!"), 60);
 			Utils.scheduleTask(() -> {
@@ -118,13 +124,7 @@ public class PrimalDragon implements CustomDragon {
 			}, 120);
 			return false;
 		} else if(dragon.getScoreboardTags().contains("600Trigger") && hp - actualDamage < 600) {
-			dragon.setHealth(600);
-			Utils.changeName(dragon);
-			dragon.teleport(FREEZE_LOCATION);
-			dragon.addScoreboardTag("Invulnerable");
-			dragon.removeScoreboardTag("600Trigger");
-			Utils.scheduleTask(() -> dragon.setAI(false), 2);
-			dragon.setSilent(true);
+			freezeDragon(dragon, 600);
 			dialogue("I am amazed you survived that.");
 			Utils.scheduleTask(() -> dialogue("Good luck escaping my explosives!"), 60);
 			Utils.scheduleTask(() -> {
@@ -138,13 +138,7 @@ public class PrimalDragon implements CustomDragon {
 			}, 120);
 			return false;
 		} else if(dragon.getScoreboardTags().contains("400Trigger") && hp - actualDamage < 400) {
-			dragon.setHealth(400);
-			Utils.changeName(dragon);
-			dragon.teleport(FREEZE_LOCATION);
-			dragon.addScoreboardTag("Invulnerable");
-			dragon.removeScoreboardTag("400Trigger");
-			Utils.scheduleTask(() -> dragon.setAI(false), 2);
-			dragon.setSilent(true);
+			freezeDragon(dragon, 400);
 			dialogue("It seems that I cannot take you on alone.");
 			Utils.scheduleTask(() -> dialogue("Fortunately, I have made a few friends here!"), 60);
 			Utils.scheduleTask(() -> {
@@ -159,13 +153,7 @@ public class PrimalDragon implements CustomDragon {
 			}, 120);
 			return false;
 		} else if(dragon.getScoreboardTags().contains("200Trigger") && hp - actualDamage < 200) {
-			dragon.setHealth(200);
-			Utils.changeName(dragon);
-			dragon.teleport(FREEZE_LOCATION);
-			dragon.addScoreboardTag("Invulnerable");
-			dragon.removeScoreboardTag("200Trigger");
-			Utils.scheduleTask(() -> dragon.setAI(false), 2);
-			dragon.setSilent(true);
+			freezeDragon(dragon, 200);
 			dialogue("Enough!  I did not want to do this, but you leave me no choice!");
 			Utils.scheduleTask(() -> dialogue("I have held back, hoping that you would see the error in your ways."), 60);
 			Utils.scheduleTask(() -> dialogue("I was wrong.  Prepare to face my true power."), 120);
@@ -184,6 +172,7 @@ public class PrimalDragon implements CustomDragon {
 			}, 240);
 			return false;
 		} else if(hp - actualDamage <= 0) {
+			dragon.addScoreboardTag("Dead");
 			dialogue("Centuries of training down the drain...");
 			Utils.scheduleTask(() -> dialogue("Your power is unmatched.  I commend you for that."), 60);
 			Utils.scheduleTask(() -> dialogue("I hope you will stop killing my kind, but when has asking nicely ever worked?"), 120);
@@ -191,6 +180,42 @@ public class PrimalDragon implements CustomDragon {
 		}
 		CustomDamage.calculateFinalDamage(dragon, damager, actualDamage, type, data);
 		return false;
+	}
+
+	private static void freezeDragon(EnderDragon dragon, double newHealth) {
+		if(newHealth > 0) {
+			dragon.setHealth(newHealth);
+		}
+		Utils.changeName(dragon);
+
+		dragon.setPhase(EnderDragon.Phase.HOVER);
+		dragon.removeScoreboardTag((int) newHealth + "Trigger");
+		dragon.addScoreboardTag("Invulnerable");
+		dragon.setSilent(true);
+
+		// Get NMS dragon entity
+		net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon =
+				((CraftEnderDragon) dragon).getHandle();
+
+		// 4. Stop all movement
+		nmsDragon.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
+		nmsDragon.setYRot(0);
+		nmsDragon.setXRot(0);
+
+		// 6. Teleport the dragon
+		nmsDragon.teleportTo(FREEZE_LOCATION.getX(), FREEZE_LOCATION.getY(), FREEZE_LOCATION.getZ());
+
+		// 7. Force client sync
+		ClientboundTeleportEntityPacket packet = ClientboundTeleportEntityPacket.teleport(nmsDragon.getId(), NMS_FREEZE_LOCATION, Set.of(), false);
+		Utils.broadcastPacket(packet);
+
+		// 8. Update dragon parts to prevent desync
+		net.minecraft.world.entity.boss.EnderDragonPart[] parts = nmsDragon.getSubEntities();
+		for(EnderDragonPart part : parts) {
+			part.setPos(FREEZE_LOCATION.getX(), FREEZE_LOCATION.getY(), FREEZE_LOCATION.getZ());
+			ClientboundTeleportEntityPacket partPacket = ClientboundTeleportEntityPacket.teleport(part.getId(), NMS_FREEZE_LOCATION, Set.of(), false);
+			Utils.broadcastPacket(partPacket);
+		}
 	}
 
 	private static void dialogue(String message) {
@@ -219,14 +244,14 @@ public class PrimalDragon implements CustomDragon {
 		if(damagee.getScoreboardTags().contains("600Trigger")) return 0.2;
 		if(damagee.getScoreboardTags().contains("400Trigger")) return 0.15;
 		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.1;
-		return 0.05;
+		return 0.0667;
 	}
 
 	private static double getMagicMultiplier(LivingEntity damagee) {
 		if(damagee.getScoreboardTags().contains("600Trigger")) return 1;
 		if(damagee.getScoreboardTags().contains("400Trigger")) return 0.5;
 		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.25;
-		return 0.1;
+		return 0.15;
 	}
 
 	private static void tntRain(EnderDragon dragon) {
@@ -305,7 +330,7 @@ public class PrimalDragon implements CustomDragon {
 		if(dragon.getScoreboardTags().contains("Invulnerable") || dragon.isDead()) return;
 
 		String phase = getCurrentPhase(dragon);
-		int delay = getFireballDelay(phase);
+		int delay = getFireballDelay(notPerching(dragon), phase);
 
 		Utils.scheduleTask(() -> {
 			if(dragon.getScoreboardTags().contains("Invulnerable") || dragon.isDead()) return;
@@ -316,21 +341,19 @@ public class PrimalDragon implements CustomDragon {
 
 			if(notPerching(dragon)) {
 				shootFireballAtNearestPlayer(dragon);
-				scheduleNextFireball(dragon, delay);
 			} else if(phase.equals("final")) {
-				// Perched fireballs only in final phase
 				dropFireballsOnAllPlayers(dragon);
-				scheduleNextFireball(dragon, 120);
 			}
+			fireballSpam(dragon);
 		}, delay);
 	}
 
-	private static int getFireballDelay(String phase) {
+	private static int getFireballDelay(boolean notPerched, String phase) {
 		return switch(phase) {
 			case "600Trigger" -> 200;
 			case "400Trigger" -> 160;
 			case "200Trigger" -> 120;
-			case "final" -> 80;
+			case "final" -> notPerched ? 80 : 120;
 			default -> Integer.MAX_VALUE;
 		};
 	}
@@ -354,15 +377,6 @@ public class PrimalDragon implements CustomDragon {
 				p.playSound(dragon, Sound.ENTITY_ENDER_DRAGON_SHOOT, 1.0f, 1.0f);
 			}
 		}
-	}
-
-	private static void scheduleNextFireball(EnderDragon dragon, int delay) {
-		Utils.scheduleTask(() -> {
-			String phase = getCurrentPhase(dragon);
-			if(!phase.equals("800Trigger")) {
-				fireballSpam(dragon);
-			}
-		}, delay);
 	}
 
 	private static void summonZealots(EnderDragon dragon) {
