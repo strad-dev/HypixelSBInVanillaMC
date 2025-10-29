@@ -9,30 +9,26 @@ import items.summonItems.*;
 import items.weapons.Claymore;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
-import misc.Plugin;
 import org.bukkit.*;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
 public class CreativeMenu implements Listener {
 	private static final String GUI_TITLE = ChatColor.DARK_GRAY + "Creative Inventory";
-	private final Map<UUID, String> playerTabs = new HashMap<>();
-	private final Map<UUID, Integer> playerPages = new HashMap<>();
+	private static final Map<UUID, String> playerTabs = new HashMap<>();
+	private static final Map<UUID, Integer> playerPages = new HashMap<>();
 
 	// Item categories
 	private static final Map<String, List<ItemStack>> ITEMS = new HashMap<>();
@@ -129,26 +125,6 @@ public class CreativeMenu implements Listener {
 		return book;
 	}
 
-	@EventHandler
-	public void onRightClick(PlayerInteractEvent event) {
-		if (event.getAction() != Action.RIGHT_CLICK_AIR &&
-				event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-
-		Player player = event.getPlayer();
-		if (player.getGameMode() != GameMode.CREATIVE) return;
-
-		ItemStack item = event.getItem();
-		if (item == null || !item.hasItemMeta()) return;
-
-		ItemMeta meta = item.getItemMeta();
-		NamespacedKey key = new NamespacedKey(Plugin.getInstance(), "skyblock");
-
-		if (meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
-			event.setCancelled(true);
-			openCreativeMenu(player);
-		}
-	}
-
 	private static String tabIdToName(String tab) {
 		return switch(tab) {
 			case "items" -> "Items";
@@ -159,7 +135,7 @@ public class CreativeMenu implements Listener {
 		};
 	}
 
-	private void openCreativeMenu(Player player) {
+	public static void openCreativeMenu(Player player) {
 		String currentTab = playerTabs.getOrDefault(player.getUniqueId(), "combat");
 		int page = playerPages.getOrDefault(player.getUniqueId(), 0);
 
@@ -200,7 +176,7 @@ public class CreativeMenu implements Listener {
 		player.openInventory(gui);
 	}
 
-	private void addTabs(Inventory gui, String currentTab) {
+	private static void addTabs(Inventory gui, String currentTab) {
 		// Combat tab
 		ItemStack combat = new ItemStack(Material.DIAMOND_SWORD);
 		ItemMeta combatMeta = combat.getItemMeta();

@@ -3,6 +3,7 @@ package mobs.hardmode;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Plugin;
 import misc.Utils;
 import mobs.enderDragons.CustomDragon;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
@@ -172,6 +173,16 @@ public class PrimalDragon implements CustomDragon {
 			}, 240);
 			return false;
 		} else if(hp - actualDamage <= 0) {
+			Player p;
+			if(damager instanceof Player p1) {
+				p = p1;
+			} else {
+				p = Utils.getNearestPlayer(damagee);
+			}
+
+			Utils.playGlobalSound(Sound.UI_TOAST_CHALLENGE_COMPLETE);
+			Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_primal_dragon").incrementProgression(p);
+
 			dragon.addScoreboardTag("Dead");
 			dialogue("Centuries of training down the drain...");
 			Utils.scheduleTask(() -> dialogue("Your power is unmatched.  I commend you for that."), 60);
