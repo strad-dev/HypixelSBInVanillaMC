@@ -29,7 +29,7 @@ public class OldRegen implements Listener {
 	public void onEntityRegainHealth(EntityRegainHealthEvent e) {
 		if(e.getEntityType() != EntityType.PLAYER) {
 			if(e.getEntity() instanceof LivingEntity entity) {
-				if(entity instanceof Wither && entity.getScoreboardTags().contains("Invulnerable")) {
+				if(entity.getScoreboardTags().contains("Invulnerable")) {
 					e.setCancelled(true);
 					return;
 				}

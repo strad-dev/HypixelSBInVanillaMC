@@ -273,6 +273,7 @@ public class MasterWitherKing implements CustomWither {
 			damagee.addScoreboardTag("Invulnerable");
 			damagee.addScoreboardTag("Dead");
 			damagee.setHealth(1.0);
+			damagee.setSilent(true);
 			Utils.changeName(damagee);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain...");
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
@@ -338,9 +339,9 @@ public class MasterWitherKing implements CustomWither {
 
 		CustomMobs.updateWitherLordFight(false);
 
+		p.sendMessage(ChatColor.GOLD + "You have defeated the Wither Lords.  Congratulations!");
 		Utils.playGlobalSound(Sound.UI_TOAST_CHALLENGE_COMPLETE);
-		UltimateAdvancementAPI.getInstance(Plugin.getInstance()).getAdvancement("skyblock:defeat_wither_lords").revoke(p);
-		UltimateAdvancementAPI.getInstance(Plugin.getInstance()).getAdvancement("skyblock:defeat_wither_lords").grant(p);
+		Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_wither_lords").incrementProgression(p);
 	}
 
 	@Override
