@@ -273,7 +273,14 @@ public class CustomDrops implements Listener {
 			}
 			case EnderDragon dragon -> {
 				if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-					if(dragon.getScoreboardTags().contains("SuperiorDragon") || random.nextDouble() < 0.02 * rngLootingBonus) {
+					if(dragon.getScoreboardTags().contains("HardMode")) {
+						item = SuperiorRemnant.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Remnant of the Superior Dragon");
+						item = SuperiorRemnant.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Remnant of the Superior Dragon");
+					} else if(dragon.getScoreboardTags().contains("SuperiorDragon") || random.nextDouble() < 0.02 * rngLootingBonus) {
 						item = SuperiorRemnant.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Remnant of the Superior Dragon");
@@ -899,7 +906,9 @@ public class CustomDrops implements Listener {
 			}
 		}
 
-		if(died.getScoreboardTags().contains("SkyblockBoss")) {
+		if(died.getScoreboardTags().contains("HardMode")) {
+			e.setDroppedExp(e.getDroppedExp() * 100);
+		} else if(died.getScoreboardTags().contains("SkyblockBoss")) {
 			e.setDroppedExp(e.getDroppedExp() * 10);
 		} else if(p == null) {
 			e.setDroppedExp(0);

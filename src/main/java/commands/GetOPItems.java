@@ -140,14 +140,14 @@ public class GetOPItems implements CommandExecutor {
 				case "t7" -> {
 					ItemStack godBook = new ItemStack(Material.ENCHANTED_BOOK);
 					EnchantmentStorageMeta meta = (EnchantmentStorageMeta) godBook.getItemMeta();
-					meta.addStoredEnchant(Enchantment.SHARPNESS, 7, true);
-					meta.addStoredEnchant(Enchantment.POWER, 7, true);
-					meta.addStoredEnchant(Enchantment.LOOTING, 5, true);
-					meta.addStoredEnchant(Enchantment.FORTUNE, 4, true);
-					meta.addStoredEnchant(Enchantment.EFFICIENCY, 6, true);
+					meta.addStoredEnchant(Enchantment.SHARPNESS, 7, true); //
+					meta.addStoredEnchant(Enchantment.POWER, 7, true); //
+					meta.addStoredEnchant(Enchantment.LOOTING, 5, true); //
+					meta.addStoredEnchant(Enchantment.FORTUNE, 4, true); //
+					meta.addStoredEnchant(Enchantment.EFFICIENCY, 6, true); //
 					meta.addStoredEnchant(Enchantment.PROTECTION, 5, true);
 					meta.addStoredEnchant(Enchantment.FEATHER_FALLING, 5, true);
-					meta.addStoredEnchant(Enchantment.SWEEPING_EDGE, 4, true);
+					meta.addStoredEnchant(Enchantment.SWEEPING_EDGE, 4, true); //
 					meta.addStoredEnchant(Enchantment.FIRE_ASPECT, 2, true);
 					meta.addStoredEnchant(Enchantment.KNOCKBACK, 2, true);
 					meta.addStoredEnchant(Enchantment.PUNCH, 2, true);
