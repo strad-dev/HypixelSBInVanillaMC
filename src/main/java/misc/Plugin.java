@@ -73,7 +73,7 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new ChatListener(), this);
 		getServer().getPluginManager().registerEvents(new CustomItemUses(), this);
 		getServer().getPluginManager().registerEvents(new StopBossesTeleporting(), this);
-		getServer().getPluginManager().registerEvents(new GivePlayersRecipes(), this);
+		getServer().getPluginManager().registerEvents(new PlayerLoginHandler(), this);
 		getServer().getPluginManager().registerEvents(new AllMobsHaveNames(), this);
 		getServer().getPluginManager().registerEvents(new CustomChestLoot(), this);
 		getServer().getPluginManager().registerEvents(new WitherKingDragonCustomAI(), this);
@@ -87,6 +87,7 @@ public class Plugin extends JavaPlugin {
 		getServer().addRecipe(AddRecipes.addNecronElytraRecipe(this));
 		getServer().addRecipe(AddRecipes.addGoldorLeggingsRecipe(this));
 		getServer().addRecipe(AddRecipes.addMaxorBootsRecipe(this));
+		getServer().addRecipe(AddRecipes.addPrimalChesplateRecipe(this));
 		getServer().addRecipe(AddRecipes.addGodAppleRecipe(this));
 		getServer().addRecipe(AddRecipes.addWandOfRestorationRecipe(this));
 		getServer().addRecipe(AddRecipes.addWandOfAtonementRecipe(this));

@@ -1,9 +1,6 @@
 package misc;
 
-import items.armor.GoldorLeggings;
-import items.armor.MaxorBoots;
-import items.armor.NecronElytra;
-import items.armor.WardenHelmet;
+import items.armor.*;
 import items.ingredients.mining.*;
 import items.ingredients.misc.*;
 import items.ingredients.witherLords.*;
@@ -42,6 +39,7 @@ public class AddRecipes {
 		allRecipes.add(new NamespacedKey(plugin, "featherFalling5"));
 		allRecipes.add(new NamespacedKey(plugin, "efficiency6"));
 		allRecipes.add(new NamespacedKey(plugin, "divanPickaxe"));
+		allRecipes.add(new NamespacedKey(plugin, "primalChestplate"));
 		return allRecipes;
 	}
 
@@ -250,6 +248,24 @@ public class AddRecipes {
 		maxorRecipe.setIngredient('N', Material.NETHER_STAR);
 		maxorRecipe.setIngredient('B', Material.NETHERITE_BOOTS);
 		maxorRecipe.setIngredient('S', new RecipeChoice.ExactChoice(maxorSecrets));
+
+		return maxorRecipe;
+	}
+
+	public static Recipe addPrimalChesplateRecipe(Plugin plugin) {
+		ItemStack primalChestplate = PrimalDragonChestplate.getItem();
+		ItemStack dragonEgg = AncientDragonEgg.getItem();
+		ItemStack core = Core.getItem();
+		ItemStack ovoid = NullOvoid.getItem();
+
+		NamespacedKey maxorKey = new NamespacedKey(plugin, "primalChestplate");
+		ShapedRecipe maxorRecipe = new ShapedRecipe(maxorKey, primalChestplate);
+
+		maxorRecipe.shape("OEO", "OCO", "OJO");
+		maxorRecipe.setIngredient('O', new RecipeChoice.ExactChoice(ovoid));
+		maxorRecipe.setIngredient('J', new RecipeChoice.ExactChoice(core));
+		maxorRecipe.setIngredient('E', new RecipeChoice.ExactChoice(dragonEgg));
+		maxorRecipe.setIngredient('C', Material.NETHERITE_CHESTPLATE);
 
 		return maxorRecipe;
 	}
