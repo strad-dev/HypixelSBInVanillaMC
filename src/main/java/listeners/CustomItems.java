@@ -114,21 +114,29 @@ public class CustomItems implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 		ItemStack itemInUse = e.getItem();
-		ItemMeta meta = itemInUse.getItemMeta();
-		NamespacedKey key = new NamespacedKey(Plugin.getInstance(), "creative_menu");
+		if(itemInUse != null && itemInUse.hasItemMeta()) {
+			ItemMeta meta = itemInUse.getItemMeta();
+			NamespacedKey key = new NamespacedKey(Plugin.getInstance(), "creative_menu");
 
-		if(meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
-			if(e.getAction() != Action.RIGHT_CLICK_AIR &&
-					e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
-			if(p.getGameMode() != GameMode.CREATIVE) return;
-			if(!itemInUse.hasItemMeta()) return;
-			e.setCancelled(true);
-			CreativeMenu.openCreativeMenu(p);
-		}
+			if(meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
+				if(e.getAction() != Action.RIGHT_CLICK_AIR &&
+						e.getAction() != Action.RIGHT_CLICK_BLOCK) {
+					return;
+				}
 
+				if(p.getGameMode() != GameMode.CREATIVE) {
+					return;
+				}
 
-		if(itemInUse.hasItemMeta()) {
-			if(itemInUse.getItemMeta().hasLore()) {
+				if(!itemInUse.hasItemMeta()) {
+					return;
+				}
+
+				e.setCancelled(true);
+				CreativeMenu.openCreativeMenu(p);
+			}
+
+			if(meta.hasLore()) {
 				if(itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/summon")) {
 					e.setCancelled(true);
 				}

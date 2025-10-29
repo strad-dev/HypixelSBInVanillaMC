@@ -9,8 +9,10 @@ import misc.DamageData;
 import misc.Plugin;
 import misc.Utils;
 import mobs.withers.CustomWither;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftWither;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
@@ -296,6 +298,9 @@ public class MasterWitherKing implements CustomWither {
 			Utils.scheduleTask(() -> dropLoot(damagee, damager), 420);
 			return false;
 		}
+
+		WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
+		nmsWither.bossEvent.setProgress((float) (witherKing.getHealth() / 2000));
 		return true;
 	}
 

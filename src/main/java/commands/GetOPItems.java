@@ -50,8 +50,10 @@ public class GetOPItems implements CommandExecutor {
 	private ItemStack createMenuOpener() {
 		ItemStack item = new ItemStack(Material.NETHER_STAR);
 		ItemMeta meta = item.getItemMeta();
-		meta.setDisplayName(ChatColor.GOLD + "✦ " + ChatColor.YELLOW + ChatColor.BOLD + "SkyBlock Creative Menu");
+		meta.setDisplayName(ChatColor.RED + "" + ChatColor.BOLD + "Creative Menu");
 		meta.setLore(List.of(ChatColor.GREEN + "Right-click to open"));
+		meta.setLore(List.of(""));
+		meta.setLore(List.of(ChatColor.RED + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + " SPECIAL " + ChatColor.MAGIC + "a"));
 
 		// Add unique identifier
 		NamespacedKey key = new NamespacedKey(Plugin.getInstance(), "creative_menu");

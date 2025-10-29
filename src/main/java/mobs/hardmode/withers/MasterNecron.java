@@ -103,10 +103,11 @@ public class MasterNecron implements CustomWither {
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;
 		} else if(hp - originalDamage < 1) {
-			damagee.setAI(false);
 			damagee.addScoreboardTag("Invulnerable");
 			damagee.addScoreboardTag("Dead");
 			damagee.setHealth(1.0);
+			damagee.setSilent(true);
+			damagee.setAI(false);
 			Utils.changeName(damagee);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have destroyed us... but you have not destroyed our forefather.");
