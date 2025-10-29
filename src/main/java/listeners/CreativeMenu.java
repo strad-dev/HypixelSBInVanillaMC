@@ -26,7 +26,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 public class CreativeMenu implements Listener {
-	private static final String GUI_TITLE = ChatColor.DARK_GRAY + "Creative Inventory";
+	private static final String GUI_TITLE = ChatColor.DARK_GRAY + "SkyBlock";
 	private static final Map<UUID, String> playerTabs = new HashMap<>();
 	private static final Map<UUID, Integer> playerPages = new HashMap<>();
 
@@ -34,7 +34,7 @@ public class CreativeMenu implements Listener {
 	private static final Map<String, List<ItemStack>> ITEMS = new HashMap<>();
 
 	static {
-		// Initialize combat items
+		// Initialize items
 		ITEMS.put("items", Arrays.asList(
 				Scylla.getItem(Enchantment.SHARPNESS, 0),
 				Claymore.getItem(Enchantment.SHARPNESS, 0),
@@ -136,11 +136,10 @@ public class CreativeMenu implements Listener {
 	}
 
 	public static void openCreativeMenu(Player player) {
-		String currentTab = playerTabs.getOrDefault(player.getUniqueId(), "combat");
+		String currentTab = playerTabs.getOrDefault(player.getUniqueId(), "items");
 		int page = playerPages.getOrDefault(player.getUniqueId(), 0);
 
-		Inventory gui = Bukkit.createInventory(null, 54, GUI_TITLE + " - " +
-				ChatColor.YELLOW + tabIdToName(currentTab));
+		Inventory gui = Bukkit.createInventory(null, 54, GUI_TITLE + " " + tabIdToName(currentTab));
 
 		// Add tabs at top
 		addTabs(gui, currentTab);
@@ -178,28 +177,26 @@ public class CreativeMenu implements Listener {
 
 	private static void addTabs(Inventory gui, String currentTab) {
 		// Combat tab
-		ItemStack combat = new ItemStack(Material.DIAMOND_SWORD);
-		ItemMeta combatMeta = combat.getItemMeta();
-		combatMeta.setDisplayName(ChatColor.YELLOW + "Combat");
-		combatMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		ItemStack items = new ItemStack(Material.DIAMOND_SWORD);
+		ItemMeta itemsMeta = items.getItemMeta();
+		itemsMeta.setDisplayName("Items");
+		itemsMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 
-		if (currentTab.equals("combat")) {
-			combatMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
-			combatMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			combatMeta.setLore(List.of(ChatColor.GREEN + "▶ Selected"));
+		if (currentTab.equals("items")) {
+			itemsMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
+			itemsMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		}
-		combat.setItemMeta(combatMeta);
-		gui.setItem(0, combat);
+		items.setItemMeta(itemsMeta);
+		gui.setItem(0, items);
 
 		// Ingredients tab
 		ItemStack ingredients = new ItemStack(Material.BLAZE_POWDER);
 		ItemMeta ingredientsMeta = ingredients.getItemMeta();
-		ingredientsMeta.setDisplayName(ChatColor.YELLOW + "Ingredients");
+		ingredientsMeta.setDisplayName("Ingredients");
 
 		if (currentTab.equals("ingredients")) {
 			ingredientsMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
 			ingredientsMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			ingredientsMeta.setLore(List.of(ChatColor.GREEN + "▶ Selected"));
 		}
 		ingredients.setItemMeta(ingredientsMeta);
 		gui.setItem(1, ingredients);
@@ -207,12 +204,11 @@ public class CreativeMenu implements Listener {
 		// Summon items tab
 		ItemStack summon = new ItemStack(Material.ZOMBIE_SPAWN_EGG);
 		ItemMeta summonMeta = summon.getItemMeta();
-		summonMeta.setDisplayName(ChatColor.YELLOW + "Summon Items");
+		summonMeta.setDisplayName("Summon Items");
 
 		if (currentTab.equals("summon")) {
 			summonMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
 			summonMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			summonMeta.setLore(List.of(ChatColor.GREEN + "▶ Selected"));
 		}
 		summon.setItemMeta(summonMeta);
 		gui.setItem(2, summon);
@@ -220,12 +216,11 @@ public class CreativeMenu implements Listener {
 		// Enchantments items tab
 		ItemStack enchantment = new ItemStack(Material.ENCHANTED_BOOK);
 		ItemMeta enchantmentMeta = summon.getItemMeta();
-		summonMeta.setDisplayName(ChatColor.YELLOW + "Enchantments");
+		summonMeta.setDisplayName("Enchantments");
 
 		if (currentTab.equals("enchantments")) {
 			summonMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
 			summonMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-			summonMeta.setLore(List.of(ChatColor.GREEN + "▶ Selected"));
 		}
 		summon.setItemMeta(enchantmentMeta);
 		gui.setItem(3, enchantment);
@@ -242,72 +237,80 @@ public class CreativeMenu implements Listener {
 	}
 
 	@EventHandler
-	public void onInventoryClick(InventoryClickEvent event) {
-		if (!event.getView().getTitle().startsWith(GUI_TITLE)) return;
+	public void onInventoryClick(InventoryClickEvent e) {
+		if (!e.getView().getTitle().startsWith(GUI_TITLE)) return;
 
-		event.setCancelled(true);
+		Player player = (Player) e.getWhoClicked();
+		ItemStack clicked = e.getCurrentItem();
+		int slot = e.getRawSlot();
 
-		Player player = (Player) event.getWhoClicked();
-		ItemStack clicked = event.getCurrentItem();
-		if (clicked == null || clicked.getType() == Material.AIR) return;
+		// Only cancel if clicking in the GUI area (top inventory)
+		// Slot < 54 means it's in the GUI, not player inventory
+		if (e.getClickedInventory() != null && slot < 54) {
+			e.setCancelled(true);
 
-		int slot = event.getRawSlot();
+			if (clicked == null || clicked.getType() == Material.AIR) {
+				player.setItemOnCursor(null);
+			}
 
-		// Tab clicks (top row)
-		if (slot < 9) {
-			switch (slot) {
-				case 0 -> {
-					playerTabs.put(player.getUniqueId(), "combat");
-					playerPages.put(player.getUniqueId(), 0);
-					openCreativeMenu(player);
+			// Tab clicks (top row)
+			if (slot < 9) {
+				switch (slot) {
+					case 0 -> {
+						playerTabs.put(player.getUniqueId(), "items");
+						playerPages.put(player.getUniqueId(), 0);
+						openCreativeMenu(player);
+					}
+					case 1 -> {
+						playerTabs.put(player.getUniqueId(), "ingredients");
+						playerPages.put(player.getUniqueId(), 0);
+						openCreativeMenu(player);
+					}
+					case 2 -> {
+						playerTabs.put(player.getUniqueId(), "summon");
+						playerPages.put(player.getUniqueId(), 0);
+						openCreativeMenu(player);
+					}
+					case 3 -> {
+						playerTabs.put(player.getUniqueId(), "enchantments");
+						playerPages.put(player.getUniqueId(), 0);
+						openCreativeMenu(player);
+					}
 				}
-				case 1 -> {
-					playerTabs.put(player.getUniqueId(), "ingredients");
-					playerPages.put(player.getUniqueId(), 0);
-					openCreativeMenu(player);
+			}
+			// Navigation
+			else if (slot == 45 && clicked.getType() == Material.ARROW) {
+				playerPages.compute(player.getUniqueId(), (k, currentPage) -> Math.max(0, currentPage - 1));
+				openCreativeMenu(player);
+			}
+			else if (slot == 53 && clicked.getType() == Material.ARROW) {
+				playerPages.compute(player.getUniqueId(), (k, currentPage) -> currentPage + 1);
+				openCreativeMenu(player);
+			}
+			// Item clicks - behave like creative
+			else if (slot < 45) {
+				// Left click - pick up item
+				if (e.isLeftClick() && !e.isShiftClick()) {
+					player.setItemOnCursor(clicked.clone());
 				}
-				case 2 -> {
-					playerTabs.put(player.getUniqueId(), "summon");
-					playerPages.put(player.getUniqueId(), 0);
-					openCreativeMenu(player);
+				// Shift click - add to inventory
+				else if (e.isShiftClick()) {
+					ItemStack toGive = clicked.clone();
+					if (player.getInventory().firstEmpty() != -1) {
+						player.getInventory().addItem(toGive);
+						player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1f);
+					}
 				}
-				case 3 -> {
-					playerTabs.put(player.getUniqueId(), "enchantments");
-					playerPages.put(player.getUniqueId(), 0);
-					openCreativeMenu(player);
+				// Middle click - clone with NBT
+				else if (e.getClick() == ClickType.MIDDLE) {
+					ItemStack toGive = clicked.clone();
+					toGive.setAmount(toGive.getMaxStackSize());
+					player.setItemOnCursor(toGive);
 				}
 			}
 		}
-		// Navigation
-		else if (slot == 45 && clicked.getType() == Material.ARROW) {
-			playerPages.compute(player.getUniqueId(), (k, currentPage) -> Math.max(0, currentPage - 1));
-			openCreativeMenu(player);
-		}
-		else if (slot == 53 && clicked.getType() == Material.ARROW) {
-			playerPages.compute(player.getUniqueId(), (k, currentPage) -> currentPage + 1);
-			openCreativeMenu(player);
-		}
-		// Item clicks - behave like creative
-		else if (slot < 45) {
-			// Left click - pick up item
-			if (event.isLeftClick()) {
-				player.setItemOnCursor(clicked.clone());
-			}
-			// Shift click - add to inventory
-			else if (event.isShiftClick()) {
-				ItemStack toGive = clicked.clone();
-				if (player.getInventory().firstEmpty() != -1) {
-					player.getInventory().addItem(toGive);
-					player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1f);
-				}
-			}
-			// Middle click - clone with NBT
-			else if (event.getClick() == ClickType.MIDDLE) {
-				ItemStack toGive = clicked.clone();
-				toGive.setAmount(toGive.getMaxStackSize());
-				player.setItemOnCursor(toGive);
-			}
-		}
+		// Don't cancel clicks in player inventory (slots >= 54)
+		// This allows normal inventory management
 	}
 
 	@EventHandler

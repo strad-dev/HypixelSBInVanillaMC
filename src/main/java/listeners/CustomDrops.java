@@ -274,12 +274,17 @@ public class CustomDrops implements Listener {
 			case EnderDragon dragon -> {
 				if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
 					if(dragon.getScoreboardTags().contains("HardMode")) {
+						item = new ItemStack(Material.DRAGON_EGG);
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Dragon Egg");
 						item = SuperiorRemnant.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Remnant of the Superior Dragon");
-						item = SuperiorRemnant.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Remnant of the Superior Dragon");
+						if(random.nextDouble() < 0.25 * rngLootingBonus) {
+							item = AncientDragonEgg.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Ancient Dragon Egg");
+						}
 					} else if(dragon.getScoreboardTags().contains("SuperiorDragon") || random.nextDouble() < 0.02 * rngLootingBonus) {
 						item = SuperiorRemnant.getItem();
 						world.dropItemNaturally(l, item);
