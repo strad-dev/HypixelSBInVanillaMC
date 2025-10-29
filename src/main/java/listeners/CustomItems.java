@@ -9,10 +9,7 @@ import misc.Plugin;
 import misc.Utils;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,6 +18,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Score;
 
 import java.util.ArrayList;
@@ -114,7 +113,20 @@ public class CustomItems implements Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
-		ItemStack itemInUse = p.getInventory().getItemInMainHand();
+		ItemStack itemInUse = e.getItem();
+		ItemMeta meta = itemInUse.getItemMeta();
+		NamespacedKey key = new NamespacedKey(Plugin.getInstance(), "creative_menu");
+
+		if(meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
+			if(e.getAction() != Action.RIGHT_CLICK_AIR &&
+					e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+			if(p.getGameMode() != GameMode.CREATIVE) return;
+			if(!itemInUse.hasItemMeta()) return;
+			e.setCancelled(true);
+			CreativeMenu.openCreativeMenu(p);
+		}
+
+
 		if(itemInUse.hasItemMeta()) {
 			if(itemInUse.getItemMeta().hasLore()) {
 				if(itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/summon")) {
