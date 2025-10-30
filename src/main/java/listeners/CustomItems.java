@@ -34,7 +34,7 @@ public class CustomItems implements Listener {
 	}
 
 	public String getID(ItemStack item) {
-		if(!item.hasItemMeta()) {
+		if(item == null || !item.hasItemMeta()) {
 			return "";
 		} else if(!item.getItemMeta().hasLore()) {
 			return "";

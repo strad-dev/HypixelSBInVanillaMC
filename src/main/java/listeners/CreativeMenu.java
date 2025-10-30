@@ -251,6 +251,7 @@ public class CreativeMenu implements Listener {
 
 			if (clicked == null || clicked.getType() == Material.AIR) {
 				player.setItemOnCursor(null);
+				return;
 			}
 
 			// Tab clicks (top row)
