@@ -580,7 +580,7 @@ public class CustomDamage implements Listener {
 
 				// damage
 				damagee.setHealth(oldHealth - finalDamage);
-				if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) {
+				if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.IFRAME_ENVIRONMENTAL) {
 					damagee.setNoDamageTicks(9);
 				}
 
