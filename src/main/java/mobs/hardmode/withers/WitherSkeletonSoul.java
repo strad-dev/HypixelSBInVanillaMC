@@ -10,7 +10,7 @@ import org.bukkit.entity.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SoulWitherSkeleton implements CustomMob {
+public class WitherSkeletonSoul implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of the Soul" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
@@ -26,7 +26,7 @@ public class SoulWitherSkeleton implements CustomMob {
 
 	private void teleport(Mob e) {
 		if(!e.isDead()) {
-			Utils.teleport(e, MasterWitherKing.getEntity().getLocation(), 16);
+			Utils.teleport(e, WitherKing.getEntity().getLocation(), 16);
 			Utils.scheduleTask(() -> teleport(e), 300);
 		}
 	}
@@ -38,7 +38,7 @@ public class SoulWitherSkeleton implements CustomMob {
 			immune.add(EntityType.WITHER_SKELETON);
 			immune.add(EntityType.WITHER);
 			Utils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
-			MasterWitherKing.defeatHenchman("Soul");
+			WitherKing.defeatHenchman("Soul");
 			damagee.remove();
 			return false;
 		}

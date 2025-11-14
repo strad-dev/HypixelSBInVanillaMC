@@ -18,7 +18,7 @@ import java.util.List;
 import static listeners.CustomDamage.customMobs;
 import static misc.Utils.teleport;
 
-public class MasterStorm implements CustomWither {
+public class Storm implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
 	@Override
@@ -226,7 +226,7 @@ public class MasterStorm implements CustomWither {
 			}, 300);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new MasterGoldor().onSpawn(Utils.getNearestPlayer(damagee), wither);
+				new Goldor().onSpawn(Utils.getNearestPlayer(damagee), wither);
 			}, 340);
 			return false;
 		}

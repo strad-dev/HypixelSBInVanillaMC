@@ -172,7 +172,7 @@ public class Utils {
 			List<Entity> entities = (List<Entity>) l.getWorld().getNearbyEntities(l, radius, radius, radius);
 			for(Entity entity : entities) {
 				if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-					CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
+					CustomDamage.customMobs(entity1, spawner, damage, DamageType.MELEE_SWEEP);
 				}
 			}
 			spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), Math.min((int) Math.pow(radius, 3), 65536), radius, radius / 2.0, radius);
@@ -186,7 +186,7 @@ public class Utils {
 				List<Entity> entities = tnt.getNearbyEntities(radius, radius, radius);
 				for(Entity entity : entities) {
 					if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-						CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
+						CustomDamage.customMobs(entity1, spawner, damage, DamageType.MELEE_SWEEP);
 					}
 				}
 				tnt.getWorld().spawnParticle(Particle.EXPLOSION, tnt.getLocation(), Math.min((int) Math.pow(radius, 3), 65536), radius, radius / 2.0, radius);

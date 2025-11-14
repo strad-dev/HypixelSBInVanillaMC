@@ -1,4 +1,4 @@
-package mobs.generic;
+package mobs.hardmode;
 
 import listeners.DamageType;
 import misc.DamageData;
@@ -44,6 +44,7 @@ public class AtonedHorror implements CustomMob {
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("AtonedHorror");
+		e.addScoreboardTag("HardMode");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Atoned Horror has risen from the depths!");
 		Bukkit.getLogger().info(p.getName() + " has summoned the Atoned Horror.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
@@ -71,7 +72,9 @@ public class AtonedHorror implements CustomMob {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		Utils.spawnTNT(damager, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
+		if(type == DamageType.MELEE) {
+			Utils.spawnTNT(damager, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
+		}
 		return true;
 	}
 }

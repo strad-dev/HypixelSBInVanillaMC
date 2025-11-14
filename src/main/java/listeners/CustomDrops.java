@@ -5,6 +5,7 @@ import items.ingredients.misc.*;
 import items.ingredients.witherLords.*;
 import items.misc.IceSpray;
 import items.summonItems.*;
+import misc.BossBarManager;
 import misc.Plugin;
 import misc.Utils;
 import net.minecraft.core.component.DataComponents;
@@ -871,7 +872,7 @@ public class CustomDrops implements Listener {
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Remnant of the Giant's Sword");
 					}
-					Plugin.getInstance().getServer().getBossBar(new NamespacedKey(Plugin.getInstance(), "sadan")).removeAll();
+					BossBarManager.removeBossBar(died);
 				} else if(random.nextDouble() < 0.005 * rngLootingBonus && p != null) {
 					item = GiantZombieFlesh.getItem();
 					world.dropItemNaturally(l, item);

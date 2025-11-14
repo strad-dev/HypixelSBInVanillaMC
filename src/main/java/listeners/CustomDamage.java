@@ -258,7 +258,7 @@ public class CustomDamage implements Listener {
 	}
 
 	private static void dealDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
-		if(finalDamage > 0) {
+		if(finalDamage > 0 && (damagee.getNoDamageTicks() == 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC || type == DamageType.ABSOLUTE)) {
 			// sweeping edge
 			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.SWEEPING_EDGE)) {
 				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SWEEPING_EDGE);

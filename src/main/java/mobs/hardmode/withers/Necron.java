@@ -19,7 +19,7 @@ import java.util.List;
 import static listeners.CustomDamage.calculateFinalDamage;
 import static misc.Utils.teleport;
 
-public class MasterNecron implements CustomWither {
+public class Necron implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
 	@Override
@@ -139,7 +139,7 @@ public class MasterNecron implements CustomWither {
 			}, 480);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new MasterWitherKing().onSpawn(Utils.getNearestPlayer(damagee), wither);
+				new WitherKing().onSpawn(Utils.getNearestPlayer(damagee), wither);
 			}, 540);
 			return false;
 		}

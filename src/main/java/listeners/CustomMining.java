@@ -2,10 +2,14 @@ package listeners;
 
 import items.ingredients.mining.*;
 import misc.Utils;
+import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_21_R4.CraftChunk;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,6 +36,7 @@ public class CustomMining implements Listener {
 				dropDouble = itemInHand.getItemMeta().getLore().getFirst().contains("skyblock/combat/divan_pickaxe");
 			}
 			int fortune = itemInHand.getItemMeta().getEnchantLevel(Enchantment.FORTUNE);
+
 			double fortuneMulti = 1 + 0.25 * fortune;
 			ItemStack item;
 			Location dropLocation = e.getBlock().getLocation().add(0.5, 0.5, 0.5);
@@ -129,7 +134,7 @@ public class CustomMining implements Listener {
 						item.setAmount(random.nextInt(fortune + 1) + 1);
 						world.dropItemNaturally(dropLocation, item);
 					}
-					if(random.nextDouble() < 0.005 * fortuneMulti) {
+					if(random.nextDouble() < 0.01 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedEmerald.getItem());
 						sendRareDropMessage(p, "Refined Emerald");
 					}
@@ -143,7 +148,7 @@ public class CustomMining implements Listener {
 						e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
 						Utils.damageItem(p, itemInHand, 1); // see comment in stone section
 					}
-					if(random.nextDouble() < 0.005 * fortuneMulti) {
+					if(random.nextDouble() < 0.01 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedNetherite.getItem());
 						sendRareDropMessage(p, "Refined Netherite");
 					}

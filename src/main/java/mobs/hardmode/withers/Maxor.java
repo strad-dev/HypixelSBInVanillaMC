@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MasterMaxor implements CustomWither {
+public class Maxor implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
 	@Override
@@ -160,7 +160,7 @@ public class MasterMaxor implements CustomWither {
 			}, 300);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new MasterStorm().onSpawn(Utils.getNearestPlayer(damagee), wither);
+				new Storm().onSpawn(Utils.getNearestPlayer(damagee), wither);
 			}, 340);
 			return false;
 		}
