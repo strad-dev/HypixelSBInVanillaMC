@@ -79,69 +79,69 @@ public class Storm implements CustomWither {
 		return name;
 	}
 
-	private void spawnGuards(LivingEntity e) {
-		if(!e.isDead() && !e.getScoreboardTags().contains("Survival2") && !e.getScoreboardTags().contains("Dead")) {
-			if(e.getScoreboardTags().contains("Survival1")) {
-				Utils.spawnGuards(e, 2);
-				Utils.scheduleTask(() -> spawnGuards(e), 201);
+	private void spawnGuards(Wither wither) {
+		if(!wither.isDead() && !wither.getScoreboardTags().contains("Survival2") && !wither.getScoreboardTags().contains("Dead")) {
+			if(wither.getScoreboardTags().contains("Survival1")) {
+				Utils.spawnGuards(wither, 2);
+				Utils.scheduleTask(() -> spawnGuards(wither), 201);
 			} else {
-				Utils.spawnGuards(e, 2);
-				Utils.scheduleTask(() -> spawnGuards(e), 301);
+				Utils.spawnGuards(wither, 2);
+				Utils.scheduleTask(() -> spawnGuards(wither), 301);
 			}
 		}
 	}
 
-	private void spawnMoreGuards(LivingEntity e) {
-		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-			if(e.getScoreboardTags().contains("Survival2")) {
-				Utils.spawnGuards(e, 3);
-				Utils.scheduleTask(() -> spawnMoreGuards(e), 151);
+	private void spawnMoreGuards(Wither wither) {
+		if(!wither.isDead() && !wither.getScoreboardTags().contains("Dead")) {
+			if(wither.getScoreboardTags().contains("Survival2")) {
+				Utils.spawnGuards(wither, 3);
+				Utils.scheduleTask(() -> spawnMoreGuards(wither), 151);
 			} else {
-				Utils.spawnGuards(e, 2);
-				Utils.scheduleTask(() -> spawnMoreGuards(e), 301);
+				Utils.spawnGuards(wither, 2);
+				Utils.scheduleTask(() -> spawnMoreGuards(wither), 301);
 			}
 		}
 	}
 
-	private void spawnLightning(LivingEntity e) {
-		if(!e.isDead() && !e.getScoreboardTags().contains("Survival2") && !e.getScoreboardTags().contains("Dead")) {
-			if(e.getScoreboardTags().contains("Survival1")) {
-				CustomMobs.spawnLightning(e, 24);
-				Utils.scheduleTask(() -> spawnLightning(e), 100);
+	private void spawnLightning(Wither wither) {
+		if(!wither.isDead() && !wither.getScoreboardTags().contains("Survival2") && !wither.getScoreboardTags().contains("Dead")) {
+			if(wither.getScoreboardTags().contains("Survival1")) {
+				CustomMobs.spawnLightning(wither, 24);
+				Utils.scheduleTask(() -> spawnLightning(wither), 100);
 			} else {
-				CustomMobs.spawnLightning(e, 16);
-				Utils.scheduleTask(() -> spawnLightning(e), 200);
+				CustomMobs.spawnLightning(wither, 16);
+				Utils.scheduleTask(() -> spawnLightning(wither), 200);
 			}
 		}
 	}
 
-	private void spawnMoreLightning(LivingEntity e) {
-		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-			if(e.getScoreboardTags().contains("Survival2")) {
-				CustomMobs.spawnLightning(e, 32);
-				Utils.scheduleTask(() -> spawnMoreLightning(e), 60);
+	private void spawnMoreLightning(Wither wither) {
+		if(!wither.isDead() && !wither.getScoreboardTags().contains("Dead")) {
+			if(wither.getScoreboardTags().contains("Survival2")) {
+				CustomMobs.spawnLightning(wither, 32);
+				Utils.scheduleTask(() -> spawnMoreLightning(wither), 60);
 			} else {
-				CustomMobs.spawnLightning(e, 16);
-				Utils.scheduleTask(() -> spawnMoreLightning(e), 200);
+				CustomMobs.spawnLightning(wither, 16);
+				Utils.scheduleTask(() -> spawnMoreLightning(wither), 200);
 			}
 		}
 	}
 
-	private void spamSkulls(LivingEntity damagee, Player p, int i) {
+	private void spamSkulls(Wither wither, Player p, int i) {
 		Utils.scheduleTask(() -> {
-			if(!damagee.isDead()) {
-				Vector directionMain = p.getLocation().toVector().subtract(damagee.getLocation().toVector()).normalize();
-				Vector directionLeft = p.getLocation().toVector().subtract(damagee.getLocation().add(1, 0, 0).toVector()).normalize();
-				Vector directionRight = p.getLocation().toVector().subtract(damagee.getLocation().add(-1, 0, 0).toVector()).normalize();
-				WitherSkull skullMain = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL);
+			if(!wither.isDead()) {
+				Vector directionMain = p.getLocation().toVector().subtract(wither.getLocation().toVector()).normalize();
+				Vector directionLeft = p.getLocation().toVector().subtract(wither.getLocation().add(1, 0, 0).toVector()).normalize();
+				Vector directionRight = p.getLocation().toVector().subtract(wither.getLocation().add(-1, 0, 0).toVector()).normalize();
+				WitherSkull skullMain = (WitherSkull) wither.getWorld().spawnEntity(wither.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL);
 				skullMain.setDirection(directionMain);
-				skullMain.setShooter(damagee);
-				WitherSkull skullLeft = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(1, 1.5, 0), EntityType.WITHER_SKULL);
+				skullMain.setShooter(wither);
+				WitherSkull skullLeft = (WitherSkull) wither.getWorld().spawnEntity(wither.getLocation().add(1, 1.5, 0), EntityType.WITHER_SKULL);
 				skullLeft.setDirection(directionLeft);
-				skullLeft.setShooter(damagee);
-				WitherSkull skullRight = (WitherSkull) damagee.getWorld().spawnEntity(damagee.getLocation().add(-1, 1.5, 0), EntityType.WITHER_SKULL);
+				skullLeft.setShooter(wither);
+				WitherSkull skullRight = (WitherSkull) wither.getWorld().spawnEntity(wither.getLocation().add(-1, 1.5, 0), EntityType.WITHER_SKULL);
 				skullRight.setDirection(directionRight);
-				skullRight.setShooter(damagee);
+				skullRight.setShooter(wither);
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.0f);
 			}
 		}, i);
@@ -177,10 +177,10 @@ public class Storm implements CustomWither {
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You think you're funny?  Try surviving this!");
 
-			spawnMoreGuards(damagee);
-			spawnMoreLightning(damagee);
+			spawnMoreGuards((Wither) damagee);
+			spawnMoreLightning((Wither) damagee);
 			for(int i = 0; i < 600; i += 10) {
-				spamSkulls(damagee, p, i);
+				spamSkulls((Wither) damagee, p, i);
 			}
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);

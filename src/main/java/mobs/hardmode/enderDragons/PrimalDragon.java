@@ -249,7 +249,7 @@ public class PrimalDragon implements CustomDragon {
 		} else if(type == DamageType.PLAYER_MAGIC) {
 			return originalDamage * getMagicMultiplier(damagee);
 		} else {
-			return originalDamage * 	getDefaultMultiplier(damagee);
+			return originalDamage * getDefaultMultiplier(damagee);
 		}
 	}
 

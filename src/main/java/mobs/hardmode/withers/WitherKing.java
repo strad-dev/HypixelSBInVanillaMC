@@ -100,53 +100,53 @@ public class WitherKing implements CustomWither {
 		return witherKing;
 	}
 
-	private void spawnHenchman(Mob mob, String which) {
-		WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
-		Player p = Utils.getNearestPlayer(mob);
+	private void spawnHenchman(Wither wither, String which) {
+		WitherSkeleton witherSkeleton = (WitherSkeleton) wither.getWorld().spawnEntity(wither.getLocation(), EntityType.WITHER_SKELETON);
+		Player p = Utils.getNearestPlayer(wither);
 
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
 
-		Objects.requireNonNull(e.getEquipment()).setItemInMainHand(sword);
-		e.getEquipment().setItemInMainHandDropChance(0.0F);
-		Objects.requireNonNull(e.getEquipment()).setItemInOffHand(sword);
-		e.getEquipment().setItemInOffHandDropChance(0.0F);
+		Objects.requireNonNull(witherSkeleton.getEquipment()).setItemInMainHand(sword);
+		witherSkeleton.getEquipment().setItemInMainHandDropChance(0.0F);
+		Objects.requireNonNull(witherSkeleton.getEquipment()).setItemInOffHand(sword);
+		witherSkeleton.getEquipment().setItemInOffHandDropChance(0.0F);
 
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(666.0);
-		e.setHealth(666.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.SCALE)).setBaseValue(1.333);
+		witherSkeleton.getAttribute(Attribute.MAX_HEALTH).setBaseValue(666.0);
+		witherSkeleton.setHealth(666.0);
+		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.SCALE)).setBaseValue(1.333);
 		//noinspection DuplicatedCode
-		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
-		Objects.requireNonNull(e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
-		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(p);
-		e.teleport(mob);
-		e.setCustomNameVisible(true);
-		e.addScoreboardTag("SkyblockBoss");
-		e.addScoreboardTag("GuardSkeleton");
-		e.addScoreboardTag("HardMode");
-		e.setPersistent(true);
-		e.setRemoveWhenFarAway(false);
+		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
+		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
+		witherSkeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
+		witherSkeleton.setTarget(p);
+		witherSkeleton.teleport(wither);
+		witherSkeleton.setCustomNameVisible(true);
+		witherSkeleton.addScoreboardTag("SkyblockBoss");
+		witherSkeleton.addScoreboardTag("GuardSkeleton");
+		witherSkeleton.addScoreboardTag("HardMode");
+		witherSkeleton.setPersistent(true);
+		witherSkeleton.setRemoveWhenFarAway(false);
 		switch(which) {
 			case "Power" -> {
-				e.addScoreboardTag("Power");
-				new WitherSkeletonPower().onSpawn(Utils.getNearestPlayer(mob), e);
+				witherSkeleton.addScoreboardTag("Power");
+				new WitherSkeletonPower().onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
 			}
 			case "Fire" -> {
-				e.addScoreboardTag("Fire");
-				new WitherSkeletonFire().onSpawn(Utils.getNearestPlayer(mob), e);
+				witherSkeleton.addScoreboardTag("Fire");
+				new WitherSkeletonFire().onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
 			}
 			case "Ice" -> {
-				e.addScoreboardTag("Ice");
-				new WitherSkeletonIce().onSpawn(Utils.getNearestPlayer(mob), e);
+				witherSkeleton.addScoreboardTag("Ice");
+				new WitherSkeletonIce().onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
 			}
 			case "Soul" -> {
-				e.addScoreboardTag("Soul");
-				new WitherSkeletonSoul().onSpawn(Utils.getNearestPlayer(mob), e);
+				witherSkeleton.addScoreboardTag("Soul");
+				new WitherSkeletonSoul().onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
 			}
 			case "Martial" -> {
-				e.addScoreboardTag("Martial");
-				new WitherSkeletonMartial().onSpawn(Utils.getNearestPlayer(mob), e);
+				witherSkeleton.addScoreboardTag("Martial");
+				new WitherSkeletonMartial().onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
 			}
 		}
 	}

@@ -47,10 +47,10 @@ public class Goldor implements CustomWither {
 		return name;
 	}
 
-	private void damageAll(Mob e) {
-		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-			Utils.spawnTNT(e, e.getLocation(), 0, 6, Math.min(25, 5 + (int) Math.floor((1200.0 - e.getHealth()) / 50.0)), new ArrayList<>());
-			Utils.scheduleTask(() -> damageAll(e), 20);
+	private void damageAll(Wither wither) {
+		if(!wither.isDead() && !wither.getScoreboardTags().contains("Dead")) {
+			Utils.spawnTNT(wither, wither.getLocation(), 0, 6, Math.min(25, 5 + (int) Math.floor((1200.0 - wither.getHealth()) / 50.0)), new ArrayList<>());
+			Utils.scheduleTask(() -> damageAll(wither), 20);
 		}
 	}
 
