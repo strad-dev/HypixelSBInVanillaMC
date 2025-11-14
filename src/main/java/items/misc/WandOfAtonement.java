@@ -23,7 +23,7 @@ import java.util.List;
 public class WandOfAtonement implements AbilityItem {
 	private static final int MANA_COST = 10;
 	private static final String COOLDOWN_TAG = "WandCooldown";
-	private static final int COOLDOWN = 100;
+	private static final int COOLDOWN = 80;
 
 	public static ItemStack getItem() {
 		ItemStack wandOfAtonement = new ItemStack(Material.STICK);

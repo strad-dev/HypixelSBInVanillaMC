@@ -1,4 +1,4 @@
-package mobs.hardmode;
+package mobs.hardmode.enderDragons;
 
 import listeners.CustomDamage;
 import listeners.DamageType;

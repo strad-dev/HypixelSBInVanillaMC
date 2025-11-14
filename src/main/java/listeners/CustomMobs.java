@@ -2,7 +2,7 @@ package listeners;
 
 import misc.Utils;
 import mobs.enderDragons.CustomDragon;
-import mobs.hardmode.PrimalDragon;
+import mobs.hardmode.enderDragons.PrimalDragon;
 import mobs.hardmode.withers.Maxor;
 import mobs.withers.CustomWither;
 import org.bukkit.Bukkit;
