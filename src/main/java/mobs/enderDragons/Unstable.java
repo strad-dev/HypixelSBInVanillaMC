@@ -21,9 +21,16 @@ public class Unstable implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		EnderDragon dragon;
+		if(e instanceof EnderDragon) {
+			dragon = (EnderDragon) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Unstable Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		spawnLightning(e, 128);
-		e.addScoreboardTag("UnstableDragon");
+		spawnLightning(dragon, 128);
+		dragon.addScoreboardTag("UnstableDragon");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The UNSTABLE DRAGON has arrived to cause chaos!");
 		Bukkit.getLogger().info("The Unstable Dragon has been summoned!");
 		return name;

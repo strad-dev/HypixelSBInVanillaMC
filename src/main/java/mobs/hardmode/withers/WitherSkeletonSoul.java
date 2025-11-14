@@ -13,13 +13,20 @@ import java.util.List;
 public class WitherSkeletonSoul implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of the Soul" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
-		Utils.changeName(e);
-		e.addScoreboardTag("Soul");
+		WitherSkeleton witherSkeleton;
+		if(e instanceof WitherSkeleton) {
+			witherSkeleton = (WitherSkeleton) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
 
-		e.setAI(false);
+		witherSkeleton.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of the Soul" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
+		Utils.changeName(witherSkeleton);
+		witherSkeleton.addScoreboardTag("Soul");
 
-		teleport(e);
+		witherSkeleton.setAI(false);
+
+		teleport(witherSkeleton);
 
 		return "";
 	}

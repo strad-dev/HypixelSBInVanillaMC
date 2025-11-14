@@ -24,23 +24,30 @@ public class Necron implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		Wither wither;
+		if(e instanceof Wither) {
+			wither = (Wither) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
-		Utils.spawnTNT(e, e.getLocation(), 0, 32, 75, immune);
-		p = Utils.getNearestPlayer(e);
+		Utils.spawnTNT(wither, wither.getLocation(), 0, 32, 75, immune);
+		p = Utils.getNearestPlayer(wither);
 		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1400.0);
-		e.setHealth(1400.0);
-		e.addScoreboardTag("Necron");
-		e.addScoreboardTag("HardMode");
-		e.addScoreboardTag("SkyblockBoss");
-		e.addScoreboardTag("1100Frenzy");
-		e.addScoreboardTag("300Frenzy");
-		e.setPersistent(true);
-		e.setRemoveWhenFarAway(false);
-		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		Utils.changeName(e);
+		wither.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1400.0);
+		wither.setHealth(1400.0);
+		wither.addScoreboardTag("Necron");
+		wither.addScoreboardTag("HardMode");
+		wither.addScoreboardTag("SkyblockBoss");
+		wither.addScoreboardTag("1100Frenzy");
+		wither.addScoreboardTag("300Frenzy");
+		wither.setPersistent(true);
+		wither.setRemoveWhenFarAway(false);
+		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
+		Utils.changeName(wither);
 
 		return name;
 	}

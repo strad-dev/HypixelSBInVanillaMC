@@ -27,12 +27,19 @@ public class Superior implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		EnderDragon dragon;
+		if(e instanceof EnderDragon) {
+			dragon = (EnderDragon) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Superior Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(250.0);
-		e.setHealth(250.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR)).setBaseValue(5);
-		e.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
-		e.addScoreboardTag("SuperiorDragon");
+		Objects.requireNonNull(dragon.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(250.0);
+		dragon.setHealth(250.0);
+		Objects.requireNonNull(dragon.getAttribute(Attribute.ARMOR)).setBaseValue(5);
+		dragon.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
+		dragon.addScoreboardTag("SuperiorDragon");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The SUPERIOR DRAGON has arrived to utterly destroy you!");
 		Bukkit.getLogger().info("The Superior Dragon has been summoned!");
 		return name;

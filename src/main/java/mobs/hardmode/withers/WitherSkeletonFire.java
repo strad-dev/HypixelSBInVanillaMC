@@ -18,15 +18,22 @@ import java.util.Objects;
 public class WitherSkeletonFire implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Fire" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
-		Utils.changeName(e);
-		e.addScoreboardTag("Fire");
+		WitherSkeleton witherSkeleton;
+		if(e instanceof WitherSkeleton) {
+			witherSkeleton = (WitherSkeleton) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
+		witherSkeleton.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Fire" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
+		Utils.changeName(witherSkeleton);
+		witherSkeleton.addScoreboardTag("Fire");
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
 		sword.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 255);
-		Objects.requireNonNull(e.getEquipment()).setItemInMainHand(sword);
+		Objects.requireNonNull(witherSkeleton.getEquipment()).setItemInMainHand(sword);
 
-		walkOnFire(e);
+		walkOnFire(witherSkeleton);
 
 		return "";
 	}

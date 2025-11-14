@@ -43,7 +43,13 @@ public class PrimalDragon implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		EnderDragon dragon = (EnderDragon) e;
+		EnderDragon dragon;
+		if(e instanceof EnderDragon) {
+			dragon = (EnderDragon) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		FREEZE_LOCATION = new Location(dragon.getWorld(), 0.5, 70, 0.5);
 		NMS_FREEZE_LOCATION = new PositionMoveRotation(new Vec3(0.5, 70, 0.5), // position
 				Vec3.ZERO, // delta movement (we handle this separately)

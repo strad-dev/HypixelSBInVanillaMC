@@ -17,9 +17,16 @@ public class Protector implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		EnderDragon dragon;
+		if(e instanceof EnderDragon) {
+			dragon = (EnderDragon) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Protector Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR)).setBaseValue(10.0);
-		e.addScoreboardTag("ProtectorDragon");
+		Objects.requireNonNull(dragon.getAttribute(Attribute.ARMOR)).setBaseValue(10.0);
+		dragon.addScoreboardTag("ProtectorDragon");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The PROTECTOR DRAGON has arrived to protect the End from Nons!");
 		Bukkit.getLogger().info("The Protector Dragon has been summoned!");
 		return name;

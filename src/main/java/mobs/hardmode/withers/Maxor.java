@@ -19,25 +19,32 @@ public class Maxor implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		Wither wither;
+		if(e instanceof Wither) {
+			wither = (Wither) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		//noinspection DuplicatedCode
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
-		Utils.spawnTNT(e, e.getLocation(), 0, 32, 50, immune);
+		Utils.spawnTNT(wither, wither.getLocation(), 0, 32, 50, immune);
 		Utils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN);
 
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(800.0);
-		e.setHealth(800.0);
-		e.addScoreboardTag("Maxor");
-		e.addScoreboardTag("HardMode");
-		e.addScoreboardTag("SkyblockBoss");
-		e.addScoreboardTag("600Crystal");
-		e.addScoreboardTag("300Crystal");
-		e.setPersistent(true);
-		e.setRemoveWhenFarAway(false);
-		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		Utils.changeName(e);
+		wither.getAttribute(Attribute.MAX_HEALTH).setBaseValue(800.0);
+		wither.setHealth(800.0);
+		wither.addScoreboardTag("Maxor");
+		wither.addScoreboardTag("HardMode");
+		wither.addScoreboardTag("SkyblockBoss");
+		wither.addScoreboardTag("600Crystal");
+		wither.addScoreboardTag("300Crystal");
+		wither.setPersistent(true);
+		wither.setRemoveWhenFarAway(false);
+		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
+		Utils.changeName(wither);
 
-		Utils.scheduleTask(() -> spawnGuards(e), 300);
+		Utils.scheduleTask(() -> spawnGuards(wither), 300);
 
 		return name;
 	}
