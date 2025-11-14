@@ -243,26 +243,88 @@ public class PrimalDragon implements CustomDragon {
 		} else if(type == DamageType.PLAYER_MAGIC) {
 			return originalDamage * getMagicMultiplier(damagee);
 		} else {
-			if(!damagee.getScoreboardTags().contains("200Trigger")) {
-				return originalDamage * 0.5;
-			}
+			return originalDamage * 	getDefaultMultiplier(damagee);
 		}
-		return originalDamage;
+	}
+
+	private static double getDefaultMultiplier(LivingEntity damagee) {
+		if(damagee.getScoreboardTags().contains("800Trigger")) return 0.9;
+		if(damagee.getScoreboardTags().contains("600Trigger")) return 0.8;
+		if(damagee.getScoreboardTags().contains("400Trigger")) return 0.7;
+		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.6;
+		return 0.5;
 	}
 
 	private static double getRangedMultiplier(LivingEntity damagee) {
-		if(damagee.getScoreboardTags().contains("800Trigger")) return 0.25;
-		if(damagee.getScoreboardTags().contains("600Trigger")) return 0.2;
-		if(damagee.getScoreboardTags().contains("400Trigger")) return 0.15;
-		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.1;
-		return 0.0667;
+		if(damagee.getScoreboardTags().contains("800Trigger")) return 0.2;
+		if(damagee.getScoreboardTags().contains("600Trigger")) return 0.16;
+		if(damagee.getScoreboardTags().contains("400Trigger")) return 0.12;
+		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.08;
+		return 0.04;
 	}
 
 	private static double getMagicMultiplier(LivingEntity damagee) {
-		if(damagee.getScoreboardTags().contains("600Trigger")) return 1;
+		if(damagee.getScoreboardTags().contains("800Trigger")) return 0.9;
+		if(damagee.getScoreboardTags().contains("600Trigger")) return 0.75;
 		if(damagee.getScoreboardTags().contains("400Trigger")) return 0.5;
 		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.25;
 		return 0.15;
+	}
+
+	private static void fireballSpam(EnderDragon dragon) {
+		if(dragon.getScoreboardTags().contains("Invulnerable") || dragon.isDead()) return;
+
+		String phase = getCurrentPhase(dragon);
+		int delay = getFireballDelay(notPerching(dragon), phase);
+
+		Utils.scheduleTask(() -> {
+			if(dragon.getScoreboardTags().contains("Invulnerable") || dragon.isDead()) return;
+
+			// Check if phase changed (except for final phase which should continue)
+			String currentPhase = getCurrentPhase(dragon);
+			if(!phase.equals(currentPhase) && !phase.equals("final")) return;
+
+			if(notPerching(dragon)) {
+				shootFireballAtNearestPlayer(dragon);
+			} else if(phase.equals("final")) {
+				dropFireballsOnAllPlayers(dragon);
+			}
+			fireballSpam(dragon);
+		}, delay);
+	}
+
+	private static int getFireballDelay(boolean notPerched, String phase) {
+		return switch(phase) {
+			case "600Trigger" -> 120;
+			case "400Trigger" -> 100;
+			case "200Trigger" -> 80;
+			case "final" -> notPerched ? 60 : 80;
+			default -> Integer.MAX_VALUE;
+		};
+	}
+
+	private static void shootFireballAtNearestPlayer(EnderDragon dragon) {
+		Player p = Utils.getNearestPlayer(dragon);
+		if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
+			Vector direction = p.getLocation().add(0, 1, 0).subtract(dragon.getLocation()).toVector().normalize();
+			DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(dragon.getLocation().add(direction.clone().multiply(5)), EntityType.DRAGON_FIREBALL);
+			fireball.setVelocity(direction.clone().multiply(0.2));
+			fireball.setDirection(direction);
+			p.playSound(dragon, Sound.ENTITY_ENDER_DRAGON_SHOOT, 1.0f, 1.0f);
+		}
+	}
+
+	private static void dropFireballsOnAllPlayers(EnderDragon dragon) {
+		for(Player p : dragon.getWorld().getPlayers()) {
+			if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
+				DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(p.getLocation().add(0, 20, 0), EntityType.DRAGON_FIREBALL);
+				fireball.setDirection(new Vector(0, -0.2, 0));
+				p.playSound(dragon, Sound.ENTITY_ENDER_DRAGON_SHOOT, 1.0f, 1.0f);
+			}
+			DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(new Location(dragon.getWorld(), 0.5, 61, 0.5), EntityType.DRAGON_FIREBALL);
+			fireball.setDirection(new Vector(0, -0.2, 0));
+			p.playSound(dragon, Sound.ENTITY_ENDER_DRAGON_SHOOT, 1.0f, 1.0f);
+		}
 	}
 
 	private static void tntRain(EnderDragon dragon) {
@@ -274,19 +336,19 @@ public class PrimalDragon implements CustomDragon {
 
 		switch(currentPhase) {
 			case "400Trigger" -> {
-				delay = 40;
-				fuse = 20;
-				damage = 30;
-			}
-			case "200Trigger" -> {
 				delay = 30;
 				fuse = 15;
-				damage = 45;
+				damage = 40;
+			}
+			case "200Trigger" -> {
+				delay = 20;
+				fuse = 10;
+				damage = 60;
 			}
 			default -> {
-				delay = notPerching(dragon) ? 20 : 30;
-				fuse = notPerching(dragon) ? 10 : 15;
-				damage = notPerching(dragon) ? 60 : 30;
+				delay = notPerching(dragon) ? 12 : 20;
+				fuse = notPerching(dragon) ? 6 : 10;
+				damage = notPerching(dragon) ? 80 : 60;
 			}
 		}
 
@@ -327,67 +389,14 @@ public class PrimalDragon implements CustomDragon {
 				Player p = Utils.getNearestPlayer(dragon);
 				if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
 					if(notPerching(dragon)) {
-						Utils.spawnTNT(dragon, p.getLocation(), 20, 6, 40, new ArrayList<>());
+						Utils.spawnTNT(dragon, p.getLocation(), 10, 6, 40, new ArrayList<>());
 					} else {
-						Utils.spawnTNT(dragon, p.getLocation(), 20, 6, 25, new ArrayList<>());
+						Utils.spawnTNT(dragon, p.getLocation(), 10, 6, 25, new ArrayList<>());
 					}
 				}
 				extremeTNTRainPlayer(dragon);
 			}
-		}, notPerching(dragon) ? 50 : 80);
-	}
-
-	private static void fireballSpam(EnderDragon dragon) {
-		if(dragon.getScoreboardTags().contains("Invulnerable") || dragon.isDead()) return;
-
-		String phase = getCurrentPhase(dragon);
-		int delay = getFireballDelay(notPerching(dragon), phase);
-
-		Utils.scheduleTask(() -> {
-			if(dragon.getScoreboardTags().contains("Invulnerable") || dragon.isDead()) return;
-
-			// Check if phase changed (except for final phase which should continue)
-			String currentPhase = getCurrentPhase(dragon);
-			if(!phase.equals(currentPhase) && !phase.equals("final")) return;
-
-			if(notPerching(dragon)) {
-				shootFireballAtNearestPlayer(dragon);
-			} else if(phase.equals("final")) {
-				dropFireballsOnAllPlayers(dragon);
-			}
-			fireballSpam(dragon);
-		}, delay);
-	}
-
-	private static int getFireballDelay(boolean notPerched, String phase) {
-		return switch(phase) {
-			case "600Trigger" -> 200;
-			case "400Trigger" -> 160;
-			case "200Trigger" -> 120;
-			case "final" -> notPerched ? 80 : 120;
-			default -> Integer.MAX_VALUE;
-		};
-	}
-
-	private static void shootFireballAtNearestPlayer(EnderDragon dragon) {
-		Player p = Utils.getNearestPlayer(dragon);
-		if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
-			Vector direction = p.getLocation().add(0, 1, 0).subtract(dragon.getLocation()).toVector().normalize();
-			DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(dragon.getLocation().add(direction.clone().multiply(5)), EntityType.DRAGON_FIREBALL);
-			fireball.setVelocity(direction.clone().multiply(0.1));
-			fireball.setDirection(direction);
-			p.playSound(dragon, Sound.ENTITY_ENDER_DRAGON_SHOOT, 1.0f, 1.0f);
-		}
-	}
-
-	private static void dropFireballsOnAllPlayers(EnderDragon dragon) {
-		for(Player p : dragon.getWorld().getPlayers()) {
-			if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
-				DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(p.getLocation().add(0, 40, 0), EntityType.DRAGON_FIREBALL);
-				fireball.setDirection(new Vector(0, -0.2, 0));
-				p.playSound(dragon, Sound.ENTITY_ENDER_DRAGON_SHOOT, 1.0f, 1.0f);
-			}
-		}
+		}, notPerching(dragon) ? 40 : 60);
 	}
 
 	private static void summonZealots(EnderDragon dragon) {
@@ -458,9 +467,9 @@ public class PrimalDragon implements CustomDragon {
 					dragon.getWorld().spawnEntity(spawnLoc, EntityType.END_CRYSTAL);
 					dragon.setHealth(dragon.getHealth() + 15);
 					Utils.changeName(dragon);
-					Utils.scheduleTask(() -> theFinalTrick(dragon), 600);
+					Utils.scheduleTask(() -> theFinalTrick(dragon), 400);
 				}
-			}, 600);
+			}, 400);
 		}
 	}
 

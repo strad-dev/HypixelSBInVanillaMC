@@ -14,7 +14,7 @@ import org.bukkit.entity.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MasterGoldor implements CustomWither {
+public class Goldor implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 
 	@Override
@@ -87,7 +87,7 @@ public class MasterGoldor implements CustomWither {
 			}, 300);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new MasterNecron().onSpawn(Utils.getNearestPlayer(damagee), wither);
+				new Necron().onSpawn(Utils.getNearestPlayer(damagee), wither);
 			}, 340);
 			return false;
 		}

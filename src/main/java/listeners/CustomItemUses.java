@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +52,8 @@ public class CustomItemUses implements Listener {
 				p.removeScoreboardTag("HasCrystal");
 			}
 			case Mob entity when e.getHand().equals(EquipmentSlot.HAND) -> {
-				CustomMob mob = SummonItem.spawnABoss(id);
+				CustomMob mob = SummonItem.spawnABoss(entity, id, e.getPlayer().hasPotionEffect(PotionEffectType.BAD_OMEN));
+				e.getPlayer().removePotionEffect(PotionEffectType.BAD_OMEN);
 				String newName;
 				if(mob == null) {
 					if(item.getType().equals(Material.NAME_TAG)) {

@@ -3,7 +3,7 @@ package listeners;
 import misc.Utils;
 import mobs.enderDragons.CustomDragon;
 import mobs.hardmode.PrimalDragon;
-import mobs.hardmode.withers.MasterMaxor;
+import mobs.hardmode.withers.Maxor;
 import mobs.withers.CustomWither;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -79,7 +79,7 @@ public class CustomMobs implements Listener {
 								Utils.scheduleTask(wither::remove, 1);
 								Utils.scheduleTask(() -> {
 									Wither wither2 = (Wither) wither.getWorld().spawnEntity(wither.getLocation(), EntityType.WITHER);
-									new MasterMaxor().onSpawn(Utils.getNearestPlayer(wither2), wither2);
+									new Maxor().onSpawn(Utils.getNearestPlayer(wither2), wither2);
 								}, 240);
 								isWitherLordFightActive = true;
 								Utils.scheduleTask(() -> {

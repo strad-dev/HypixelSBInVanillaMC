@@ -14,7 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IceWitherSkeleton implements CustomMob {
+public class WitherSkeletonIce implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Ice" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
@@ -30,7 +30,7 @@ public class IceWitherSkeleton implements CustomMob {
 			immune.add(EntityType.WITHER_SKELETON);
 			immune.add(EntityType.WITHER);
 			Utils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
-			MasterWitherKing.defeatHenchman("Ice");
+			WitherKing.defeatHenchman("Ice");
 			damagee.remove();
 			return false;
 		}

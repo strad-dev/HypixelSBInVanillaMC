@@ -1,6 +1,5 @@
 package mobs.hardmode.withers;
 
-import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI;
 import items.armor.WitherKingCrown;
 import items.ingredients.witherLords.*;
 import listeners.CustomMobs;
@@ -24,7 +23,7 @@ import java.util.*;
 import static misc.Utils.sendRareDropMessage;
 import static misc.Utils.teleport;
 
-public class MasterWitherKing implements CustomWither {
+public class WitherKing implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 	private static Mob witherKing;
 
@@ -124,23 +123,23 @@ public class MasterWitherKing implements CustomWither {
 		switch(which) {
 			case "Power" -> {
 				e.addScoreboardTag("Power");
-				new PowerWitherSkeleton().onSpawn(Utils.getNearestPlayer(mob), e);
+				new WitherSkeletonPower().onSpawn(Utils.getNearestPlayer(mob), e);
 			}
 			case "Fire" -> {
 				e.addScoreboardTag("Fire");
-				new FireWitherSkeleton().onSpawn(Utils.getNearestPlayer(mob), e);
+				new WitherSkeletonFire().onSpawn(Utils.getNearestPlayer(mob), e);
 			}
 			case "Ice" -> {
 				e.addScoreboardTag("Ice");
-				new IceWitherSkeleton().onSpawn(Utils.getNearestPlayer(mob), e);
+				new WitherSkeletonIce().onSpawn(Utils.getNearestPlayer(mob), e);
 			}
 			case "Soul" -> {
 				e.addScoreboardTag("Soul");
-				new SoulWitherSkeleton().onSpawn(Utils.getNearestPlayer(mob), e);
+				new WitherSkeletonSoul().onSpawn(Utils.getNearestPlayer(mob), e);
 			}
 			case "Martial" -> {
 				e.addScoreboardTag("Martial");
-				new MartialWitherSkeleton().onSpawn(Utils.getNearestPlayer(mob), e);
+				new WitherSkeletonMartial().onSpawn(Utils.getNearestPlayer(mob), e);
 			}
 		}
 	}

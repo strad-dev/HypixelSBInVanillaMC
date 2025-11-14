@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class FireWitherSkeleton implements CustomMob {
+public class WitherSkeletonFire implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Fire" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
@@ -48,7 +48,7 @@ public class FireWitherSkeleton implements CustomMob {
 			immune.add(EntityType.WITHER_SKELETON);
 			immune.add(EntityType.WITHER);
 			Utils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
-			MasterWitherKing.defeatHenchman("Fire");
+			WitherKing.defeatHenchman("Fire");
 			damagee.remove();
 			return false;
 		}
