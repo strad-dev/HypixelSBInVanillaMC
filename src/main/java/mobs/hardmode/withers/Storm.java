@@ -4,6 +4,7 @@ import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
+import mobs.CustomMob;
 import mobs.withers.CustomWither;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -235,7 +236,7 @@ public class Storm implements CustomWither {
 			}, 300);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new Goldor().onSpawn(Utils.getNearestPlayer(damagee), wither);
+				CustomMob.getMob("Goldor", true).onSpawn(Utils.getNearestPlayer(damagee), wither);
 			}, 340);
 			return false;
 		}

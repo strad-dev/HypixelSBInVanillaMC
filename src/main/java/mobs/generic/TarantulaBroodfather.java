@@ -47,14 +47,19 @@ public class TarantulaBroodfather implements CustomMob {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		teleport(damagee, 12);
 		if(damager instanceof LivingEntity livingEntity) {
 			CustomDamage.customMobs(livingEntity, damagee, 1, DamageType.MAGIC);
 		}
 		if(originalDamage > 5) {
 			double finalDamage = 5 + (originalDamage - 5) / 5;
+			if(finalDamage < damagee.getHealth()) {
+				teleport(damagee, 12);
+			}
 			CustomDamage.calculateFinalDamage(damagee, damager, finalDamage, type);
 			return false;
+		}
+		if(originalDamage < damagee.getHealth()) {
+			teleport(damagee, 12);
 		}
 		return true;
 	}

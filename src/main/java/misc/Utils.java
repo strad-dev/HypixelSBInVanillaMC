@@ -330,7 +330,9 @@ public class Utils {
 	 */
 	public static void broadcastPacket(Packet<?> pkt) {
 		for(Player p : Bukkit.getOnlinePlayers()) {
-			((CraftPlayer) p).getHandle().connection.send(pkt);
+			if(p.isOnline()) {
+				((CraftPlayer) p).getHandle().connection.send(pkt);
+			}
 		}
 	}
 }

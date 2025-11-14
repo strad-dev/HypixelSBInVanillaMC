@@ -4,6 +4,7 @@ import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
+import mobs.CustomMob;
 import mobs.withers.CustomWither;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -167,7 +168,7 @@ public class Maxor implements CustomWither {
 			}, 300);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new Storm().onSpawn(Utils.getNearestPlayer(damagee), wither);
+				CustomMob.getMob("Storm", true).onSpawn(Utils.getNearestPlayer(damagee), wither);
 			}, 340);
 			return false;
 		}

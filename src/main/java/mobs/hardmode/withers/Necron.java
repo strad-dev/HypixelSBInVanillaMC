@@ -4,6 +4,7 @@ import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
+import mobs.CustomMob;
 import mobs.withers.CustomWither;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -146,7 +147,7 @@ public class Necron implements CustomWither {
 			}, 480);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				new WitherKing().onSpawn(Utils.getNearestPlayer(damagee), wither);
+				CustomMob.getMob("WitherKing", true).onSpawn(Utils.getNearestPlayer(damagee), wither);
 			}, 540);
 			return false;
 		}

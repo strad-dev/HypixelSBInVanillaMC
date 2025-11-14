@@ -4,11 +4,12 @@ import listeners.DamageType;
 import misc.DamageData;
 import mobs.enderDragons.*;
 import mobs.generic.*;
-import mobs.hardmode.generic.AtonedHorror;
 import mobs.hardmode.enderDragons.PrimalDragon;
+import mobs.hardmode.generic.AtonedHorror;
+import mobs.hardmode.generic.ConjoinedBrood;
 import mobs.hardmode.generic.PrimordialBroodfather;
 import mobs.hardmode.withers.*;
-import mobs.withers.*;
+import mobs.withers.Default;
 import org.bukkit.entity.*;
 
 import java.util.HashMap;
@@ -27,6 +28,7 @@ public interface CustomMob {
 			MOBS.put("AtonedHorror", new AtonedHorror());
 			MOBS.put("TarantulaBroodfather", new TarantulaBroodfather());
 			MOBS.put("PrimordialBroodfather", new PrimordialBroodfather());
+			MOBS.put("ConjoinedBrood", new ConjoinedBrood());
 			MOBS.put("Sadan", new Sadan());
 			MOBS.put("Voidgloom", new VoidgloomSeraph());
 			MOBS.put("MutantEnderman", new MutantEnderman());
@@ -70,8 +72,8 @@ public interface CustomMob {
 			MOBS.put("DefaultWither", new Default());
 		}
 
-		public static CustomMob get(String tag, boolean hardMode) {
-			if(hardMode && HARDMODE_WITHERS.containsKey(tag)) {
+		public static CustomMob get(String tag, boolean hardModeWither) {
+			if(hardModeWither && HARDMODE_WITHERS.containsKey(tag)) {
 				return HARDMODE_WITHERS.get(tag);
 			}
 			return MOBS.get(tag);
@@ -79,24 +81,28 @@ public interface CustomMob {
 	}
 
 	static CustomMob getMob(Entity e) {
-		if (e != null) {
+		if(e != null) {
 			Set<String> tags = e.getScoreboardTags();
 			boolean isHardMode = tags.contains("HardMode");
 
 			// Check each tag against the registry keys
-			for (String tag : tags) {
+			for(String tag : tags) {
 				CustomMob mob = MobRegistry.get(tag, isHardMode);
-				if (mob != null) {
+				if(mob != null) {
 					return mob;
 				}
 			}
 
 			// Special case for default withers
-			if (e instanceof Wither) {
+			if(e instanceof Wither) {
 				return MobRegistry.get("DefaultWither", false);
 			}
 		}
 		return null;
+	}
+
+	static CustomMob getMob(String id, boolean hardModewither) {
+		return MobRegistry.get(id, hardModewither);
 	}
 
 	String onSpawn(Player p, Mob e);
@@ -108,7 +114,7 @@ public interface CustomMob {
 	 * @param damager        the entity dealing damage
 	 * @param originalDamage the original damage amount
 	 * @param type           the original damage type
-	 * @param data			 extra data associated with the damage
+	 * @param data           extra data associated with the damage
 	 * @return true if the original calculation can proceed; false if not
 	 */
 	boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data);
@@ -120,7 +126,7 @@ public interface CustomMob {
 	 * @param damager        the custom entity
 	 * @param originalDamage the original damage amount
 	 * @param type           the original damage type
-	 * @param data			 extra data associated with the damage
+	 * @param data           extra data associated with the damage
 	 * @return true if the original calculation can proceed; false if not
 	 */
 	boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data);
