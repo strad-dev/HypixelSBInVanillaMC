@@ -42,7 +42,9 @@ public class WitherSkeletonPower implements CustomMob {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		Utils.spawnTNT(damager, damagee.getLocation(), 20, 6, 10, new ArrayList<>());
+		if(type == DamageType.MELEE) {
+			Utils.spawnTNT(damager, damagee.getLocation(), 20, 6, 10, new ArrayList<>());
+		}
 		return true;
 	}
 }

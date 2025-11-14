@@ -26,7 +26,7 @@ public interface SummonItem {
 			SUMMONS.put("skyblock/summon/corrupt_pearl", new SummonMapping("MutantEnderman", "MutantEnderman", Enderman.class));
 			SUMMONS.put("skyblock/summon/antimatter", new SummonMapping("meloGnorI", "meloGnorI", IronGolem.class));
 			SUMMONS.put("skyblock/summon/omega_egg", new SummonMapping("Chickzilla", "Chickzilla", Chicken.class));
-			SUMMONS.put("skyblock/summon/spider_relic", new SummonMapping("Broodfather", "Broodfather\",", Spider.class));
+			SUMMONS.put("skyblock/summon/spider_relic", new SummonMapping("TarantulaBroodfather", "PrimordialBroodfather", Spider.class));
 			SUMMONS.put("skyblock/summon/atoned_flesh", new SummonMapping("RevenantHorror", "AtonedHorror", Zombie.class));
 			SUMMONS.put("skyblock/summon/giant_flesh", new SummonMapping("Sadan", "Sadan", Zombie.class));
 

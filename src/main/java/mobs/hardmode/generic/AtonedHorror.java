@@ -77,6 +77,7 @@ public class AtonedHorror implements CustomMob {
 		if(!zombie.isDead()) {
 			zombie.setAI(false);
 			zombie.addScoreboardTag("Invulnerable");
+			Utils.changeName(zombie);
 			zombie.getNearbyEntities(64, 64, 64).stream().filter(entity -> entity instanceof Player).map(Player.class::cast).forEach(p -> {
 				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "7", "", 0, 21, 0);
 				Utils.scheduleTask(() -> {

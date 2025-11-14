@@ -595,11 +595,19 @@ public class CustomDrops implements Listener {
 					item = new ItemStack(Material.SPIDER_EYE);
 					world.dropItemNaturally(l, item);
 				}
-				if(spider.getScoreboardTags().contains("Broodfather")) {
-					if(random.nextDouble() < 0.1 * rngLootingBonus) {
+				if(spider.getScoreboardTags().contains("TarantulaBroodfather")) {
+					if(random.nextDouble() < 0.05 * rngLootingBonus) {
 						item = TarantulaSilk.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tarantula Silk");
+						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_tarantula_broodfather").incrementProgression(p);
+					}
+				} else if(spider.getScoreboardTags().contains("ConjuredBrood")) {
+					if(random.nextDouble() < 0.25 * rngLootingBonus) {
+						item = TarantulaSilk.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Tarantula Silk");
+						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_primordial_broodfather").incrementProgression(p);
 					}
 				} else if(random.nextDouble() < 0.03 * rngLootingBonus && p != null) {
 					item = SpiderRelic.getItem();
