@@ -29,7 +29,7 @@ public class AtonedHorror implements CustomMob {
 		} else {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
-	
+
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Atoned Horror" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
 		sword.addEnchantment(Enchantment.KNOCKBACK, 2);
@@ -75,33 +75,41 @@ public class AtonedHorror implements CustomMob {
 
 	private static void nuclearExplosion(Zombie zombie) {
 		if(!zombie.isDead()) {
+			zombie.setAI(false);
+			zombie.addScoreboardTag("Invulnerable");
 			zombie.getNearbyEntities(64, 64, 64).stream().filter(entity -> entity instanceof Player).map(Player.class::cast).forEach(p -> {
 				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "7", "", 0, 21, 0);
 				Utils.scheduleTask(() -> {
 					if(!zombie.isDead()) {
 						p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "6", "", 0, 21, 0);
 					}
-				}, 20); Utils.scheduleTask(() -> {
+				}, 20);
+				Utils.scheduleTask(() -> {
 					if(!zombie.isDead()) {
 						p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "5", "", 0, 21, 0);
 					}
-				}, 40); Utils.scheduleTask(() -> {
+				}, 40);
+				Utils.scheduleTask(() -> {
 					if(!zombie.isDead()) {
 						p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "4", "", 0, 21, 0);
 					}
-				}, 60); Utils.scheduleTask(() -> {
+				}, 60);
+				Utils.scheduleTask(() -> {
 					if(!zombie.isDead()) {
 						p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "3", "", 0, 21, 0);
 					}
-				}, 80); Utils.scheduleTask(() -> {
+				}, 80);
+				Utils.scheduleTask(() -> {
 					if(!zombie.isDead()) {
 						p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "2", "", 0, 21, 0);
 					}
-				}, 100); Utils.scheduleTask(() -> {
+				}, 100);
+				Utils.scheduleTask(() -> {
 					if(!zombie.isDead()) {
 						p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "1", "", 0, 21, 0);
 					}
-				}, 120); Utils.scheduleTask(() -> {
+				}, 120);
+				Utils.scheduleTask(() -> {
 					if(!zombie.isDead()) {
 						p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "BOOM", "", 0, 21, 0);
 					}
@@ -111,6 +119,8 @@ public class AtonedHorror implements CustomMob {
 				if(!zombie.isDead()) {
 					Utils.spawnTNT(zombie, zombie.getLocation(), 0, 64, 150, new ArrayList<>());
 				}
+				zombie.setAI(true);
+				zombie.removeScoreboardTag("Invulnerable");
 			}, 140);
 			Utils.scheduleTask(() -> nuclearExplosion(zombie), 600);
 		}
@@ -118,10 +128,17 @@ public class AtonedHorror implements CustomMob {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		if(type == DamageType.PLAYER_MAGIC || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) {
+		if(damagee.getScoreboardTags().contains("Invulnerable")) {
+			if(damager instanceof Player p) {
+				p.sendTitle("", ChatColor.YELLOW + "You cannot damage the Atoned Horror.", 0, 20, 0);
+			}
+			damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
+			return false;
+		} else if(type == DamageType.PLAYER_MAGIC || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) {
 			if(damager instanceof Player p) {
 				p.sendTitle("", ChatColor.YELLOW + "You cannot deal " + DamageType.toString(type) + " to the Atoned Horror.", 0, 20, 0);
 			}
+			damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			return false;
 		}
 		return true;

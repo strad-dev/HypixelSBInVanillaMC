@@ -105,21 +105,21 @@ public class Maxor implements CustomWither {
 		double hp = damagee.getHealth();
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
-			if(damager instanceof Player p) {
-				if(p.getScoreboardTags().contains("HasCrystal")) {
-					damagee.removeScoreboardTag("Invulnerable");
-					damagee.removeScoreboardTag("InvulnerableReminder");
-					Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???");
-					List<EntityType> immune = new ArrayList<>();
-					immune.add(EntityType.WITHER_SKELETON);
-					Utils.spawnTNT(damagee, damagee.getLocation(), 0, 8, 10, immune);
-					p.removeScoreboardTag("HasCrystal");
-					Utils.changeName(damagee);
-				} else {
-					if(!damagee.getScoreboardTags().contains("Dead")) {
-						damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
+			if(damager instanceof Player p && p.getScoreboardTags().contains("HasCrystal")) {
+				damagee.removeScoreboardTag("Invulnerable");
+				damagee.removeScoreboardTag("InvulnerableReminder");
+				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???");
+				List<EntityType> immune = new ArrayList<>();
+				immune.add(EntityType.WITHER_SKELETON);
+				Utils.spawnTNT(damagee, damagee.getLocation(), 0, 8, 10, immune);
+				p.removeScoreboardTag("HasCrystal");
+				Utils.changeName(damagee);
+			} else {
+				if(!damagee.getScoreboardTags().contains("Dead")) {
+					if(damagee instanceof Player p) {
 						p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Maxor!", 0, 20, 0);
 					}
+					damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 				}
 			}
 			if(damagee.getScoreboardTags().contains("InvulnerableReminder") && !damagee.getScoreboardTags().contains("Dead")) {

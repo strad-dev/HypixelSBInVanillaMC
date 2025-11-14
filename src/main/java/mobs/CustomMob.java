@@ -6,6 +6,7 @@ import mobs.enderDragons.*;
 import mobs.generic.*;
 import mobs.hardmode.generic.AtonedHorror;
 import mobs.hardmode.enderDragons.PrimalDragon;
+import mobs.hardmode.generic.PrimordialBroodfather;
 import mobs.hardmode.withers.*;
 import mobs.withers.*;
 import org.bukkit.entity.*;
@@ -17,18 +18,19 @@ import java.util.Set;
 public interface CustomMob {
 	class MobRegistry {
 		private static final Map<String, CustomMob> MOBS = new HashMap<>();
-		private static final Map<String, CustomMob> HARDMODE_MOBS = new HashMap<>();
+		private static final Map<String, CustomMob> HARDMODE_WITHERS = new HashMap<>();
 
 		static {
 			// Initialize all mob singletons
 			// Generic mobs
 			MOBS.put("RevenantHorror", new RevenantHorror());
 			MOBS.put("AtonedHorror", new AtonedHorror());
+			MOBS.put("TarantulaBroodfather", new TarantulaBroodfather());
+			MOBS.put("PrimordialBroodfather", new PrimordialBroodfather());
 			MOBS.put("Sadan", new Sadan());
 			MOBS.put("Voidgloom", new VoidgloomSeraph());
 			MOBS.put("MutantEnderman", new MutantEnderman());
 			MOBS.put("meloGnorI", new meloGnorI());
-			MOBS.put("Broodfather", new Broodfather());
 			MOBS.put("Chickzilla", new Chickzilla());
 			MOBS.put("InfuriatedSkeleton", new InfuriatedWitherSkeleton());
 
@@ -39,11 +41,11 @@ public interface CustomMob {
 			MOBS.put("Necron", new mobs.withers.Necron());
 
 			// Hard mode withers (separate registry to avoid key conflicts)
-			HARDMODE_MOBS.put("Maxor", new mobs.hardmode.withers.Maxor());
-			HARDMODE_MOBS.put("Storm", new mobs.hardmode.withers.Storm());
-			HARDMODE_MOBS.put("Goldor", new mobs.hardmode.withers.Goldor());
-			HARDMODE_MOBS.put("Necron", new mobs.hardmode.withers.Necron());
-			HARDMODE_MOBS.put("WitherKing", new mobs.hardmode.withers.WitherKing());
+			HARDMODE_WITHERS.put("Maxor", new mobs.hardmode.withers.Maxor());
+			HARDMODE_WITHERS.put("Storm", new mobs.hardmode.withers.Storm());
+			HARDMODE_WITHERS.put("Goldor", new mobs.hardmode.withers.Goldor());
+			HARDMODE_WITHERS.put("Necron", new mobs.hardmode.withers.Necron());
+			HARDMODE_WITHERS.put("WitherKing", new mobs.hardmode.withers.WitherKing());
 
 			// Dragons
 			MOBS.put("HolyDragon", new Holy());
@@ -54,7 +56,6 @@ public interface CustomMob {
 			MOBS.put("UnstableDragon", new Unstable());
 			MOBS.put("WiseDragon", new Wise());
 			MOBS.put("YoungDragon", new Young());
-			MOBS.put("WitherKingDragon", new WitherKingDragon());
 			MOBS.put("PrimalDragon", new PrimalDragon());
 
 			// Wither Skeletons
@@ -70,8 +71,8 @@ public interface CustomMob {
 		}
 
 		public static CustomMob get(String tag, boolean hardMode) {
-			if(hardMode && HARDMODE_MOBS.containsKey(tag)) {
-				return HARDMODE_MOBS.get(tag);
+			if(hardMode && HARDMODE_WITHERS.containsKey(tag)) {
+				return HARDMODE_WITHERS.get(tag);
 			}
 			return MOBS.get(tag);
 		}

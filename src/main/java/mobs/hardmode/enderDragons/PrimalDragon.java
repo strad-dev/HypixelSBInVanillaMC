@@ -112,9 +112,9 @@ public class PrimalDragon implements CustomDragon {
 		if(dragon.getScoreboardTags().contains("Invulnerable") || dragon.getScoreboardTags().contains("Dead")) {
 			if(damager instanceof Player p) {
 				if(!dragon.getScoreboardTags().contains("Dead")) {
-					dragon.getWorld().playSound(dragon, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 					p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Primal Dragon!", 0, 20, 0);
 				}
+				dragon.getWorld().playSound(dragon, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			}
 			return false;
 		} else if(dragon.getScoreboardTags().contains("800Trigger") && hp - actualDamage < 800) {
