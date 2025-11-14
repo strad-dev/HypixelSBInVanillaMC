@@ -102,9 +102,9 @@ public enum DamageType {
 				return "Melee Damage";
 			}
 			case MELEE_SWEEP -> {
-				return "Melee AOE Damage";
+				return "Sweep Damage";
 			}
-			case RANGED -> {
+			case RANGED, RANGED_SPECIAL -> {
 				return "Ranged Damage";
 			}
 			case MAGIC, PLAYER_MAGIC -> {

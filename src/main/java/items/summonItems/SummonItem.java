@@ -22,13 +22,13 @@ public interface SummonItem {
 		static {
 			// Map item IDs to their corresponding mob registry keys
 			// Format: (normal mode key, hard mode key, required entity type)
-			SUMMONS.put("skyblock/summon/superior_remnant", new SummonMapping("Voidgloom", "VoidgloomHard", Enderman.class));
-			SUMMONS.put("skyblock/summon/corrupt_pearl", new SummonMapping("MutantEnderman", "MutantEndermanHard", Enderman.class));
-			SUMMONS.put("skyblock/summon/antimatter", new SummonMapping("meloGnorI", "meloGnorIHard", IronGolem.class));
-			SUMMONS.put("skyblock/summon/omega_egg", new SummonMapping("Chickzilla", "ChickzillaHard", Chicken.class));
-			SUMMONS.put("skyblock/summon/spider_relic", new SummonMapping("Broodfather", "BroodfatherHard", Spider.class));
+			SUMMONS.put("skyblock/summon/superior_remnant", new SummonMapping("Voidgloom", "Voidgloom", Enderman.class));
+			SUMMONS.put("skyblock/summon/corrupt_pearl", new SummonMapping("MutantEnderman", "MutantEnderman", Enderman.class));
+			SUMMONS.put("skyblock/summon/antimatter", new SummonMapping("meloGnorI", "meloGnorI", IronGolem.class));
+			SUMMONS.put("skyblock/summon/omega_egg", new SummonMapping("Chickzilla", "Chickzilla", Chicken.class));
+			SUMMONS.put("skyblock/summon/spider_relic", new SummonMapping("Broodfather", "Broodfather\",", Spider.class));
 			SUMMONS.put("skyblock/summon/atoned_flesh", new SummonMapping("RevenantHorror", "AtonedHorror", Zombie.class));
-			SUMMONS.put("skyblock/summon/giant_flesh", new SummonMapping("Sadan", "SadanHard", Zombie.class));
+			SUMMONS.put("skyblock/summon/giant_flesh", new SummonMapping("Sadan", "Sadan", Zombie.class));
 
 			// Wither Skeleton doesn't change between modes
 			SUMMONS.put("skyblock/summon/wither_skeleton_spawn_egg", new SummonMapping("InfuriatedSkeleton", WitherSkeleton.class));
