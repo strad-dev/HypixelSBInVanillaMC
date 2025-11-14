@@ -49,14 +49,14 @@ public class Maxor implements CustomWither {
 		return name;
 	}
 
-	private void spawnGuards(Mob e) {
-		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-			Utils.spawnGuards(e, 2);
-			Utils.scheduleTask(() -> spawnGuards(e), 300);
+	private void spawnGuards(Wither wither) {
+		if(!wither.isDead() && !wither.getScoreboardTags().contains("Dead")) {
+			Utils.spawnGuards(wither, 2);
+			Utils.scheduleTask(() -> spawnGuards(wither), 300);
 		}
 	}
 
-	private void spawnCrystal(LivingEntity wither, int which) {
+	private void spawnCrystal(Wither wither, int which) {
 		Location l = wither.getLocation();
 		Random random = new Random();
 		l.add(random.nextInt(32) - 16, 0, random.nextInt(32) - 16);
@@ -129,12 +129,12 @@ public class Maxor implements CustomWither {
 			}
 			return false;
 		} else if(damagee.getScoreboardTags().contains("600Crystal") && hp - originalDamage < 600) {
-			spawnCrystal(damagee, 600);
+			spawnCrystal((Wither) damagee, 600);
 			Utils.changeName(damagee);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;
 		} else if(damagee.getScoreboardTags().contains("300Crystal") && hp - originalDamage < 300) {
-			spawnCrystal(damagee, 300);
+			spawnCrystal((Wither) damagee, 300);
 			Utils.changeName(damagee);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;

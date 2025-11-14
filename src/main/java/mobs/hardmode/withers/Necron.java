@@ -52,7 +52,7 @@ public class Necron implements CustomWither {
 		return name;
 	}
 
-	private void frenzy(LivingEntity wither, int which) {
+	private void frenzy(Wither wither, int which) {
 		wither.addScoreboardTag("Invulnerable");
 		wither.setAI(false);
 		Bukkit.getOnlinePlayers().forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 0)));
@@ -100,12 +100,12 @@ public class Necron implements CustomWither {
 			}
 			return false;
 		} else if(damagee.getScoreboardTags().contains("1100Frenzy") && hp - originalDamage < 1100) {
-			frenzy(damagee, 1100);
+			frenzy((Wither) damagee, 1100);
 			Utils.changeName(damagee);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;
 		} else if(damagee.getScoreboardTags().contains("300Frenzy") && hp - originalDamage < 300) {
-			frenzy(damagee, 300);
+			frenzy((Wither) damagee, 300);
 			Utils.changeName(damagee);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			return false;

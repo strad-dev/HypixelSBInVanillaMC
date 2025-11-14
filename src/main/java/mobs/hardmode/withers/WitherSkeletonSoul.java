@@ -31,10 +31,10 @@ public class WitherSkeletonSoul implements CustomMob {
 		return "";
 	}
 
-	private void teleport(Mob e) {
-		if(!e.isDead()) {
-			Utils.teleport(e, WitherKing.getEntity().getLocation(), 16);
-			Utils.scheduleTask(() -> teleport(e), 300);
+	private void teleport(WitherSkeleton witherSkeleton) {
+		if(!witherSkeleton.isDead()) {
+			Utils.teleport(witherSkeleton, WitherKing.getEntity().getLocation(), 16);
+			Utils.scheduleTask(() -> teleport(witherSkeleton), 300);
 		}
 	}
 

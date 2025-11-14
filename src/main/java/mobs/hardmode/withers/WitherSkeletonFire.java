@@ -38,13 +38,13 @@ public class WitherSkeletonFire implements CustomMob {
 		return "";
 	}
 
-	private void walkOnFire(Mob e) {
-		if(!e.isDead()) {
-			Block b = e.getLocation().add(0, 1, 0).getBlock();
+	private void walkOnFire(WitherSkeleton witherSkeleton) {
+		if(!witherSkeleton.isDead()) {
+			Block b = witherSkeleton.getLocation().add(0, 1, 0).getBlock();
 			if(b.getType() != Material.AIR) {
 				b.setType(Material.FIRE);
 			}
-			Utils.scheduleTask(() -> walkOnFire(e), 5);
+			Utils.scheduleTask(() -> walkOnFire(witherSkeleton), 5);
 		}
 	}
 
