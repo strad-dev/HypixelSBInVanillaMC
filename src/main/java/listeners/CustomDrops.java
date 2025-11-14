@@ -860,12 +860,20 @@ public class CustomDrops implements Listener {
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Zombie Head");
 				}
-				if(zombie.getScoreboardTags().contains("AtonedHorror")) {
-					if(random.nextDouble() < 0.1 * rngLootingBonus) {
+				if(zombie.getScoreboardTags().contains("RevenantHorror")) {
+					if(random.nextDouble() < 0.05 * rngLootingBonus) {
 						item = Viscera.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Revenant Viscera");
 					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_revenant_horror").incrementProgression(p);
+				} else if(zombie.getScoreboardTags().contains("AtonedHorror")) {
+					if(random.nextDouble() < 0.25 * rngLootingBonus) {
+						item = Viscera.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Revenant Viscera");
+					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_atoned_horror").incrementProgression(p);
 				} else if(zombie.getScoreboardTags().contains("Sadan")) {
 					if(random.nextDouble() < 0.1 * rngLootingBonus) {
 						item = GiantSwordRemnant.getItem();

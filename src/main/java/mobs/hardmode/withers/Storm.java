@@ -159,9 +159,11 @@ public class Storm implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			Utils.changeName(damagee);
-			if(damager instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
+			if(damagee.getScoreboardTags().contains("Dead")) {
+				if(damager instanceof Player p) {
+					p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Storm!", 0, 20, 0);
+				}
 				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
-				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Storm!", 0, 20, 0);
 			}
 			return false;
 		} else if(damagee.getScoreboardTags().contains("Survival2Trigger") && hp - originalDamage < 500) {

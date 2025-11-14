@@ -57,6 +57,7 @@ public class WitherKing implements CustomWither {
 		wither.setPersistent(true);
 		wither.setRemoveWhenFarAway(false);
 		wither.setAI(false);
+		wither.setSilent(true);
 		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
 		teleport(wither, 0);
 		Utils.changeName(wither);
@@ -267,10 +268,10 @@ public class WitherKing implements CustomWither {
 			return false;
 		} else if(hp - originalDamage < minHealth && countHenchmenLeft() != 0) {
 			if(hp == minHealth) {
-				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 				if(damager instanceof Player p) {
 					p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage " + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GREEN + "!", 0, 20, 0);
 				}
+				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			} else {
 				damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			}

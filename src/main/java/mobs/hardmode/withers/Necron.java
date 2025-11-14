@@ -95,9 +95,9 @@ public class Necron implements CustomWither {
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			Utils.changeName(damagee);
 			if(damager instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
-				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Necron!", 0, 20, 0);
 			}
+				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			return false;
 		} else if(damagee.getScoreboardTags().contains("1100Frenzy") && hp - originalDamage < 1100) {
 			frenzy((Wither) damagee, 1100);

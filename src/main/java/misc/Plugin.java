@@ -112,7 +112,7 @@ public class Plugin extends JavaPlugin {
 			getLogger().info("Deteced Intelligence.");
 		}
 
-		Utils.scheduleTask(Plugin::passiveIntel, 100L);
+		Utils.scheduleTask(() -> passiveIntel(0), 20L);
 	}
 
 	private static void setupAdvancements() {
@@ -146,23 +146,29 @@ public class Plugin extends JavaPlugin {
 		});
 	}
 
-	public static void passiveIntel() {
-		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
-			try {
-				Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
-				if(score.getScore() < 2500) {
-					score.setScore(score.getScore() + 1);
-					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500"));
-				} else {
-					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE"));
+	public static void passiveIntel(int second) {
+		if(second == 5) {
+			for(Player p : Bukkit.getServer().getOnlinePlayers()) {
+				try {
+					Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
+					if(score.getScore() < 2500) {
+						score.setScore(score.getScore() + 1);
+						p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500"));
+					} else {
+						p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE"));
+					}
+				} catch(Exception exception) {
+					Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+					Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+					return;
 				}
-			} catch(Exception exception) {
-				Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
-				Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
-				return;
 			}
+			second = 0;
+		} else {
+			second ++;
 		}
-		Utils.scheduleTask(Plugin::passiveIntel, 100L);
+		int finalSecond = second;
+		Utils.scheduleTask(() -> passiveIntel(finalSecond), 20L);
 	}
 
 	@Override
