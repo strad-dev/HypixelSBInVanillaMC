@@ -29,30 +29,37 @@ public class WitherKing implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		witherKing = e;
+		Wither wither;
+		if(e instanceof Wither) {
+			wither = (Wither) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
+		witherKing = wither;
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
-		Utils.spawnTNT(e, e.getLocation(), 0, 48, 100, immune);
-		p = Utils.getNearestPlayer(e);
+		Utils.spawnTNT(wither, wither.getLocation(), 0, 48, 100, immune);
+		p = Utils.getNearestPlayer(wither);
 		Utils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
-		e.getAttribute(Attribute.SCALE).setBaseValue(2.0);
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(2000.0);
-		e.setHealth(2000.0);
-		e.addScoreboardTag("WitherKing");
-		e.addScoreboardTag("HardMode");
-		e.addScoreboardTag("SkyblockBoss");
-		e.addScoreboardTag("PowerUndefeated");
-		e.addScoreboardTag("FireUndefeated");
-		e.addScoreboardTag("IceUndefeated");
-		e.addScoreboardTag("SoulUndefeated");
-		e.addScoreboardTag("MartialUndefeated");
-		e.setPersistent(true);
-		e.setRemoveWhenFarAway(false);
-		e.setAI(false);
-		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		teleport(e, 0);
-		Utils.changeName(e);
+		wither.getAttribute(Attribute.SCALE).setBaseValue(2.0);
+		wither.getAttribute(Attribute.MAX_HEALTH).setBaseValue(2000.0);
+		wither.setHealth(2000.0);
+		wither.addScoreboardTag("WitherKing");
+		wither.addScoreboardTag("HardMode");
+		wither.addScoreboardTag("SkyblockBoss");
+		wither.addScoreboardTag("PowerUndefeated");
+		wither.addScoreboardTag("FireUndefeated");
+		wither.addScoreboardTag("IceUndefeated");
+		wither.addScoreboardTag("SoulUndefeated");
+		wither.addScoreboardTag("MartialUndefeated");
+		wither.setPersistent(true);
+		wither.setRemoveWhenFarAway(false);
+		wither.setAI(false);
+		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
+		teleport(wither, 0);
+		Utils.changeName(wither);
 
 		ArrayList<String> ordering = new ArrayList<>();
 		ordering.add("Power");
@@ -64,27 +71,27 @@ public class WitherKing implements CustomWither {
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My henchmen are the best in the land.  They will defeat you swiftly!");
-			spawnHenchman(e, ordering.getFirst());
-			spawnHenchman(e, ordering.get(1));
+			spawnHenchman(wither, ordering.getFirst());
+			spawnHenchman(wither, ordering.get(1));
 		}, 40);
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": One more to join the fray.  I hope you are having fun!");
-			spawnHenchman(e, ordering.get(2));
+			spawnHenchman(wither, ordering.get(2));
 		}, 640);
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Another one can't hurt, can it?");
-			spawnHenchman(e, ordering.get(3));
+			spawnHenchman(wither, ordering.get(3));
 		}, 1240);
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My last Henchman.  Go forth and destroy the insolent players!");
-			spawnHenchman(e, ordering.get(4));
+			spawnHenchman(wither, ordering.get(4));
 		}, 1840);
 
-		spawnGuards(e);
-		boom(e);
+		spawnGuards(wither);
+		boom(wither);
 
 		return name;
 	}

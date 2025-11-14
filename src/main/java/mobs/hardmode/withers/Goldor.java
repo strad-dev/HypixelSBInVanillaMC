@@ -19,23 +19,30 @@ public class Goldor implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		Wither wither;
+		if(e instanceof Wither) {
+			wither = (Wither) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		//noinspection DuplicatedCode
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
-		Utils.spawnTNT(e, e.getLocation(), 0, 32, 50, immune);
+		Utils.spawnTNT(wither, wither.getLocation(), 0, 32, 50, immune);
 		Utils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN);
 
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1200.0);
-		e.setHealth(1200.0);
-		e.addScoreboardTag("Goldor");
-		e.addScoreboardTag("HardMode");
-		e.addScoreboardTag("SkyblockBoss");
-		e.setPersistent(true);
-		e.setRemoveWhenFarAway(false);
-		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		Utils.changeName(e);
+		wither.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1200.0);
+		wither.setHealth(1200.0);
+		wither.addScoreboardTag("Goldor");
+		wither.addScoreboardTag("HardMode");
+		wither.addScoreboardTag("SkyblockBoss");
+		wither.setPersistent(true);
+		wither.setRemoveWhenFarAway(false);
+		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
+		Utils.changeName(wither);
 
-		damageAll(e);
+		damageAll(wither);
 
 		return name;
 	}

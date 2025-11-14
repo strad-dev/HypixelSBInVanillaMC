@@ -29,7 +29,7 @@ public class AtonedHorror implements CustomMob {
 		} else {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
-
+	
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Atoned Horror" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		ItemStack sword = new ItemStack(Material.DIAMOND_SWORD);
 		sword.addEnchantment(Enchantment.KNOCKBACK, 2);

@@ -14,8 +14,15 @@ public class Wise implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		EnderDragon dragon;
+		if(e instanceof EnderDragon) {
+			dragon = (EnderDragon) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wise Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		e.addScoreboardTag("WiseDragon");
+		dragon.addScoreboardTag("WiseDragon");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The WISE DRAGON has arrived to destroy you using smart tactics!");
 		Bukkit.getLogger().info("The Wise Dragon has been summoned!");
 		return name;

@@ -15,13 +15,20 @@ import static listeners.CustomMobs.spawnLightning;
 public class Storm implements CustomWither {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		Wither wither;
+		if(e instanceof Wither) {
+			wither = (Wither) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		e.addScoreboardTag("Storm");
-		e.getWorld().setThundering(true);
-		e.getWorld().setWeatherDuration(1000000);
+		wither.addScoreboardTag("Storm");
+		wither.getWorld().setThundering(true);
+		wither.getWorld().setWeatherDuration(1000000);
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "STORM, most explosive Wither in the universe, has come to smite you with his Lightning!");
 		Bukkit.getLogger().info("Storm has been summoned!");
-		Utils.scheduleTask(() -> spawnLightning(e, 64), 200);
+		Utils.scheduleTask(() -> spawnLightning(wither, 64), 200);
 		return newName;
 	}
 

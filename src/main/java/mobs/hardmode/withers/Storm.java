@@ -23,30 +23,37 @@ public class Storm implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		Wither wither;
+		if(e instanceof Wither) {
+			wither = (Wither) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		//noinspection DuplicatedCode
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
-		Utils.spawnTNT(e, e.getLocation(), 0, 32, 50, immune);
+		Utils.spawnTNT(wither, wither.getLocation(), 0, 32, 50, immune);
 		Utils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN);
 
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000.0);
-		e.setHealth(1000.0);
-		e.setAI(false);
-		e.addScoreboardTag("Storm");
-		e.addScoreboardTag("HardMode");
-		e.addScoreboardTag("SkyblockBoss");
-		e.addScoreboardTag("Invulnerable");
-		e.addScoreboardTag("Survival1");
-		e.addScoreboardTag("Survival2Trigger");
-		e.setPersistent(true);
-		e.setRemoveWhenFarAway(false);
-		e.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		Utils.changeName(e);
+		wither.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000.0);
+		wither.setHealth(1000.0);
+		wither.setAI(false);
+		wither.addScoreboardTag("Storm");
+		wither.addScoreboardTag("HardMode");
+		wither.addScoreboardTag("SkyblockBoss");
+		wither.addScoreboardTag("Invulnerable");
+		wither.addScoreboardTag("Survival1");
+		wither.addScoreboardTag("Survival2Trigger");
+		wither.setPersistent(true);
+		wither.setRemoveWhenFarAway(false);
+		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
+		Utils.changeName(wither);
 
-		spawnGuards(e);
-		spawnLightning(e);
+		spawnGuards(wither);
+		spawnLightning(wither);
 		for(int i = 0; i < 600; i += 15) {
-			spamSkulls(e, p, i);
+			spamSkulls(wither, p, i);
 		}
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
@@ -63,10 +70,10 @@ public class Storm implements CustomWither {
 		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 580);
 		Utils.scheduleTask(() -> {
 			Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BOOM!", "", 0, 21, 0));
-			Utils.spawnTNT(e, e.getLocation(), 0, 64, 200, immune);
-			e.removeScoreboardTag("Survival1");
-			e.removeScoreboardTag("Invulnerable");
-			e.setAI(true);
+			Utils.spawnTNT(wither, wither.getLocation(), 0, 64, 200, immune);
+			wither.removeScoreboardTag("Survival1");
+			wither.removeScoreboardTag("Invulnerable");
+			wither.setAI(true);
 		}, 600);
 
 		return name;

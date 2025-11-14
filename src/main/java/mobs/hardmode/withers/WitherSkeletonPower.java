@@ -13,9 +13,16 @@ import java.util.List;
 public class WitherSkeletonPower implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Power" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
-		Utils.changeName(e);
-		e.addScoreboardTag("Power");
+		WitherSkeleton witherSkeleton;
+		if(e instanceof WitherSkeleton) {
+			witherSkeleton = (WitherSkeleton) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
+		witherSkeleton.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Power" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
+		Utils.changeName(witherSkeleton);
+		witherSkeleton.addScoreboardTag("Power");
 		return "";
 	}
 

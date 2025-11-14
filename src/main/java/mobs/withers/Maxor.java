@@ -16,10 +16,17 @@ import static misc.Utils.teleport;
 public class Maxor implements CustomWither {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		Wither wither;
+		if(e instanceof Wither) {
+			wither = (Wither) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(2.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.FLYING_SPEED)).setBaseValue(2.0);
-		e.addScoreboardTag("Maxor");
+		Objects.requireNonNull(wither.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(2.0);
+		Objects.requireNonNull(wither.getAttribute(Attribute.FLYING_SPEED)).setBaseValue(2.0);
+		wither.addScoreboardTag("Maxor");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "MAXOR, the fastest Wither in the universe, has come to destroy you 0.01 seconds faster than all other Withers!");
 		Bukkit.getLogger().info("Maxor has been summoned!");
 		return newName;

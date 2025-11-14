@@ -11,8 +11,15 @@ import static listeners.CustomDamage.calculateFinalDamage;
 public class Necron implements CustomWither {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		Wither wither;
+		if(e instanceof Wither) {
+			wither = (Wither) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		e.addScoreboardTag("Necron");
+		wither.addScoreboardTag("Necron");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "NECRON, the strongest Wither in the universe, has come to wipe you straight off the planet!");
 		Bukkit.getLogger().info("Necron has been summoned!");
 		return newName;
