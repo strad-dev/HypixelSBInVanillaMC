@@ -42,10 +42,10 @@ public class RevenantHorror implements CustomMob {
 		equipment.setItem(EquipmentSlot.LEGS, new ItemStack(Material.CHAINMAIL_LEGGINGS));
 		equipment.setItem(EquipmentSlot.FEET, new ItemStack(Material.CHAINMAIL_BOOTS));
 
-		Objects.requireNonNull(zombie.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(100.0);
+		Objects.requireNonNull(zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(100.0);
 		zombie.setHealth(100.0);
-		Objects.requireNonNull(zombie.getAttribute(Attribute.ATTACK_DAMAGE)).setBaseValue(12.0);
-		Objects.requireNonNull(zombie.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.4);
+		Objects.requireNonNull(zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(12.0);
+		Objects.requireNonNull(zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.setTarget(p);
 		zombie.setCustomNameVisible(true);

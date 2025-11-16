@@ -5,9 +5,7 @@ import misc.DamageData;
 import mobs.enderDragons.*;
 import mobs.generic.*;
 import mobs.hardmode.enderDragons.PrimalDragon;
-import mobs.hardmode.generic.AtonedHorror;
-import mobs.hardmode.generic.ConjoinedBrood;
-import mobs.hardmode.generic.PrimordialBroodfather;
+import mobs.hardmode.generic.*;
 import mobs.hardmode.withers.*;
 import mobs.withers.Default;
 import org.bukkit.entity.*;
@@ -29,11 +27,12 @@ public interface CustomMob {
 			MOBS.put("TarantulaBroodfather", new TarantulaBroodfather());
 			MOBS.put("PrimordialBroodfather", new PrimordialBroodfather());
 			MOBS.put("ConjoinedBrood", new ConjoinedBrood());
-			MOBS.put("Sadan", new Sadan());
-			MOBS.put("Voidgloom", new VoidgloomSeraph());
-			MOBS.put("MutantEnderman", new MutantEnderman());
-			MOBS.put("meloGnorI", new meloGnorI());
 			MOBS.put("Chickzilla", new Chickzilla());
+			MOBS.put("EnragedChickzilla", new EnragedChickzilla());
+			MOBS.put("Sadan", new Sadan());
+			MOBS.put("Voidgloom", new ZealotBrusier());
+			MOBS.put("MutantEnderman", new Zealot());
+			MOBS.put("meloGnorI", new meloGnorI());
 			MOBS.put("InfuriatedSkeleton", new InfuriatedWitherSkeleton());
 
 			// Normal mode withers

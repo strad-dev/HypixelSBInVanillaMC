@@ -1,4 +1,4 @@
-package mobs.generic;
+package mobs.hardmode.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
@@ -16,18 +16,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Objects;
 import java.util.Random;
 
-public class VoidgloomSeraph implements CustomMob {
+public class ZealotBrusier implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Voidgloom Seraph" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(300.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
 		e.setHealth(300.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR)).setBaseValue(14.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.ATTACK_DAMAGE)).setBaseValue(25.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.6);
+		e.getAttribute(Attribute.ARMOR).setBaseValue(14.0);
+		e.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
+		e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.6);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		e.setTarget(Utils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);

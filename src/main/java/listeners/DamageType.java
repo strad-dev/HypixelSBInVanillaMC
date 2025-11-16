@@ -15,7 +15,7 @@ public enum DamageType {
 	/*
 	 * Melee Sweep Damage Type
 	 * ------------------
-	 * Used for all damage caused by Sweep attacks and TNT/AOE attacks.
+	 * Used for all damage caused by Sweep attacks
 	 */
 
 	RANGED,

@@ -172,7 +172,7 @@ public class Utils {
 			List<Entity> entities = (List<Entity>) l.getWorld().getNearbyEntities(l, radius, radius, radius);
 			for(Entity entity : entities) {
 				if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-					CustomDamage.customMobs(entity1, spawner, damage, DamageType.MELEE_SWEEP);
+					CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
 				}
 			}
 			spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), Math.min((int) Math.pow(radius, 3), 65536), radius, radius / 2.0, radius);
@@ -186,7 +186,7 @@ public class Utils {
 				List<Entity> entities = tnt.getNearbyEntities(radius, radius, radius);
 				for(Entity entity : entities) {
 					if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-						CustomDamage.customMobs(entity1, spawner, damage, DamageType.MELEE_SWEEP);
+						CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
 					}
 				}
 				tnt.getWorld().spawnParticle(Particle.EXPLOSION, tnt.getLocation(), Math.min((int) Math.pow(radius, 3), 65536), radius, radius / 2.0, radius);
@@ -257,8 +257,8 @@ public class Utils {
 			//noinspection DuplicatedCode
 			e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(50.0);
 			e.setHealth(50.0);
-			Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
-			Objects.requireNonNull(e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
+			e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+			e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
 			e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 			e.setTarget(Utils.getNearestPlayer(entity));
 			e.setCustomNameVisible(true);

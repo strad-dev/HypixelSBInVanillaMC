@@ -31,10 +31,10 @@ public class InfuriatedWitherSkeleton implements CustomMob {
 		e.getEquipment().setItemInOffHand(sword);
 		e.getEquipment().setItemInOffHandDropChance(0.0F);
 
-		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(50.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(50.0);
 		e.setHealth(50.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR_TOUGHNESS)).setBaseValue(13);
-		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
+		e.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(13);
+		e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		e.setTarget(p);
 		e.teleport(p);
