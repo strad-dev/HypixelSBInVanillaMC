@@ -79,7 +79,7 @@ public class CustomChestLoot implements Listener {
 				chest.getBlockInventory().addItem(book);
 			}
 		} else if(e.getInventoryHolder() instanceof StorageMinecart minecart) {
-			if(random.nextDouble() < 0.02) {
+			if(random.nextDouble() < 0.025) {
 				minecart.getInventory().addItem(Alloy.getItem());
 			}
 		}

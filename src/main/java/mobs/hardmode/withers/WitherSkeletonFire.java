@@ -31,7 +31,7 @@ public class WitherSkeletonFire implements CustomMob {
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
 		sword.addUnsafeEnchantment(Enchantment.FIRE_ASPECT, 255);
-		Objects.requireNonNull(witherSkeleton.getEquipment()).setItemInMainHand(sword);
+		witherSkeleton.getEquipment().setItemInMainHand(sword);
 
 		walkOnFire(witherSkeleton);
 

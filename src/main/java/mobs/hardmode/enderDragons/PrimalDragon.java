@@ -436,10 +436,10 @@ public class PrimalDragon implements CustomDragon {
 		}
 		for(int i = 0; i < 2; i++) {
 			Enderman enderman = (Enderman) dragon.getWorld().spawnEntity(spawnLoc, EntityType.ENDERMAN);
-			Objects.requireNonNull(enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(66.0);
+			enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(66.0);
 			enderman.setHealth(66.0);
-			Objects.requireNonNull(enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(15.0);
-			Objects.requireNonNull(enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
+			enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(15.0);
+			enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
 			enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 			enderman.setTarget(Utils.getNearestPlayer(enderman));
 			enderman.setCustomNameVisible(true);
@@ -450,10 +450,10 @@ public class PrimalDragon implements CustomDragon {
 		}
 		if(spawnBruiser) {
 			Enderman enderman = (Enderman) dragon.getWorld().spawnEntity(spawnLoc, EntityType.ENDERMAN);
-			Objects.requireNonNull(enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(133.0);
+			enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(133.0);
 			enderman.setHealth(133.0);
-			Objects.requireNonNull(enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
-			Objects.requireNonNull(enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+			enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
+			enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 			enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 			enderman.setTarget(Utils.getNearestPlayer(enderman));
 			enderman.setCustomNameVisible(true);

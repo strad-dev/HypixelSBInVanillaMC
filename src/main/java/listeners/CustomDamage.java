@@ -1048,6 +1048,14 @@ public class CustomDamage implements Listener {
 					}
 
 					Entity damager = e.getDamager();
+
+					if(damager instanceof LivingEntity livingEntity) {
+						int sharpness = livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SHARPNESS);
+						if(sharpness > 1) {
+							e.setDamage(e.getDamage() + (sharpness - 1) * 0.5);
+						}
+					}
+
 					customMobs(entity, damager, e.getDamage(), type, new DamageData(e));
 				}
 			}
