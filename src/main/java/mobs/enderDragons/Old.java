@@ -25,7 +25,7 @@ public class Old implements CustomDragon {
 		}
 
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Old Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(dragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
+		dragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
 		dragon.setHealth(300.0);
 		dragon.addScoreboardTag("OldDragon");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The OLD DRAGON has arrived for one last battle!");

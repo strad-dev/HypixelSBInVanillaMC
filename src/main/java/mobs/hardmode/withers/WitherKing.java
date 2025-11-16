@@ -108,17 +108,17 @@ public class WitherKing implements CustomWither {
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
 
-		Objects.requireNonNull(witherSkeleton.getEquipment()).setItemInMainHand(sword);
+		witherSkeleton.getEquipment().setItemInMainHand(sword);
 		witherSkeleton.getEquipment().setItemInMainHandDropChance(0.0F);
-		Objects.requireNonNull(witherSkeleton.getEquipment()).setItemInOffHand(sword);
+		witherSkeleton.getEquipment().setItemInOffHand(sword);
 		witherSkeleton.getEquipment().setItemInOffHandDropChance(0.0F);
 
 		witherSkeleton.getAttribute(Attribute.MAX_HEALTH).setBaseValue(666.0);
 		witherSkeleton.setHealth(666.0);
-		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.SCALE).setBaseValue(1.333);
+		witherSkeleton.getAttribute(Attribute.SCALE).setBaseValue(1.333);
 		//noinspection DuplicatedCode
-		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
-		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
+		witherSkeleton.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+		witherSkeleton.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
 		witherSkeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		witherSkeleton.setTarget(p);
 		witherSkeleton.teleport(wither);

@@ -35,12 +35,12 @@ public class Claymore implements CustomItem {
 		if(ench.equals(Enchantment.SHARPNESS)) {
 			switch(enchLevel) {
 				case 1 -> loreDamage = "10";
-				case 2 -> loreDamage = "10.5";
-				case 3 -> loreDamage = "11";
-				case 4 -> loreDamage = "11.5";
-				case 5 -> loreDamage = "12";
-				case 6 -> loreDamage = "12.5";
-				case 7 -> loreDamage = "13";
+				case 2 -> loreDamage = "11";
+				case 3 -> loreDamage = "12";
+				case 4 -> loreDamage = "13";
+				case 5 -> loreDamage = "14";
+				case 6 -> loreDamage = "15";
+				case 7 -> loreDamage = "16";
 				default -> loreDamage = "9";
 			}
 		}

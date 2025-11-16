@@ -31,7 +31,7 @@ public class WitherSkeletonMartial implements CustomMob {
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
 		sword.addUnsafeEnchantment(Enchantment.KNOCKBACK, 10);
-		Objects.requireNonNull(witherSkeleton.getEquipment()).setItemInMainHand(sword);
+		witherSkeleton.getEquipment().setItemInMainHand(sword);
 
 		return "";
 	}
