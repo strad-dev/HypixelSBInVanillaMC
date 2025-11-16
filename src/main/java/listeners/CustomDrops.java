@@ -311,12 +311,20 @@ public class CustomDrops implements Listener {
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Judgement Core");
 					}
-				} else if(enderman.getScoreboardTags().contains("MutantEnderman")) {
-					if(random.nextDouble() < 0.1 * rngLootingBonus) {
+				} else if(enderman.getScoreboardTags().contains("Zealot")) {
+					if(random.nextDouble() < 0.05 * rngLootingBonus) {
 						item = TessellatedPearl.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tessellated Ender Pearl");
 					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_zealot").incrementProgression(p);
+				} else if(enderman.getScoreboardTags().contains("ZealotBrusier")) {
+					if(random.nextDouble() < 0.25 * rngLootingBonus) {
+						item = TessellatedPearl.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Tessellated Ender Pearl");
+					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_zealot_brusier").incrementProgression(p);
 				} else {
 					if((died.getWorld().getEnvironment().equals(World.Environment.THE_END) && random.nextDouble() < 0.005 * rngLootingBonus ||
 							!died.getWorld().getEnvironment().equals(World.Environment.THE_END) && random.nextDouble() < 0.03 * rngLootingBonus) && p != null) {

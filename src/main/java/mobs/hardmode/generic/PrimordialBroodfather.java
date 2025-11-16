@@ -31,8 +31,8 @@ public class PrimordialBroodfather implements CustomMob {
 		}
 
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Primordial Broodfather" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(100.0);
-		spider.setHealth(100.0);
+		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
+		spider.setHealth(200.0);
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.67);
 		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(10.0);
 		spider.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
@@ -73,8 +73,8 @@ public class PrimordialBroodfather implements CustomMob {
 			damagee.remove();
 			Spider spider = (Spider) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.SPIDER);
 			CustomMob.getMob("ConjoinedBrood", false).onSpawn(Utils.getNearestPlayer(damagee), spider);
-		} else if(health - finalDamage < 50 && damagee.getScoreboardTags().contains("50Trigger")) {
-			damagee.setHealth(50.0);
+		} else if(health - finalDamage < 100 && damagee.getScoreboardTags().contains("50Trigger")) {
+			damagee.setHealth(100.0);
 			Utils.changeName(damagee);
 			damagee.addScoreboardTag("Invulnerable");
 			damagee.removeScoreboardTag("50Trigger");

@@ -26,11 +26,10 @@ public class ZealotBrusier implements CustomMob {
 		}
 
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Voidgloom Seraph" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
-		enderman.setHealth(300.0);
-		enderman.getAttribute(Attribute.ARMOR).setBaseValue(14.0);
+		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(777.0);
+		enderman.setHealth(777.0);
 		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
-		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.6);
+		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		enderman.setTarget(Utils.getNearestPlayer(enderman));
 		enderman.setCustomNameVisible(true);
@@ -49,10 +48,10 @@ public class ZealotBrusier implements CustomMob {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		Random random = new Random();
 		if(damager instanceof LivingEntity entity1) {
-			if(random.nextDouble() < 0.15) {
+			if(random.nextDouble() < 0.2) {
 				damager.teleport(damagee);
-				CustomDamage.calculateFinalDamage(entity1, damagee, 10, DamageType.MELEE);
-				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Voidgloom Seraph's Dark Magic has caused you to teleport to it!  It also deals extra damage to you!");
+				CustomDamage.calculateFinalDamage(entity1, damagee, 20, DamageType.MELEE);
+				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Zealot Brusier's Dark Magic has caused you to teleport to it!  It also deals 20 damage to you!");
 			}
 		}
 		return true;

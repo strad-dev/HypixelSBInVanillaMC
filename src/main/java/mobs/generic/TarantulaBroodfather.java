@@ -28,8 +28,8 @@ public class TarantulaBroodfather implements CustomMob {
 		}
 
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Tarantula Broodfather" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(50.0);
-		spider.setHealth(50.0);
+		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(100.0);
+		spider.setHealth(100.0);
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(5.0);
 		spider.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
