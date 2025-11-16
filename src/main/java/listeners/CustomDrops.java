@@ -118,11 +118,19 @@ public class CustomDrops implements Listener {
 				item.setAmount(random.nextInt(1 + lootingLevel) + 1);
 				world.dropItemNaturally(l, item);
 				if(chicken.getScoreboardTags().contains("Chickzilla")) {
-					if(random.nextDouble() < 0.1 * rngLootingBonus) {
+					if(random.nextDouble() < 0.05 * rngLootingBonus) {
 						item = BraidedFeather.getItem();
 						chicken.getWorld().dropItem(chicken.getLocation(), item);
 						sendRareDropMessage(p, "Braided Feather");
 					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_chickzilla").incrementProgression(p);
+				} else if(chicken.getScoreboardTags().contains("EnragedChickzilla")) {
+					if(random.nextDouble() < 0.25 * rngLootingBonus) {
+						item = BraidedFeather.getItem();
+						chicken.getWorld().dropItem(chicken.getLocation(), item);
+						sendRareDropMessage(p, "Braided Feather");
+					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_chickzilla").incrementProgression(p);
 				} else if(random.nextDouble() < 0.02 * rngLootingBonus && p != null) {
 					item = OmegaEgg.getItem();
 					chicken.getWorld().dropItem(chicken.getLocation(), item);
@@ -600,15 +608,15 @@ public class CustomDrops implements Listener {
 						item = TarantulaSilk.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tarantula Silk");
-						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_tarantula_broodfather").incrementProgression(p);
 					}
-				} else if(spider.getScoreboardTags().contains("ConjuredBrood")) {
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_tarantula_broodfather").incrementProgression(p);
+				} else if(spider.getScoreboardTags().contains("ConjoinedBrood")) {
 					if(random.nextDouble() < 0.25 * rngLootingBonus) {
 						item = TarantulaSilk.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tarantula Silk");
-						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_primordial_broodfather").incrementProgression(p);
 					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_primordial_broodfather").incrementProgression(p);
 				} else if(random.nextDouble() < 0.03 * rngLootingBonus && p != null) {
 					item = SpiderRelic.getItem();
 					world.dropItemNaturally(l, item);
@@ -969,7 +977,7 @@ public class CustomDrops implements Listener {
 			case WARDEN -> 5;
 
 			// Bosses - Special XP
-			case ENDER_DRAGON -> 12000;
+			case ENDER_DRAGON -> 6400;
 			case WITHER -> 50;
 
 			// Neutral Mobs - 1-3 XP

@@ -1,4 +1,4 @@
-package mobs.generic;
+package mobs.hardmode.generic;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
@@ -15,20 +15,21 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Objects;
 
-public class Chickzilla implements CustomMob {
+public class EnragedChickzilla implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Chickzilla" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
-		e.setHealth(500.0);
-		e.getAttribute(Attribute.SCALE).setBaseValue(2.0);
+		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Enraged Chickzilla" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000.0);
+		e.setHealth(1000.0);
+		e.getAttribute(Attribute.SCALE).setBaseValue(4.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		e.setTarget(Utils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
-		e.addScoreboardTag("Chickzilla");
-		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Omega Egg hatches into the Chickzilla!");
-		Bukkit.getLogger().info(p.getName() + " has summoned Chickzilla.");
+		e.addScoreboardTag("EnragedChickzilla");
+		e.addScoreboardTag("HardMode");
+		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Omega Egg hatches into the Enraged Chickzilla!");
+		Bukkit.getLogger().info(p.getName() + " has summoned Enraged Chickzilla.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		((Ageable) e).setAdult();
 		e.setPersistent(true);
@@ -39,8 +40,8 @@ public class Chickzilla implements CustomMob {
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(damager instanceof LivingEntity damager1) {
-			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Chickzilla has REFLECTED " + originalDamage / 2 + " Damage back to you!");
-			CustomDamage.calculateFinalDamage(damager1, damagee, originalDamage / 2, DamageType.MELEE); // damager takes 50% of their original damage
+			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Chickzilla has REFLECTED " + originalDamage + " Damage back to you!");
+			CustomDamage.calculateFinalDamage(damager1, damagee, originalDamage, DamageType.MELEE); // damager takes 100% of their original damage
 		}
 		return true;
 	}

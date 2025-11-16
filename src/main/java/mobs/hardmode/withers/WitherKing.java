@@ -115,10 +115,10 @@ public class WitherKing implements CustomWither {
 
 		witherSkeleton.getAttribute(Attribute.MAX_HEALTH).setBaseValue(666.0);
 		witherSkeleton.setHealth(666.0);
-		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.SCALE)).setBaseValue(1.333);
+		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.SCALE).setBaseValue(1.333);
 		//noinspection DuplicatedCode
-		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
-		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
+		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+		Objects.requireNonNull(witherSkeleton.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
 		witherSkeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		witherSkeleton.setTarget(p);
 		witherSkeleton.teleport(wither);
@@ -210,8 +210,8 @@ public class WitherKing implements CustomWither {
 				e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(health);
 				e.setHealth(health);
 				//noinspection DuplicatedCode
-				Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.5);
-				Objects.requireNonNull(e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER)).setBaseValue(0.0);
+				e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+				e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
 				e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 				e.setTarget(p);
 				e.setCustomNameVisible(true);

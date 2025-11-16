@@ -38,14 +38,14 @@ public class Sadan implements CustomMob {
 		equipment.setItem(EquipmentSlot.LEGS, new ItemStack(Material.DIAMOND_LEGGINGS));
 		equipment.setItem(EquipmentSlot.FEET, new ItemStack(Material.DIAMOND_BOOTS));
 
-		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(600.0);
+		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(600.0);
 		e.setHealth(600.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR)).setBaseValue(-20.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR_TOUGHNESS)).setBaseValue(5.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.ATTACK_DAMAGE)).setBaseValue(20.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).setBaseValue(1.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.MOVEMENT_SPEED)).setBaseValue(0.125);
-		Objects.requireNonNull(e.getAttribute(Attribute.SCALE)).setBaseValue(6.0);
+		e.getAttribute(Attribute.ARMOR).setBaseValue(-20.0);
+		e.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(5.0);
+		e.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(20.0);
+		e.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+		e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.125);
+		e.getAttribute(Attribute.SCALE).setBaseValue(6.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		e.setTarget(Utils.getNearestPlayer(e));
 		e.setCustomNameVisible(true);
