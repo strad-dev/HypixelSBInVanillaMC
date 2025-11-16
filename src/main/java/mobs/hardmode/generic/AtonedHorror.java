@@ -41,12 +41,11 @@ public class AtonedHorror implements CustomMob {
 		equipment.setItem(EquipmentSlot.LEGS, new ItemStack(Material.DIAMOND_LEGGINGS));
 		equipment.setItem(EquipmentSlot.FEET, new ItemStack(Material.DIAMOND_BOOTS));
 
-		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(150.0);
-		zombie.setHealth(150.0);
+		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
+		zombie.setHealth(200.0);
 		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(12.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		zombie.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 2));
 		zombie.setTarget(Utils.getNearestPlayer(zombie));
 		zombie.setCustomNameVisible(true);
 		zombie.addScoreboardTag("SkyblockBoss");
@@ -59,10 +58,19 @@ public class AtonedHorror implements CustomMob {
 		zombie.setPersistent(true);
 		zombie.setRemoveWhenFarAway(false);
 
+		Utils.scheduleTask(() -> healing(zombie), 5);
 		Utils.scheduleTask(() -> summonTNT(zombie), 60);
 		Utils.scheduleTask(() -> nuclearExplosion(zombie), 600);
 
 		return newName;
+	}
+
+	private static void healing(Zombie zombie) {
+		if(!zombie.isDead()) {
+			zombie.setHealth(Math.min(zombie.getHealth() + 1, 200));
+			Utils.changeName(zombie);
+			Utils.scheduleTask(() -> healing(zombie), 5);
+		}
 	}
 
 	private static void summonTNT(Zombie zombie) {
