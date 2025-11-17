@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonDeathPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
@@ -22,6 +23,8 @@ import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.SculkSpreader;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -32,6 +35,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -49,6 +53,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
+import java.util.logging.Filter;
+import java.util.logging.Logger;
 
 public class CustomDamage implements Listener {
 
@@ -486,7 +492,7 @@ public class CustomDamage implements Listener {
 					((Mob) damagee).setTarget((LivingEntity) damager);
 				}
 
-				if(damagee instanceof Shulker shulker && damager instanceof ShulkerBullet) {
+				if(damagee instanceof Shulker shulker && damager instanceof Shulker) {
 					handleShulkerDuplication(shulker);
 				}
 
@@ -745,18 +751,32 @@ public class CustomDamage implements Listener {
 		ServerLevel level = ((CraftWorld) deathLoc.getWorld()).getHandle();
 		BlockPos deathPos = new BlockPos(deathLoc.getBlockX(), deathLoc.getBlockY(), deathLoc.getBlockZ());
 
-		// Create a sculk spreader instance
-		SculkSpreader spreader = SculkSpreader.createWorldGenSpreader();
+		Logger logger = Bukkit.getLogger();
+		Filter originalFilter = logger.getFilter();
 
-		// Add charge at death location
-		int experience = ((CraftLivingEntity) victim).getHandle().getExperienceReward(level, ((CraftLivingEntity) victim).getHandle());
-		spreader.addCursors(deathPos, experience);
+		logger.setFilter(record -> {
+			if (record.getMessage().contains("PostProcessing")) {
+				return false;
+			}
+			return originalFilter == null || originalFilter.isLoggable(record);
+		});
 
-		// Update the spreader (this triggers the actual spreading)
-		spreader.updateCursors(level, deathPos, level.random, true);
+		try {
+			// Create a sculk spreader instance
+			SculkSpreader spreader = SculkSpreader.createWorldGenSpreader();
+
+			// Add charge at death location
+			int experience = ((CraftLivingEntity) victim).getHandle().getExperienceReward(level, ((CraftLivingEntity) victim).getHandle());
+			spreader.addCursors(deathPos, experience);
+
+			// Update the spreader (this triggers the actual spreading)
+			spreader.updateCursors(level, deathPos, level.random, true);
+		} finally {
+			logger.setFilter(originalFilter);
+		}
 	}
 
-	private static void handleShulkerDuplication(org.bukkit.entity.Shulker victim) {
+	private static void handleShulkerDuplication(Shulker victim) {
 		// Check if health is below 50% threshold (vanilla requirement)
 		if(victim.getHealth() > victim.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.5) return;
 
