@@ -893,49 +893,53 @@ public class CustomDrops implements Listener {
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Zombie Head");
 				}
-				if(zombie.getScoreboardTags().contains("RevenantHorror")) {
-					if(random.nextDouble() < 0.05 * rngLootingBonus) {
-						item = Viscera.getItem();
+				if(!zombie.getScoreboardTags().contains("MutantGiant")) {
+					if(zombie.getScoreboardTags().contains("RevenantHorror")) {
+						if(random.nextDouble() < 0.05 * rngLootingBonus) {
+							item = Viscera.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Revenant Viscera");
+						}
+						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_revenant_horror").incrementProgression(p);
+					} else if(zombie.getScoreboardTags().contains("AtonedHorror")) {
+						if(random.nextDouble() < 0.25 * rngLootingBonus) {
+							item = Viscera.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Revenant Viscera");
+						}
+						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_atoned_horror").incrementProgression(p);
+					} else if(zombie.getScoreboardTags().contains("Sadan")) {
+						if(random.nextDouble() < 0.05 * rngLootingBonus) {
+							item = GiantSwordRemnant.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Remnant of the Giant's Sword");
+						}
+						BossBarManager.removeBossBar(died);
+						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_sadan").incrementProgression(p);
+					} else if(zombie.getScoreboardTags().contains("TheGiantOne")) {
+						if(random.nextDouble() < 0.25 * rngLootingBonus) {
+							item = GiantSwordRemnant.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Remnant of the Giant's Sword");
+						}
+						if(random.nextDouble() < 0.25 * rngLootingBonus) {
+							item = GiantSwordRemnant.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Remnant of the Giant's Sword");
+						}
+						BossBarManager.removeBossBar(died);
+						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_sadan").incrementProgression(p);
+						Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Sadan" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": NOOOOOOOOOO!!! THIS IS IMPOSSIBLE!!");
+						Utils.scheduleTask(() -> Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Sadan" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": FATHER, FORGIVE ME!!!"), 60);
+					} else if(random.nextDouble() < 0.005 * rngLootingBonus && p != null) {
+						item = GiantZombieFlesh.getItem();
 						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Revenant Viscera");
-					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_revenant_horror").incrementProgression(p);
-				} else if(zombie.getScoreboardTags().contains("AtonedHorror")) {
-					if(random.nextDouble() < 0.25 * rngLootingBonus) {
-						item = Viscera.getItem();
+						sendRareDropMessage(p, "Giant Zombie Flesh");
+					} else if(random.nextDouble() < 0.01 * rngLootingBonus && p != null) {
+						item = AtonedFlesh.getItem();
 						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Revenant Viscera");
+						sendRareDropMessage(p, "Atoned Flesh");
 					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_atoned_horror").incrementProgression(p);
-				} else if(zombie.getScoreboardTags().contains("Sadan")) {
-					if(random.nextDouble() < 0.05 * rngLootingBonus) {
-						item = GiantSwordRemnant.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Remnant of the Giant's Sword");
-					}
-					BossBarManager.removeBossBar(died);
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_sadan").incrementProgression(p);
-				} else if(zombie.getScoreboardTags().contains("TheGiantOne")) {
-					if(random.nextDouble() < 0.25 * rngLootingBonus) {
-						item = GiantSwordRemnant.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Remnant of the Giant's Sword");
-					}
-					if(random.nextDouble() < 0.25 * rngLootingBonus) {
-						item = GiantSwordRemnant.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Remnant of the Giant's Sword");
-					}
-					BossBarManager.removeBossBar(died);
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_sadan").incrementProgression(p);
-				} else if(random.nextDouble() < 0.005 * rngLootingBonus && p != null) {
-					item = GiantZombieFlesh.getItem();
-					world.dropItemNaturally(l, item);
-					sendRareDropMessage(p, "Giant Zombie Flesh");
-				} else if(random.nextDouble() < 0.01 * rngLootingBonus && p != null) {
-					item = AtonedFlesh.getItem();
-					world.dropItemNaturally(l, item);
-					sendRareDropMessage(p, "Atoned Flesh");
 				}
 			}
 			case null, default -> {
