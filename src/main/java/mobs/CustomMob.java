@@ -36,6 +36,7 @@ public interface CustomMob {
 			MOBS.put("meloGnorI", new meloGnorI());
 			MOBS.put("ObfuscatedmeloGnorI", new ObfuscatedmeloGnorI());
 			MOBS.put("Sadan", new Sadan());
+			MOBS.put("MutantGiant", new MutantGiant());
 			MOBS.put("DummySadan", new mobs.hardmode.generic.Sadan());
 			MOBS.put("TheGiantOne", new mobs.hardmode.generic.Sadan());
 			MOBS.put("InfuriatedSkeleton", new InfuriatedWitherSkeleton());

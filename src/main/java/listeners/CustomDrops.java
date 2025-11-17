@@ -411,24 +411,26 @@ public class CustomDrops implements Listener {
 				item = new ItemStack(Material.POPPY);
 				item.setAmount(random.nextInt(3 + lootingLevel));
 				world.dropItemNaturally(l, item);
-				if(golem.getScoreboardTags().contains("meloGnorI")) {
-					if(random.nextDouble() < 0.05 * rngLootingBonus) {
-						item = NullBlade.getItem();
+				if(!golem.getScoreboardTags().contains("WokeGolem")) {
+					if(golem.getScoreboardTags().contains("meloGnorI")) {
+						if(random.nextDouble() < 0.05 * rngLootingBonus) {
+							item = NullBlade.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Null Blade");
+						}
+						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_melog_nori").incrementProgression(p);
+					} else if(golem.getScoreboardTags().contains("ObfuscatedmeloGnorI")) {
+						if(random.nextDouble() < 0.25 * rngLootingBonus) {
+							item = NullBlade.getItem();
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Null Blade");
+						}
+						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_melog_nori").incrementProgression(p);
+					} else if(random.nextDouble() < 0.02 * rngLootingBonus && p != null) {
+						item = Antimatter.getItem();
 						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Null Blade");
+						sendRareDropMessage(p, "Antimatter");
 					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_melog_nori").incrementProgression(p);
-				} else if(golem.getScoreboardTags().contains("ObfuscatedmeloGnorI")) {
-					if(random.nextDouble() < 0.25 * rngLootingBonus) {
-						item = NullBlade.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Null Blade");
-					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_melog_nori").incrementProgression(p);
-				} else if(random.nextDouble() < 0.02 * rngLootingBonus && p != null) {
-					item = Antimatter.getItem();
-					world.dropItemNaturally(l, item);
-					sendRareDropMessage(p, "Antimatter");
 				}
 			}
 			case MagmaCube cube -> {
