@@ -908,12 +908,26 @@ public class CustomDrops implements Listener {
 					}
 					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_atoned_horror").incrementProgression(p);
 				} else if(zombie.getScoreboardTags().contains("Sadan")) {
-					if(random.nextDouble() < 0.1 * rngLootingBonus) {
+					if(random.nextDouble() < 0.05 * rngLootingBonus) {
 						item = GiantSwordRemnant.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Remnant of the Giant's Sword");
 					}
 					BossBarManager.removeBossBar(died);
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_sadan").incrementProgression(p);
+				} else if(zombie.getScoreboardTags().contains("TheGiantOne")) {
+					if(random.nextDouble() < 0.25 * rngLootingBonus) {
+						item = GiantSwordRemnant.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Remnant of the Giant's Sword");
+					}
+					if(random.nextDouble() < 0.25 * rngLootingBonus) {
+						item = GiantSwordRemnant.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Remnant of the Giant's Sword");
+					}
+					BossBarManager.removeBossBar(died);
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_sadan").incrementProgression(p);
 				} else if(random.nextDouble() < 0.005 * rngLootingBonus && p != null) {
 					item = GiantZombieFlesh.getItem();
 					world.dropItemNaturally(l, item);
