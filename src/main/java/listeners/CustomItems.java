@@ -137,7 +137,7 @@ public class CustomItems implements Listener {
 			}
 
 			if(meta.hasLore()) {
-				if(itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/summon")) {
+				if(itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/summon") || itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/ingredient")) {
 					e.setCancelled(true);
 				}
 			}
