@@ -28,7 +28,7 @@ public interface SummonItem {
 			SUMMONS.put("skyblock/summon/omega_egg", new SummonMapping("Chickzilla", "EnragedChickzilla", Chicken.class));
 			SUMMONS.put("skyblock/summon/spider_relic", new SummonMapping("TarantulaBroodfather", "PrimordialBroodfather", Spider.class));
 			SUMMONS.put("skyblock/summon/atoned_flesh", new SummonMapping("RevenantHorror", "AtonedHorror", Zombie.class));
-			SUMMONS.put("skyblock/summon/giant_flesh", new SummonMapping("Sadan", "Sadan", Zombie.class));
+			SUMMONS.put("skyblock/summon/giant_flesh", new SummonMapping("Sadan", "TheGiantOne", Zombie.class));
 
 			// Wither Skeleton doesn't change between modes
 			SUMMONS.put("skyblock/summon/wither_skeleton_spawn_egg", new SummonMapping("InfuriatedSkeleton", WitherSkeleton.class));

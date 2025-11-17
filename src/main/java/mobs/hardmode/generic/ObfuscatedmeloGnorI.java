@@ -30,6 +30,7 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(250.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		e.setTarget(Utils.getNearestPlayer(e));
+		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(40.0);
 		e.setHealth(250.0);
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
@@ -52,6 +53,7 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 				CustomDamage.calculateFinalDamage((Player) p, ironGolem, 40, DamageType.PLAYER_MAGIC);
 				p.setVelocity(new Vector(0, 1, 0));
 			});
+			ironGolem.getWorld().playSound(ironGolem.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0F, 2.0F);
 			Utils.scheduleTask(() -> launch(ironGolem), 100);
 		}
 	}

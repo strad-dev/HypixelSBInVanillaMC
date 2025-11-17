@@ -72,8 +72,10 @@ public class AtonedHorror implements CustomMob {
 
 	private static void healing(Zombie zombie) {
 		if(!zombie.isDead()) {
-			zombie.setHealth(Math.min(zombie.getHealth() + 1, 200));
-			Utils.changeName(zombie);
+			if(!zombie.getScoreboardTags().contains("Invulnerable")) {
+				zombie.setHealth(Math.min(zombie.getHealth() + 1, 200));
+				Utils.changeName(zombie);
+			}
 			Utils.scheduleTask(() -> healing(zombie), 5);
 		}
 	}

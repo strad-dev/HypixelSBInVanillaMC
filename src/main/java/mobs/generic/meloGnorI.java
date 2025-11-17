@@ -30,6 +30,7 @@ public class meloGnorI implements CustomMob {
 		ironGolem.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		ironGolem.setTarget(Utils.getNearestPlayer(ironGolem));
 		ironGolem.setHealth(150.0);
+		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
 		ironGolem.setCustomNameVisible(true);
 		ironGolem.addScoreboardTag("SkyblockBoss");
 		ironGolem.addScoreboardTag("meloGnorI");
