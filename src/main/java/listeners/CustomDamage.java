@@ -21,10 +21,10 @@ import net.minecraft.world.entity.projectile.FireworkRocketEntity;
 import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.SculkSpreader;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_21_R4.entity.*;
 import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
@@ -44,7 +44,11 @@ import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.WeakHashMap;
 
 public class CustomDamage implements Listener {
 
@@ -418,7 +422,7 @@ public class CustomDamage implements Listener {
 								Utils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 							}
 							dragon.setSilent(true);
-							for(int i = 181; i < 201; i ++) {
+							for(int i = 181; i < 201; i++) {
 								int finalI = i;
 								Utils.scheduleTask(() -> {
 									ExperienceOrb orb = (ExperienceOrb) dragon.getWorld().spawnEntity(dragon.getLocation(), EntityType.EXPERIENCE_ORB);
@@ -480,6 +484,10 @@ public class CustomDamage implements Listener {
 
 				if(damagee instanceof Mob && damager instanceof LivingEntity) {
 					((Mob) damagee).setTarget((LivingEntity) damager);
+				}
+
+				if(damagee instanceof Shulker shulker && damager instanceof ShulkerBullet) {
+					handleShulkerDuplication(shulker);
 				}
 
 				// special ender dragon knockback to make zero- and one-cycling possible
@@ -586,7 +594,7 @@ public class CustomDamage implements Listener {
 
 				// 5 & 6. Sculk catalyst triggers - only if sculk catalyst is nearby
 				if(isSculkCatalystNearby(victim.getLocation())) {
-					triggerSculkSpread(victim);
+					triggerVanillaSculkSpread(victim);
 					CriteriaTriggers.KILL_MOB_NEAR_SCULK_CATALYST.trigger(serverPlayer, nmsVictim, nmsSource);
 					CriteriaTriggers.KILL_MOB_NEAR_SCULK_CATALYST.trigger(serverPlayer, nmsVictim, nmsSource);
 				}
@@ -732,80 +740,40 @@ public class CustomDamage implements Listener {
 		return false;
 	}
 
-	private static void triggerSculkSpread(LivingEntity victim) {
-		Location deathLocation = victim.getLocation();
-		World world = deathLocation.getWorld();
-		if(world == null) return;
+	private static void triggerVanillaSculkSpread(LivingEntity victim) {
+		Location deathLoc = victim.getLocation();
+		ServerLevel level = ((CraftWorld) deathLoc.getWorld()).getHandle();
+		BlockPos deathPos = new BlockPos(deathLoc.getBlockX(), deathLoc.getBlockY(), deathLoc.getBlockZ());
 
-		// Find nearby sculk catalysts (within 8 blocks)
-		for(int x = -8; x <= 8; x++) {
-			for(int y = -8; y <= 8; y++) {
-				for(int z = -8; z <= 8; z++) {
-					Location catalystLoc = deathLocation.clone().add(x, y, z);
-					if(catalystLoc.getBlock().getType() == Material.SCULK_CATALYST) {
-						// Calculate experience points (similar to vanilla)
-						int xpAmount = CustomDrops.calculateMobXP(victim);
+		// Create a sculk spreader instance
+		SculkSpreader spreader = SculkSpreader.createWorldGenSpreader();
 
-						// Spread sculk blocks around the catalyst
-						spreadSculkFromCatalyst(catalystLoc, deathLocation, xpAmount);
-						break; // Only spread from the first catalyst found
-					}
-				}
-			}
-		}
+		// Add charge at death location
+		int experience = ((CraftLivingEntity) victim).getHandle().getExperienceReward(level, ((CraftLivingEntity) victim).getHandle());
+		spreader.addCursors(deathPos, experience);
+
+		// Update the spreader (this triggers the actual spreading)
+		spreader.updateCursors(level, deathPos, level.random, true);
 	}
 
-	private static void spreadSculkFromCatalyst(Location catalyst, Location deathSite, int experience) {
-		World world = catalyst.getWorld();
-		Random random = new Random();
+	private static void handleShulkerDuplication(org.bukkit.entity.Shulker victim) {
+		// Check if health is below 50% threshold (vanilla requirement)
+		if(victim.getHealth() > victim.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.5) return;
 
-		// Number of blocks to spread based on experience (vanilla behavior)
-		int blocksToSpread = Math.min(experience, 32); // Cap at 32 like vanilla
+		// Use NMS to trigger vanilla duplication logic
+		net.minecraft.world.entity.monster.Shulker nmsShulker = ((CraftShulker) victim).getHandle();
 
-		for(int i = 0; i < blocksToSpread; i++) {
-			// Random spread around the death location (within 9 blocks)
-			int spreadX = random.nextInt(19) - 9; // -9 to +9
-			int spreadY = random.nextInt(19) - 9;
-			int spreadZ = random.nextInt(19) - 9;
-
-			Location spreadLocation = deathSite.clone().add(spreadX, spreadY, spreadZ);
-			Block targetBlock = spreadLocation.getBlock();
-
-			// Check if block can be converted to sculk
-			if(canConvertToSculk(targetBlock)) {
-				// Convert based on block type and surrounding blocks
-				convertToSculk(targetBlock, random);
-
-				// Play sculk spread sound
-				world.playSound(spreadLocation, Sound.BLOCK_SCULK_CATALYST_BLOOM, 0.8f, random.nextFloat() * 0.4f + 0.8f);
-
-				// Spawn particles
-				world.spawnParticle(Particle.SCULK_SOUL, spreadLocation.add(0.5, 0.5, 0.5), 1, 0.25, 0.25, 0.25, 0.05);
-			}
-		}
-	}
-
-	private static boolean canConvertToSculk(Block block) {
-		Material type = block.getType();
-		return type == Material.STONE || type == Material.COBBLESTONE || type == Material.DEEPSLATE || type == Material.DIRT || type == Material.GRASS_BLOCK || type == Material.GRAVEL || type == Material.SAND || type == Material.CLAY || type.name().contains("TERRACOTTA") || type == Material.AIR; // Can place sculk in air
-	}
-
-	private static void convertToSculk(Block block, Random random) {
-		Material currentType = block.getType();
-
-		// Conversion logic (simplified version of vanilla)
-		if(currentType == Material.AIR) {
-			// Small chance to place sculk vein in air
-			if(random.nextFloat() < 0.1f) {
-				block.setType(Material.SCULK_VEIN);
-			}
-		} else {
-			// Convert solid blocks to sculk or sculk vein
-			if(random.nextFloat() < 0.7f) {
-				block.setType(Material.SCULK);
-			} else {
-				block.setType(Material.SCULK_VEIN);
-			}
+		// This method handles all the vanilla logic:
+		// - Finding valid teleport location
+		// - Spawning new shulker with correct color
+		// - Teleport attempts
+		try {
+			Method hitByShulkerBulletMethod = net.minecraft.world.entity.monster.Shulker.class
+					.getDeclaredMethod("hitByShulkerBullet");
+			hitByShulkerBulletMethod.setAccessible(true);
+			hitByShulkerBulletMethod.invoke(nmsShulker);
+		} catch(Exception exception) {
+			// nothing here
 		}
 	}
 

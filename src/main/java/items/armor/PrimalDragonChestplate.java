@@ -37,7 +37,7 @@ public class PrimalDragonChestplate {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+2");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+8");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+4");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-20%");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+20%");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "A powerful chestplate forged from");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "the remnants of the Primal Dragon.");

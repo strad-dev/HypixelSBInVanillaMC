@@ -37,7 +37,7 @@ public class WitherKingCrown implements Armor {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+3");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-10%");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+10%");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "The Wither King left behind this");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "crown after His unfortunate demise.");

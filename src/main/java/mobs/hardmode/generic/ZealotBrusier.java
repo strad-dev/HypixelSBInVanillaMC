@@ -25,9 +25,9 @@ public class ZealotBrusier implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Voidgloom Seraph" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(777.0);
-		enderman.setHealth(777.0);
+		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot Brusier" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(650.0);
+		enderman.setHealth(650.0);
 		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
@@ -36,7 +36,7 @@ public class ZealotBrusier implements CustomMob {
 		enderman.addScoreboardTag("SkyblockBoss");
 		enderman.addScoreboardTag("ZealotBrusier");
 		enderman.addScoreboardTag("HardMode");
-		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The remains of the Superior Dragon has drawn the attention of the Voidgloom Seraph!  Defeat it before it's too late!");
+		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Pearl corrupts the Enderman.  It has become a Zealot Brusier!");
 		Bukkit.getLogger().info(p.getName() + " has summoned the Voidgloom Seraph.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		enderman.setPersistent(true);

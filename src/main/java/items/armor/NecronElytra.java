@@ -37,7 +37,7 @@ public class NecronElytra implements Armor {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+8");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-10%");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+10%");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "This Elytra has the stats of a Netherite");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Chestplate, while still allowing you to fly!");
