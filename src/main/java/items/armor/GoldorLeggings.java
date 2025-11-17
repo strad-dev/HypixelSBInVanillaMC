@@ -37,7 +37,7 @@ public class GoldorLeggings implements Armor {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+6");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+4");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-20%");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+20%");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Goldor has spent centuries");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "researching how to make Netherite");

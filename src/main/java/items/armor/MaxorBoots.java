@@ -41,7 +41,7 @@ public class MaxorBoots implements Armor {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-10%");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+10%");
 		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x4");
 		lore.add(ChatColor.GRAY + "Fall Damage: " + ChatColor.RED + "-10%");
 		lore.add("");

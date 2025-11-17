@@ -20,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
@@ -253,16 +254,16 @@ public class CustomDrops implements Listener {
 					item = new ItemStack(Material.COPPER_INGOT);
 					world.dropItemNaturally(l, item);
 				}
-				if(random.nextDouble() < 0.005 * rngLootingBonus) {
-					item = new ItemStack(Material.TRIDENT);
-					world.dropItemNaturally(l, item);
-					sendRareDropMessage(p, "Trident");
-				}
-				if(random.nextDouble() < 0.03 * rngLootingBonus) {
-					item = new ItemStack(Material.NAUTILUS_SHELL);
-					world.dropItemNaturally(l, item);
-					sendRareDropMessage(p, "Nautilus Shell");
-				}
+//				if(random.nextDouble() < 0.005 * rngLootingBonus) {
+//					item = new ItemStack(Material.TRIDENT);
+//					world.dropItemNaturally(l, item);
+//					sendRareDropMessage(p, "Trident");
+//				}
+//				if(random.nextDouble() < 0.03 * rngLootingBonus) {
+//					item = new ItemStack(Material.NAUTILUS_SHELL);
+//					world.dropItemNaturally(l, item);
+//					sendRareDropMessage(p, "Nautilus Shell");
+//				}
 			}
 			case ElderGuardian ignored -> {
 				item = new ItemStack(Material.PRISMARINE_SHARD);
@@ -411,11 +412,19 @@ public class CustomDrops implements Listener {
 				item.setAmount(random.nextInt(3 + lootingLevel));
 				world.dropItemNaturally(l, item);
 				if(golem.getScoreboardTags().contains("meloGnorI")) {
-					if(random.nextDouble() < 0.1 * rngLootingBonus) {
+					if(random.nextDouble() < 0.05 * rngLootingBonus) {
 						item = NullBlade.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Null Blade");
 					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_melog_nori").incrementProgression(p);
+				} else if(golem.getScoreboardTags().contains("ObfuscatedmeloGnorI")) {
+					if(random.nextDouble() < 0.25 * rngLootingBonus) {
+						item = NullBlade.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Null Blade");
+					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_melog_nori").incrementProgression(p);
 				} else if(random.nextDouble() < 0.02 * rngLootingBonus && p != null) {
 					item = Antimatter.getItem();
 					world.dropItemNaturally(l, item);
@@ -917,6 +926,40 @@ public class CustomDrops implements Listener {
 			}
 			case null, default -> {
 			}
+		}
+
+		EntityEquipment equipment = died.getEquipment();
+		if(random.nextDouble() < equipment.getItemInMainHandDropChance()) {
+			world.dropItemNaturally(l, equipment.getItemInMainHand());
+			if(died instanceof Drowned) {
+				if(equipment.getItemInMainHand().getType().equals(Material.TRIDENT)) {
+					sendRareDropMessage(p, "Trident");
+				} else if(equipment.getItemInMainHand().getType().equals(Material.NAUTILUS_SHELL)) {
+					sendRareDropMessage(p, "Nautilus Shell");
+				}
+			}
+		}
+		if(random.nextDouble() < equipment.getItemInOffHandDropChance()) {
+			world.dropItemNaturally(l, equipment.getItemInOffHand());
+			if(died instanceof Drowned) {
+				if(equipment.getItemInOffHand().getType().equals(Material.TRIDENT)) {
+					sendRareDropMessage(p, "Trident");
+				} else if(equipment.getItemInOffHand().getType().equals(Material.NAUTILUS_SHELL)) {
+					sendRareDropMessage(p, "Nautilus Shell");
+				}
+			}
+		}
+		if(random.nextDouble() < equipment.getHelmetDropChance()) {
+			world.dropItemNaturally(l, equipment.getHelmet());
+		}
+		if(random.nextDouble() < equipment.getChestplateDropChance()) {
+			world.dropItemNaturally(l, equipment.getChestplate());
+		}
+		if(random.nextDouble() < equipment.getLeggingsDropChance()) {
+			world.dropItemNaturally(l, equipment.getLeggings());
+		}
+		if(random.nextDouble() < equipment.getBootsDropChance()) {
+			world.dropItemNaturally(l, equipment.getBoots());
 		}
 	}
 

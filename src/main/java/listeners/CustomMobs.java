@@ -63,9 +63,6 @@ public class CustomMobs implements Listener {
 			}
 		}
 		if(e.getEntity() instanceof LivingEntity entity) {
-			if(!(entity instanceof Player) && !(entity instanceof Villager)) {
-				entity.setCanPickupItems(false);
-			}
 			String name = "";
 
 			// MAXOR, STORM, GOLDOR, NECRON
@@ -128,14 +125,6 @@ public class CustomMobs implements Listener {
 								dragon.addScoreboardTag("SkyblockBoss");
 							}
 						}
-					}
-					case Drowned drowned -> {
-						EntityEquipment equipment = drowned.getEquipment();
-						assert equipment != null;
-						equipment.setItemInMainHand(new ItemStack(Material.AIR));
-						equipment.setItemInOffHand(new ItemStack(Material.AIR));
-						equipment.setItemInMainHandDropChance(0.0F);
-						equipment.setItemInOffHandDropChance(0.0F);
 					}
 					default -> {
 					}

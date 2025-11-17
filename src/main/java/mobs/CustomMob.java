@@ -4,6 +4,7 @@ import listeners.DamageType;
 import misc.DamageData;
 import mobs.enderDragons.*;
 import mobs.generic.*;
+import mobs.generic.meloGnorI;
 import mobs.hardmode.enderDragons.PrimalDragon;
 import mobs.hardmode.generic.*;
 import mobs.hardmode.withers.*;
@@ -29,10 +30,11 @@ public interface CustomMob {
 			MOBS.put("ConjoinedBrood", new ConjoinedBrood());
 			MOBS.put("Chickzilla", new Chickzilla());
 			MOBS.put("EnragedChickzilla", new EnragedChickzilla());
-			MOBS.put("Sadan", new Sadan());
-			MOBS.put("Voidgloom", new ZealotBrusier());
-			MOBS.put("MutantEnderman", new Zealot());
+			MOBS.put("Zealot", new Zealot());
+			MOBS.put("ZealotBrusier", new ZealotBrusier());
 			MOBS.put("meloGnorI", new meloGnorI());
+			MOBS.put("ObfuscatedmeloGnorI", new ObfuscatedmeloGnorI());
+			MOBS.put("Sadan", new Sadan());
 			MOBS.put("InfuriatedSkeleton", new InfuriatedWitherSkeleton());
 
 			// Normal mode withers
