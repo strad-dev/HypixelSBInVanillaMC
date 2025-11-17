@@ -928,38 +928,40 @@ public class CustomDrops implements Listener {
 			}
 		}
 
-		EntityEquipment equipment = died.getEquipment();
-		if(random.nextDouble() < equipment.getItemInMainHandDropChance()) {
-			world.dropItemNaturally(l, equipment.getItemInMainHand());
-			if(died instanceof Drowned) {
-				if(equipment.getItemInMainHand().getType().equals(Material.TRIDENT)) {
-					sendRareDropMessage(p, "Trident");
-				} else if(equipment.getItemInMainHand().getType().equals(Material.NAUTILUS_SHELL)) {
-					sendRareDropMessage(p, "Nautilus Shell");
+		if(!(died instanceof Player)) {
+			EntityEquipment equipment = died.getEquipment();
+			if(random.nextDouble() < equipment.getItemInMainHandDropChance()) {
+				world.dropItemNaturally(l, equipment.getItemInMainHand());
+				if(died instanceof Drowned) {
+					if(equipment.getItemInMainHand().getType().equals(Material.TRIDENT)) {
+						sendRareDropMessage(p, "Trident");
+					} else if(equipment.getItemInMainHand().getType().equals(Material.NAUTILUS_SHELL)) {
+						sendRareDropMessage(p, "Nautilus Shell");
+					}
 				}
 			}
-		}
-		if(random.nextDouble() < equipment.getItemInOffHandDropChance()) {
-			world.dropItemNaturally(l, equipment.getItemInOffHand());
-			if(died instanceof Drowned) {
-				if(equipment.getItemInOffHand().getType().equals(Material.TRIDENT)) {
-					sendRareDropMessage(p, "Trident");
-				} else if(equipment.getItemInOffHand().getType().equals(Material.NAUTILUS_SHELL)) {
-					sendRareDropMessage(p, "Nautilus Shell");
+			if(random.nextDouble() < equipment.getItemInOffHandDropChance()) {
+				world.dropItemNaturally(l, equipment.getItemInOffHand());
+				if(died instanceof Drowned) {
+					if(equipment.getItemInOffHand().getType().equals(Material.TRIDENT)) {
+						sendRareDropMessage(p, "Trident");
+					} else if(equipment.getItemInOffHand().getType().equals(Material.NAUTILUS_SHELL)) {
+						sendRareDropMessage(p, "Nautilus Shell");
+					}
 				}
 			}
-		}
-		if(random.nextDouble() < equipment.getHelmetDropChance()) {
-			world.dropItemNaturally(l, equipment.getHelmet());
-		}
-		if(random.nextDouble() < equipment.getChestplateDropChance()) {
-			world.dropItemNaturally(l, equipment.getChestplate());
-		}
-		if(random.nextDouble() < equipment.getLeggingsDropChance()) {
-			world.dropItemNaturally(l, equipment.getLeggings());
-		}
-		if(random.nextDouble() < equipment.getBootsDropChance()) {
-			world.dropItemNaturally(l, equipment.getBoots());
+			if(random.nextDouble() < equipment.getHelmetDropChance()) {
+				world.dropItemNaturally(l, equipment.getHelmet());
+			}
+			if(random.nextDouble() < equipment.getChestplateDropChance()) {
+				world.dropItemNaturally(l, equipment.getChestplate());
+			}
+			if(random.nextDouble() < equipment.getLeggingsDropChance()) {
+				world.dropItemNaturally(l, equipment.getLeggings());
+			}
+			if(random.nextDouble() < equipment.getBootsDropChance()) {
+				world.dropItemNaturally(l, equipment.getBoots());
+			}
 		}
 	}
 

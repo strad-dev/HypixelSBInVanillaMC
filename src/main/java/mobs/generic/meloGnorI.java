@@ -46,8 +46,8 @@ public class meloGnorI implements CustomMob {
 		if(type == DamageType.MELEE) {
 			if(damager instanceof LivingEntity entity1) {
 				if(originalDamage > 10.0) {
-					if(damagee.getHealth() + ((originalDamage - 10.0) / 2) > 200) {
-						damagee.setHealth(200);
+					if(damagee.getHealth() + ((originalDamage - 10.0) / 2) > 150) {
+						damagee.setHealth(150);
 						CustomDamage.calculateFinalDamage(entity1, damagee, (originalDamage - 10) / 2, DamageType.MELEE); // damager takes 50% of their original damage, -10
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt is at full health and has REFLECTED " + (originalDamage - 10) / 2 + " Damage back to you!");
 					} else {

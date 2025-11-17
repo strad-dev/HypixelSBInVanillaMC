@@ -40,6 +40,11 @@ public class AtonedHorror implements CustomMob {
 		equipment.setItem(EquipmentSlot.CHEST, new ItemStack(Material.DIAMOND_CHESTPLATE));
 		equipment.setItem(EquipmentSlot.LEGS, new ItemStack(Material.DIAMOND_LEGGINGS));
 		equipment.setItem(EquipmentSlot.FEET, new ItemStack(Material.DIAMOND_BOOTS));
+		equipment.setItemInMainHandDropChance(0);
+		equipment.setHelmetDropChance(0);
+		equipment.setChestplateDropChance(0);
+		equipment.setLeggingsDropChance(0);
+		equipment.setBootsDropChance(0);
 
 		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
 		zombie.setHealth(200.0);
