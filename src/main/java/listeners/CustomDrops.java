@@ -306,12 +306,30 @@ public class CustomDrops implements Listener {
 				item = new ItemStack(Material.ENDER_PEARL);
 				item.setAmount(random.nextInt(2 + lootingLevel));
 				world.dropItemNaturally(l, item);
-				if(enderman.getScoreboardTags().contains("Voidgloom")) {
-					if(random.nextDouble() < 0.1 * rngLootingBonus) {
+				if(enderman.getScoreboardTags().contains("VoidgloomSeraph")) {
+					if(random.nextDouble() < 0.05 * rngLootingBonus) {
 						item = Core.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Judgement Core");
 					}
+					if(random.nextDouble() < 0.1 * rngLootingBonus) {
+						item = NullOvoid.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Null Ovoid");
+					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_voidgloom_seraph").incrementProgression(p);
+				} else if(enderman.getScoreboardTags().contains("VoidcrazedSeraph")) {
+					if(random.nextDouble() < 0.25 * rngLootingBonus) {
+						item = Core.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Judgement Core");
+					}
+					if(random.nextDouble() < 0.5 * rngLootingBonus) {
+						item = NullOvoid.getItem();
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Null Ovoid");
+					}
+					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_voidcrazed_seraph").incrementProgression(p);
 				} else if(enderman.getScoreboardTags().contains("Zealot")) {
 					if(random.nextDouble() < 0.05 * rngLootingBonus) {
 						item = TessellatedPearl.getItem();
@@ -927,7 +945,7 @@ public class CustomDrops implements Listener {
 						if(random.nextDouble() < 0.25 * rngLootingBonus) {
 							item = GiantSwordRemnant.getItem();
 							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Remnant of the Giant's Sword");
+							sendRareDropMessage(p, "Necromancer's Brooch");
 						}
 						BossBarManager.removeBossBar(died);
 						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_sadan").incrementProgression(p);
