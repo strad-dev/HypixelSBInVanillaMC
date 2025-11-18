@@ -8,7 +8,6 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
-import java.util.Objects;
 import java.util.Random;
 
 import static misc.Utils.teleport;
@@ -34,7 +33,7 @@ public class Maxor implements CustomWither {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
+		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
 		Random random = new Random();

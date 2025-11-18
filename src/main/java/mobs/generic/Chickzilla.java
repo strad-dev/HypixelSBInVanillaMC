@@ -13,8 +13,6 @@ import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Objects;
-
 public class Chickzilla implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {

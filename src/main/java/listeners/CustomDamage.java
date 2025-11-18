@@ -14,7 +14,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonDeathPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
@@ -23,8 +22,6 @@ import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.SculkSpreader;
-import net.minecraft.world.level.chunk.status.ChunkStatus;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
@@ -35,7 +32,6 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
@@ -139,7 +135,7 @@ public class CustomDamage implements Listener {
 			doContinue = false;
 		}
 
-		if(type == DamageType.ABSOLUTE || doContinue) {
+		if(DamageType.isAbsoluteDamage(type) || doContinue) {
 			calculateFinalDamage(damagee, damager, originalDamage, type, data);
 		}
 	}
@@ -149,7 +145,7 @@ public class CustomDamage implements Listener {
 	}
 
 	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
-		if(type != DamageType.ABSOLUTE) {
+		if(!(DamageType.isAbsoluteDamage(type))) {
 			// bonus damage to withers from hyperion
 			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && p.getInventory().getItemInMainHand().hasItemMeta() && p.getInventory().getItemInMainHand().getItemMeta().hasLore() && p.getInventory().getItemInMainHand().getItemMeta().getLore().getFirst().equals("skyblock/combat/scylla")) {
 				finalDamage += 4;
@@ -268,7 +264,7 @@ public class CustomDamage implements Listener {
 	}
 
 	private static void dealDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
-		if(!damagee.isDead() && finalDamage > 0 && (damagee.getNoDamageTicks() == 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC || type == DamageType.ABSOLUTE)) {
+		if(!damagee.isDead() && finalDamage > 0 && (damagee.getNoDamageTicks() == 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC || type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE)) {
 			// sweeping edge
 			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.SWEEPING_EDGE)) {
 				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SWEEPING_EDGE);
@@ -355,7 +351,7 @@ public class CustomDamage implements Listener {
 			}
 
 			if(doesDie) {
-				if(type != DamageType.ABSOLUTE && (damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING))) {
+				if(type != DamageType.LETHAL_ABSOLUTE && (damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING))) {
 					if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
 						damagee.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
 					} else if(damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
@@ -466,7 +462,7 @@ public class CustomDamage implements Listener {
 								Bukkit.broadcastMessage(p.getName() + " was killed by the world");
 							} else if(type == DamageType.FALL) {
 								Bukkit.broadcastMessage(p.getName() + " fell to their death");
-							} else if(type == DamageType.ABSOLUTE) {
+							} else if(type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE) {
 								Bukkit.broadcastMessage(p.getName() + " fell out of the world");
 							}
 						}
@@ -578,7 +574,8 @@ public class CustomDamage implements Listener {
 				case ENVIRONMENTAL -> org.bukkit.damage.DamageType.FALLING_BLOCK;
 				case IFRAME_ENVIRONMENTAL -> org.bukkit.damage.DamageType.ON_FIRE;
 				case FALL -> org.bukkit.damage.DamageType.FALL;
-				case ABSOLUTE -> org.bukkit.damage.DamageType.GENERIC_KILL;
+				case ABSOLUTE -> org.bukkit.damage.DamageType.GENERIC;
+				case LETHAL_ABSOLUTE -> org.bukkit.damage.DamageType.GENERIC_KILL;
 			};
 			causingEntity = attacker;
 			nmsSource = convertBukkitDamageSource(org.bukkit.damage.DamageSource.builder(bukkitType).build(), victim);
@@ -1060,11 +1057,11 @@ public class CustomDamage implements Listener {
 			switch(e.getCause()) {
 				case BLOCK_EXPLOSION, THORNS -> type = DamageType.MELEE;
 				case POISON, WITHER -> type = DamageType.MAGIC;
-				case CONTACT, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION,
+				case CONTACT, CRAMMING, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION,
 					 SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
 				case CUSTOM -> type = DamageType.IFRAME_ENVIRONMENTAL;
 				case FALL, FLY_INTO_WALL -> type = DamageType.FALL;
-				case CRAMMING, KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.ABSOLUTE;
+				case KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.LETHAL_ABSOLUTE;
 				default -> {
 					return;
 				}

@@ -34,7 +34,7 @@ public class PrimordialBroodfather implements CustomMob {
 		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
 		spider.setHealth(200.0);
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.67);
-		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(10.0);
+		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(15.0);
 		spider.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		spider.setTarget(Utils.getNearestPlayer(spider));
 		spider.setCustomNameVisible(true);
@@ -98,9 +98,7 @@ public class PrimordialBroodfather implements CustomMob {
 			}
 
 			for(int i = 10; i < 201; i += 10) {
-				Utils.scheduleTask(() -> damagee.getNearbyEntities(32, 32, 32).stream().filter(entity -> entity instanceof Player).forEach(p -> {
-					CustomDamage.customMobs((LivingEntity) p, damagee, p.getLocation().distanceSquared(damagee.getLocation()) < 4 ? 2 : 1, DamageType.ABSOLUTE);
-				}), i);
+				Utils.scheduleTask(() -> Utils.applyToAllNearbyPlayers(damagee, 32, p -> CustomDamage.customMobs(p, damagee, p.getLocation().distanceSquared(damagee.getLocation()) < 9 ? 2 : 1, DamageType.ABSOLUTE)), i);
 			}
 			Utils.scheduleTask(() -> {
 				damagee.removeScoreboardTag("Invulnerable");

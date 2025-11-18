@@ -231,17 +231,17 @@ public class WitherKing implements CustomWither {
 		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
 			Utils.scheduleTask(() -> {
 				if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-					Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0));
+					Bukkit.getOnlinePlayers().forEach(p -> p.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0));
 				}
 			}, 360 + countHenchmenLeft() * 40L);
 			Utils.scheduleTask(() -> {
 				if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-					Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0));
+					Bukkit.getOnlinePlayers().forEach(p -> p.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0));
 				}
 			}, 380 + countHenchmenLeft() * 40L);
 			Utils.scheduleTask(() -> {
 				if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-					Bukkit.getOnlinePlayers().forEach(player -> player.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BOOM!", "", 0, 21, 0));
+					Bukkit.getOnlinePlayers().forEach(p -> p.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BOOM!", "", 0, 21, 0));
 					List<EntityType> immune = new ArrayList<>();
 					immune.add(EntityType.WITHER_SKELETON);
 					Utils.spawnTNT(e, e.getLocation(), 0, 48, 200 - countHenchmenLeft() * 20, immune);
@@ -254,7 +254,7 @@ public class WitherKing implements CustomWither {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
+		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
 

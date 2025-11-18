@@ -7,8 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 
-import java.util.Objects;
-
 public class Protector implements CustomDragon {
 	@Override
 	public void whenShootingFireball(DragonFireball fireball) {

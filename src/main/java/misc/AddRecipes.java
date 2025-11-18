@@ -282,7 +282,7 @@ public class AddRecipes {
 
 		necromancerRecipe.shape("VVV", "SNS", "SBS");
 		necromancerRecipe.setIngredient('S', Material.NETHER_STAR);
-		necromancerRecipe.setIngredient('N', Material.NETHERITE_CHESTPLATE);
+		necromancerRecipe.setIngredient('N', Material.NETHERITE_LEGGINGS);
 		necromancerRecipe.setIngredient('V', new RecipeChoice.ExactChoice(viscera));
 		necromancerRecipe.setIngredient('B', new RecipeChoice.ExactChoice(brooch));
 

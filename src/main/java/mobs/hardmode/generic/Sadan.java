@@ -117,7 +117,7 @@ public class Sadan implements CustomMob {
 		}
 
 		Utils.playGlobalSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
-		double maxHealth = terracottas.size() * 250 + golems.size() * 400;
+		double maxHealth = terracottas.size() * 300 + golems.size() * 500;
 		sadan.getAttribute(Attribute.MAX_HEALTH).setBaseValue(100.0);
 		sadan.setHealth(100.0);
 		Utils.changeName(sadan);
@@ -127,15 +127,15 @@ public class Sadan implements CustomMob {
 	private static Husk spawnTerracotta(Location l) {
 		Husk terracotta = (Husk) l.getWorld().spawnEntity(l, EntityType.HUSK);
 
-		terracotta.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Terracotta" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + "250/250");
+		terracotta.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Terracotta" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + "300/300");
 
 		EntityEquipment equipment = terracotta.getEquipment();
 		equipment.setItemInMainHand(new ItemStack(Material.POPPY));
 
-		terracotta.getAttribute(Attribute.MAX_HEALTH).setBaseValue(250.0);
-		terracotta.setHealth(250.0);
-		terracotta.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(35.0);
-		terracotta.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+		terracotta.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
+		terracotta.setHealth(300.0);
+		terracotta.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(40.0);
+		terracotta.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.6);
 		terracotta.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		terracotta.setTarget(Utils.getNearestPlayer(terracotta));
 		terracotta.setCustomNameVisible(true);
@@ -152,15 +152,15 @@ public class Sadan implements CustomMob {
 	private static IronGolem spawnGolem(Location l) {
 		IronGolem ironGolem = (IronGolem) l.getWorld().spawnEntity(l, EntityType.IRON_GOLEM);
 
-		ironGolem.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Woke Golem" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + "400/400");
+		ironGolem.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Woke Golem" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + "500/500");
 
 		EntityEquipment equipment = ironGolem.getEquipment();
 		equipment.setItemInMainHand(new ItemStack(Material.POPPY));
 
-		ironGolem.getAttribute(Attribute.MAX_HEALTH).setBaseValue(400.0);
-		ironGolem.setHealth(400.0);
-		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(50.0);
-		ironGolem.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+		ironGolem.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
+		ironGolem.setHealth(500.0);
+		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(60.0);
+		ironGolem.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.6);
 		ironGolem.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		ironGolem.setTarget(Utils.getNearestPlayer(ironGolem));
 		ironGolem.setCustomNameVisible(true);
@@ -225,24 +225,22 @@ public class Sadan implements CustomMob {
 	private static Zombie spawnGiant(Zombie sadan) {
 		Zombie zombie = (Zombie) sadan.getWorld().spawnEntity(Utils.randomLocation(sadan.getLocation(), 12), EntityType.ZOMBIE);
 
-		zombie.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Mutant Giant" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + "600/600");
+		zombie.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Mutant Giant" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + "800/800");
 
 		EntityEquipment equipment = zombie.getEquipment();
-		equipment.setItemInMainHand(new ItemStack(Material.DIAMOND_SWORD));
 		equipment.setItem(EquipmentSlot.HEAD, setArmorColor(new ItemStack(Material.LEATHER_HELMET)));
 		equipment.setItem(EquipmentSlot.CHEST, setArmorColor(new ItemStack(Material.LEATHER_CHESTPLATE)));
 		equipment.setItem(EquipmentSlot.LEGS, setArmorColor(new ItemStack(Material.LEATHER_LEGGINGS)));
 		equipment.setItem(EquipmentSlot.FEET, setArmorColor(new ItemStack(Material.LEATHER_BOOTS)));
-		equipment.setItemInMainHandDropChance(0);
 		equipment.setHelmetDropChance(0);
 		equipment.setChestplateDropChance(0);
 		equipment.setLeggingsDropChance(0);
 		equipment.setBootsDropChance(0);
 
-		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(600.0);
-		zombie.setHealth(600.0);
-		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(50.0);
-		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(800.0);
+		zombie.setHealth(800.0);
+		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(60.0);
+		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.75);
 		zombie.getAttribute(Attribute.ARMOR).setBaseValue(-7.0);
 		zombie.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 		zombie.getAttribute(Attribute.SCALE).setBaseValue(6.0);
@@ -291,18 +289,18 @@ public class Sadan implements CustomMob {
 			Player p = Utils.getNearestPlayer(giant);
 			p.playSound(p, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
 			giant.swingMainHand();
-			CustomDamage.customMobs(p, giant, finalPhase ? 150 : 100, DamageType.MELEE);
+			CustomDamage.customMobs(p, giant, finalPhase ? 150 : 120, DamageType.MELEE);
 			Utils.scheduleTask(() -> diamondGiant(giant, finalPhase), finalPhase ? 160 : 320);
 		}
 	}
 
 	private static void bigfoot(Zombie giant, boolean finalPhase) {
 		if(!giant.isDead()) {
-			giant.getNearbyEntities(64, 64, 64).stream().filter(e -> e instanceof Player).forEach(p -> {
+			Utils.applyToAllNearbyPlayers(giant, 64, p -> {
 				Location l = p.getLocation();
 				l.setY(l.getY() - 1);
 				p.teleport(l);
-				CustomDamage.customMobs((LivingEntity) p, giant, finalPhase ? 80 : 50, DamageType.MELEE);
+				CustomDamage.customMobs(p, giant, finalPhase ? 100 : 70, DamageType.MELEE);
 			});
 			Utils.playGlobalSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 2.0F);
 			Utils.scheduleTask(() -> bigfoot(giant, finalPhase), finalPhase ? 160 : 320);
@@ -310,10 +308,12 @@ public class Sadan implements CustomMob {
 	}
 
 	private static void lasr(Zombie giant, boolean finalPhase) {
+		// Giants Phase: Every 10 ticks for 80 ticks (9 total procs), dealing 8 damage (72 total damage)
+		// Sadan Phase: Every 4 ticks for 40 ticks (11 total procs), dealing 12 damage (132 total damage)
 		if(!giant.isDead()) {
 			for(int i = 0; i < (finalPhase ? 40 : 80); i += (finalPhase ? 4 : 10)) {
 				Utils.scheduleTask(() -> {
-					Utils.shootBeam(giant, Utils.getNearestPlayer(giant), Color.RED, 64, 1, finalPhase ? 10 : 8);
+					Utils.shootBeam(giant, Utils.getNearestPlayer(giant), Color.RED, 64, 1, finalPhase ? 12 : 8);
 
 					Utils.playGlobalSound(Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 				}, i);
@@ -339,12 +339,12 @@ public class Sadan implements CustomMob {
 			equipment.setLeggingsDropChance(0);
 			equipment.setBootsDropChance(0);
 
-			sadan.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1200.0);
-			sadan.setHealth(1200.0);
+			sadan.getAttribute(Attribute.MAX_HEALTH).setBaseValue(2000.0);
+			sadan.setHealth(2000.0);
 			sadan.getAttribute(Attribute.ARMOR).setBaseValue(-7.0);
-			sadan.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(80.0);
+			sadan.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(93.0);
 			sadan.getAttribute(Attribute.SCALE).setBaseValue(6.0);
-			sadan.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+			sadan.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(1.0);
 			sadan.removePotionEffect(PotionEffectType.INVISIBILITY);
 
 			Utils.changeName(sadan);
@@ -390,7 +390,7 @@ public class Sadan implements CustomMob {
 					currentHP += zombie.getHealth();
 				}
 			}
-			sadan.setHealth(Math.max(1, currentHP * 100 / 2400));
+			sadan.setHealth(Math.max(1, currentHP * 100 / 3200));
 			Utils.changeName(sadan);
 			int finalDead = dead;
 			Utils.scheduleTask(() -> updateHealthGiants(sadan, giants, finalDead), 1);

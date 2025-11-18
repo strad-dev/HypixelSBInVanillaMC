@@ -56,7 +56,7 @@ public class Necron implements CustomWither {
 	private void frenzy(Wither wither, int which) {
 		wither.addScoreboardTag("Invulnerable");
 		wither.setAI(false);
-		Bukkit.getOnlinePlayers().forEach(player -> player.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 0)));
+		Bukkit.getOnlinePlayers().forEach(p -> p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 0)));
 		teleport(wither, 16);
 		for(int i = 0; i < 161; i += 20) {
 			int finalI = i;
@@ -85,7 +85,7 @@ public class Necron implements CustomWither {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
+		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
 

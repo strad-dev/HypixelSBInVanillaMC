@@ -35,7 +35,7 @@ public class VoidcrazedSeraph implements CustomMob {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Voidcrazed Seraph" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(999.9);
 		enderman.setHealth(999.9);
-		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(40.0);
+		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(50.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		enderman.setTarget(Utils.getNearestPlayer(enderman));
@@ -62,7 +62,7 @@ public class VoidcrazedSeraph implements CustomMob {
 	private static void dissonance(Enderman voidgloom) {
 		if(!voidgloom.isDead()) {
 			if(!voidgloom.getScoreboardTags().contains("Invulnerable")) {
-				voidgloom.getNearbyEntities(16, 16, 16).stream().filter(e -> e instanceof Player).forEach(p -> CustomDamage.customMobs((LivingEntity) p, voidgloom, 20, DamageType.MELEE));
+				Utils.applyToAllNearbyPlayers(voidgloom, 16, p -> CustomDamage.customMobs(p, voidgloom, 30, DamageType.MELEE));
 			}
 			Utils.scheduleTask(() -> dissonance(voidgloom), 20);
 		}
@@ -77,18 +77,20 @@ public class VoidcrazedSeraph implements CustomMob {
 			Utils.scheduleTask(() -> {
 				if(!voidgloom.isDead() && voidgloom.getHealth() < 666) {
 					voidgloom.setCarriedBlock(Material.AIR.createBlockData());
+					voidgloom.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.333);
 					Block block = Utils.randomLocation(voidgloom.getLocation(), 16).getBlock();
 					block.setType(Material.BEACON);
 					beacons.add(block);
 					Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
-					voidgloom.getNearbyEntities(32, 32, 32).stream().filter(e -> e instanceof Player).forEach(p -> ((Player) p).sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Destroy it or die!", 0, 160, 0));
+					Utils.applyToAllNearbyPlayers(voidgloom, 32, p -> p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Destroy it or die!", 0, 200, 0));
 					Utils.scheduleTask(() -> {
 						if(!voidgloom.isDead() && block.getType() == Material.BEACON) {
 							Utils.spawnTNT(voidgloom, block.getLocation(), 0, 32, 500, new ArrayList<>());
 						}
+						voidgloom.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 						block.setType(Material.AIR);
 						beacons.remove(block);
-					}, 160);
+					}, 200);
 				}
 			}, 60);
 			Utils.scheduleTask(() -> yangGlyph(voidgloom), 600);

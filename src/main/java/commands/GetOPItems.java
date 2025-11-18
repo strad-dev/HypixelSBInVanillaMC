@@ -1,31 +1,20 @@
 package commands;
 
-import items.armor.*;
-import items.ingredients.mining.*;
-import items.ingredients.misc.*;
-import items.ingredients.witherLords.*;
-import items.misc.*;
-import items.summonItems.*;
-import items.weapons.Claymore;
-import items.weapons.Scylla;
-import items.weapons.Terminator;
 import misc.Plugin;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Arrays;
 import java.util.List;
-
-import static org.bukkit.Bukkit.getServer;
 
 public class GetOPItems implements CommandExecutor {
 	@Override

@@ -155,9 +155,6 @@ public class Plugin extends JavaPlugin {
 				if(score.getScore() < 2500) {
 					if(second == 5) {
 						score.setScore(score.getScore() + 1);
-						second = 0;
-					} else {
-						second++;
 					}
 					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500"));
 				} else {
@@ -168,6 +165,12 @@ public class Plugin extends JavaPlugin {
 				Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
 				return;
 			}
+		}
+
+		if(second == 5) {
+			second = 0;
+		} else {
+			second ++;
 		}
 		int finalSecond = second;
 		Utils.scheduleTask(() -> passiveIntel(finalSecond), 20L);
