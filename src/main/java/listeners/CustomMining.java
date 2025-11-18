@@ -2,6 +2,7 @@ package listeners;
 
 import items.ingredients.mining.*;
 import misc.Utils;
+import mobs.hardmode.generic.VoidcrazedSeraph;
 import net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
@@ -26,6 +27,10 @@ public class CustomMining implements Listener {
 	public void onBlockBreak(BlockBreakEvent e) {
 		Player p = e.getPlayer();
 		Block b = e.getBlock();
+		if(VoidcrazedSeraph.isVoidgloomBeacon(b)) {
+			e.setDropItems(false);
+			return;
+		}
 		Location l = b.getLocation();
 		World world = l.getWorld();
 		ItemStack itemInHand = p.getInventory().getItemInMainHand();

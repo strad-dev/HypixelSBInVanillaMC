@@ -24,9 +24,8 @@ public class RefinedIron implements Ingredients {
 		List<String> lore = new ArrayList<>();
 		lore.add("skyblock/ingredient/refined_iron");
 		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "A shiny ingot in its");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "purest form straight");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "from the mines.");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "A shiny ingot in its purest form");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "straight from the mines.");
 		lore.add("");
 		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
 
