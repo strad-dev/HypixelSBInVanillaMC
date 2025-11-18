@@ -19,9 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 
 import static misc.Utils.shootBeam;
@@ -52,13 +49,13 @@ public class Sadan implements CustomMob {
 		equipment.setLeggingsDropChance(0);
 		equipment.setBootsDropChance(0);
 
-		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
-		zombie.setHealth(300.0);
+		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(400.0);
+		zombie.setHealth(400.0);
 		zombie.getAttribute(Attribute.ARMOR).setBaseValue(-20.0);
 		zombie.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(-8.0);
-		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(15.0);
+		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
 		zombie.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
-		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.125);
+		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		zombie.getAttribute(Attribute.SCALE).setBaseValue(6.0);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.setTarget(Utils.getNearestPlayer(zombie));
@@ -83,18 +80,18 @@ public class Sadan implements CustomMob {
 				switch(random.nextInt(7)) {
 					case 0 -> {
 						damager.teleport(damager.getLocation().subtract(0, 1, 0));
-						CustomDamage.customMobs(entity, damagee, 15, DamageType.MELEE);
+						CustomDamage.customMobs(entity, damagee, 25, DamageType.MELEE);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan has stomped you into the ground!");
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 2.0F);
 					}
 					case 1, 2 -> {
-						shootBeam(damagee, damager, Color.RED, 32, 1, 15);
+						shootBeam(damagee, damager, Color.RED, 32, 1, 25);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan has shot you with Laser Eyes!");
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 					}
 					case 3, 4 -> {
 						damagee.swingMainHand();
-						CustomDamage.customMobs(entity, damagee, 15, DamageType.MELEE);
+						CustomDamage.customMobs(entity, damagee, 25, DamageType.MELEE);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Sadan attacks you violently with his Diamond Sword!");
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
 					}

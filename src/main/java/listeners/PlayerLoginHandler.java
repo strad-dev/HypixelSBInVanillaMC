@@ -1,6 +1,5 @@
 package listeners;
 
-import io.netty.buffer.Unpooled;
 import items.armor.*;
 import items.ingredients.mining.*;
 import items.ingredients.misc.*;
@@ -13,18 +12,7 @@ import items.weapons.Terminator;
 import misc.AddRecipes;
 import misc.BossBarManager;
 import misc.Plugin;
-import misc.Utils;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

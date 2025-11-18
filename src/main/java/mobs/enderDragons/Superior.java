@@ -10,7 +10,6 @@ import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Objects;
 import java.util.Random;
 
 import static listeners.CustomDamage.calculateFinalDamage;

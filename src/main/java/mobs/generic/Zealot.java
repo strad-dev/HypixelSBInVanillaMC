@@ -28,7 +28,7 @@ public class Zealot implements CustomMob {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(130.0);
 		enderman.setHealth(130.0);
-		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(15.0);
+		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(18.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		enderman.setTarget(Utils.getNearestPlayer(enderman));
@@ -49,8 +49,8 @@ public class Zealot implements CustomMob {
 		if(damager instanceof LivingEntity entity1) {
 			if(random.nextDouble() < 0.2) {
 				damager.teleport(damagee);
-				CustomDamage.calculateFinalDamage(entity1, damagee, 10, DamageType.MELEE);
-				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Zealot's Dark Magic has caused you to teleport to it!  It also deals 10 damage to you!");
+				CustomDamage.calculateFinalDamage(entity1, damagee, 12, DamageType.MELEE);
+				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Zealot's Dark Magic has caused you to teleport to it!  It also deals 12 damage to you!");
 			}
 		}
 		return true;

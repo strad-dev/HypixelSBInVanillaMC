@@ -86,7 +86,17 @@ public enum DamageType {
 	 * I-Frames: Normal
 	 */
 
-	ABSOLUTE;
+	ABSOLUTE,
+	/*
+	 * ABSOLUTE Damage Type
+	 * ------------------
+	 * Used for damage that will always deal full damage
+	 * Affected by: Totem of Undying
+	 * Knockback: None
+	 * I-Frames: None
+	 */
+
+	LETHAL_ABSOLUTE;
 	/*
 	 * ABSOLUTE Damage Type
 	 * ------------------
@@ -95,6 +105,10 @@ public enum DamageType {
 	 * Knockback: None
 	 * I-Frames: None
 	 */
+
+	public static boolean isAbsoluteDamage(DamageType type) {
+		return type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE;
+	}
 
 	public static String toString(DamageType type) {
 		switch(type) {
@@ -116,7 +130,7 @@ public enum DamageType {
 			case FALL -> {
 				return "Fall Damage";
 			}
-			case ABSOLUTE -> {
+			case ABSOLUTE, LETHAL_ABSOLUTE -> {
 				return "Absolute Damage";
 			}
 			default -> throw new IllegalArgumentException("Unknown Damage Type");

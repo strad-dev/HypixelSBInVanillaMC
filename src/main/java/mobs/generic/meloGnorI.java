@@ -26,10 +26,10 @@ public class meloGnorI implements CustomMob {
 		}
 
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "meloG norI" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		ironGolem.getAttribute(Attribute.MAX_HEALTH).setBaseValue(150.0);
+		ironGolem.getAttribute(Attribute.MAX_HEALTH).setBaseValue(100.0);
 		ironGolem.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		ironGolem.setTarget(Utils.getNearestPlayer(ironGolem));
-		ironGolem.setHealth(150.0);
+		ironGolem.setHealth(100.0);
 		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
 		ironGolem.setCustomNameVisible(true);
 		ironGolem.addScoreboardTag("SkyblockBoss");
@@ -46,15 +46,15 @@ public class meloGnorI implements CustomMob {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(type == DamageType.MELEE) {
 			if(damager instanceof LivingEntity entity1) {
-				if(originalDamage > 10.0) {
-					if(damagee.getHealth() + ((originalDamage - 10.0) / 2) > 150) {
-						damagee.setHealth(150);
-						CustomDamage.calculateFinalDamage(entity1, damagee, (originalDamage - 10) / 2, DamageType.MELEE); // damager takes 50% of their original damage, -10
-						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt is at full health and has REFLECTED " + (originalDamage - 10) / 2 + " Damage back to you!");
+				if(originalDamage > 5) {
+					if(damagee.getHealth() + ((originalDamage - 5) / 2) > 1000) {
+						damagee.setHealth(100);
+						CustomDamage.calculateFinalDamage(entity1, damagee, (originalDamage - 5) / 2, DamageType.MELEE); // damager takes 50% of their original damage, -5
+						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt is at full health and has REFLECTED " + (originalDamage - 5) / 2 + " Damage back to you!");
 					} else {
-						damagee.setHealth(damagee.getHealth() + (originalDamage - 10.0) / 2);
+						damagee.setHealth(damagee.getHealth() + (originalDamage - 5) / 2);
 						Utils.changeName(damagee);
-						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt has HEALED ITSELF by " + (originalDamage - 10.0) / 2 + " HP!");
+						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt has HEALED ITSELF by " + (originalDamage - 5) / 2 + " HP!");
 					}
 					damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 					damagee.setNoDamageTicks(9);

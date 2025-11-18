@@ -21,6 +21,7 @@ import org.bukkit.util.Vector;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Consumer;
 
 import static listeners.CustomDamage.customMobs;
 
@@ -80,7 +81,7 @@ public class Utils {
 	 * @param s The sound to play
 	 */
 	public static void playGlobalSound(Sound s) {
-		Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player, s, 1.0F, 1.0F));
+		Bukkit.getOnlinePlayers().forEach(p -> p.playSound(p, s, 1.0F, 1.0F));
 	}
 
 	/**
@@ -91,7 +92,7 @@ public class Utils {
 	 * @param pitch  The pitch of the sound
 	 */
 	public static void playGlobalSound(Sound s, float volume, float pitch) {
-		Bukkit.getOnlinePlayers().forEach(player -> player.playSound(player, s, volume, pitch));
+		Bukkit.getOnlinePlayers().forEach(p -> p.playSound(p, s, volume, pitch));
 	}
 
 	/**
@@ -321,6 +322,10 @@ public class Utils {
 	
 	public static void scheduleTask(Runnable task, long delay) {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), task, delay);
+	}
+
+	public static void applyToAllNearbyPlayers(LivingEntity entity, int radius, Consumer<Player> function) {
+		entity.getNearbyEntities(radius, radius, radius).stream().filter(e -> e instanceof Player).map(Player.class::cast).forEach(function);
 	}
 
 	/**

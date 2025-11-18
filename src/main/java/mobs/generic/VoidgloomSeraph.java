@@ -9,7 +9,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -29,7 +28,7 @@ public class VoidgloomSeraph implements CustomMob {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Voidgloom Seraph" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(250.0);
 		enderman.setHealth(250.0);
-		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(20.0);
+		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		enderman.setTarget(Utils.getNearestPlayer(enderman));
@@ -49,7 +48,7 @@ public class VoidgloomSeraph implements CustomMob {
 
 	private static void dissonance(Enderman voidgloom) {
 		if(!voidgloom.isDead()) {
-			voidgloom.getNearbyEntities(16, 16, 16).stream().filter(e -> e instanceof Player).forEach(p -> CustomDamage.customMobs((LivingEntity) p, voidgloom, 10, DamageType.MELEE));
+			Utils.applyToAllNearbyPlayers(voidgloom, 16, p -> CustomDamage.customMobs(p, voidgloom, 12, DamageType.MELEE));
 			Utils.scheduleTask(() -> dissonance(voidgloom), 20);
 		}
 	}

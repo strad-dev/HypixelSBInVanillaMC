@@ -18,7 +18,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class AtonedHorror implements CustomMob {
 	@Override
@@ -48,7 +47,7 @@ public class AtonedHorror implements CustomMob {
 
 		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
 		zombie.setHealth(200.0);
-		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(12.0);
+		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(23.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.setTarget(Utils.getNearestPlayer(zombie));
@@ -63,7 +62,7 @@ public class AtonedHorror implements CustomMob {
 		zombie.setPersistent(true);
 		zombie.setRemoveWhenFarAway(false);
 
-		Utils.scheduleTask(() -> healing(zombie), 5);
+		Utils.scheduleTask(() -> healing(zombie), 4);
 		Utils.scheduleTask(() -> summonTNT(zombie), 60);
 		Utils.scheduleTask(() -> nuclearExplosion(zombie), 600);
 
@@ -76,14 +75,14 @@ public class AtonedHorror implements CustomMob {
 				zombie.setHealth(Math.min(zombie.getHealth() + 1, 200));
 				Utils.changeName(zombie);
 			}
-			Utils.scheduleTask(() -> healing(zombie), 5);
+			Utils.scheduleTask(() -> healing(zombie), 4);
 		}
 	}
 
 	private static void summonTNT(Zombie zombie) {
 		if(!zombie.isDead()) {
 			Player p = Utils.getNearestPlayer(zombie);
-			Utils.spawnTNT(zombie, p.getLocation(), 20, 5, 25, new ArrayList<>());
+			Utils.spawnTNT(zombie, p.getLocation(), 20, 5, 30, new ArrayList<>());
 			Utils.scheduleTask(() -> summonTNT(zombie), 60);
 		}
 	}
@@ -93,7 +92,7 @@ public class AtonedHorror implements CustomMob {
 			zombie.setAI(false);
 			zombie.addScoreboardTag("Invulnerable");
 			Utils.changeName(zombie);
-			zombie.getNearbyEntities(64, 64, 64).stream().filter(entity -> entity instanceof Player).map(Player.class::cast).forEach(p -> {
+			Utils.applyToAllNearbyPlayers(zombie, 64,p -> {
 				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "7", "", 0, 21, 0);
 				Utils.scheduleTask(() -> {
 					if(!zombie.isDead()) {
@@ -133,7 +132,7 @@ public class AtonedHorror implements CustomMob {
 			});
 			Utils.scheduleTask(() -> {
 				if(!zombie.isDead()) {
-					Utils.spawnTNT(zombie, zombie.getLocation(), 0, 64, 150, new ArrayList<>());
+					Utils.spawnTNT(zombie, zombie.getLocation(), 0, 64, 200, new ArrayList<>());
 				}
 				zombie.setAI(true);
 				zombie.removeScoreboardTag("Invulnerable");
