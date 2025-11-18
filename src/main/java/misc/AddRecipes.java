@@ -28,18 +28,19 @@ public class AddRecipes {
 		allRecipes.add(new NamespacedKey(plugin, "enchanted_golden_apple"));
 		allRecipes.add(new NamespacedKey(plugin, "wardenHelmet"));
 		allRecipes.add(new NamespacedKey(plugin, "necronElytra"));
+		allRecipes.add(new NamespacedKey(plugin, "primalChestplate"));
 		allRecipes.add(new NamespacedKey(plugin, "goldorLeggings"));
 		allRecipes.add(new NamespacedKey(plugin, "maxorBoots"));
 		allRecipes.add(new NamespacedKey(plugin, "wandOfRestoration"));
 		allRecipes.add(new NamespacedKey(plugin, "wandOfAtonement"));
 		allRecipes.add(new NamespacedKey(plugin, "holyIce"));
+		allRecipes.add(new NamespacedKey(plugin, "gyro"));
 		allRecipes.add(new NamespacedKey(plugin, "sharp7"));
 		allRecipes.add(new NamespacedKey(plugin, "power7"));
 		allRecipes.add(new NamespacedKey(plugin, "looting5"));
 		allRecipes.add(new NamespacedKey(plugin, "featherFalling5"));
 		allRecipes.add(new NamespacedKey(plugin, "efficiency6"));
 		allRecipes.add(new NamespacedKey(plugin, "divanPickaxe"));
-		allRecipes.add(new NamespacedKey(plugin, "primalChestplate"));
 		return allRecipes;
 	}
 
@@ -188,6 +189,21 @@ public class AddRecipes {
 		iceRecipe.setIngredient('D', Material.DIAMOND);
 
 		return iceRecipe;
+	}
+
+	public static Recipe addGyroRecipe(Plugin plugin) {
+		ItemStack gyro = GyrokineticWand.getItem();
+		ItemStack nullOvoid = NullOvoid.getItem();
+
+		NamespacedKey gyroKey = new NamespacedKey(plugin, "gyro");
+		ShapedRecipe gyroRecipe = new ShapedRecipe(gyroKey, gyro);
+
+		gyroRecipe.shape("NON", "NCN", "NGN");
+		gyroRecipe.setIngredient('N',  new RecipeChoice.ExactChoice(nullOvoid));
+		gyroRecipe.setIngredient('O', Material.OBSIDIAN);
+		gyroRecipe.setIngredient('C', Material.PURPLE_CONCRETE);
+		gyroRecipe.setIngredient('G', Material.PURPLE_STAINED_GLASS);
+		return gyroRecipe;
 	}
 
 	public static Recipe addWardenHelmetRecipe(Plugin plugin) {

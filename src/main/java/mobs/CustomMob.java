@@ -39,6 +39,8 @@ public interface CustomMob {
 			MOBS.put("MutantGiant", new MutantGiant());
 			MOBS.put("DummySadan", new mobs.hardmode.generic.Sadan());
 			MOBS.put("TheGiantOne", new mobs.hardmode.generic.Sadan());
+			MOBS.put("VoidgloomSeraph", new VoidgloomSeraph());
+			MOBS.put("VoidcrazedSeraph", new VoidcrazedSeraph());
 			MOBS.put("InfuriatedSkeleton", new InfuriatedWitherSkeleton());
 
 			// Normal mode withers
