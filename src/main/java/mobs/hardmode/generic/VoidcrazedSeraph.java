@@ -17,9 +17,12 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class VoidcrazedSeraph implements CustomMob {
+	private static final List<Block> beacons = new ArrayList<>();
+
 	@Override
 	public String onSpawn(Player p, Mob e) {
 		Enderman enderman;
@@ -40,7 +43,7 @@ public class VoidcrazedSeraph implements CustomMob {
 		enderman.addScoreboardTag("SkyblockBoss");
 		enderman.addScoreboardTag("VoidcrazedSeraph");
 		enderman.addScoreboardTag("HardMode");
-		enderman.addScoreboardTag("450Trigger");
+		enderman.addScoreboardTag("499Trigger");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "From the ashes of the Superior Dragon rises the terrifying Voidcrazed Seraph!");
 		Bukkit.getLogger().info(p.getName() + " has summoned the Voidcrazed Seraph.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
@@ -58,7 +61,9 @@ public class VoidcrazedSeraph implements CustomMob {
 
 	private static void dissonance(Enderman voidgloom) {
 		if(!voidgloom.isDead()) {
-			voidgloom.getNearbyEntities(16, 16, 16).stream().filter(e -> e instanceof Player).forEach(p -> CustomDamage.customMobs((LivingEntity) p, voidgloom, 20, DamageType.MELEE));
+			if(!voidgloom.getScoreboardTags().contains("Invulnerable")) {
+				voidgloom.getNearbyEntities(16, 16, 16).stream().filter(e -> e instanceof Player).forEach(p -> CustomDamage.customMobs((LivingEntity) p, voidgloom, 20, DamageType.MELEE));
+			}
 			Utils.scheduleTask(() -> dissonance(voidgloom), 20);
 		}
 	}
@@ -74,6 +79,7 @@ public class VoidcrazedSeraph implements CustomMob {
 					voidgloom.setCarriedBlock(Material.AIR.createBlockData());
 					Block block = Utils.randomLocation(voidgloom.getLocation(), 16).getBlock();
 					block.setType(Material.BEACON);
+					beacons.add(block);
 					Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
 					voidgloom.getNearbyEntities(32, 32, 32).stream().filter(e -> e instanceof Player).forEach(p -> ((Player) p).sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Destroy it or die!", 0, 160, 0));
 					Utils.scheduleTask(() -> {
@@ -81,11 +87,16 @@ public class VoidcrazedSeraph implements CustomMob {
 							Utils.spawnTNT(voidgloom, block.getLocation(), 0, 32, 500, new ArrayList<>());
 						}
 						block.setType(Material.AIR);
+						beacons.remove(block);
 					}, 160);
 				}
 			}, 60);
 			Utils.scheduleTask(() -> yangGlyph(voidgloom), 600);
 		}
+	}
+
+	public static boolean isVoidgloomBeacon(Block b) {
+		return beacons.contains(b);
 	}
 
 	@Override
@@ -96,69 +107,58 @@ public class VoidcrazedSeraph implements CustomMob {
 			}
 			damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			return false;
-		} else if(damagee.getHealth() - originalDamage < 450 && damagee.getScoreboardTags().contains("450Trigger")) {
+		} else if(damagee.getHealth() - originalDamage < 499 && damagee.getScoreboardTags().contains("499Trigger")) {
 			damagee.addScoreboardTag("Invulnerable");
-			damagee.removeScoreboardTag("450Trigger");
-			damagee.setHealth(450.0);
+			damagee.removeScoreboardTag("499Trigger");
+			damagee.setHealth(499.0);
 			Utils.changeName(damagee);
 			damagee.setAI(false);
 
 			// Spinning flame beams
 			final int[] tickCounter = {0};
+			Location center = damagee.getLocation();
 
 			BukkitTask beamTask = Bukkit.getScheduler().runTaskTimer(Plugin.getInstance(), () -> {
 				if(!damagee.isValid() || damagee.isDead()) {
 					return;
 				}
 
-				Location currentCenter = damagee.getLocation();
-
 				// Calculate rotation angle (full rotation over DURATION ticks)
 				double rotationAngle = (tickCounter[0] * 2 * Math.PI) / 240;
 
 				// Create 4 sets of beams at 90-degree intervals
-				for(int set = 0; set < 4; set++) {
-					double baseAngle = (set * Math.PI / 2) + rotationAngle;
+				for(int direction = 0; direction < 4; direction++) {
+					double angle = (direction * Math.PI / 2) + rotationAngle;
 
 					// Stack beams for each block of Enderman height (3 blocks)
 					for(int height = 0; height < 3; height++) {
-						double y = currentCenter.getY() + height + 0.5;
+						double y = center.getY() + height + 0.5;
 
 						// Create 3 beams per set (120 degrees apart within the set)
-						for(int beam = 0; beam < 3; beam++) {
-							double angle = baseAngle + (beam * 2 * Math.PI / 3);
+						// Draw the beam with particles
+						for(double distance = 0; distance < 16; distance += 0.2) {
+							double x = center.getX() + Math.cos(angle) * distance;
+							double z = center.getZ() + Math.sin(angle) * distance;
 
-							// Draw the beam with particles
-							for(double distance = 0; distance < 16; distance += 0.2) {
-								double x = currentCenter.getX() + Math.cos(angle) * distance;
-								double z = currentCenter.getZ() + Math.sin(angle) * distance;
+							Location particleLocation = new Location(center.getWorld(), x, y, z);
 
-								Location particleLocation = new Location(currentCenter.getWorld(), x, y, z);
+							// Spawn flame particle
+							center.getWorld().spawnParticle(Particle.FLAME, particleLocation, 1,  // count
+									0, 0, 0,  // offset
+									0  // speed
+							);
 
-								// Spawn flame particle
-								currentCenter.getWorld().spawnParticle(
-										Particle.FLAME,
-										particleLocation,
-										1,  // count
-										0, 0, 0,  // offset
-										0  // speed
-								);
-
-								// Check for player collision every few particles to optimize
-								if(distance % 1.0 < 0.2) {
-									for(Player player : Bukkit.getOnlinePlayers()) {
-										if(player.getWorld().equals(currentCenter.getWorld())) {
-											Location playerLoc = player.getLocation();
-											// Check if player is within 0.8 blocks of the beam particle
-											if(playerLoc.distanceSquared(particleLocation) < 0.64) { // 0.8^2
-												// Check vertical alignment (player is ~2 blocks tall)
-												if(Math.abs(playerLoc.getY() - y) < 2.0 ||
-														Math.abs(playerLoc.getY() + 1 - y) < 1.0) {
-
-													// Deal absolute damage
-													CustomDamage.customMobs(player, damagee, 4, DamageType.ABSOLUTE);
-												}
-											}
+							// Check for player collision every few particles to optimize
+							for(Player player : Bukkit.getOnlinePlayers()) {
+								if(player.getNoDamageTicks() == 0 && player.getWorld().equals(center.getWorld())) {
+									Location playerLoc = player.getLocation();
+									// Check if player is within 0.8 blocks of the beam particle
+									if(playerLoc.distanceSquared(particleLocation) < 0.64) { // 0.8^2
+										// Check vertical alignment (player is ~2 blocks tall)
+										if(Math.abs(playerLoc.getY() - y) < 2.0 || Math.abs(playerLoc.getY() + 1 - y) < 1.0) {
+											// Deal absolute damage
+											CustomDamage.customMobs(player, damagee, 4, DamageType.ABSOLUTE);
+											player.setNoDamageTicks(9);
 										}
 									}
 								}
@@ -166,19 +166,20 @@ public class VoidcrazedSeraph implements CustomMob {
 						}
 					}
 				}
+				tickCounter[0]++;
 			}, 0, 1); // Run every tick
 
 			// Stop the beams after DURATION ticks
 			Utils.scheduleTask(() -> {
 				beamTask.cancel();
 				// Re-enable AI after the attack
-					damagee.setAI(true);
-					damagee.removeScoreboardTag("Invulnerable");
+				damagee.setAI(true);
+				damagee.removeScoreboardTag("Invulnerable");
 			}, 240);
 		}
 		Random random = new Random();
 		if(random.nextDouble() < 0.2) {
-			damager.teleport(Utils.randomLocation(damagee.getLocation(), 3));
+			damagee.teleport(Utils.randomLocation(damager.getLocation(), 3));
 		}
 		return true;
 	}

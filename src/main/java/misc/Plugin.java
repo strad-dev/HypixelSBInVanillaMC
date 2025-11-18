@@ -87,6 +87,7 @@ public class Plugin extends JavaPlugin {
 		getServer().addRecipe(AddRecipes.addWardenHelmetRecipe(this));
 		getServer().addRecipe(AddRecipes.addNecronElytraRecipe(this));
 		getServer().addRecipe(AddRecipes.addGoldorLeggingsRecipe(this));
+		getServer().addRecipe(AddRecipes.addNecromancerLegginsRecipe(this));
 		getServer().addRecipe(AddRecipes.addMaxorBootsRecipe(this));
 		getServer().addRecipe(AddRecipes.addPrimalChesplateRecipe(this));
 		getServer().addRecipe(AddRecipes.addGodAppleRecipe(this));

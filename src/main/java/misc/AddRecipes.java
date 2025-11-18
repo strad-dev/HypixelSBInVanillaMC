@@ -30,6 +30,7 @@ public class AddRecipes {
 		allRecipes.add(new NamespacedKey(plugin, "necronElytra"));
 		allRecipes.add(new NamespacedKey(plugin, "primalChestplate"));
 		allRecipes.add(new NamespacedKey(plugin, "goldorLeggings"));
+		allRecipes.add(new NamespacedKey(plugin, "necromancerPants"));
 		allRecipes.add(new NamespacedKey(plugin, "maxorBoots"));
 		allRecipes.add(new NamespacedKey(plugin, "wandOfRestoration"));
 		allRecipes.add(new NamespacedKey(plugin, "wandOfAtonement"));
@@ -238,6 +239,24 @@ public class AddRecipes {
 		return elytraRecipe;
 	}
 
+	public static Recipe addPrimalChesplateRecipe(Plugin plugin) {
+		ItemStack primalChestplate = PrimalDragonChestplate.getItem();
+		ItemStack dragonEgg = AncientDragonEgg.getItem();
+		ItemStack core = Core.getItem();
+		ItemStack ovoid = NullOvoid.getItem();
+
+		NamespacedKey primalKey = new NamespacedKey(plugin, "primalChestplate");
+		ShapedRecipe primalRecipe = new ShapedRecipe(primalKey, primalChestplate);
+
+		primalRecipe.shape("OEO", "OCO", "OJO");
+		primalRecipe.setIngredient('O', new RecipeChoice.ExactChoice(ovoid));
+		primalRecipe.setIngredient('J', new RecipeChoice.ExactChoice(core));
+		primalRecipe.setIngredient('E', new RecipeChoice.ExactChoice(dragonEgg));
+		primalRecipe.setIngredient('C', Material.NETHERITE_CHESTPLATE);
+
+		return primalRecipe;
+	}
+
 	public static Recipe addGoldorLeggingsRecipe(Plugin plugin) {
 		ItemStack goldorLeggings = GoldorLeggings.getItem();
 		ItemStack goldorSecrets = GoldorSecrets.getItem();
@@ -253,6 +272,23 @@ public class AddRecipes {
 		return goldorRecipe;
 	}
 
+	public static Recipe addNecromancerLegginsRecipe(Plugin plugin) {
+		ItemStack necromancerLeggings = NecromancerLordLeggings.getItem();
+		ItemStack brooch = NecromancerBrooch.getItem();
+		ItemStack viscera = Viscera.getItem();
+
+		NamespacedKey necromancerKey = new NamespacedKey(plugin, "necromancerPants");
+		ShapedRecipe necromancerRecipe = new ShapedRecipe(necromancerKey, necromancerLeggings);
+
+		necromancerRecipe.shape("VVV", "SNS", "SBS");
+		necromancerRecipe.setIngredient('S', Material.NETHER_STAR);
+		necromancerRecipe.setIngredient('N', Material.NETHERITE_CHESTPLATE);
+		necromancerRecipe.setIngredient('V', new RecipeChoice.ExactChoice(viscera));
+		necromancerRecipe.setIngredient('B', new RecipeChoice.ExactChoice(brooch));
+
+		return necromancerRecipe;
+	}
+
 	public static Recipe addMaxorBootsRecipe(Plugin plugin) {
 		ItemStack maxorBoots = MaxorBoots.getItem();
 		ItemStack maxorSecrets = MaxorSecrets.getItem();
@@ -264,24 +300,6 @@ public class AddRecipes {
 		maxorRecipe.setIngredient('N', Material.NETHER_STAR);
 		maxorRecipe.setIngredient('B', Material.NETHERITE_BOOTS);
 		maxorRecipe.setIngredient('S', new RecipeChoice.ExactChoice(maxorSecrets));
-
-		return maxorRecipe;
-	}
-
-	public static Recipe addPrimalChesplateRecipe(Plugin plugin) {
-		ItemStack primalChestplate = PrimalDragonChestplate.getItem();
-		ItemStack dragonEgg = AncientDragonEgg.getItem();
-		ItemStack core = Core.getItem();
-		ItemStack ovoid = NullOvoid.getItem();
-
-		NamespacedKey maxorKey = new NamespacedKey(plugin, "primalChestplate");
-		ShapedRecipe maxorRecipe = new ShapedRecipe(maxorKey, primalChestplate);
-
-		maxorRecipe.shape("OEO", "OCO", "OJO");
-		maxorRecipe.setIngredient('O', new RecipeChoice.ExactChoice(ovoid));
-		maxorRecipe.setIngredient('J', new RecipeChoice.ExactChoice(core));
-		maxorRecipe.setIngredient('E', new RecipeChoice.ExactChoice(dragonEgg));
-		maxorRecipe.setIngredient('C', Material.NETHERITE_CHESTPLATE);
 
 		return maxorRecipe;
 	}

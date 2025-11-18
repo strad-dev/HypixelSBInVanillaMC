@@ -943,7 +943,7 @@ public class CustomDrops implements Listener {
 							sendRareDropMessage(p, "Remnant of the Giant's Sword");
 						}
 						if(random.nextDouble() < 0.25 * rngLootingBonus) {
-							item = GiantSwordRemnant.getItem();
+							item = NecromancerBrooch.getItem();
 							world.dropItemNaturally(l, item);
 							sendRareDropMessage(p, "Necromancer's Brooch");
 						}
