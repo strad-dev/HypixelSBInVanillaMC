@@ -1,5 +1,6 @@
 package mobs.enderDragons;
 
+import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
@@ -12,7 +13,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.Random;
 
-import static listeners.CustomDamage.calculateFinalDamage;
 import static listeners.CustomMobs.spawnLightning;
 
 public class Superior implements CustomDragon {
@@ -51,7 +51,7 @@ public class Superior implements CustomDragon {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		calculateFinalDamage(damagee, Utils.getNearestPlayer(damagee), 3, DamageType.RANGED);
+		CustomDamage.calculateFinalDamage(damagee, Utils.getNearestPlayer(damagee), 3, DamageType.RANGED);
 		return true;
 	}
 }

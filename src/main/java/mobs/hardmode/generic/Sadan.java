@@ -96,7 +96,7 @@ public class Sadan implements CustomMob {
 		} else {
 			int index = 0;
 			for(int i = 0; i < terracottaCount; i++) {
-				Location l = Utils.randomLocation(players.get(index).getLocation(), 8);
+				Location l = Utils.randomLocation(players.get(index).getLocation(), 8, false);
 				terracottas.add(spawnTerracotta(l));
 				if(index + 1 == players.size()) {
 					index = 0;
@@ -106,7 +106,7 @@ public class Sadan implements CustomMob {
 			}
 			index = 0;
 			for(int i = 0; i < golemCount; i++) {
-				Location l = Utils.randomLocation(players.get(index).getLocation(), 8);
+				Location l = Utils.randomLocation(players.get(index).getLocation(), 8, false);
 				golems.add(spawnGolem(l));
 				if(index + 1 == players.size()) {
 					index = 0;
@@ -223,7 +223,7 @@ public class Sadan implements CustomMob {
 	}
 
 	private static Zombie spawnGiant(Zombie sadan) {
-		Zombie zombie = (Zombie) sadan.getWorld().spawnEntity(Utils.randomLocation(sadan.getLocation(), 12), EntityType.ZOMBIE);
+		Zombie zombie = (Zombie) sadan.getWorld().spawnEntity(Utils.randomLocation(sadan.getLocation(), 12, false), EntityType.ZOMBIE);
 
 		zombie.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Mutant Giant" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + "800/800");
 
@@ -318,7 +318,7 @@ public class Sadan implements CustomMob {
 					Utils.playGlobalSound(Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 				}, i);
 			}
-			Utils.scheduleTask(() -> bigfoot(giant, finalPhase), finalPhase ? 160 : 320);
+			Utils.scheduleTask(() -> lasr(giant, finalPhase), finalPhase ? 160 : 320);
 		}
 	}
 
@@ -351,12 +351,12 @@ public class Sadan implements CustomMob {
 
 			Location l = sadan.getLocation();
 			int y = sadan.getWorld().getHighestBlockYAt(l);
-			l.setY(y + 24);
+			l.setY(y - 12);
 			sadan.teleport(l);
 			Utils.playGlobalSound(Sound.ENTITY_HORSE_ARMOR, 2.0F, 0.5F);
-			for(int i = 10; i < 240; i += 10) {
+			for(int i = 10; i < 260; i += 10) {
 				Utils.scheduleTask(() -> {
-					l.setY(l.getY() - 1);
+					l.setY(l.getY() + 0.5);
 					sadan.teleport(l);
 					Utils.playGlobalSound(Sound.ENTITY_HORSE_ARMOR, 2.0F, 0.5F);
 				}, i);
@@ -379,7 +379,7 @@ public class Sadan implements CustomMob {
 				Utils.scheduleTask(() -> bigfoot(sadan, true), 120);
 				Utils.scheduleTask(() -> lasr(sadan, true), 160);
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
-			}, 300);
+			}, 320);
 		} else {
 			double currentHP = 0;
 			dead = 0;

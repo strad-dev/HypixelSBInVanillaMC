@@ -200,46 +200,74 @@ public class Utils {
 	/**
 	 * Teleports the entity to a random position in a given radius from its current location.<br>The entity will always be teleported to the highest block.
 	 *
-	 * @param e      The entity to be teleported
-	 * @param radius The radius of the randomness
+	 * @param e       The entity to be teleported
+	 * @param radius  The radius of the randomness
+	 * @param highest Whether to look for the highest block or the closest block, with respect to Y
 	 */
-	public static void teleport(Entity e, int radius) {
-		teleport(e, e.getLocation(), radius);
+	public static void teleport(Entity e, int radius, boolean highest) {
+		teleport(e, e.getLocation(), radius, highest);
 	}
 
 	/**
 	 * Teleports the entity to a random position in a given radius from the given location.<br>The entity will always be teleported to the highest block.
 	 *
-	 * @param e      The entity to be teleported
-	 * @param radius The radius of the randomness
+	 * @param e       The entity to be teleported
+	 * @param center  The center of the radius to teleport from
+	 * @param radius  The radius of the randomness
+	 * @param highest Whether to look for the highest block or the closest block, with respect to Y
 	 */
-	public static void teleport(Entity e, Location center, int radius) {
-		e.teleport(randomLocation(center, radius));
+	public static void teleport(Entity e, Location center, int radius, boolean highest) {
+		e.teleport(randomLocation(center, radius, highest));
 		e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
 	}
 
 	/**
 	 * Finds a random location given a center and a radius.<br>The Location will always be the highest block.
 	 *
-	 * @param center The center
-	 * @param radius How far away at most
+	 * @param center  The center
+	 * @param radius  How far away at most
+	 * @param highest Whether to look for the highest block or the closest block, with respect to Y
 	 * @return The randomized Location
 	 */
-	public static Location randomLocation(Location center, int radius) {
+	public static Location randomLocation(Location center, int radius, boolean highest) {
 		Vector added = new Vector(random.nextInt(radius * 2 + 1) - radius, 0, random.nextInt(radius * 2 + 1) - radius);
 		Location newLoc = center.clone().add(added);
-		newLoc.setY(highestBlock(center));
+		if(highest) {
+			newLoc.setY(highestBlockY(center));
+		} else {
+			newLoc.setY(nearestBlockY(center));
+		}
 		return newLoc;
 	}
 
-	public static int highestBlock(Location l) {
-		for(int i = 319; i > -64; i--) {
-			Block b = l.getWorld().getBlockAt((int) l.getX(), i, (int) l.getZ());
-			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
-				return i + 1;
+	public static int highestBlockY(Location l) {
+		Block b = l.getWorld().getBlockAt((int) l.getX(), l.getWorld().getHighestBlockYAt(l), (int) l.getZ());
+		return b.getY();
+	}
+
+	public static int nearestBlockY(Location l) {
+		int yUp = (int) l.getY();
+		int yDown = yUp;
+		while(yUp < 320 || yDown > -64) {
+			Location temp = l.clone();
+			if(yDown > -64) {
+				temp.setY(yDown);
+				Block b = temp.getBlock();
+				if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
+					return yDown;
+				}
+				yDown--;
+			}
+			if(yUp < 320) {
+				temp.setY(yUp);
+				Block b = temp.getBlock();
+				if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
+					return yUp;
+				}
+				yUp++;
 			}
 		}
-		return -64;
+		return 320;
 	}
 
 	public static void spawnGuards(LivingEntity entity, int num) {
@@ -319,13 +347,19 @@ public class Utils {
 			}
 		}
 	}
-	
+
 	public static void scheduleTask(Runnable task, long delay) {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), task, delay);
 	}
 
+	/**
+	 * Applys the given function to all Players that are in Survival or in the given radius of the given Entity
+	 * @param entity   The Entity
+	 * @param radius   The radius in which to apply th efucntion
+	 * @param function The function to apply
+	 */
 	public static void applyToAllNearbyPlayers(LivingEntity entity, int radius, Consumer<Player> function) {
-		entity.getNearbyEntities(radius, radius, radius).stream().filter(e -> e instanceof Player).map(Player.class::cast).forEach(function);
+		entity.getNearbyEntities(radius, radius, radius).stream().filter(e -> e instanceof Player p && (p.getGameMode() == GameMode.ADVENTURE || p.getGameMode() == GameMode.SURVIVAL)).map(Player.class::cast).forEach(function);
 	}
 
 	/**

@@ -7,6 +7,7 @@ import listeners.DamageType;
 import misc.DamageData;
 import misc.Plugin;
 import misc.Utils;
+import mobs.CustomMob;
 import mobs.withers.CustomWither;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.*;
@@ -26,6 +27,7 @@ import static misc.Utils.teleport;
 public class WitherKing implements CustomWither {
 	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 	private static Mob witherKing;
+	private static final List<WitherSkeleton> henchmen = new ArrayList<>();
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -40,7 +42,6 @@ public class WitherKing implements CustomWither {
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
 		Utils.spawnTNT(wither, wither.getLocation(), 0, 48, 100, immune);
-		p = Utils.getNearestPlayer(wither);
 		Utils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
 		wither.getAttribute(Attribute.SCALE).setBaseValue(2.0);
@@ -59,7 +60,7 @@ public class WitherKing implements CustomWither {
 		wither.setAI(false);
 		wither.setSilent(true);
 		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		teleport(wither, 0);
+		teleport(wither, 0, false);
 		Utils.changeName(wither);
 
 		ArrayList<String> ordering = new ArrayList<>();
@@ -93,12 +94,26 @@ public class WitherKing implements CustomWither {
 
 		spawnGuards(wither);
 		boom(wither);
+		henchmanChecker();
 
 		return name;
 	}
 
 	public static Entity getEntity() {
 		return witherKing;
+	}
+
+	private static void henchmanChecker() {
+		if(witherKing.isValid() && !witherKing.isDead() && !witherKing.getScoreboardTags().contains("Dead")) {
+			for(WitherSkeleton henchman : henchmen) {
+				if(!henchman.isValid() || henchman.isDead()) {
+					for(String tag : henchman.getScoreboardTags()) {
+						defeatHenchman(tag);
+					}
+				}
+			}
+			Utils.scheduleTask(WitherKing::henchmanChecker, 1);
+		}
 	}
 
 	private void spawnHenchman(Wither wither, String which) {
@@ -128,28 +143,9 @@ public class WitherKing implements CustomWither {
 		witherSkeleton.addScoreboardTag("HardMode");
 		witherSkeleton.setPersistent(true);
 		witherSkeleton.setRemoveWhenFarAway(false);
-		switch(which) {
-			case "Power" -> {
-				witherSkeleton.addScoreboardTag("Power");
-				new WitherSkeletonPower().onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
-			}
-			case "Fire" -> {
-				witherSkeleton.addScoreboardTag("Fire");
-				new WitherSkeletonFire().onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
-			}
-			case "Ice" -> {
-				witherSkeleton.addScoreboardTag("Ice");
-				new WitherSkeletonIce().onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
-			}
-			case "Soul" -> {
-				witherSkeleton.addScoreboardTag("Soul");
-				new WitherSkeletonSoul().onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
-			}
-			case "Martial" -> {
-				witherSkeleton.addScoreboardTag("Martial");
-				new WitherSkeletonMartial().onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
-			}
-		}
+		CustomMob.getMob(which, false).onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
+		witherSkeleton.addScoreboardTag(which);
+		henchmen.add(witherSkeleton);
 	}
 
 	private static int countHenchmenLeft() {
@@ -174,20 +170,29 @@ public class WitherKing implements CustomWither {
 	}
 
 	public static void defeatHenchman(String which) {
-		witherKing.removeScoreboardTag(which + "Undefeated");
-		int left = countHenchmenLeft();
-		Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-		switch(left) {
-			case 4 ->
-					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My most loyal henchman, what have they done to you?");
-			case 3 ->
-					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": It seems my henchmen are not as powerful as I thought they were.  I suppose i must help them out.");
-			case 2 ->
-					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Are you this heartless?  Murdering my defenseless followers for no good reason.");
-			case 1 ->
-					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You are getting on my nerves.  Quit being annoying!");
-			case 0 ->
-					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My energy is waning...  I must use my last hurrah.");
+		System.out.println("Defeated " + which);
+		if(witherKing.removeScoreboardTag(which + "Undefeated")) {
+			System.out.println(witherKing.getScoreboardTags());
+			int left = countHenchmenLeft();
+			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
+			switch(left) {
+				case 4 ->
+						Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My most loyal henchman, what have they done to you?");
+				case 3 ->
+						Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": It seems my henchmen are not as powerful as I thought they were.  I suppose i must help them out.");
+				case 2 ->
+						Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Are you this heartless?  Murdering my defenseless followers for no good reason.");
+				case 1 ->
+						Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You are getting on my nerves.  Quit being annoying!");
+				case 0 ->
+						Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My energy is waning...  I must use my last hurrah.");
+			}
+			for(int i = 0; i < henchmen.size(); i++) {
+				if(henchmen.get(i).getScoreboardTags().contains(which)) {
+					henchmen.remove(i);
+					break;
+				}
+			}
 		}
 	}
 
@@ -277,12 +282,16 @@ public class WitherKing implements CustomWither {
 			}
 			damagee.setHealth(minHealth);
 			Utils.changeName(damagee);
+			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
+			nmsWither.bossEvent.setProgress((float) (witherKing.getHealth() / 2000));
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.addScoreboardTag("Invulnerable");
 			damagee.addScoreboardTag("Dead");
 			damagee.setHealth(1.0);
 			damagee.setSilent(true);
+			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
+			nmsWither.bossEvent.setProgress((float) (witherKing.getHealth() / 2000));
 			Utils.changeName(damagee);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain...");
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);

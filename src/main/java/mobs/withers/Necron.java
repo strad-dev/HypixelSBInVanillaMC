@@ -1,12 +1,11 @@
 package mobs.withers;
 
+import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.DamageData;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
-
-import static listeners.CustomDamage.calculateFinalDamage;
 
 public class Necron implements CustomWither {
 	@Override
@@ -32,7 +31,7 @@ public class Necron implements CustomWither {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		calculateFinalDamage(damagee, damager, 4, DamageType.RANGED);
+		CustomDamage.calculateFinalDamage(damagee, damager, 4, DamageType.RANGED);
 		return true;
 	}
 

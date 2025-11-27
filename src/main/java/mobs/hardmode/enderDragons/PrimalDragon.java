@@ -265,7 +265,7 @@ public class PrimalDragon implements CustomDragon {
 		if(damagee.getScoreboardTags().contains("600Trigger")) return 0.16;
 		if(damagee.getScoreboardTags().contains("400Trigger")) return 0.12;
 		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.08;
-		return 0.04;
+		return 0.05;
 	}
 
 	private static double getMagicMultiplier(LivingEntity damagee) {
@@ -367,7 +367,7 @@ public class PrimalDragon implements CustomDragon {
 			if(notPerching(dragon)) {
 				// Flying TNT rain
 				Location l = dragon.getLocation();
-				l.setY(Utils.highestBlock(l));
+				l.setY(Utils.highestBlockY(l));
 				Utils.spawnTNT(dragon, l, fuse, 8, damage, new ArrayList<>());
 			} else if(currentPhase.equals("final")) {
 				// Perched TNT only in final phase
@@ -428,10 +428,10 @@ public class PrimalDragon implements CustomDragon {
 		Player p = Utils.getNearestPlayer(dragon);
 		Location spawnLoc;
 		if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
-			spawnLoc = Utils.randomLocation(p.getLocation(), 16);
+			spawnLoc = Utils.randomLocation(p.getLocation(), 16, false);
 		} else {
 			spawnLoc = dragon.getLocation().clone();
-			spawnLoc.setY(Utils.highestBlock(spawnLoc));
+			spawnLoc.setY(Utils.highestBlockY(spawnLoc));
 		}
 		for(int i = 0; i < 2; i++) {
 			Enderman enderman = (Enderman) dragon.getWorld().spawnEntity(spawnLoc, EntityType.ENDERMAN);
@@ -467,8 +467,8 @@ public class PrimalDragon implements CustomDragon {
 		if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
 			Utils.scheduleTask(() -> {
 				if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
-					Location spawnLoc = Utils.randomLocation(new Location(dragon.getWorld(), 0, 64, 0), 24);
-					spawnLoc.setY(Utils.highestBlock(spawnLoc) + 10 + random.nextInt(6));
+					Location spawnLoc = Utils.randomLocation(new Location(dragon.getWorld(), 0, 64, 0), 24, true);
+					spawnLoc.setY(Utils.highestBlockY(spawnLoc) + 10 + random.nextInt(6));
 					dragon.getWorld().spawnEntity(spawnLoc, EntityType.END_CRYSTAL);
 					dragon.setHealth(dragon.getHealth() + 15);
 					Utils.changeName(dragon);

@@ -78,7 +78,7 @@ public class VoidcrazedSeraph implements CustomMob {
 				if(!voidgloom.isDead() && voidgloom.getHealth() < 666) {
 					voidgloom.setCarriedBlock(Material.AIR.createBlockData());
 					voidgloom.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.333);
-					Block block = Utils.randomLocation(voidgloom.getLocation(), 16).getBlock();
+					Block block = Utils.randomLocation(voidgloom.getLocation(), 16, false).getBlock();
 					block.setType(Material.BEACON);
 					beacons.add(block);
 					Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
@@ -181,7 +181,7 @@ public class VoidcrazedSeraph implements CustomMob {
 		}
 		Random random = new Random();
 		if(random.nextDouble() < 0.2) {
-			damagee.teleport(Utils.randomLocation(damager.getLocation(), 3));
+			damagee.teleport(Utils.randomLocation(damager.getLocation(), 3, false));
 		}
 		return true;
 	}

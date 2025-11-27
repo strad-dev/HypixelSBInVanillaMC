@@ -39,7 +39,7 @@ public class EnragedChickzilla implements CustomMob {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(damager instanceof LivingEntity damager1) {
 			damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "Chickzilla has REFLECTED " + originalDamage + " Damage back to you!");
-			CustomDamage.calculateFinalDamage(damager1, damagee, originalDamage, DamageType.MELEE); // damager takes 100% of their original damage
+			CustomDamage.customMobs(damager1, damagee, originalDamage, DamageType.MELEE); // damager takes 100% of their original damage
 		}
 		return true;
 	}

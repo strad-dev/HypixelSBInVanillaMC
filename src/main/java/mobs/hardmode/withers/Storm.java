@@ -6,10 +6,12 @@ import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
 import mobs.withers.CustomWither;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftWither;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
@@ -168,12 +170,13 @@ public class Storm implements CustomWither {
 			}
 			return false;
 		} else if(damagee.getScoreboardTags().contains("Survival2Trigger") && hp - originalDamage < 500) {
+			damagee.setHealth(500.0);
 			Utils.changeName(damagee);
 			damagee.setAI(false);
 			damagee.removeScoreboardTag("Survival2Trigger");
 			damagee.addScoreboardTag("Survival2");
 			damagee.addScoreboardTag("Invulnerable");
-			teleport(damagee, 0);
+			teleport(damagee, 0, false);
 
 			Player p = Utils.getNearestPlayer(damagee);
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
@@ -205,7 +208,8 @@ public class Storm implements CustomWither {
 				damagee.removeScoreboardTag("Invulnerable");
 				damagee.setAI(true);
 			}, 600);
-			damagee.setHealth(500.0);
+			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
+			nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 1000);
 			return false;
 		} else if(hp - originalDamage < 1) {
 			damagee.addScoreboardTag("Invulnerable");
@@ -214,6 +218,8 @@ public class Storm implements CustomWither {
 			damagee.setSilent(true);
 			damagee.setAI(false);
 			Utils.changeName(damagee);
+			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
+			nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 1000);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I knew I should have prepared better.");
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);

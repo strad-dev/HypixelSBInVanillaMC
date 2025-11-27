@@ -108,7 +108,7 @@ public class PrimordialBroodfather implements CustomMob {
 				}
 			}, 200);
 		} else {
-			teleport(damagee, 12);
+			teleport(damagee, 12, false);
 			CustomDamage.calculateFinalDamage(damagee, damager, finalDamage, type);
 		}
 		return false;

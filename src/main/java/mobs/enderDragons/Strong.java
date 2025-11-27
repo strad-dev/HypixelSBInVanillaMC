@@ -1,13 +1,12 @@
 package mobs.enderDragons;
 
+import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
-
-import static listeners.CustomDamage.calculateFinalDamage;
 
 public class Strong implements CustomDragon {
 	@Override
@@ -38,7 +37,7 @@ public class Strong implements CustomDragon {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		calculateFinalDamage(damagee, Utils.getNearestPlayer(damagee), 4, DamageType.RANGED);
+		CustomDamage.calculateFinalDamage(damagee, Utils.getNearestPlayer(damagee), 4, DamageType.RANGED);
 		return true;
 	}
 }

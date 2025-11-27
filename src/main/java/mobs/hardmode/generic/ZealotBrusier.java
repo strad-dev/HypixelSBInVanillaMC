@@ -46,11 +46,11 @@ public class ZealotBrusier implements CustomMob {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		Random random = new Random();
+		Random random = new Random();	
 		if(damager instanceof LivingEntity entity1) {
 			if(random.nextDouble() < 0.2) {
 				damager.teleport(damagee);
-				CustomDamage.calculateFinalDamage(entity1, damagee, 20, DamageType.MELEE);
+				CustomDamage.customMobs(entity1, damagee, 20, DamageType.MELEE);
 				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Zealot Brusier's Dark Magic has caused you to teleport to it!  It also deals 20 damage to you!");
 			}
 		}
