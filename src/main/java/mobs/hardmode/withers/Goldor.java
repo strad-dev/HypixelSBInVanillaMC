@@ -6,10 +6,12 @@ import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
 import mobs.withers.CustomWither;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftWither;
 import org.bukkit.entity.*;
 
 import java.util.ArrayList;
@@ -73,6 +75,8 @@ public class Goldor implements CustomWither {
 			damagee.setSilent(true);
 			damagee.setAI(false);
 			Utils.changeName(damagee);
+			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
+			nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 1200);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": How did you break through my shield???");
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);

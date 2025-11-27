@@ -122,7 +122,7 @@ public class Necron implements CustomWither {
 			damagee.setAI(false);
 			Utils.changeName(damagee);
 			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
-			nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 500);
+			nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 1400);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have destroyed us... but you have not destroyed our forefather.");
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);

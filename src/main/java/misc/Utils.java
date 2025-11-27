@@ -254,6 +254,7 @@ public class Utils {
 				temp.setY(yDown);
 				Block b = temp.getBlock();
 				if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
+					yDown ++;
 					return yDown;
 				}
 				yDown--;
@@ -262,6 +263,7 @@ public class Utils {
 				temp.setY(yUp);
 				Block b = temp.getBlock();
 				if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
+					yUp ++;
 					return yUp;
 				}
 				yUp++;

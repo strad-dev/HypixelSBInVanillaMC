@@ -86,14 +86,14 @@ public class Maxor implements CustomWither {
 					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": IF YOU FAIL ONCE, YOU SHOULD SIMPLY TRY AGAIN!");
 					wither.setHealth(300.0);
 				}
-				WitherBoss nmsWither = ((CraftWither) wither).getHandle();
-				nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 800);
 				wither.addScoreboardTag("Invulnerable");
 				Utils.scheduleTask(() -> wither.addScoreboardTag("InvulnerableReminder"), 60L);
 				Bukkit.broadcastMessage(ChatColor.YELLOW + "An Energy Crystal has spawned!  Maybe it is useful?");
 				return;
 			}
 		}
+		WitherBoss nmsWither = ((CraftWither) wither).getHandle();
+		nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 800);
 		Bukkit.broadcastMessage(ChatColor.RED + "Oops!  Unable to summon a crystal!  Take it for free.");
 		wither.removeScoreboardTag("600Crystal");
 		wither.removeScoreboardTag("300Crystal");
@@ -150,6 +150,8 @@ public class Maxor implements CustomWither {
 			damagee.setSilent(true);
 			damagee.setAI(false);
 			Utils.changeName(damagee);
+			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
+			nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 800);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": HOW DID YOU DEFEAT ME?!?!?!");
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
