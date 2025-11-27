@@ -50,7 +50,7 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 	private static void launch(IronGolem ironGolem) {
 		if(!ironGolem.isDead()) {
 			Utils.applyToAllNearbyPlayers(ironGolem, 32, p -> {
-				CustomDamage.calculateFinalDamage((Player) p, ironGolem, 50, DamageType.PLAYER_MAGIC);
+				CustomDamage.customMobs(p, ironGolem, 50, DamageType.PLAYER_MAGIC);
 				p.setVelocity(new Vector(0, 1, 0));
 			});
 			ironGolem.getWorld().playSound(ironGolem.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0F, 2.0F);
@@ -65,7 +65,7 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 				if(originalDamage > 10.0) {
 					if(damagee.getHealth() + (originalDamage - 10.0) > 250) {
 						damagee.setHealth(250);
-						CustomDamage.calculateFinalDamage(entity1, damagee, originalDamage - 10, DamageType.MELEE);
+						CustomDamage.customMobs(entity1, damagee, originalDamage - 10, DamageType.MELEE);
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt is at full health and has REFLECTED " + (originalDamage - 10) + " Damage back to you!");
 					} else {
 						damagee.setHealth(damagee.getHealth() + (originalDamage - 10.0));
@@ -78,7 +78,7 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 				} else {
 					Random random = new Random();
 					if(random.nextDouble() < 0.15) {
-						CustomDamage.calculateFinalDamage(entity1, damagee, 20, DamageType.MELEE);
+						CustomDamage.customMobs(entity1, damagee, 20, DamageType.MELEE);
 						damagee.swingMainHand();
 						damagee.swingOffHand();
 						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The meloG norI becomes enraged and deals extra damage to you!");

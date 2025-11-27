@@ -1,15 +1,18 @@
 package mobs.hardmode.withers;
 
+import listeners.CustomDamage;
 import listeners.CustomMobs;
 import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
 import mobs.withers.CustomWither;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftWither;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -17,7 +20,6 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static listeners.CustomDamage.calculateFinalDamage;
 import static misc.Utils.teleport;
 
 public class Necron implements CustomWither {
@@ -57,7 +59,7 @@ public class Necron implements CustomWither {
 		wither.addScoreboardTag("Invulnerable");
 		wither.setAI(false);
 		Bukkit.getOnlinePlayers().forEach(p -> p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 40, 0)));
-		teleport(wither, 16);
+		teleport(wither, 16, false);
 		for(int i = 0; i < 161; i += 20) {
 			int finalI = i;
 			Utils.scheduleTask(() -> {
@@ -81,6 +83,8 @@ public class Necron implements CustomWither {
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Sometimes when you have a problem, you just need to destroy it and start again!");
 			wither.setHealth(300.0);
 		}
+		WitherBoss nmsWither = ((CraftWither) wither).getHandle();
+		nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 1400);
 	}
 
 	@Override
@@ -117,6 +121,8 @@ public class Necron implements CustomWither {
 			damagee.setSilent(true);
 			damagee.setAI(false);
 			Utils.changeName(damagee);
+			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
+			nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 500);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have destroyed us... but you have not destroyed our forefather.");
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
@@ -156,7 +162,7 @@ public class Necron implements CustomWither {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		calculateFinalDamage(damagee, damager, 6, DamageType.RANGED);
+		CustomDamage.calculateFinalDamage(damagee, damager, 6, DamageType.RANGED);
 		return true;
 	}
 

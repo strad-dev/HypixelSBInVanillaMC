@@ -38,7 +38,7 @@ public class Maxor implements CustomWither {
 		}
 		Random random = new Random();
 		if(!type.equals(DamageType.RANGED) && random.nextDouble() < 0.1 || type.equals(DamageType.RANGED) && random.nextDouble() < 0.05) {
-			teleport(damagee, 8);
+			teleport(damagee, 8, false);
 		}
 		return true;
 

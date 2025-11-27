@@ -40,7 +40,7 @@ public class Young implements CustomDragon {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		Random random = new Random();
 		if(random.nextDouble() < 0.05 && damagee.getLocation().distanceSquared(new Location(damagee.getWorld(), 0, 60, 0)) > 75) {
-			teleport(damagee, 16);
+			teleport(damagee, 16, true);
 		}
 		return true;
 	}

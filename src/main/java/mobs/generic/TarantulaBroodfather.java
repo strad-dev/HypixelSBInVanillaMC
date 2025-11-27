@@ -51,13 +51,13 @@ public class TarantulaBroodfather implements CustomMob {
 		if(originalDamage > 5) {
 			double finalDamage = 5 + (originalDamage - 5) / 5;
 			if(finalDamage < damagee.getHealth()) {
-				teleport(damagee, 12);
+				teleport(damagee, 12, false);
 			}
-			CustomDamage.calculateFinalDamage(damagee, damager, finalDamage, type);
+			CustomDamage.customMobs(damagee, damager, finalDamage, type);
 			return false;
 		}
 		if(originalDamage < damagee.getHealth()) {
-			teleport(damagee, 12);
+			teleport(damagee, 12, false);
 		}
 		return true;
 	}

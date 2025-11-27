@@ -49,7 +49,7 @@ public class Zealot implements CustomMob {
 		if(damager instanceof LivingEntity entity1) {
 			if(random.nextDouble() < 0.2) {
 				damager.teleport(damagee);
-				CustomDamage.calculateFinalDamage(entity1, damagee, 12, DamageType.MELEE);
+				CustomDamage.customMobs(entity1, damagee, 12, DamageType.MELEE);
 				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Zealot's Dark Magic has caused you to teleport to it!  It also deals 12 damage to you!");
 			}
 		}

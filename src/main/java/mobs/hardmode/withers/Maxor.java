@@ -6,9 +6,11 @@ import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
 import mobs.withers.CustomWither;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_21_R4.entity.CraftWither;
 import org.bukkit.entity.*;
 
 import java.util.ArrayList;
@@ -84,6 +86,8 @@ public class Maxor implements CustomWither {
 					Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": IF YOU FAIL ONCE, YOU SHOULD SIMPLY TRY AGAIN!");
 					wither.setHealth(300.0);
 				}
+				WitherBoss nmsWither = ((CraftWither) wither).getHandle();
+				nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 800);
 				wither.addScoreboardTag("Invulnerable");
 				Utils.scheduleTask(() -> wither.addScoreboardTag("InvulnerableReminder"), 60L);
 				Bukkit.broadcastMessage(ChatColor.YELLOW + "An Energy Crystal has spawned!  Maybe it is useful?");
