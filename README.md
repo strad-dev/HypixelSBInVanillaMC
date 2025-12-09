@@ -7,7 +7,10 @@ Disclaimers:
 # Install the plugin
 Go to the [releases](https://github.com/Poseidon-I/HypixelSBInVanillaMC/releases) page and download the latest version.
 Install it into your server by dragging it into the `plugins` folder once downloaded.
+
 **REQUIRES SPIGOT OR PAPER**
+
+Older releases are available but **may contain unpatched bugs and exploits**.  This is your one and only warning.
 
 ## Info About Items, Mobs, & Gameplay Changes
 Check out the Wiki [here](https://github.com/Poseidon-I/HypixelSBInVanillaMC/wiki) (work-in-progress)
