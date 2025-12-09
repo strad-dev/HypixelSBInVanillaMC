@@ -230,14 +230,17 @@ public class Utils {
 	 * @return The randomized Location
 	 */
 	public static Location randomLocation(Location center, int radius, boolean highest) {
+		System.out.println("Original location: " + center);
 		Vector added = new Vector(random.nextInt(radius * 2 + 1) - radius, 0, random.nextInt(radius * 2 + 1) - radius);
-		Location newLoc = center.clone().add(added);
+		center.add(added);
+		System.out.println("New location: " + center);
+		System.out.println("Added: " + added);
 		if(highest) {
-			newLoc.setY(highestBlockY(center));
+			center.setY(highestBlockY(center));
 		} else {
-			newLoc.setY(nearestBlockY(center));
+			center.setY(nearestBlockY(center));
 		}
-		return newLoc;
+		return center;
 	}
 
 	public static int highestBlockY(Location l) {

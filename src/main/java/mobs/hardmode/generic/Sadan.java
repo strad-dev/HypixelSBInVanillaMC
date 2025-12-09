@@ -289,7 +289,7 @@ public class Sadan implements CustomMob {
 			Player p = Utils.getNearestPlayer(giant);
 			p.playSound(p, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
 			giant.swingMainHand();
-			CustomDamage.customMobs(p, giant, finalPhase ? 150 : 120, DamageType.MELEE);
+			CustomDamage.customMobs(p, giant, finalPhase ? 125 : 100, DamageType.MELEE);
 			Utils.scheduleTask(() -> diamondGiant(giant, finalPhase), finalPhase ? 160 : 320);
 		}
 	}
@@ -300,7 +300,7 @@ public class Sadan implements CustomMob {
 				Location l = p.getLocation();
 				l.setY(l.getY() - 1);
 				p.teleport(l);
-				CustomDamage.customMobs(p, giant, finalPhase ? 100 : 70, DamageType.MELEE);
+				CustomDamage.customMobs(p, giant, finalPhase ? 90 : 70, DamageType.MELEE);
 			});
 			Utils.playGlobalSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 2.0F);
 			Utils.scheduleTask(() -> bigfoot(giant, finalPhase), finalPhase ? 160 : 320);
@@ -313,7 +313,7 @@ public class Sadan implements CustomMob {
 		if(!giant.isDead()) {
 			for(int i = 0; i < (finalPhase ? 40 : 80); i += (finalPhase ? 4 : 10)) {
 				Utils.scheduleTask(() -> {
-					Utils.shootBeam(giant, Utils.getNearestPlayer(giant), Color.RED, 64, 1, finalPhase ? 12 : 8);
+					Utils.shootBeam(giant, Utils.getNearestPlayer(giant), Color.RED, 64, 1, finalPhase ? 10 : 8);
 
 					Utils.playGlobalSound(Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 				}, i);
@@ -354,7 +354,7 @@ public class Sadan implements CustomMob {
 			l.setY(y - 12);
 			sadan.teleport(l);
 			Utils.playGlobalSound(Sound.ENTITY_HORSE_ARMOR, 2.0F, 0.5F);
-			for(int i = 10; i < 260; i += 10) {
+			for(int i = 10; i < 270; i += 10) {
 				Utils.scheduleTask(() -> {
 					l.setY(l.getY() + 0.5);
 					sadan.teleport(l);

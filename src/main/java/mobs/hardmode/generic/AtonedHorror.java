@@ -62,7 +62,7 @@ public class AtonedHorror implements CustomMob {
 		zombie.setPersistent(true);
 		zombie.setRemoveWhenFarAway(false);
 
-		Utils.scheduleTask(() -> healing(zombie), 4);
+		Utils.scheduleTask(() -> healing(zombie), 5);
 		Utils.scheduleTask(() -> summonTNT(zombie), 60);
 		Utils.scheduleTask(() -> nuclearExplosion(zombie), 600);
 
@@ -75,7 +75,7 @@ public class AtonedHorror implements CustomMob {
 				zombie.setHealth(Math.min(zombie.getHealth() + 1, 200));
 				Utils.changeName(zombie);
 			}
-			Utils.scheduleTask(() -> healing(zombie), 4);
+			Utils.scheduleTask(() -> healing(zombie), 5);
 		}
 	}
 
