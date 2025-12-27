@@ -11,7 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftWither;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftWither;
 import org.bukkit.entity.*;
 
 import java.util.ArrayList;

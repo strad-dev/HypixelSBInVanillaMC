@@ -3,7 +3,7 @@ package misc;
 import net.minecraft.world.entity.LightningBolt;
 import org.bukkit.Sound;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftLightningStrike;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftLightningStrike;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
