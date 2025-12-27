@@ -8,14 +8,14 @@ import misc.Utils;
 import mobs.enderDragons.CustomDragon;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.world.entity.PositionMoveRotation;
-import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftEnderDragon;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftEnderDragon;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -226,7 +226,7 @@ public class PrimalDragon implements CustomDragon {
 		Utils.broadcastPacket(packet);
 
 		// 8. Update dragon parts to prevent desync
-		net.minecraft.world.entity.boss.EnderDragonPart[] parts = nmsDragon.getSubEntities();
+		net.minecraft.world.entity.boss.enderdragon.EnderDragonPart[] parts = nmsDragon.getSubEntities();
 		for(EnderDragonPart part : parts) {
 			part.setPos(FREEZE_LOCATION.getX(), FREEZE_LOCATION.getY(), FREEZE_LOCATION.getZ());
 			ClientboundTeleportEntityPacket partPacket = ClientboundTeleportEntityPacket.teleport(part.getId(), NMS_FREEZE_LOCATION, Set.of(), false);

@@ -12,7 +12,7 @@ import mobs.withers.CustomWither;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftWither;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftWither;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;

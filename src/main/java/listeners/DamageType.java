@@ -5,7 +5,7 @@ public enum DamageType {
 	/*
 	 * Melee Damage Type
 	 * ------------------
-	 * Used for all damage via Melee Weapons and Non-Environmental Abilities (e.g. Atoned Horror TNT)
+	 * Used for all damage via Melee Weapons and Thorns
 	 * Affected by: Armor, Toughness, Protection, Resistance
 	 * Knockback: Normal
 	 * I-Frames: Normal
@@ -40,7 +40,7 @@ public enum DamageType {
 	/*
 	 * Magic Damage Type
 	 * ------------------
-	 * Used for all damage via Potions and Status Effects
+	 * Used for all damage via Potions, Enchantments, and Status Effects
 	 * Affected by: Toughness, Protection, Resistance
 	 * Knockback: None
 	 * I-Frames: None
@@ -98,9 +98,9 @@ public enum DamageType {
 
 	LETHAL_ABSOLUTE;
 	/*
-	 * ABSOLUTE Damage Type
+	 * LETHAL ABSOLUTE Damage Type
 	 * ------------------
-	 * Used for damage that will always deal full damage
+	 * Used for damage that will always deal full damage AND where cheating death is impossible
 	 * Affected by: NOTHING
 	 * Knockback: None
 	 * I-Frames: None

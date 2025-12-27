@@ -13,7 +13,7 @@ import net.minecraft.world.item.component.OminousBottleAmplifier;
 import org.bukkit.*;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
-import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -21,6 +21,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
@@ -93,6 +94,12 @@ public class CustomDrops implements Listener {
 				item.setAmount(random.nextInt(2 + lootingLevel));
 				world.dropItemNaturally(l, item);
 			}
+			// Camel has no drops
+			case CamelHusk ignored -> {
+				item = new ItemStack(Material.ROTTEN_FLESH);
+				item.setAmount(random.nextInt(2 + lootingLevel) + 2);
+				world.dropItemNaturally(l, item);
+			}
 			case Cat ignored -> {
 				item = new ItemStack(Material.STRING);
 				item.setAmount(random.nextInt(3));
@@ -151,6 +158,11 @@ public class CustomDrops implements Listener {
 				item.setAmount(random.nextInt(1 + lootingLevel) + 1);
 				world.dropItemNaturally(l, item);
 			}
+			case CopperGolem ignored -> {
+				item = new ItemStack(Material.COPPER_INGOT);
+				item.setAmount(random.nextInt(3 + lootingLevel) + 1);
+				world.dropItemNaturally(l, item);
+			}
 			case Cow ignored -> {
 				item = new ItemStack(Material.LEATHER);
 				item.setAmount(random.nextInt(3 + lootingLevel));
@@ -163,6 +175,7 @@ public class CustomDrops implements Listener {
 				item.setAmount(random.nextInt(3 + lootingLevel) + 1);
 				world.dropItemNaturally(l, item);
 			}
+			// Creaking has no drops
 			case Creeper ignored -> {
 				item = new ItemStack(Material.GUNPOWDER);
 				item.setAmount(random.nextInt(3 + lootingLevel));
@@ -374,6 +387,10 @@ public class CustomDrops implements Listener {
 				item.setAmount(random.nextInt(3 + lootingLevel));
 				world.dropItemNaturally(l, item);
 			}
+			case HappyGhast ghast -> {
+				item = ghast.getEquipment().getItem(EquipmentSlot.BODY);
+				world.dropItemNaturally(l, item);
+			}
 			// no drops
 			case GlowSquid ignored -> {
 				item = new ItemStack(Material.GLOW_INK_SAC);
@@ -467,6 +484,25 @@ public class CustomDrops implements Listener {
 						item = new ItemStack(Material.VERDANT_FROGLIGHT);
 						world.dropItemNaturally(l, item);
 					}
+				}
+			}
+			case Nautilus ignored -> {
+				if(random.nextDouble() < 0.05 * rngLootingBonus) {
+					item = new ItemStack(Material.NAUTILUS_SHELL);
+					world.dropItemNaturally(l, item);
+				}
+			}
+			case Parched ignored -> {
+				item = new ItemStack(Material.BONE);
+				item.setAmount(random.nextInt(3 + lootingLevel));
+				world.dropItemNaturally(l, item);
+				item = new ItemStack(Material.ARROW);
+				item.setAmount(random.nextInt(3 + lootingLevel));
+				world.dropItemNaturally(l, item);
+				if(killer instanceof Creeper c && c.isPowered()) {
+					item = new ItemStack(Material.SKELETON_SKULL);
+					world.dropItemNaturally(l, item);
+					sendRareDropMessage(p, "Skeleton Skull");
 				}
 			}
 			case Parrot ignored -> {
@@ -589,8 +625,25 @@ public class CustomDrops implements Listener {
 				item.setAmount(random.nextInt(1 + lootingLevel) + 1);
 				world.dropItemNaturally(l, item);
 			}
-			case Sheep ignored -> {
-				item = new ItemStack(Material.WHITE_WOOL);
+			case Sheep sheep -> {
+				switch(sheep.getColor()) {
+					case DyeColor.BLACK -> item = new ItemStack(Material.BLACK_WOOL);
+					case DyeColor.BLUE -> item = new ItemStack(Material.BLUE_WOOL);
+					case DyeColor.GREEN -> item = new ItemStack(Material.GREEN_WOOL);
+					case DyeColor.CYAN -> item = new ItemStack(Material.CYAN_WOOL);
+					case DyeColor.RED -> item = new ItemStack(Material.RED_WOOL);
+					case DyeColor.PURPLE -> item = new ItemStack(Material.PURPLE_WOOL);
+					case DyeColor.ORANGE -> item = new ItemStack(Material.ORANGE_WOOL);
+					case DyeColor.LIGHT_GRAY -> item = new ItemStack(Material.LIGHT_GRAY_WOOL);
+					case DyeColor.GRAY -> item = new ItemStack(Material.GRAY_WOOL);
+					case DyeColor.LIGHT_BLUE -> item = new ItemStack(Material.LIGHT_BLUE_WOOL);
+					case DyeColor.LIME -> item = new ItemStack(Material.LIME_WOOL);
+					case DyeColor.BROWN -> item = new ItemStack(Material.BROWN_WOOL);
+					case DyeColor.PINK -> item = new ItemStack(Material.PINK_WOOL);
+					case DyeColor.MAGENTA -> item = new ItemStack(Material.MAGENTA_WOOL);
+					case DyeColor.YELLOW -> item = new ItemStack(Material.YELLOW_WOOL);
+					default -> item = new ItemStack(Material.WHITE_WOOL);
+				}
 				item.setAmount(random.nextInt(1 + lootingLevel) + 1);
 				world.dropItemNaturally(l, item);
 				if(onFire) {
@@ -961,6 +1014,11 @@ public class CustomDrops implements Listener {
 						sendRareDropMessage(p, "Atoned Flesh");
 					}
 				}
+			}
+			case ZombieNautilus ignored -> {
+				item = new ItemStack(Material.ROTTEN_FLESH);
+				item.setAmount(random.nextInt(4 + lootingLevel));
+				world.dropItemNaturally(l, item);
 			}
 			case null, default -> {
 			}

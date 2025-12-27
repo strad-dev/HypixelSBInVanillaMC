@@ -18,16 +18,16 @@ import net.minecraft.world.entity.boss.enderdragon.phases.DragonDeathPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
-import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
+import net.minecraft.world.entity.projectile.hurtingprojectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.SculkSpreader;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R4.entity.*;
-import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R7.CraftWorld;
+import org.bukkit.craftbukkit.v1_21_R7.entity.*;
+import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -38,6 +38,7 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
@@ -45,10 +46,7 @@ import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.WeakHashMap;
+import java.util.*;
 import java.util.logging.Filter;
 import java.util.logging.Logger;
 
@@ -181,6 +179,7 @@ public class CustomDamage implements Listener {
 			}
 
 			// Attribute.ARMOR reduces damage taken by 4% per level, up to 15 points (-60%)
+			// The Breach enchantment removes 1.25 armor points per level, up to -5 points at Breach IV
 			// Examples
 			// Iron Armor (15 points) reduces damage by 60%
 			// Diamond Armor (20 points) also reduces damage by 60%
@@ -188,18 +187,18 @@ public class CustomDamage implements Listener {
 			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
 			if(affectedByArmor) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
-				armor *= 1 - breach * 0.125;
+				armor -= breach * 1.25;
 				finalDamage *= Math.max(0.4, 1 - armor * 0.04);
 			}
 
 			// Attribute.ARMOR_TOUGHNESS further reduces damage taken by 5% per level, up to 16 points (-80%)
+			// Not affected by Breach
 			// Examples
 			// Iron Armor (0 toughness) does not work here
 			// Diamond Armor (8 toughness) reduces damage by 40%
 			// Netherite Armor (12 toughness) reduces damage by 60%
 			// 3/4 Netherite + Elytra (9 toughness) reduces damage by 45%
 			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR_TOUGHNESS)).getValue(), 0);
-			toughness *= 1 - breach * 0.125;
 			finalDamage *= Math.max(0.2, 1 - toughness * 0.05);
 
 			// The Resistance status effect reduces damage by 20% per level.
@@ -345,6 +344,57 @@ public class CustomDamage implements Listener {
 						if(damager instanceof Player player) {
 							ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
 							raidAtPos.addHeroOfTheVillage(nmsPlayer);
+						}
+					}
+				}
+			}
+
+			// handle thorns
+			if(damager instanceof LivingEntity && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
+				EntityEquipment eq = damagee.getEquipment();
+				if(eq != null) {
+					Random random = new Random();
+					int totalThornsLevel = 0;
+					List<ItemStack> thornsArmor = new ArrayList<>();
+
+					// Check all armor pieces for thorns
+					ItemStack[] armorPieces = {
+							eq.getHelmet(),
+							eq.getChestplate(),
+							eq.getLeggings(),
+							eq.getBoots()
+					};
+
+					for (ItemStack armor : armorPieces) {
+						if (armor == null || armor.getType() == Material.AIR) continue;
+
+						int thornsLevel = armor.getEnchantmentLevel(Enchantment.THORNS);
+						if (thornsLevel > 0) {
+							totalThornsLevel += thornsLevel;
+							thornsArmor.add(armor);
+						}
+					}
+
+					if(totalThornsLevel > 0) {
+						double activationChance = Math.min(totalThornsLevel * 0.15, 1.0);
+
+						if(random.nextDouble() < activationChance) {
+							// Calculate thorns damage (1-4 damage, higher levels increase max)
+							int thornsDamage = random.nextInt(4) + 1;
+
+							// Higher thorns levels can do more damage
+							if(totalThornsLevel > 10) {
+								thornsDamage += 2;
+							} else if(totalThornsLevel > 5) {
+								thornsDamage += 1;
+							}
+
+							customMobs((LivingEntity) damager, damagee, thornsDamage, DamageType.PLAYER_MAGIC);
+
+							if (!thornsArmor.isEmpty()) {
+								ItemStack armorToDamage = thornsArmor.get(random.nextInt(thornsArmor.size()));
+								Utils.damageItem(damagee, armorToDamage, 1);
+							}
 						}
 					}
 				}
@@ -819,19 +869,19 @@ public class CustomDamage implements Listener {
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.ARROW) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.AbstractArrow arrow) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.arrow.AbstractArrow arrow) {
 				return sources.arrow(arrow, nmsCausingEntity);
 			}
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.FIREBALL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.Fireball fireball) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.Fireball fireball) {
 				return sources.fireball(fireball, nmsCausingEntity);
 			}
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.UNATTRIBUTED_FIREBALL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.Fireball fireball) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.Fireball fireball) {
 				return sources.fireball(fireball, nmsCausingEntity);
 			}
 			return sources.generic();
@@ -864,7 +914,7 @@ public class CustomDamage implements Listener {
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.WITHER_SKULL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.WitherSkull witherSkull) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.WitherSkull witherSkull) {
 				return sources.witherSkull(witherSkull, nmsCausingEntity);
 			}
 			return sources.generic();

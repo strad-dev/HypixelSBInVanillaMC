@@ -8,8 +8,8 @@ import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.player.PlayerItemBreakEvent;
@@ -304,6 +304,13 @@ public class Utils {
 		entity.getWorld().playSound(entity, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
 	}
 
+	/**
+	 * Damages an item
+	 *
+	 * @param user   The owner of the item being damaged
+	 * @param item   The item to be damage
+	 * @param damage The amount of damage to deal.  Partial amounts equate to the chance to deal that extra damage, e.g. 3.33 means 3 damage with 33% chance to deal +1 damage.
+	 */
 	public static void damageItem(Entity user, ItemStack item, double damage) {
 		int maxDurability = item.getType().getMaxDurability();
 		if(item.getItemMeta() instanceof Damageable d && !d.isUnbreakable() && maxDurability != 0) {

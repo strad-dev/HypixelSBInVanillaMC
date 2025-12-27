@@ -6,11 +6,12 @@ import misc.DamageData;
 import misc.Plugin;
 import misc.Utils;
 import mobs.CustomMob;
+import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.monster.EnderMan;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftEnderman;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftEnderman;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -54,8 +55,8 @@ public class VoidcrazedSeraph implements CustomMob {
 		Utils.scheduleTask(() -> yangGlyph(enderman), 600);
 
 		EnderMan nmsEnderman = ((CraftEnderman) enderman).getHandle();
-		nmsEnderman.setRemainingPersistentAngerTime(2147483647);
-		nmsEnderman.setPersistentAngerTarget(p.getUniqueId());
+		nmsEnderman.setPersistentAngerEndTime(2147483647);
+		nmsEnderman.setPersistentAngerTarget(EntityReference.of(p.getUniqueId()));
 		return newName;
 	}
 
