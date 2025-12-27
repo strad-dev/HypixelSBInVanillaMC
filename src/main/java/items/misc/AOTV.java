@@ -53,6 +53,11 @@ public class AOTV implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		if(p.isSneaking()) {
 			RayTraceResult result = p.rayTraceBlocks(61);

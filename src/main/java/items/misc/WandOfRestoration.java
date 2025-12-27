@@ -23,7 +23,7 @@ import java.util.List;
 public class WandOfRestoration implements AbilityItem {
 	private static final int MANA_COST = 10;
 	private static final String COOLDOWN_TAG = "WandCooldown";
-	private static final int COOLDOWN = 100;
+	private static final int COOLDOWN = 80;
 
 	public static ItemStack getItem() {
 		ItemStack wand = new ItemStack(Material.STICK);
@@ -42,8 +42,8 @@ public class WandOfRestoration implements AbilityItem {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Heal " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Gain Regeration III for");
-		lore.add(ChatColor.GREEN + "1.25" + ChatColor.GRAY + " seconds!");
+		lore.add(ChatColor.GRAY + "Gain Regeration II for");
+		lore.add(ChatColor.GREEN + "2.5" + ChatColor.GRAY + " seconds!");
 		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
 		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + COOLDOWN / 20 + "s");
 		lore.add("");
@@ -56,8 +56,13 @@ public class WandOfRestoration implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
-		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 26, 2));
+		p.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 51, 1));
 		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);
 		return true;
 	}

@@ -1,10 +1,9 @@
 package mobs.hardmode.withers;
 
 import listeners.DamageType;
-import misc.Plugin;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -15,23 +14,30 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IceWitherSkeleton implements CustomMob {
+public class WitherSkeletonIce implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
-		e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Ice" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
-		PluginUtils.changeName(e);
-		e.addScoreboardTag("Ice");
+		WitherSkeleton witherSkeleton;
+		if(e instanceof WitherSkeleton) {
+			witherSkeleton = (WitherSkeleton) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
+		witherSkeleton.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Ice" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
+		Utils.changeName(witherSkeleton);
+		witherSkeleton.addScoreboardTag("Ice");
 		return "";
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(damagee.getHealth() - originalDamage < 1) {
 			List<EntityType> immune = new ArrayList<>();
 			immune.add(EntityType.WITHER_SKELETON);
 			immune.add(EntityType.WITHER);
-			PluginUtils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
-			MasterWitherKing.defeatHenchman("Ice");
+			Utils.spawnTNT(damagee, damagee.getLocation(), 0, 12, 25, immune);
+			WitherKing.defeatHenchman("Ice");
 			damagee.remove();
 			return false;
 		}
@@ -39,11 +45,11 @@ public class IceWitherSkeleton implements CustomMob {
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(!damagee.getScoreboardTags().contains("IceSprayed")) {
 			damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 201, 3));
 			damagee.addScoreboardTag("IceSprayed");
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> damagee.removeScoreboardTag("IceSprayed"), 201);
+			Utils.scheduleTask(() -> damagee.removeScoreboardTag("IceSprayed"), 201);
 			damagee.getWorld().playSound(damagee, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.0F);
 			damagee.getWorld().spawnParticle(Particle.SNOWFLAKE, damagee.getLocation(), 1000);
 			if(damagee instanceof Player p) {

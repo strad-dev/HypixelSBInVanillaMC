@@ -5,7 +5,7 @@ public enum DamageType {
 	/*
 	 * Melee Damage Type
 	 * ------------------
-	 * Used for all damage via Melee Weapons and Non-Environmental Abilities (e.g. Atoned Horror TNT)
+	 * Used for all damage via Melee Weapons and Thorns
 	 * Affected by: Armor, Toughness, Protection, Resistance
 	 * Knockback: Normal
 	 * I-Frames: Normal
@@ -15,7 +15,7 @@ public enum DamageType {
 	/*
 	 * Melee Sweep Damage Type
 	 * ------------------
-	 * Used for all damage caused by Sweep attacks.  No difference from MELEE.
+	 * Used for all damage caused by Sweep attacks
 	 */
 
 	RANGED,
@@ -40,7 +40,7 @@ public enum DamageType {
 	/*
 	 * Magic Damage Type
 	 * ------------------
-	 * Used for all damage via Potions and Status Effects
+	 * Used for all damage via Potions, Enchantments, and Status Effects
 	 * Affected by: Toughness, Protection, Resistance
 	 * Knockback: None
 	 * I-Frames: None
@@ -86,15 +86,29 @@ public enum DamageType {
 	 * I-Frames: Normal
 	 */
 
-	ABSOLUTE;
+	ABSOLUTE,
 	/*
 	 * ABSOLUTE Damage Type
 	 * ------------------
 	 * Used for damage that will always deal full damage
+	 * Affected by: Totem of Undying
+	 * Knockback: None
+	 * I-Frames: None
+	 */
+
+	LETHAL_ABSOLUTE;
+	/*
+	 * LETHAL ABSOLUTE Damage Type
+	 * ------------------
+	 * Used for damage that will always deal full damage AND where cheating death is impossible
 	 * Affected by: NOTHING
 	 * Knockback: None
 	 * I-Frames: None
 	 */
+
+	public static boolean isAbsoluteDamage(DamageType type) {
+		return type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE;
+	}
 
 	public static String toString(DamageType type) {
 		switch(type) {
@@ -102,9 +116,9 @@ public enum DamageType {
 				return "Melee Damage";
 			}
 			case MELEE_SWEEP -> {
-				return "Melee AOE Damage";
+				return "Sweep Damage";
 			}
-			case RANGED -> {
+			case RANGED, RANGED_SPECIAL -> {
 				return "Ranged Damage";
 			}
 			case MAGIC, PLAYER_MAGIC -> {
@@ -116,7 +130,7 @@ public enum DamageType {
 			case FALL -> {
 				return "Fall Damage";
 			}
-			case ABSOLUTE -> {
+			case ABSOLUTE, LETHAL_ABSOLUTE -> {
 				return "Absolute Damage";
 			}
 			default -> throw new IllegalArgumentException("Unknown Damage Type");

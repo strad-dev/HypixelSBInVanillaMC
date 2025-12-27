@@ -1,9 +1,6 @@
 package misc;
 
-import items.armor.GoldorLeggings;
-import items.armor.MaxorBoots;
-import items.armor.NecronElytra;
-import items.armor.WardenHelmet;
+import items.armor.*;
 import items.ingredients.mining.*;
 import items.ingredients.misc.*;
 import items.ingredients.witherLords.*;
@@ -31,11 +28,14 @@ public class AddRecipes {
 		allRecipes.add(new NamespacedKey(plugin, "enchanted_golden_apple"));
 		allRecipes.add(new NamespacedKey(plugin, "wardenHelmet"));
 		allRecipes.add(new NamespacedKey(plugin, "necronElytra"));
+		allRecipes.add(new NamespacedKey(plugin, "primalChestplate"));
 		allRecipes.add(new NamespacedKey(plugin, "goldorLeggings"));
+		allRecipes.add(new NamespacedKey(plugin, "necromancerPants"));
 		allRecipes.add(new NamespacedKey(plugin, "maxorBoots"));
 		allRecipes.add(new NamespacedKey(plugin, "wandOfRestoration"));
 		allRecipes.add(new NamespacedKey(plugin, "wandOfAtonement"));
 		allRecipes.add(new NamespacedKey(plugin, "holyIce"));
+		allRecipes.add(new NamespacedKey(plugin, "gyro"));
 		allRecipes.add(new NamespacedKey(plugin, "sharp7"));
 		allRecipes.add(new NamespacedKey(plugin, "power7"));
 		allRecipes.add(new NamespacedKey(plugin, "looting5"));
@@ -192,6 +192,21 @@ public class AddRecipes {
 		return iceRecipe;
 	}
 
+	public static Recipe addGyroRecipe(Plugin plugin) {
+		ItemStack gyro = GyrokineticWand.getItem();
+		ItemStack nullOvoid = NullOvoid.getItem();
+
+		NamespacedKey gyroKey = new NamespacedKey(plugin, "gyro");
+		ShapedRecipe gyroRecipe = new ShapedRecipe(gyroKey, gyro);
+
+		gyroRecipe.shape("NON", "NCN", "NGN");
+		gyroRecipe.setIngredient('N',  new RecipeChoice.ExactChoice(nullOvoid));
+		gyroRecipe.setIngredient('O', Material.OBSIDIAN);
+		gyroRecipe.setIngredient('C', Material.PURPLE_CONCRETE);
+		gyroRecipe.setIngredient('G', Material.PURPLE_STAINED_GLASS);
+		return gyroRecipe;
+	}
+
 	public static Recipe addWardenHelmetRecipe(Plugin plugin) {
 		ItemStack wardenHelmet = WardenHelmet.getItem();
 		ItemStack wardenHeart = WardenHeart.getItem();
@@ -224,6 +239,24 @@ public class AddRecipes {
 		return elytraRecipe;
 	}
 
+	public static Recipe addPrimalChesplateRecipe(Plugin plugin) {
+		ItemStack primalChestplate = PrimalDragonChestplate.getItem();
+		ItemStack dragonEgg = AncientDragonEgg.getItem();
+		ItemStack core = Core.getItem();
+		ItemStack ovoid = NullOvoid.getItem();
+
+		NamespacedKey primalKey = new NamespacedKey(plugin, "primalChestplate");
+		ShapedRecipe primalRecipe = new ShapedRecipe(primalKey, primalChestplate);
+
+		primalRecipe.shape("OEO", "OCO", "OJO");
+		primalRecipe.setIngredient('O', new RecipeChoice.ExactChoice(ovoid));
+		primalRecipe.setIngredient('J', new RecipeChoice.ExactChoice(core));
+		primalRecipe.setIngredient('E', new RecipeChoice.ExactChoice(dragonEgg));
+		primalRecipe.setIngredient('C', Material.NETHERITE_CHESTPLATE);
+
+		return primalRecipe;
+	}
+
 	public static Recipe addGoldorLeggingsRecipe(Plugin plugin) {
 		ItemStack goldorLeggings = GoldorLeggings.getItem();
 		ItemStack goldorSecrets = GoldorSecrets.getItem();
@@ -237,6 +270,23 @@ public class AddRecipes {
 		goldorRecipe.setIngredient('S', new RecipeChoice.ExactChoice(goldorSecrets));
 
 		return goldorRecipe;
+	}
+
+	public static Recipe addNecromancerLegginsRecipe(Plugin plugin) {
+		ItemStack necromancerLeggings = NecromancerLordLeggings.getItem();
+		ItemStack brooch = NecromancerBrooch.getItem();
+		ItemStack viscera = Viscera.getItem();
+
+		NamespacedKey necromancerKey = new NamespacedKey(plugin, "necromancerPants");
+		ShapedRecipe necromancerRecipe = new ShapedRecipe(necromancerKey, necromancerLeggings);
+
+		necromancerRecipe.shape("VVV", "SNS", "SBS");
+		necromancerRecipe.setIngredient('S', Material.NETHER_STAR);
+		necromancerRecipe.setIngredient('N', Material.NETHERITE_LEGGINGS);
+		necromancerRecipe.setIngredient('V', new RecipeChoice.ExactChoice(viscera));
+		necromancerRecipe.setIngredient('B', new RecipeChoice.ExactChoice(brooch));
+
+		return necromancerRecipe;
 	}
 
 	public static Recipe addMaxorBootsRecipe(Plugin plugin) {

@@ -6,8 +6,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R7.CraftWorld;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static misc.PluginUtils.shootBeam;
+import static misc.Utils.shootBeam;
 
 public class Terminator implements AbilityItem {
 	private static final String COOLDOWN_TAG = "SalvationCooldown";
@@ -83,6 +83,11 @@ public class Terminator implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return true;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		// you don't need arrows
 		p.getInventory().remove(Material.ARROW);
@@ -106,9 +111,9 @@ public class Terminator implements AbilityItem {
 		float basePitch = p.getEyeLocation().getPitch();
 
 		// Create NMS arrows directly
-		net.minecraft.world.entity.projectile.Arrow nmsLeft = new net.minecraft.world.entity.projectile.Arrow(EntityType.ARROW, nmsWorld);
-		net.minecraft.world.entity.projectile.Arrow nmsMiddle = new net.minecraft.world.entity.projectile.Arrow(EntityType.ARROW, nmsWorld);
-		net.minecraft.world.entity.projectile.Arrow nmsRight = new net.minecraft.world.entity.projectile.Arrow(EntityType.ARROW, nmsWorld);
+		net.minecraft.world.entity.projectile.arrow.Arrow nmsLeft = new net.minecraft.world.entity.projectile.arrow.Arrow(EntityType.ARROW, nmsWorld);
+		net.minecraft.world.entity.projectile.arrow.Arrow nmsMiddle = new net.minecraft.world.entity.projectile.arrow.Arrow(EntityType.ARROW, nmsWorld);
+		net.minecraft.world.entity.projectile.arrow.Arrow nmsRight = new net.minecraft.world.entity.projectile.arrow.Arrow(EntityType.ARROW, nmsWorld);
 
 		// Set positions and rotations directly
 		nmsLeft.setPos(spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ());
@@ -177,6 +182,8 @@ public class Terminator implements AbilityItem {
 			arrow.setWeapon(p.getInventory().getItemInMainHand());
 			arrow.addScoreboardTag("TerminatorArrow");
 		}
+
+		p.playSound(p.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0F, 2.0F);
 
 		return false;
 	}

@@ -1,9 +1,11 @@
 package items.weapons;
 
 import items.AbilityItem;
+import listeners.CustomDamage;
 import listeners.CustomItems;
 import listeners.DamageType;
 import misc.Plugin;
+import misc.Utils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -20,8 +22,6 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import static listeners.CustomDamage.customMobs;
 
 public class Scylla implements AbilityItem {
 	private static final int MANA_COST = 12;
@@ -42,12 +42,12 @@ public class Scylla implements AbilityItem {
 		if(ench.equals(Enchantment.SHARPNESS)) {
 			switch(enchLevel) {
 				case 1 -> loreDamage = "9";
-				case 2 -> loreDamage = "9.5";
-				case 3 -> loreDamage = "10";
-				case 4 -> loreDamage = "10.5";
-				case 5 -> loreDamage = "11";
-				case 6 -> loreDamage = "11.5";
-				case 7 -> loreDamage = "12";
+				case 2 -> loreDamage = "10";
+				case 3 -> loreDamage = "11";
+				case 4 -> loreDamage = "12";
+				case 5 -> loreDamage = "13";
+				case 6 -> loreDamage = "14";
+				case 7 -> loreDamage = "15";
 				default -> loreDamage = "8";
 			}
 		}
@@ -96,6 +96,11 @@ public class Scylla implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		Location originalLocation = p.getLocation().clone();
 		Location l = p.getEyeLocation();
@@ -135,7 +140,7 @@ public class Scylla implements AbilityItem {
 		int bane = 0;
 		if(p.getInventory().getItemInMainHand().containsEnchantment(Enchantment.SHARPNESS)) {
 			int sharpness = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.SHARPNESS);
-			targetDamage += sharpness * 0.5 + 0.5;
+			targetDamage += sharpness;
 		} else if(p.getInventory().getItemInMainHand().containsEnchantment(Enchantment.SMITE)) {
 			smite = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.SMITE);
 		} else if(p.getInventory().getItemInMainHand().containsEnchantment(Enchantment.BANE_OF_ARTHROPODS)) {
@@ -152,7 +157,7 @@ public class Scylla implements AbilityItem {
 					tempDamage += bane * 2.5;
 				}
 				tempDamage = Math.ceil(tempDamage * 0.51);
-				customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC);
+				CustomDamage.customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC);
 				damaged += 1;
 				damage += tempDamage;
 			}
@@ -171,14 +176,14 @@ public class Scylla implements AbilityItem {
 			p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 101, 2));
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 0.65F);
 			Location finalL = l;
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> { // convert to healing after 5 seconds
+			Utils.scheduleTask(() -> { // convert to healing after 5 seconds
 				p.setHealth(Math.min(p.getHealth() + (p.getAbsorptionAmount() / 2), p.getAttribute(Attribute.MAX_HEALTH).getValue()));
 				p.playSound(finalL, Sound.ENTITY_PLAYER_LEVELUP, 2.0F, 2.0F);
 			}, 101L);
 		}
 		if(!p.getScoreboardTags().contains("WitherShield")) { // reduced damage
 			p.addScoreboardTag("WitherShield");
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("WitherShield"), 101);
+			Utils.scheduleTask(() -> p.removeScoreboardTag("WitherShield"), 101);
 		}
 		return true;
 	}

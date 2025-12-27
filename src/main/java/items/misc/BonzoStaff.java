@@ -2,7 +2,11 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
-import org.bukkit.*;
+import misc.Utils;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.entity.EntityType;
@@ -48,11 +52,16 @@ public class BonzoStaff implements AbilityItem {
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		Location l = p.getLocation();
 		l.add(l.getDirection().setY(0).normalize().multiply(0.5));
 		l.add(0, 1.2, 0);
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+		Utils.scheduleTask(() -> {
 			WindCharge charge1 = (WindCharge) l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
 			WindCharge charge2 = (WindCharge) l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
 		}, 1);

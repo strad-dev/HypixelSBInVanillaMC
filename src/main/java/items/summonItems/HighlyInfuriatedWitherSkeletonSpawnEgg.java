@@ -45,6 +45,11 @@ public class HighlyInfuriatedWitherSkeletonSpawnEgg implements AbilityItem, Summ
 	}
 
 	@Override
+	public boolean hasLeftClickAbility() {
+		return false;
+	}
+
+	@Override
 	public boolean onRightClick(Player p) {
 		WitherSkeleton skeleton = (WitherSkeleton) p.getWorld().spawnEntity(p.getLocation(), EntityType.WITHER_SKELETON);
 		skeleton.setCustomName(new InfuriatedWitherSkeleton().onSpawn(p, skeleton));

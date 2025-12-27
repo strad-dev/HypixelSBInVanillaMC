@@ -24,8 +24,7 @@ public class RefinedLapis implements Ingredients {
 		List<String> lore = new ArrayList<>();
 		lore.add("skyblock/ingredient/refined_lapis");
 		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "This piece of Lapis");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "is brighter than usual.");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "This piece of Lapis is brighter than usual.");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Maybe it has useful properties?");
 		lore.add("");
 		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");

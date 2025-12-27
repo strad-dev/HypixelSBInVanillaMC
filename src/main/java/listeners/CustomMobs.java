@@ -1,21 +1,18 @@
 package listeners;
 
-import misc.Plugin;
-import misc.PluginUtils;
+import misc.Utils;
 import mobs.enderDragons.CustomDragon;
-import mobs.hardmode.withers.MasterMaxor;
+import mobs.hardmode.enderDragons.PrimalDragon;
+import mobs.hardmode.withers.Maxor;
 import mobs.withers.CustomWither;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntitySpawnEvent;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -46,24 +43,23 @@ public class CustomMobs implements Listener {
 
 	@EventHandler
 	public void onEntitySpawn(EntitySpawnEvent e) {
-		Player p = PluginUtils.getNearestPlayer(e.getEntity());
+		Player p = Utils.getNearestPlayer(e.getEntity());
 		boolean hardMode = false;
 		if(p != null) {
 			// Hard Mode will apply if any player in a 64-block radius of the mob has the effect
+			// Otherwise, if the nearest player has the effect, Hard Mode will always take effect
 			hardMode = p.hasPotionEffect(PotionEffectType.BAD_OMEN);
 			if(!hardMode) {
 				for(Player p2 : e.getEntity().getWorld().getPlayers()) {
 					if(p2.getLocation().distanceSquared(e.getLocation()) <= 4096 && p2.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
 						hardMode = true;
+						p = p2;
 						break;
 					}
 				}
 			}
 		}
 		if(e.getEntity() instanceof LivingEntity entity) {
-			if(!(entity instanceof Player) && !(entity instanceof Villager)) {
-				entity.setCanPickupItems(false);
-			}
 			String name = "";
 
 			// MAXOR, STORM, GOLDOR, NECRON
@@ -73,33 +69,34 @@ public class CustomMobs implements Listener {
 						wither.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 						if(!isWitherLordFightActive) {
 							if(hardMode) {
-								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), wither::remove, 1);
-								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+								p.removePotionEffect(PotionEffectType.BAD_OMEN);
+								Utils.scheduleTask(wither::remove, 1);
+								Utils.scheduleTask(() -> {
 									Wither wither2 = (Wither) wither.getWorld().spawnEntity(wither.getLocation(), EntityType.WITHER);
-									new MasterMaxor().onSpawn(PluginUtils.getNearestPlayer(wither2), wither2);
+									new Maxor().onSpawn(Utils.getNearestPlayer(wither2), wither2);
 								}, 240);
 								isWitherLordFightActive = true;
-								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-									PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": WELL WELL WELL LOOK WHO'S BACK FOR A REMATCH!");
+								Utils.scheduleTask(() -> {
+									Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": WELL WELL WELL LOOK WHO'S BACK FOR A REMATCH!");
 								}, 20);
-								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-									PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I HAVE BEEN PRACTISING 40 HOURS A DAY SINCE WE LAST MET!");
+								Utils.scheduleTask(() -> {
+									Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I HAVE BEEN PRACTISING 40 HOURS A DAY SINCE WE LAST MET!");
 								}, 80);
-								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-									PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": MY TRICKS ARE MORE SOPHISTICATED THAN EVER; YOU WILL NEVER GET AROUND THEM!");
+								Utils.scheduleTask(() -> {
+									Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": MY TRICKS ARE MORE SOPHISTICATED THAN EVER; YOU WILL NEVER GET AROUND THEM!");
 								}, 140);
-								Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-									PluginUtils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": NOW LET'S HAVE SOME FUN HERE!");
+								Utils.scheduleTask(() -> {
+									Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": NOW LET'S HAVE SOME FUN HERE!");
 								}, 200);
-								Bukkit.getLogger().info("A player has initiated THE GAUNTLET!");
+								Bukkit.getLogger().info("A player has initiated the Wither Lords fight!");
 							} else {
-								name = CustomWither.spawnRandom().onSpawn(PluginUtils.getNearestPlayer(wither), wither);
+								name = CustomWither.spawnRandom().onSpawn(Utils.getNearestPlayer(wither), wither);
 								wither.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-								wither.setTarget(PluginUtils.getNearestPlayer(wither));
+								wither.setTarget(Utils.getNearestPlayer(wither));
 								wither.setCustomNameVisible(true);
 								wither.setPersistent(true);
 								wither.setRemoveWhenFarAway(false);
@@ -110,24 +107,21 @@ public class CustomMobs implements Listener {
 						}
 					}
 					case EnderDragon dragon -> {
-						if(!dragon.getScoreboardTags().contains("WitherKingDragon") && !isWitherLordFightActive) {
-							name = CustomDragon.spawnRandom().onSpawn(PluginUtils.getNearestPlayer(dragon), dragon);
-							dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
-							dragon.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-							dragon.setTarget(PluginUtils.getNearestPlayer(dragon));
-							dragon.setCustomNameVisible(true);
-							dragon.setPersistent(true);
-							dragon.setRemoveWhenFarAway(false);
-							dragon.addScoreboardTag("SkyblockBoss");
+						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
+							if(hardMode) {
+								p.removePotionEffect(PotionEffectType.BAD_OMEN);
+								name = new PrimalDragon().onSpawn(p, dragon);
+							} else {
+								name = CustomDragon.spawnRandom().onSpawn(Utils.getNearestPlayer(dragon), dragon);
+								dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+								dragon.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
+								dragon.setTarget(Utils.getNearestPlayer(dragon));
+								dragon.setCustomNameVisible(true);
+								dragon.setPersistent(true);
+								dragon.setRemoveWhenFarAway(false);
+								dragon.addScoreboardTag("SkyblockBoss");
+							}
 						}
-					}
-					case Drowned drowned -> {
-						EntityEquipment equipment = drowned.getEquipment();
-						assert equipment != null;
-						equipment.setItemInMainHand(new ItemStack(Material.AIR));
-						equipment.setItemInOffHand(new ItemStack(Material.AIR));
-						equipment.setItemInMainHandDropChance(0.0F);
-						equipment.setItemInOffHandDropChance(0.0F);
 					}
 					default -> {
 					}
