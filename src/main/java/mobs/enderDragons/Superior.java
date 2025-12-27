@@ -1,7 +1,9 @@
 package mobs.enderDragons;
 
+import listeners.CustomDamage;
 import listeners.DamageType;
-import misc.PluginUtils;
+import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
@@ -9,10 +11,8 @@ import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Objects;
 import java.util.Random;
 
-import static listeners.CustomDamage.calculateFinalDamage;
 import static listeners.CustomMobs.spawnLightning;
 
 public class Superior implements CustomDragon {
@@ -26,25 +26,32 @@ public class Superior implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		EnderDragon dragon;
+		if(e instanceof EnderDragon) {
+			dragon = (EnderDragon) e;
+		} else {
+			throw new IllegalStateException("Uh oh!  Wrong mob type!");
+		}
+
 		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Superior Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		Objects.requireNonNull(e.getAttribute(Attribute.MAX_HEALTH)).setBaseValue(250.0);
-		e.setHealth(250.0);
-		Objects.requireNonNull(e.getAttribute(Attribute.ARMOR)).setBaseValue(5);
-		e.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
-		e.addScoreboardTag("SuperiorDragon");
+		dragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(250.0);
+		dragon.setHealth(250.0);
+		dragon.getAttribute(Attribute.ARMOR).setBaseValue(5);
+		dragon.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
+		dragon.addScoreboardTag("SuperiorDragon");
 		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The SUPERIOR DRAGON has arrived to utterly destroy you!");
 		Bukkit.getLogger().info("The Superior Dragon has been summoned!");
 		return name;
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
-		calculateFinalDamage(damagee, PluginUtils.getNearestPlayer(damagee), 3, DamageType.RANGED);
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
+		CustomDamage.calculateFinalDamage(damagee, Utils.getNearestPlayer(damagee), 3, DamageType.RANGED);
 		return true;
 	}
 }

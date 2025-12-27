@@ -6,7 +6,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -14,7 +13,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class GoldorLeggings implements Armor {
 	public static ItemStack getItem() {
@@ -39,7 +37,7 @@ public class GoldorLeggings implements Armor {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+6");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+4");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-20%");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+20%");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Goldor has spent centuries");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "researching how to make Netherite");

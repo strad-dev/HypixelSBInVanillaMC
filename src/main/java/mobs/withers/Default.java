@@ -1,6 +1,7 @@
 package mobs.withers;
 
 import listeners.DamageType;
+import misc.DamageData;
 import org.bukkit.entity.*;
 
 public class Default implements CustomWither {
@@ -15,12 +16,12 @@ public class Default implements CustomWither {
 	}
 
 	@Override
-	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 
 	@Override
-	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
+	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		return true;
 	}
 }

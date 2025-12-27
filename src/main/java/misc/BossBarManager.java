@@ -69,11 +69,9 @@ public class BossBarManager {
 		private final LivingEntity entity;
 		private final BossBar bossBar;
 		private BukkitTask updateTask;
-		private final double maxHealth;
 
 		ManagedBossBar(LivingEntity entity, BarColor color, BarStyle style) {
 			this.entity = entity;
-			this.maxHealth = entity.getAttribute(Attribute.MAX_HEALTH).getValue();
 
 			// Use the entity's existing custom name or default name
 			String title = buildTitle();
@@ -116,7 +114,7 @@ public class BossBarManager {
 			bossBar.setTitle(buildTitle());
 
 			// Update progress
-			double progress = Math.max(0.0, Math.min(1.0, currentHealth / maxHealth));
+			double progress = Math.max(0.0, Math.min(1.0, currentHealth / entity.getAttribute(Attribute.MAX_HEALTH).getValue()));
 			bossBar.setProgress(progress);
 
 			// Update player visibility
@@ -133,7 +131,7 @@ public class BossBarManager {
 		}
 
 		boolean shouldBeVisible(Player player) {
-			return player.getWorld().equals(entity.getWorld()) && player.getLocation().distance(entity.getLocation()) <= DEFAULT_VISIBILITY_RANGE;
+			return player.getWorld().equals(entity.getWorld()) && player.getLocation().distanceSquared(entity.getLocation()) <= Math.pow(DEFAULT_VISIBILITY_RANGE, 2);
 		}
 
 		void cleanup() {

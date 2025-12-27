@@ -1,7 +1,7 @@
 package listeners;
 
 import items.summonItems.SummonItem;
-import misc.PluginUtils;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,14 +45,15 @@ public class CustomItemUses implements Listener {
 			}
 			case Wither wither when wither.getScoreboardTags().contains("Maxor") && p.getScoreboardTags().contains("HasCrystal") -> {
 				wither.removeScoreboardTag("Invulnerable");
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "MASTER Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???.");
+				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???.");
 				List<EntityType> immune = new ArrayList<>();
 				immune.add(EntityType.WITHER_SKELETON);
-				PluginUtils.spawnTNT(wither, wither.getLocation(), 0, 8, 10, immune);
+				Utils.spawnTNT(wither, wither.getLocation(), 0, 8, 10, immune);
 				p.removeScoreboardTag("HasCrystal");
 			}
 			case Mob entity when e.getHand().equals(EquipmentSlot.HAND) -> {
-				CustomMob mob = SummonItem.spawnABoss(id);
+				CustomMob mob = SummonItem.spawnABoss(entity, id, e.getPlayer().hasPotionEffect(PotionEffectType.BAD_OMEN));
+				e.getPlayer().removePotionEffect(PotionEffectType.BAD_OMEN);
 				String newName;
 				if(mob == null) {
 					if(item.getType().equals(Material.NAME_TAG)) {

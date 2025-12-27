@@ -24,8 +24,7 @@ public class RefinedRedstone implements Ingredients {
 		List<String> lore = new ArrayList<>();
 		lore.add("skyblock/ingredient/refined_redstone");
 		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Redstone of the");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "highest quality.");
+		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Redstone of the highest quality.");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Use it wisely.");
 		lore.add("");
 		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");

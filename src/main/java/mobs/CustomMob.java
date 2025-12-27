@@ -1,103 +1,114 @@
 package mobs;
 
 import listeners.DamageType;
+import misc.DamageData;
 import mobs.enderDragons.*;
 import mobs.generic.*;
+import mobs.generic.Sadan;
+import mobs.hardmode.enderDragons.PrimalDragon;
+import mobs.hardmode.generic.*;
 import mobs.hardmode.withers.*;
-import mobs.withers.*;
+import mobs.withers.Default;
 import org.bukkit.entity.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public interface CustomMob {
+	class MobRegistry {
+		private static final Map<String, CustomMob> MOBS = new HashMap<>();
+		private static final Map<String, CustomMob> HARDMODE_WITHERS = new HashMap<>();
+
+		static {
+			// Initialize all mob singletons
+			// Generic mobs
+			MOBS.put("RevenantHorror", new RevenantHorror());
+			MOBS.put("AtonedHorror", new AtonedHorror());
+			MOBS.put("TarantulaBroodfather", new TarantulaBroodfather());
+			MOBS.put("PrimordialBroodfather", new PrimordialBroodfather());
+			MOBS.put("ConjoinedBrood", new ConjoinedBrood());
+			MOBS.put("Chickzilla", new Chickzilla());
+			MOBS.put("EnragedChickzilla", new EnragedChickzilla());
+			MOBS.put("Zealot", new Zealot());
+			MOBS.put("ZealotBrusier", new ZealotBrusier());
+			MOBS.put("meloGnorI", new meloGnorI());
+			MOBS.put("ObfuscatedmeloGnorI", new ObfuscatedmeloGnorI());
+			MOBS.put("Sadan", new Sadan());
+			MOBS.put("MutantGiant", new MutantGiant());
+			MOBS.put("DummySadan", new mobs.hardmode.generic.Sadan());
+			MOBS.put("TheGiantOne", new mobs.hardmode.generic.Sadan());
+			MOBS.put("VoidgloomSeraph", new VoidgloomSeraph());
+			MOBS.put("VoidcrazedSeraph", new VoidcrazedSeraph());
+			MOBS.put("InfuriatedSkeleton", new InfuriatedWitherSkeleton());
+
+			// Normal mode withers
+			MOBS.put("Maxor", new mobs.withers.Maxor());
+			MOBS.put("Storm", new mobs.withers.Storm());
+			MOBS.put("Goldor", new mobs.withers.Goldor());
+			MOBS.put("Necron", new mobs.withers.Necron());
+
+			// Hard mode withers (separate registry to avoid key conflicts)
+			HARDMODE_WITHERS.put("Maxor", new mobs.hardmode.withers.Maxor());
+			HARDMODE_WITHERS.put("Storm", new mobs.hardmode.withers.Storm());
+			HARDMODE_WITHERS.put("Goldor", new mobs.hardmode.withers.Goldor());
+			HARDMODE_WITHERS.put("Necron", new mobs.hardmode.withers.Necron());
+			HARDMODE_WITHERS.put("WitherKing", new mobs.hardmode.withers.WitherKing());
+
+			// Dragons
+			MOBS.put("HolyDragon", new Holy());
+			MOBS.put("OldDragon", new Old());
+			MOBS.put("ProtectorDragon", new Protector());
+			MOBS.put("StrongDragon", new Strong());
+			MOBS.put("SuperiorDragon", new Superior());
+			MOBS.put("UnstableDragon", new Unstable());
+			MOBS.put("WiseDragon", new Wise());
+			MOBS.put("YoungDragon", new Young());
+			MOBS.put("PrimalDragon", new PrimalDragon());
+
+			// Wither Skeletons
+			MOBS.put("Power", new WitherSkeletonPower());
+			MOBS.put("Fire", new WitherSkeletonFire());
+			MOBS.put("Ice", new WitherSkeletonIce());
+			MOBS.put("Soul", new WitherSkeletonSoul());
+			MOBS.put("Martial", new WitherSkeletonMartial());
+			MOBS.put("GuardSkeleton", new WitherKingSkeleton());
+
+			// Default wither handler
+			MOBS.put("DefaultWither", new Default());
+		}
+
+		public static CustomMob get(String tag, boolean hardModeWither) {
+			if(hardModeWither && HARDMODE_WITHERS.containsKey(tag)) {
+				return HARDMODE_WITHERS.get(tag);
+			}
+			return MOBS.get(tag);
+		}
+	}
+
 	static CustomMob getMob(Entity e) {
 		if(e != null) {
 			Set<String> tags = e.getScoreboardTags();
-			if(tags.contains("AtonedHorror")) {
-				return new AtonedHorror();
-			} else if(tags.contains("Sadan")) {
-				return new Sadan();
-			} else if(tags.contains("Voidgloom")) {
-				return new VoidgloomSeraph();
-			} else if(tags.contains("MutantEnderman")) {
-				return new MutantEnderman();
-			} else if(tags.contains("meloGnorI")) {
-				return new meloGnorI();
-			} else if(tags.contains("Broodfather")) {
-				return new Broodfather();
-			} else if(tags.contains("Chickzilla")) {
-				return new Chickzilla();
-			} else if(tags.contains("InfuriatedSkeleton")) {
-				return new InfuriatedWitherSkeleton();
-			} else if(tags.contains("Maxor")) {
-				if(tags.contains("HardMode")) {
-					return new MasterMaxor();
-				} else {
-					return new Maxor();
+			boolean isHardMode = tags.contains("HardMode");
+
+			// Check each tag against the registry keys
+			for(String tag : tags) {
+				CustomMob mob = MobRegistry.get(tag, isHardMode);
+				if(mob != null) {
+					return mob;
 				}
-			} else if(tags.contains("Storm")) {
-				if(tags.contains("HardMode")) {
-					return new MasterStorm();
-				} else {
-					return new Storm();
-				}
-			} else if(tags.contains("Goldor")) {
-				if(tags.contains("HardMode")) {
-					return new MasterGoldor();
-				} else {
-					return new Goldor();
-				}
-			} else if(tags.contains("Necron")) {
-				if(tags.contains("HardMode")) {
-					return new MasterNecron();
-				} else {
-					return new Necron();
-				}
-			} else if(tags.contains("WitherKing")) {
-				if(tags.contains("HardMode")) {
-					return new MasterWitherKing();
-				} else {
-					return new WitherKing();
-				}
-			} else if(tags.contains("HolyDragon")) {
-				return new Holy();
-			} else if(tags.contains("OldDragon")) {
-				return new Old();
-			} else if(tags.contains("ProtectorDragon")) {
-				return new Protector();
-			} else if(tags.contains("StrongDragon")) {
-				return new Strong();
-			} else if(tags.contains("SuperiorDragon")) {
-				return new Superior();
-			} else if(tags.contains("UnstableDragon")) {
-				return new Unstable();
-			} else if(tags.contains("WiseDragon")) {
-				return new Wise();
-			} else if(tags.contains("YoungDragon")) {
-				return new Young();
-			} else if(tags.contains("WitherKingDragon")) {
-				return new WitherKingDragon();
-			} else if(tags.contains("Power")) {
-				return new PowerWitherSkeleton();
-			} else if(tags.contains("Fire")) {
-				return new FireWitherSkeleton();
-			} else if(tags.contains("Ice")) {
-				return new IceWitherSkeleton();
-			} else if(tags.contains("Soul")) {
-				return new SoulWitherSkeleton();
-			} else if(tags.contains("Martial")) {
-				return new MartialWitherSkeleton();
-			} else if(tags.contains("GuardSkeleton")) {
-				return new WitherKingSkeleton();
-			} else {
-				if(e instanceof Wither) {
-					// avoid null pointers on default withers
-					return new Default();
-				}
-				return null;
+			}
+
+			// Special case for default withers
+			if(e instanceof Wither) {
+				return MobRegistry.get("DefaultWither", false);
 			}
 		}
 		return null;
+	}
+
+	static CustomMob getMob(String id, boolean hardModewither) {
+		return MobRegistry.get(id, hardModewither);
 	}
 
 	String onSpawn(Player p, Mob e);
@@ -108,10 +119,11 @@ public interface CustomMob {
 	 * @param damagee        the custom entity
 	 * @param damager        the entity dealing damage
 	 * @param originalDamage the original damage amount
-	 * @param type           the originla damage type
+	 * @param type           the original damage type
+	 * @param data           extra data associated with the damage
 	 * @return true if the original calculation can proceed; false if not
 	 */
-	boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
+	boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data);
 
 	/**
 	 * Handles custom entity behavior when the mob deals damage
@@ -119,8 +131,9 @@ public interface CustomMob {
 	 * @param damagee        the entity taking the damage
 	 * @param damager        the custom entity
 	 * @param originalDamage the original damage amount
-	 * @param type           the originla damage type
+	 * @param type           the original damage type
+	 * @param data           extra data associated with the damage
 	 * @return true if the original calculation can proceed; false if not
 	 */
-	boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type);
+	boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data);
 }

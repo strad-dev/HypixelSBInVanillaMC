@@ -6,11 +6,37 @@ import items.weapons.Scylla;
 import items.weapons.Terminator;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A generic interface for all custom items.
  */
 
 public interface CustomItem {
+	class ItemRegistry {
+		private static final Map<String, CustomItem> ITEMS = new HashMap<>();
+
+		static {
+			// Initialize all items once
+			ITEMS.put("skyblock/combat/scylla", new Scylla());
+			ITEMS.put("skyblock/combat/aspect_of_the_void", new AOTV());
+			ITEMS.put("skyblock/combat/ice_spray_wand", new IceSpray());
+			ITEMS.put("skyblock/combat/terminator", new Terminator());
+			ITEMS.put("skyblock/combat/wand_of_restoration", new WandOfRestoration());
+			ITEMS.put("skyblock/combat/wand_of_atonement", new WandOfAtonement());
+			ITEMS.put("skyblock/combat/holy_ice", new HolyIce());
+			ITEMS.put("skyblock/combat/bonzo_staff", new BonzoStaff());
+			ITEMS.put("skyblock/combat/tactical_insertion", new TacticalInsertion());
+			ITEMS.put("skyblock/combat/gyro", new GyrokineticWand());
+			ITEMS.put("skyblock/summon/wither_skeleton_spawn_egg", new HighlyInfuriatedWitherSkeletonSpawnEgg());
+		}
+
+		static CustomItem get(String id) {
+			return ITEMS.get(id);
+		}
+	}
+
 	/**
 	 * Returns an instance of the item given the item
 	 *
@@ -31,43 +57,6 @@ public interface CustomItem {
 	 * @return the item
 	 */
 	static CustomItem getItem(String id) {
-		switch(id) {
-			case "skyblock/combat/scylla" -> {
-				return new Scylla();
-			}
-			case "skyblock/combat/aspect_of_the_void" -> {
-				return new AOTV();
-			}
-			case "skyblock/combat/ice_spray_wand" -> {
-				return new IceSpray();
-			}
-			case "skyblock/combat/terminator" -> {
-				return new Terminator();
-			}
-			case "skyblock/combat/wand_of_restoration" -> {
-				return new WandOfRestoration();
-			}
-			case "skyblock/combat/wand_of_atonement" -> {
-				return new WandOfAtonement();
-			}
-			case "skyblock/combat/holy_ice" -> {
-				return new HolyIce();
-			}
-			case "skyblock/combat/bonzo_staff" -> {
-				return new BonzoStaff();
-			}
-			case "skyblock/combat/tactical_insertion" -> {
-				return new TacticalInsertion();
-			}
-			case "skyblock/combat/gyro" -> {
-				return new GyrokineticWand();
-			}
-			case "skyblock/summon/wither_skeleton_spawn_egg" -> {
-				return new HighlyInfuriatedWitherSkeletonSpawnEgg();
-			}
-			default -> {
-				return null;
-			}
-		}
+		return ItemRegistry.get(id);
 	}
 }

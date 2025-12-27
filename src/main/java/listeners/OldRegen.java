@@ -5,14 +5,12 @@ package listeners;
  * Github: https://github.com/kernitus/BukkitOldCombatMechanics/tree/master
  */
 
-import misc.Plugin;
-import org.bukkit.Bukkit;
+import misc.Utils;
 import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Wither;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -30,7 +28,7 @@ public class OldRegen implements Listener {
 	public void onEntityRegainHealth(EntityRegainHealthEvent e) {
 		if(e.getEntityType() != EntityType.PLAYER) {
 			if(e.getEntity() instanceof LivingEntity entity) {
-				if(entity instanceof Wither && entity.getScoreboardTags().contains("Invulnerable")) {
+				if(entity.getScoreboardTags().contains("Invulnerable")) {
 					e.setCancelled(true);
 					return;
 				}
@@ -69,7 +67,7 @@ public class OldRegen implements Listener {
 		long lastHealTime = healTimes.computeIfAbsent(playerId, id -> currentTime);
 
 		if(hasLastHealTime && currentTime - lastHealTime <= 3990) {
-			Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.setExhaustion(previousExhaustion), 1L);
+			Utils.scheduleTask(() -> p.setExhaustion(previousExhaustion), 1L);
 			return;
 		}
 
@@ -83,7 +81,7 @@ public class OldRegen implements Listener {
 
 		final float exhaustionToApply = 3;
 
-		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+		Utils.scheduleTask(() -> {
 			// We do this in the next tick because bukkit doesn't stop the exhaustion change when cancelling the event
 			p.setExhaustion(previousExhaustion + exhaustionToApply);
 		}, 1L);

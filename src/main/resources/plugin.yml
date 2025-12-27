@@ -1,7 +1,7 @@
-name: SkyBlockInVanilla
-version: 1.2.0
+name: SkyBlock
+version: 1.3.0
 main: misc.Plugin
-api-version: '1.21.5'
+api-version: '1.21.11'
 
 commands:
   getopitems:

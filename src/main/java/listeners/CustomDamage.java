@@ -1,7 +1,8 @@
 package listeners;
 
+import misc.DamageData;
 import misc.Plugin;
-import misc.PluginUtils;
+import misc.Utils;
 import mobs.CustomMob;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -13,21 +14,20 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
-import net.minecraft.world.entity.LightningBolt;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonDeathPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
-import net.minecraft.world.entity.projectile.windcharge.AbstractWindCharge;
+import net.minecraft.world.entity.projectile.hurtingprojectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.SculkSpreader;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_21_R4.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R4.entity.*;
-import org.bukkit.craftbukkit.v1_21_R4.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_21_R7.CraftWorld;
+import org.bukkit.craftbukkit.v1_21_R7.entity.*;
+import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -38,124 +38,19 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
+import java.util.logging.Filter;
+import java.util.logging.Logger;
 
 public class CustomDamage implements Listener {
-	private static class DamageData {
-		public EntityDamageEvent e;
-		public boolean isBlocking;
-		public boolean flamingArrow = false;
-		public int punchArrow = 0;
-		public boolean isTermArrow = false;
-		public double originalDamage;
-		public boolean lightningInvolved = false;
-		public LightningBolt lightningBolt = null;
-		public boolean isTridentAttack = false;
-		public boolean tridentChanneling = false;
-		public Trident trident = null;
-
-		public DamageData(EntityDamageByEntityEvent e) {
-			this.originalDamage = e.getDamage();
-			this.e = e;
-			this.isBlocking = e.getEntity() instanceof Player p && p.isBlocking();
-			if(e.getDamager() instanceof Projectile projectile) {
-				// stop stupidly annoying arrows
-				if(projectile instanceof Trident temp) {
-					this.isTridentAttack = true;
-					this.trident = temp;
-					ItemStack tridentItem = trident.getItem();
-					if(tridentItem.containsEnchantment(Enchantment.CHANNELING)) {
-						this.tridentChanneling = true;
-
-						// Check if conditions are right for channeling
-						LivingEntity target = (LivingEntity) e.getEntity();
-						World world = target.getWorld();
-						if(world.hasStorm() && world.getHighestBlockYAt(target.getLocation()) <= target.getLocation().getBlockY()) {
-							// Strike lightning
-							LightningStrike lightning = world.strikeLightning(target.getLocation());
-							this.lightningInvolved = true;
-							this.lightningBolt = ((CraftLightningStrike) lightning).getHandle();
-						}
-					}
-				} else //noinspection ConstantValue
-					if(projectile instanceof AbstractArrow arrow && arrow.getWeapon() != null) {
-						if(arrow.getWeapon().containsEnchantment(Enchantment.FLAME)) {
-							this.flamingArrow = true;
-						}
-
-						if(arrow.getWeapon().containsEnchantment(Enchantment.PUNCH)) {
-							this.punchArrow = arrow.getWeapon().getEnchantmentLevel(Enchantment.PUNCH);
-						}
-
-						if(arrow.getScoreboardTags().contains("TerminatorArrow")) {
-							this.isTermArrow = true;
-							this.originalDamage = arrow.getDamage();
-						}
-					}
-			}
-
-			if(e.getDamager() instanceof LightningStrike lightning) {
-				this.lightningInvolved = true;
-				this.lightningBolt = ((CraftLightningStrike) lightning).getHandle();
-			}
-		}
-
-		public DamageData(EntityDamageEvent e) {
-			this.originalDamage = e.getDamage();
-			this.e = e;
-			this.isBlocking = e.getEntity() instanceof Player p && p.isBlocking();
-		}
-
-		public DamageData(LivingEntity damagee, Entity damager, double originalDamage) {
-			this.originalDamage = originalDamage;
-			this.isBlocking = damagee instanceof Player p && p.isBlocking();
-			if(damager instanceof Projectile projectile) {
-				// stop stupidly annoying arrows
-				if(projectile instanceof Trident temp) {
-					this.isTridentAttack = true;
-					this.trident = temp;
-					ItemStack tridentItem = trident.getItem();
-					if(tridentItem.containsEnchantment(Enchantment.CHANNELING)) {
-						this.tridentChanneling = true;
-
-						// Check if conditions are right for channeling
-						World world = damagee.getWorld();
-						if(world.hasStorm() && world.getHighestBlockYAt(damagee.getLocation()) <= damagee.getLocation().getBlockY()) {
-							// Strike lightning
-							LightningStrike lightning = world.strikeLightning(damagee.getLocation());
-							this.lightningInvolved = true;
-							this.lightningBolt = ((CraftLightningStrike) lightning).getHandle();
-							damager.getWorld().playSound(damager, Sound.ITEM_TRIDENT_THUNDER, 1f, 1f);
-						}
-					}
-				} else if(projectile instanceof AbstractArrow arrow) {
-					if(arrow.getWeapon().containsEnchantment(Enchantment.FLAME)) {
-						this.flamingArrow = true;
-					}
-
-					if(arrow.getWeapon().containsEnchantment(Enchantment.PUNCH)) {
-						this.punchArrow = arrow.getWeapon().getEnchantmentLevel(Enchantment.PUNCH);
-					}
-
-					if(arrow.getScoreboardTags().contains("TerminatorArrow")) {
-						this.isTermArrow = true;
-						this.originalDamage = arrow.getDamage();
-					}
-				}
-			}
-
-			if(damager instanceof LightningStrike lightning) {
-				this.lightningInvolved = true;
-				this.lightningBolt = ((CraftLightningStrike) lightning).getHandle();
-			}
-		}
-	}
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		customMobs(damagee, damager, originalDamage, type, new DamageData(damagee, damager, originalDamage));
@@ -172,7 +67,7 @@ public class CustomDamage implements Listener {
 		}
 	}
 
-	private static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
+	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(damager instanceof Projectile projectile) {
 			originalDamage = data.originalDamage;
 			// stop stupidly annoying arrows
@@ -184,7 +79,7 @@ public class CustomDamage implements Listener {
 				} else {
 					arrow.setPierceLevel(arrow.getPierceLevel() - 1);
 					Vector arrowSpeed = arrow.getVelocity();
-					Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> arrow.setVelocity(arrowSpeed), 1L);
+					Utils.scheduleTask(() -> arrow.setVelocity(arrowSpeed), 1L);
 				}
 			}
 
@@ -209,12 +104,12 @@ public class CustomDamage implements Listener {
 
 			// this section controls when bosses are damaged
 			if(damageeMob != null) {
-				doContinue = damageeMob.whenDamaged(damagee, damager, originalDamage, type);
+				doContinue = damageeMob.whenDamaged(damagee, damager, originalDamage, type, data);
 			}
 
 			// this section controls when bosses deal damage
 			if(damagerMob != null) {
-				doContinue = damagerMob.whenDamaging(damagee, damager, originalDamage, type);
+				doContinue = damagerMob.whenDamaging(damagee, damager, originalDamage, type, data);
 			}
 			if(!data.isBlocking) {
 				switch(damager) {
@@ -238,7 +133,7 @@ public class CustomDamage implements Listener {
 			doContinue = false;
 		}
 
-		if(type == DamageType.ABSOLUTE || doContinue) {
+		if(DamageType.isAbsoluteDamage(type) || doContinue) {
 			calculateFinalDamage(damagee, damager, originalDamage, type, data);
 		}
 	}
@@ -247,8 +142,8 @@ public class CustomDamage implements Listener {
 		calculateFinalDamage(damagee, damager, finalDamage, type, new DamageData(damagee, damager, finalDamage));
 	}
 
-	private static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
-		if(type != DamageType.ABSOLUTE) {
+	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
+		if(!(DamageType.isAbsoluteDamage(type))) {
 			// bonus damage to withers from hyperion
 			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && p.getInventory().getItemInMainHand().hasItemMeta() && p.getInventory().getItemInMainHand().getItemMeta().hasLore() && p.getInventory().getItemInMainHand().getItemMeta().getLore().getFirst().equals("skyblock/combat/scylla")) {
 				finalDamage += 4;
@@ -284,6 +179,7 @@ public class CustomDamage implements Listener {
 			}
 
 			// Attribute.ARMOR reduces damage taken by 4% per level, up to 15 points (-60%)
+			// The Breach enchantment removes 1.25 armor points per level, up to -5 points at Breach IV
 			// Examples
 			// Iron Armor (15 points) reduces damage by 60%
 			// Diamond Armor (20 points) also reduces damage by 60%
@@ -291,18 +187,18 @@ public class CustomDamage implements Listener {
 			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
 			if(affectedByArmor) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
-				armor *= 1 - breach * 0.125;
+				armor -= breach * 1.25;
 				finalDamage *= Math.max(0.4, 1 - armor * 0.04);
 			}
 
 			// Attribute.ARMOR_TOUGHNESS further reduces damage taken by 5% per level, up to 16 points (-80%)
+			// Not affected by Breach
 			// Examples
 			// Iron Armor (0 toughness) does not work here
 			// Diamond Armor (8 toughness) reduces damage by 40%
 			// Netherite Armor (12 toughness) reduces damage by 60%
 			// 3/4 Netherite + Elytra (9 toughness) reduces damage by 45%
 			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR_TOUGHNESS)).getValue(), 0);
-			toughness *= 1 - breach * 0.125;
 			finalDamage *= Math.max(0.2, 1 - toughness * 0.05);
 
 			// The Resistance status effect reduces damage by 20% per level.
@@ -327,28 +223,28 @@ public class CustomDamage implements Listener {
 				if(helmet != null) {
 					prots += helmet.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, helmet, Math.max(0.25, data.originalDamage / 33.33));
+						Utils.damageItem(damagee, helmet, Math.max(0.25, data.originalDamage / 33.33));
 					}
 				}
 
 				if(chestplate != null) {
 					prots += chestplate.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, chestplate, Math.max(0.25, data.originalDamage / 12.5));
+						Utils.damageItem(damagee, chestplate, Math.max(0.25, data.originalDamage / 12.5));
 					}
 				}
 
 				if(pants != null) {
 					prots += pants.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, pants, Math.max(0.25, data.originalDamage / 16.67));
+						Utils.damageItem(damagee, pants, Math.max(0.25, data.originalDamage / 16.67));
 					}
 				}
 
 				if(boots != null) {
 					prots += boots.getEnchantmentLevel(Enchantment.PROTECTION);
 					if(affectedByArmor) {
-						PluginUtils.damageItem(damagee, boots, Math.max(0.25, data.originalDamage / 33.33));
+						Utils.damageItem(damagee, boots, Math.max(0.25, data.originalDamage / 33.33));
 					}
 				}
 
@@ -367,7 +263,7 @@ public class CustomDamage implements Listener {
 	}
 
 	private static void dealDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
-		if(finalDamage > 0) {
+		if(!damagee.isDead() && finalDamage > 0 && (damagee.getNoDamageTicks() == 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC || type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE)) {
 			// sweeping edge
 			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.SWEEPING_EDGE)) {
 				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SWEEPING_EDGE);
@@ -424,7 +320,7 @@ public class CustomDamage implements Listener {
 				}
 
 				// damage weapon
-				PluginUtils.damageItem(p, weapon, 1);
+				Utils.damageItem(p, weapon, 1);
 			}
 
 			// handle raid mechanics
@@ -453,8 +349,59 @@ public class CustomDamage implements Listener {
 				}
 			}
 
+			// handle thorns
+			if(damager instanceof LivingEntity && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
+				EntityEquipment eq = damagee.getEquipment();
+				if(eq != null) {
+					Random random = new Random();
+					int totalThornsLevel = 0;
+					List<ItemStack> thornsArmor = new ArrayList<>();
+
+					// Check all armor pieces for thorns
+					ItemStack[] armorPieces = {
+							eq.getHelmet(),
+							eq.getChestplate(),
+							eq.getLeggings(),
+							eq.getBoots()
+					};
+
+					for (ItemStack armor : armorPieces) {
+						if (armor == null || armor.getType() == Material.AIR) continue;
+
+						int thornsLevel = armor.getEnchantmentLevel(Enchantment.THORNS);
+						if (thornsLevel > 0) {
+							totalThornsLevel += thornsLevel;
+							thornsArmor.add(armor);
+						}
+					}
+
+					if(totalThornsLevel > 0) {
+						double activationChance = Math.min(totalThornsLevel * 0.15, 1.0);
+
+						if(random.nextDouble() < activationChance) {
+							// Calculate thorns damage (1-4 damage, higher levels increase max)
+							int thornsDamage = random.nextInt(4) + 1;
+
+							// Higher thorns levels can do more damage
+							if(totalThornsLevel > 10) {
+								thornsDamage += 2;
+							} else if(totalThornsLevel > 5) {
+								thornsDamage += 1;
+							}
+
+							customMobs((LivingEntity) damager, damagee, thornsDamage, DamageType.PLAYER_MAGIC);
+
+							if (!thornsArmor.isEmpty()) {
+								ItemStack armorToDamage = thornsArmor.get(random.nextInt(thornsArmor.size()));
+								Utils.damageItem(damagee, armorToDamage, 1);
+							}
+						}
+					}
+				}
+			}
+
 			if(doesDie) {
-				if(type != DamageType.ABSOLUTE && (damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING))) {
+				if(type != DamageType.LETHAL_ABSOLUTE && (damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING))) {
 					if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
 						damagee.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
 					} else if(damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
@@ -479,15 +426,15 @@ public class CustomDamage implements Listener {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 				} else {
-					if(damagee instanceof EnderDragon dragon && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
+					if(damagee instanceof EnderDragon dragon && data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
 						if(damager == null) {
-							damager = PluginUtils.getNearestPlayer(dragon);
+							damager = Utils.getNearestPlayer(dragon);
 						}
 					}
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
 					if(damagee instanceof Villager villager && damager instanceof Zombie) {
 						villager.zombify();
-						PluginUtils.changeName(villager);
+						Utils.changeName(villager);
 					} else {
 						CustomDrops.loot(damagee, damager);
 
@@ -524,13 +471,16 @@ public class CustomDamage implements Listener {
 								Bukkit.getLogger().warning("Failed to force Dragon death animation.");
 							}
 							if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-								PluginUtils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
+								Utils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 							}
 							dragon.setSilent(true);
-							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-								ExperienceOrb orb = (ExperienceOrb) dragon.getWorld().spawnEntity(dragon.getLocation(), EntityType.EXPERIENCE_ORB);
-								orb.setExperience(64000);
-							}, 200);
+							for(int i = 181; i < 201; i++) {
+								int finalI = i;
+								Utils.scheduleTask(() -> {
+									ExperienceOrb orb = (ExperienceOrb) dragon.getWorld().spawnEntity(dragon.getLocation(), EntityType.EXPERIENCE_ORB);
+									orb.setExperience(dragon.getScoreboardTags().contains("HardMode") ? 31991 + (finalI - 180) : 3191 + (finalI - 180));
+								}, i);
+							}
 						} else {
 							damagee.setHealth(0.0);
 						}
@@ -562,7 +512,7 @@ public class CustomDamage implements Listener {
 								Bukkit.broadcastMessage(p.getName() + " was killed by the world");
 							} else if(type == DamageType.FALL) {
 								Bukkit.broadcastMessage(p.getName() + " fell to their death");
-							} else if(type == DamageType.ABSOLUTE) {
+							} else if(type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE) {
 								Bukkit.broadcastMessage(p.getName() + " fell out of the world");
 							}
 						}
@@ -588,15 +538,21 @@ public class CustomDamage implements Listener {
 					((Mob) damagee).setTarget((LivingEntity) damager);
 				}
 
+				if(damagee instanceof Shulker shulker && damager instanceof Shulker) {
+					handleShulkerDuplication(shulker);
+				}
+
 				// special ender dragon knockback to make zero- and one-cycling possible
-				if(damagee instanceof EnderDragon dragon && data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
-					Vector v = dragon.getVelocity();
-					if(dragon.getPhase() == EnderDragon.Phase.LAND_ON_PORTAL) {
-						dragon.setVelocity(new Vector(v.getX(), 0.25, v.getZ()));
-					} else {
-						dragon.setVelocity(new Vector(v.getX(), 0.333333, v.getZ()));
+				if(damagee instanceof EnderDragon dragon) {
+					if(data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
+						Vector v = dragon.getVelocity();
+						if(dragon.getPhase() == EnderDragon.Phase.LAND_ON_PORTAL) {
+							dragon.setVelocity(new Vector(v.getX(), 0.25, v.getZ()));
+						} else {
+							dragon.setVelocity(new Vector(v.getX(), 0.333333, v.getZ()));
+						}
+						damager = Utils.getNearestPlayer(dragon);
 					}
-					damager = PluginUtils.getNearestPlayer(dragon);
 				} else if(isPhysicalHit && damager != null) {
 					// apply knockback
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
@@ -646,7 +602,7 @@ public class CustomDamage implements Listener {
 				}
 
 				// change nametag health
-				PluginUtils.changeName(damagee);
+				Utils.changeName(damagee);
 				triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 			}
 		}
@@ -668,7 +624,8 @@ public class CustomDamage implements Listener {
 				case ENVIRONMENTAL -> org.bukkit.damage.DamageType.FALLING_BLOCK;
 				case IFRAME_ENVIRONMENTAL -> org.bukkit.damage.DamageType.ON_FIRE;
 				case FALL -> org.bukkit.damage.DamageType.FALL;
-				case ABSOLUTE -> org.bukkit.damage.DamageType.GENERIC_KILL;
+				case ABSOLUTE -> org.bukkit.damage.DamageType.GENERIC;
+				case LETHAL_ABSOLUTE -> org.bukkit.damage.DamageType.GENERIC_KILL;
 			};
 			causingEntity = attacker;
 			nmsSource = convertBukkitDamageSource(org.bukkit.damage.DamageSource.builder(bukkitType).build(), victim);
@@ -690,7 +647,7 @@ public class CustomDamage implements Listener {
 
 				// 5 & 6. Sculk catalyst triggers - only if sculk catalyst is nearby
 				if(isSculkCatalystNearby(victim.getLocation())) {
-					triggerSculkSpread(victim);
+					triggerVanillaSculkSpread(victim);
 					CriteriaTriggers.KILL_MOB_NEAR_SCULK_CATALYST.trigger(serverPlayer, nmsVictim, nmsSource);
 					CriteriaTriggers.KILL_MOB_NEAR_SCULK_CATALYST.trigger(serverPlayer, nmsVictim, nmsSource);
 				}
@@ -836,80 +793,54 @@ public class CustomDamage implements Listener {
 		return false;
 	}
 
-	private static void triggerSculkSpread(LivingEntity victim) {
-		Location deathLocation = victim.getLocation();
-		World world = deathLocation.getWorld();
-		if(world == null) return;
+	private static void triggerVanillaSculkSpread(LivingEntity victim) {
+		Location deathLoc = victim.getLocation();
+		ServerLevel level = ((CraftWorld) deathLoc.getWorld()).getHandle();
+		BlockPos deathPos = new BlockPos(deathLoc.getBlockX(), deathLoc.getBlockY(), deathLoc.getBlockZ());
 
-		// Find nearby sculk catalysts (within 8 blocks)
-		for(int x = -8; x <= 8; x++) {
-			for(int y = -8; y <= 8; y++) {
-				for(int z = -8; z <= 8; z++) {
-					Location catalystLoc = deathLocation.clone().add(x, y, z);
-					if(catalystLoc.getBlock().getType() == Material.SCULK_CATALYST) {
-						// Calculate experience points (similar to vanilla)
-						int xpAmount = CustomDrops.calculateMobXP(victim);
+		Logger logger = Bukkit.getLogger();
+		Filter originalFilter = logger.getFilter();
 
-						// Spread sculk blocks around the catalyst
-						spreadSculkFromCatalyst(catalystLoc, deathLocation, xpAmount);
-						break; // Only spread from the first catalyst found
-					}
-				}
+		logger.setFilter(record -> {
+			if (record.getMessage().contains("PostProcessing")) {
+				return false;
 			}
+			return originalFilter == null || originalFilter.isLoggable(record);
+		});
+
+		try {
+			// Create a sculk spreader instance
+			SculkSpreader spreader = SculkSpreader.createWorldGenSpreader();
+
+			// Add charge at death location
+			int experience = ((CraftLivingEntity) victim).getHandle().getExperienceReward(level, ((CraftLivingEntity) victim).getHandle());
+			spreader.addCursors(deathPos, experience);
+
+			// Update the spreader (this triggers the actual spreading)
+			spreader.updateCursors(level, deathPos, level.random, true);
+		} finally {
+			logger.setFilter(originalFilter);
 		}
 	}
 
-	private static void spreadSculkFromCatalyst(Location catalyst, Location deathSite, int experience) {
-		World world = catalyst.getWorld();
-		Random random = new Random();
+	private static void handleShulkerDuplication(Shulker victim) {
+		// Check if health is below 50% threshold (vanilla requirement)
+		if(victim.getHealth() > victim.getAttribute(Attribute.MAX_HEALTH).getValue() * 0.5) return;
 
-		// Number of blocks to spread based on experience (vanilla behavior)
-		int blocksToSpread = Math.min(experience, 32); // Cap at 32 like vanilla
+		// Use NMS to trigger vanilla duplication logic
+		net.minecraft.world.entity.monster.Shulker nmsShulker = ((CraftShulker) victim).getHandle();
 
-		for(int i = 0; i < blocksToSpread; i++) {
-			// Random spread around the death location (within 9 blocks)
-			int spreadX = random.nextInt(19) - 9; // -9 to +9
-			int spreadY = random.nextInt(19) - 9;
-			int spreadZ = random.nextInt(19) - 9;
-
-			Location spreadLocation = deathSite.clone().add(spreadX, spreadY, spreadZ);
-			Block targetBlock = spreadLocation.getBlock();
-
-			// Check if block can be converted to sculk
-			if(canConvertToSculk(targetBlock)) {
-				// Convert based on block type and surrounding blocks
-				convertToSculk(targetBlock, random);
-
-				// Play sculk spread sound
-				world.playSound(spreadLocation, Sound.BLOCK_SCULK_CATALYST_BLOOM, 0.8f, random.nextFloat() * 0.4f + 0.8f);
-
-				// Spawn particles
-				world.spawnParticle(Particle.SCULK_SOUL, spreadLocation.add(0.5, 0.5, 0.5), 1, 0.25, 0.25, 0.25, 0.05);
-			}
-		}
-	}
-
-	private static boolean canConvertToSculk(Block block) {
-		Material type = block.getType();
-		return type == Material.STONE || type == Material.COBBLESTONE || type == Material.DEEPSLATE || type == Material.DIRT || type == Material.GRASS_BLOCK || type == Material.GRAVEL || type == Material.SAND || type == Material.CLAY || type.name().contains("TERRACOTTA") || type == Material.AIR; // Can place sculk in air
-	}
-
-	private static void convertToSculk(Block block, Random random) {
-		Material currentType = block.getType();
-
-		// Conversion logic (simplified version of vanilla)
-		if(currentType == Material.AIR) {
-			// Small chance to place sculk vein in air
-			if(random.nextFloat() < 0.1f) {
-				block.setType(Material.SCULK_VEIN);
-			}
-		} else {
-			// Convert solid blocks to sculk or sculk vein
-			if(random.nextFloat() < 0.7f) {
-				block.setType(Material.SCULK);
-			} else {
-				block.setType(Material.SCULK_VEIN);
-			}
+		// This method handles all the vanilla logic:
+		// - Finding valid teleport location
+		// - Spawning new shulker with correct color
+		// - Teleport attempts
+		try {
+			Method hitByShulkerBulletMethod = net.minecraft.world.entity.monster.Shulker.class
+					.getDeclaredMethod("hitByShulkerBullet");
+			hitByShulkerBulletMethod.setAccessible(true);
+			hitByShulkerBulletMethod.invoke(nmsShulker);
+		} catch(Exception exception) {
+			// nothing here
 		}
 	}
 
@@ -938,19 +869,19 @@ public class CustomDamage implements Listener {
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.ARROW) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.AbstractArrow arrow) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.arrow.AbstractArrow arrow) {
 				return sources.arrow(arrow, nmsCausingEntity);
 			}
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.FIREBALL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.Fireball fireball) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.Fireball fireball) {
 				return sources.fireball(fireball, nmsCausingEntity);
 			}
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.UNATTRIBUTED_FIREBALL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.Fireball fireball) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.Fireball fireball) {
 				return sources.fireball(fireball, nmsCausingEntity);
 			}
 			return sources.generic();
@@ -983,7 +914,7 @@ public class CustomDamage implements Listener {
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.WITHER_SKULL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.WitherSkull witherSkull) {
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.WitherSkull witherSkull) {
 				return sources.witherSkull(witherSkull, nmsCausingEntity);
 			}
 			return sources.generic();
@@ -1152,6 +1083,14 @@ public class CustomDamage implements Listener {
 					}
 
 					Entity damager = e.getDamager();
+
+					if(damager instanceof LivingEntity livingEntity) {
+						int sharpness = livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SHARPNESS);
+						if(sharpness > 1) {
+							e.setDamage(e.getDamage() + (sharpness - 1) * 0.5);
+						}
+					}
+
 					customMobs(entity, damager, e.getDamage(), type, new DamageData(e));
 				}
 			}
@@ -1168,11 +1107,11 @@ public class CustomDamage implements Listener {
 			switch(e.getCause()) {
 				case BLOCK_EXPLOSION, THORNS -> type = DamageType.MELEE;
 				case POISON, WITHER -> type = DamageType.MAGIC;
-				case CONTACT, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION,
+				case CONTACT, CRAMMING, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION,
 					 SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
 				case CUSTOM -> type = DamageType.IFRAME_ENVIRONMENTAL;
 				case FALL, FLY_INTO_WALL -> type = DamageType.FALL;
-				case CRAMMING, KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.ABSOLUTE;
+				case KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.LETHAL_ABSOLUTE;
 				default -> {
 					return;
 				}

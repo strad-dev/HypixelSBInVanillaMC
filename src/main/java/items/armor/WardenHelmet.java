@@ -13,7 +13,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class WardenHelmet implements Armor {
 	public static ItemStack getItem() {
@@ -40,7 +39,7 @@ public class WardenHelmet implements Armor {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+2");
 		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
 		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+4");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "-20%");
+		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+20%");
 		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x0.5");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "The brute force of the Warden");

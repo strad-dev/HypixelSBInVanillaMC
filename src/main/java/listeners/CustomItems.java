@@ -2,18 +2,14 @@ package listeners;
 
 import items.AbilityItem;
 import items.CustomItem;
-import items.misc.*;
+import items.misc.AOTV;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
 import misc.Plugin;
+import misc.Utils;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.minecraft.core.Holder;
-import net.minecraft.network.syncher.SynchedEntityData;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -22,6 +18,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Score;
 
 import java.util.ArrayList;
@@ -36,7 +34,7 @@ public class CustomItems implements Listener {
 	}
 
 	public String getID(ItemStack item) {
-		if(!item.hasItemMeta()) {
+		if(item == null || !item.hasItemMeta()) {
 			return "";
 		} else if(!item.getItemMeta().hasLore()) {
 			return "";
@@ -115,10 +113,31 @@ public class CustomItems implements Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
-		ItemStack itemInUse = p.getInventory().getItemInMainHand();
-		if(itemInUse.hasItemMeta()) {
-			if(itemInUse.getItemMeta().hasLore()) {
-				if(itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/summon")) {
+		ItemStack itemInUse = e.getItem();
+		if(itemInUse != null && itemInUse.hasItemMeta()) {
+			ItemMeta meta = itemInUse.getItemMeta();
+			NamespacedKey key = new NamespacedKey(Plugin.getInstance(), "creative_menu");
+
+			if(meta.getPersistentDataContainer().has(key, PersistentDataType.BYTE)) {
+				if(e.getAction() != Action.RIGHT_CLICK_AIR &&
+						e.getAction() != Action.RIGHT_CLICK_BLOCK) {
+					return;
+				}
+
+				if(p.getGameMode() != GameMode.CREATIVE) {
+					return;
+				}
+
+				if(!itemInUse.hasItemMeta()) {
+					return;
+				}
+
+				e.setCancelled(true);
+				CreativeMenu.openCreativeMenu(p);
+			}
+
+			if(meta.hasLore()) {
+				if(itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/summon") || itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/ingredient")) {
 					e.setCancelled(true);
 				}
 			}
@@ -141,16 +160,20 @@ public class CustomItems implements Listener {
 				item = null;
 			}
 			if(item != null) {
-				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && (item instanceof Scylla || item instanceof AOTV || item instanceof BonzoStaff || item instanceof HolyIce || item instanceof IceSpray || item instanceof WandOfAtonement || item instanceof WandOfRestoration))) {
+				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
 					e.setCancelled(true);
 				}
 				if(!p.getScoreboardTags().contains("AbilityCooldown") || item instanceof Terminator) {
 					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
-						p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						if(!((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && !item.hasLeftClickAbility())) {
+							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						}
 					} else if(p.getScoreboardTags().contains(item.cooldownTag()) && !(item.cooldownTag().equals("SalvationCooldown") && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))) {
-						p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
-						p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
+							p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
+							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
+						}
 					} else {
 						boolean abilitySuccessful = false;
 						if(e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
@@ -165,9 +188,9 @@ public class CustomItems implements Listener {
 								score.setScore(score.getScore() - item.manaCost());
 							}
 							p.addScoreboardTag(item.cooldownTag());
-							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag(item.cooldownTag()), item.cooldown());
+							Utils.scheduleTask(() -> p.removeScoreboardTag(item.cooldownTag()), item.cooldown());
 							p.addScoreboardTag("AbilityCooldown");
-							Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> p.removeScoreboardTag("AbilityCooldown"), 2L);
+							Utils.scheduleTask(() -> p.removeScoreboardTag("AbilityCooldown"), 2L);
 						}
 					}
 				} else {
@@ -176,7 +199,11 @@ public class CustomItems implements Listener {
 					}
 				}
 			}
-			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
+			if(score.getScore() < 2500) {
+				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
+			} else {
+				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE"));
+			}
 		}
 	}
 }
