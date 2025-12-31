@@ -13,7 +13,7 @@ public class MutantGiant implements CustomMob {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		return !(damagee instanceof FallingBlock);
+		return !(damager instanceof FallingBlock);
 	}
 
 	@Override

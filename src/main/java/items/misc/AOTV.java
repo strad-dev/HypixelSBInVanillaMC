@@ -6,6 +6,7 @@ import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
@@ -61,9 +62,7 @@ public class AOTV implements AbilityItem {
 	public boolean onRightClick(Player p) {
 		if(p.isSneaking()) {
 			RayTraceResult result = p.rayTraceBlocks(61);
-			if(result == null) {
-				return false;
-			} else {
+			if(result != null) {
 				Block b = result.getHitBlock();
 				Location l = b.getLocation().add(0.5, 1, 0.5);
 				if(l.getBlock().getType().isSolid() || l.clone().add(0, 1, 0).getBlock().getType().isSolid()) {
@@ -76,35 +75,159 @@ public class AOTV implements AbilityItem {
 				p.teleport(l);
 				return true;
 			}
+			return false;
 		} else {
-			Location originalLocation = p.getLocation().clone();
-			Location l = p.getEyeLocation().clone();
-			Vector v = l.getDirection();
-			v.setX(v.getX() / 10);
-			v.setY(v.getY() / 10);
-			v.setZ(v.getZ() / 10);
-			for(int i = 0; i < 120; i++) {
-				l.add(v);
-				if(l.getBlock().getType().isSolid()) {
-					l = l.subtract(v).getBlock().getLocation();
-					if(originalLocation.getPitch() > 0) {
-						l.add(0, 1.62, 0);
+			Location origin = p.getLocation().clone();
+			RayTraceResult result = p.rayTraceBlocks(13.65);
+			if(result == null) {
+				Location targetLoc = p.getLocation().add(p.getLocation().getDirection().multiply(12));
+				targetLoc.setX(Math.floor(targetLoc.getX()) + 0.5);
+				targetLoc.setY(Math.floor(targetLoc.getY()));
+				targetLoc.setZ(Math.floor(targetLoc.getZ()) + 0.5);
+
+				// Check if the target location is safe
+				Block feetBlock = targetLoc.getBlock();
+				Block headBlock = feetBlock.getRelative(BlockFace.UP);
+
+				// If either block is solid, we need to adjust
+				if(!feetBlock.isPassable() || !headBlock.isPassable()) {
+					// Try to move up until we find a safe spot or reach original height
+					double originalY = p.getLocation().getY();
+					Location checkLoc = targetLoc.clone();
+					boolean foundSafe = false;
+
+					// Check up to 10 blocks up or until at original height
+					for(int i = 0; i < 10; i++) {
+						checkLoc.add(0, 1, 0);
+						Block checkFeet = checkLoc.getBlock();
+						Block checkHead = checkFeet.getRelative(BlockFace.UP);
+
+						// Check if this position is safe (2 blocks of air)
+						if(checkFeet.isPassable() && checkHead.isPassable()) {
+							// Also check we're not in a 1-block gap if above original height
+							if(checkLoc.getY() >= originalY) {
+								Block aboveHead = checkHead.getRelative(BlockFace.UP);
+								if(!aboveHead.isPassable()) {
+									// This is a 1-block gap at or above original height - skip it
+									continue;
+								}
+							}
+
+							targetLoc = checkLoc.clone();
+							foundSafe = true;
+							break;
+						}
+
+						// Stop if we've reached or passed original height and no safe spot
+						if(checkLoc.getY() >= originalY) {
+							break;
+						}
 					}
-					l.setYaw(originalLocation.getYaw());
-					l.setPitch(originalLocation.getPitch());
-					l.add(0.5, 0, 0.5);
-					break;
+
+					// If no safe spot found, don't teleport
+					if(!foundSafe) {
+						return false;
+					}
+				}
+
+				// Additional check for 1-block tall spaces when below original height
+				if(targetLoc.getY() < p.getLocation().getY()) {
+					Block aboveHead = targetLoc.getBlock().getRelative(BlockFace.UP, 2);
+					if(!aboveHead.isPassable()) {
+						// This would put player in crawl mode below their starting position
+						// Try to find a better spot
+						for(int i = 1; i <= 3; i++) {
+							Location upLoc = targetLoc.clone().add(0, i, 0);
+							Block upFeet = upLoc.getBlock();
+							Block upHead = upFeet.getRelative(BlockFace.UP);
+							Block upAbove = upHead.getRelative(BlockFace.UP);
+
+							if(upFeet.isPassable() && upHead.isPassable() && upAbove.isPassable()) {
+								targetLoc = upLoc;
+								break;
+							}
+						}
+					}
+				}
+
+				targetLoc.setYaw(origin.getYaw());
+				targetLoc.setPitch(origin.getPitch());
+				p.teleport(targetLoc);
+			} else {
+				switch(result.getHitBlockFace()) {
+					case SELF -> {
+						// empty case
+					}
+					case UP -> {
+						Location l = result.getHitBlock().getLocation().add(0.5, 1, 0.5);
+						l.setYaw(origin.getYaw());
+						l.setPitch(origin.getPitch());
+						p.teleport(l);
+					}
+					case DOWN -> {
+						Location l = result.getHitBlock().getLocation().add(0.5, -2, 0.5);
+						l.setYaw(origin.getYaw());
+						l.setPitch(origin.getPitch());
+						p.teleport(l);
+					}
+					default -> {
+						// Hit a side face - backtrack until we find a safe spot
+						Location hitLocation = result.getHitPosition().toLocation(p.getWorld());
+						Vector direction = origin.getDirection().normalize();
+
+						// Calculate max backtrack distance (don't go past player's origin)
+						double maxBacktrack = origin.distance(hitLocation);
+
+						// Backtrack from the exact hit point
+						Location checkLoc = hitLocation.clone();
+						Location lastSafe = null;
+						double totalBacktracked = 0;
+
+						// Backtrack in smaller increments for more precision
+						for(int i = 0; i < 120; i++) { // 120 * 0.1 = 12 blocks
+							// Backtrack by 0.1 blocks for precision
+							checkLoc.subtract(direction.clone().multiply(0.1));
+							totalBacktracked += 0.1;
+
+							// Don't go past the player's starting position
+							if(totalBacktracked > maxBacktrack) {
+								break;
+							}
+
+							// Check current block
+							Block feetBlock = checkLoc.getBlock();
+							Block headBlock = feetBlock.getRelative(BlockFace.UP);
+
+							if(feetBlock.isPassable() && headBlock.isPassable()) {
+								// This spot is safe, but keep checking for the optimal position
+								lastSafe = checkLoc.clone();
+
+								// Check if we've backtracked enough (at least 0.5 blocks from wall)
+								if(checkLoc.distance(hitLocation) >= 0.5) {
+									// Center on the block we're in
+									Location l = new Location(checkLoc.getWorld(), Math.floor(checkLoc.getX()) + 0.5, Math.floor(checkLoc.getY()), Math.floor(checkLoc.getZ()) + 0.5);
+									l.setYaw(origin.getYaw());
+									l.setPitch(origin.getPitch());
+									p.teleport(l);
+									break;
+								}
+							}
+						}
+
+						// If we found a safe spot but didn't teleport yet
+						if(lastSafe != null) {
+							Location l = new Location(lastSafe.getWorld(), Math.floor(lastSafe.getX()) + 0.5, Math.floor(lastSafe.getY()), Math.floor(lastSafe.getZ()) + 0.5);
+							l.setYaw(origin.getYaw());
+							l.setPitch(origin.getPitch());
+							p.teleport(l);
+						}
+					}
 				}
 			}
-			l.subtract(0, 1.62, 0);
-			if(!l.getBlock().isEmpty()) {
-				l.add(0, 1, 0);
-			}
 			p.setFallDistance(0);
-			p.teleport(l);
 			p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
-			return true;
 		}
+		return true;
 	}
 
 	@Override
