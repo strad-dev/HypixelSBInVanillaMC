@@ -210,8 +210,7 @@ public class PrimalDragon implements CustomDragon {
 		dragon.setSilent(true);
 
 		// Get NMS dragon entity
-		net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon =
-				((CraftEnderDragon) dragon).getHandle();
+		net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon = ((CraftEnderDragon) dragon).getHandle();
 
 		// 4. Stop all movement
 		nmsDragon.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
@@ -261,19 +260,19 @@ public class PrimalDragon implements CustomDragon {
 	}
 
 	private static double getRangedMultiplier(LivingEntity damagee) {
-		if(damagee.getScoreboardTags().contains("800Trigger")) return 0.2;
-		if(damagee.getScoreboardTags().contains("600Trigger")) return 0.16;
-		if(damagee.getScoreboardTags().contains("400Trigger")) return 0.12;
-		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.08;
-		return 0.05;
+		if(damagee.getScoreboardTags().contains("800Trigger")) return 0.25;
+		if(damagee.getScoreboardTags().contains("600Trigger")) return 0.2;
+		if(damagee.getScoreboardTags().contains("400Trigger")) return 0.16;
+		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.12;
+		return 0.08;
 	}
 
 	private static double getMagicMultiplier(LivingEntity damagee) {
 		if(damagee.getScoreboardTags().contains("800Trigger")) return 0.9;
 		if(damagee.getScoreboardTags().contains("600Trigger")) return 0.75;
 		if(damagee.getScoreboardTags().contains("400Trigger")) return 0.5;
-		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.25;
-		return 0.15;
+		if(damagee.getScoreboardTags().contains("200Trigger")) return 0.333;
+		return 0.25;
 	}
 
 	private static void fireballSpam(EnderDragon dragon) {
@@ -341,19 +340,19 @@ public class PrimalDragon implements CustomDragon {
 
 		switch(currentPhase) {
 			case "400Trigger" -> {
-				delay = 30;
-				fuse = 15;
-				damage = 30;
+				delay = 40;
+				fuse = 20;
+				damage = 25;
 			}
 			case "200Trigger" -> {
-				delay = 20;
-				fuse = 10;
-				damage = 45;
+				delay = 30;
+				fuse = 15;
+				damage = 40;
 			}
 			default -> {
-				delay = notPerching(dragon) ? 12 : 20;
-				fuse = notPerching(dragon) ? 6 : 10;
-				damage = notPerching(dragon) ? 60 : 40;
+				delay = 20;
+				fuse = 10;
+				damage = notPerching(dragon) ? 50 : 35;
 			}
 		}
 
@@ -394,9 +393,9 @@ public class PrimalDragon implements CustomDragon {
 				Player p = Utils.getNearestPlayer(dragon);
 				if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
 					if(notPerching(dragon)) {
-						Utils.spawnTNT(dragon, p.getLocation(), 10, 6, 40, new ArrayList<>());
+						Utils.spawnTNT(dragon, p.getLocation(), 20, 6, 40, new ArrayList<>());
 					} else {
-						Utils.spawnTNT(dragon, p.getLocation(), 10, 6, 25, new ArrayList<>());
+						Utils.spawnTNT(dragon, p.getLocation(), 20, 6, 25, new ArrayList<>());
 					}
 				}
 				extremeTNTRainPlayer(dragon);
@@ -412,14 +411,14 @@ public class PrimalDragon implements CustomDragon {
 						spawnZealots(dragon, false);
 						summonZealots(dragon);
 					}
-				}, 400);
+				}, 600);
 			} else { // Summon Zealot Brusiers (200 hp to dead)
 				Utils.scheduleTask(() -> {
 					if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
 						spawnZealots(dragon, true);
 						summonZealots(dragon);
 					}
-				}, 300);
+				}, 400);
 			}
 		}
 	}
@@ -465,16 +464,16 @@ public class PrimalDragon implements CustomDragon {
 
 	private static void theFinalTrick(EnderDragon dragon) {
 		if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
-			Utils.scheduleTask(() -> {
-				if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
-					Location spawnLoc = Utils.randomLocation(new Location(dragon.getWorld(), 0, 64, 0), 24, true);
-					spawnLoc.setY(Utils.highestBlockY(spawnLoc) + 10 + random.nextInt(6));
-					dragon.getWorld().spawnEntity(spawnLoc, EntityType.END_CRYSTAL);
-					dragon.setHealth(dragon.getHealth() + 15);
-					Utils.changeName(dragon);
-					Utils.scheduleTask(() -> theFinalTrick(dragon), 400);
-				}
-			}, 400);
+			if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
+				Location spawnLoc = Utils.randomLocation(new Location(dragon.getWorld(), 0, 64, 0), 24, true);
+				spawnLoc.setY(Utils.highestBlockY(spawnLoc) + 10 + random.nextInt(6));
+				dragon.getWorld().spawnEntity(spawnLoc, EntityType.END_CRYSTAL);
+				dragon.setHealth(dragon.getHealth() + 10);
+				Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.YELLOW + "" + ChatColor.BOLD + "IT'S A TRICK!", ChatColor.RED + "?" + ChatColor.GOLD + "?" + ChatColor.BLUE + "?", 0, 40, 0));
+				Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
+				Utils.changeName(dragon);
+				Utils.scheduleTask(() -> theFinalTrick(dragon), 600);
+			}
 		}
 	}
 

@@ -279,7 +279,7 @@ public class Sadan implements CustomMob {
 					}
 				}
 			}
-			Utils.scheduleTask(() -> jollyPinkGiant(giant, finalPhase), finalPhase ? 160 : 320);
+			Utils.scheduleTask(() -> jollyPinkGiant(giant, finalPhase), finalPhase ? 200 : 320);
 			p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F);
 		}
 	}
@@ -289,8 +289,8 @@ public class Sadan implements CustomMob {
 			Player p = Utils.getNearestPlayer(giant);
 			p.playSound(p, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
 			giant.swingMainHand();
-			CustomDamage.customMobs(p, giant, finalPhase ? 125 : 100, DamageType.MELEE);
-			Utils.scheduleTask(() -> diamondGiant(giant, finalPhase), finalPhase ? 160 : 320);
+			CustomDamage.customMobs(p, giant, finalPhase ? 120 : 90, DamageType.MELEE);
+			Utils.scheduleTask(() -> diamondGiant(giant, finalPhase), finalPhase ? 200 : 320);
 		}
 	}
 
@@ -303,22 +303,22 @@ public class Sadan implements CustomMob {
 				CustomDamage.customMobs(p, giant, finalPhase ? 90 : 70, DamageType.MELEE);
 			});
 			Utils.playGlobalSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 2.0F);
-			Utils.scheduleTask(() -> bigfoot(giant, finalPhase), finalPhase ? 160 : 320);
+			Utils.scheduleTask(() -> bigfoot(giant, finalPhase), finalPhase ? 200 : 320);
 		}
 	}
 
 	private static void lasr(Zombie giant, boolean finalPhase) {
 		// Giants Phase: Every 10 ticks for 80 ticks (9 total procs), dealing 8 damage (72 total damage)
-		// Sadan Phase: Every 4 ticks for 40 ticks (11 total procs), dealing 12 damage (132 total damage)
+		// Sadan Phase: Every 4 ticks for 40 ticks (11 total procs), dealing 10 damage (110 total damage)
 		if(!giant.isDead()) {
-			for(int i = 0; i < (finalPhase ? 40 : 80); i += (finalPhase ? 4 : 10)) {
+			for(int i = 0; i <= (finalPhase ? 40 : 80); i += (finalPhase ? 4 : 10)) {
 				Utils.scheduleTask(() -> {
 					Utils.shootBeam(giant, Utils.getNearestPlayer(giant), Color.RED, 64, 1, finalPhase ? 10 : 8);
 
 					Utils.playGlobalSound(Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 				}, i);
 			}
-			Utils.scheduleTask(() -> lasr(giant, finalPhase), finalPhase ? 160 : 320);
+			Utils.scheduleTask(() -> lasr(giant, finalPhase), finalPhase ? 200 : 320);
 		}
 	}
 
@@ -354,7 +354,7 @@ public class Sadan implements CustomMob {
 			l.setY(y - 12);
 			sadan.teleport(l);
 			Utils.playGlobalSound(Sound.ENTITY_HORSE_ARMOR, 2.0F, 0.5F);
-			for(int i = 10; i < 270; i += 10) {
+			for(int i = 10; i < 280; i += 10) {
 				Utils.scheduleTask(() -> {
 					l.setY(l.getY() + 0.5);
 					sadan.teleport(l);
@@ -374,12 +374,12 @@ public class Sadan implements CustomMob {
 				sadan.removeScoreboardTag("DummySadan");
 				sadan.addScoreboardTag("TheGiantOne");
 
-				Utils.scheduleTask(() -> jollyPinkGiant(sadan, true), 40);
-				Utils.scheduleTask(() -> diamondGiant(sadan, true), 80);
-				Utils.scheduleTask(() -> bigfoot(sadan, true), 120);
-				Utils.scheduleTask(() -> lasr(sadan, true), 160);
+				Utils.scheduleTask(() -> jollyPinkGiant(sadan, true), 50);
+				Utils.scheduleTask(() -> diamondGiant(sadan, true), 100);
+				Utils.scheduleTask(() -> bigfoot(sadan, true), 150);
+				Utils.scheduleTask(() -> lasr(sadan, true), 200);
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
-			}, 320);
+			}, 340);
 		} else {
 			double currentHP = 0;
 			dead = 0;

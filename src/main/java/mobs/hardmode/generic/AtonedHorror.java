@@ -47,7 +47,7 @@ public class AtonedHorror implements CustomMob {
 
 		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
 		zombie.setHealth(200.0);
-		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(23.0);
+		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(18.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.setTarget(Utils.getNearestPlayer(zombie));
@@ -62,7 +62,7 @@ public class AtonedHorror implements CustomMob {
 		zombie.setPersistent(true);
 		zombie.setRemoveWhenFarAway(false);
 
-		Utils.scheduleTask(() -> healing(zombie), 5);
+		Utils.scheduleTask(() -> healing(zombie), 8);
 		Utils.scheduleTask(() -> summonTNT(zombie), 60);
 		Utils.scheduleTask(() -> nuclearExplosion(zombie), 600);
 
@@ -75,14 +75,14 @@ public class AtonedHorror implements CustomMob {
 				zombie.setHealth(Math.min(zombie.getHealth() + 1, 200));
 				Utils.changeName(zombie);
 			}
-			Utils.scheduleTask(() -> healing(zombie), 5);
+			Utils.scheduleTask(() -> healing(zombie), 8);
 		}
 	}
 
 	private static void summonTNT(Zombie zombie) {
 		if(!zombie.isDead()) {
 			Player p = Utils.getNearestPlayer(zombie);
-			Utils.spawnTNT(zombie, p.getLocation(), 20, 5, 30, new ArrayList<>());
+			Utils.spawnTNT(zombie, p.getLocation(), 20, 5, 25, new ArrayList<>());
 			Utils.scheduleTask(() -> summonTNT(zombie), 60);
 		}
 	}
@@ -162,7 +162,7 @@ public class AtonedHorror implements CustomMob {
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(type == DamageType.MELEE) {
-			Utils.spawnTNT(damager, damagee.getLocation(), 20, 5, 25, new ArrayList<>());
+			Utils.spawnTNT(damager, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
 		}
 		return true;
 	}

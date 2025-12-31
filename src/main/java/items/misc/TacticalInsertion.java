@@ -58,8 +58,6 @@ public class TacticalInsertion implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		Location l = p.getLocation();
-		float yaw = l.getYaw();
-		float pitch = l.getPitch();
 		p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.707107F);
 		p.playSound(p, Sound.ITEM_FLINTANDSTEEL_USE, 1.0F, 1.0F);
 		Utils.scheduleTask(() -> p.playSound(p, Sound.BLOCK_NOTE_BLOCK_HAT, 1.0F, 0.793701F), 10);

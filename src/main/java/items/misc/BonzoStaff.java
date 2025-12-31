@@ -3,12 +3,11 @@ package items.misc;
 import items.AbilityItem;
 import misc.Plugin;
 import misc.Utils;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.WindCharge;
@@ -16,6 +15,8 @@ import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,13 +60,54 @@ public class BonzoStaff implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		Location l = p.getLocation();
-		l.add(l.getDirection().setY(0).normalize().multiply(0.5));
-		l.add(0, 1.2, 0);
-		Utils.scheduleTask(() -> {
-			WindCharge charge1 = (WindCharge) l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
-			WindCharge charge2 = (WindCharge) l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
-		}, 1);
+		Vector v = l.getDirection();
+		RayTraceResult result = p.rayTraceBlocks(2.5);
+		double dY = p.getVelocity().getY();
+		float pitch = l.getPitch();
+		Vector bonzoDirection = null;
+
+		if(result != null) {
+			switch(result.getHitBlockFace()) {
+				case BlockFace.UP -> bonzoDirection = new Vector(v.getX(), 0, v.getZ()).normalize();
+				case BlockFace.DOWN, BlockFace.SELF -> fireWindCharge(p);
+				default -> bonzoDirection = new Vector(-v.getX(), 0, -v.getZ()).normalize();
+			}
+		} else {
+			if(pitch > 60 && (dY < 0 && dY > -0.3333)) {
+				bonzoDirection = new Vector(v.getX(), 0, v.getZ()).normalize();
+			}
+		}
+
+		if(bonzoDirection != null) {
+			if(!(p instanceof CraftPlayer cp)) {
+				return false;
+			}
+			net.minecraft.world.entity.LivingEntity nmsEntity = cp.getHandle();
+
+			// Calculate velocity: 1.52552 blocks/tick horizontal, 0.5 blocks/tick vertical
+			Vector velocity = bonzoDirection.multiply(1.52552);
+			velocity.setY(0.5);
+
+			// Set the velocity directly through NMS for precise control
+			nmsEntity.setDeltaMovement(velocity.getX(), velocity.getY(), velocity.getZ());
+			nmsEntity.hurtMarked = true;
+
+			p.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, l, 350, 0, 0, 0, 0.75);
+			p.getWorld().spawnParticle(Particle.CRIT, l, 150, 0, 0, 0, 2);
+			p.playSound(l, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 2.0F, 1.0F);
+		} else {
+			fireWindCharge(p);
+		}
 		return true;
+	}
+
+	private static void fireWindCharge(Player p) {
+		Location l = p.getEyeLocation();
+		l.add(l.getDirection().setY(0).normalize().multiply(0.5));
+		Utils.scheduleTask(() -> {
+			l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
+			l.getWorld().spawnEntity(l, EntityType.WIND_CHARGE);
+		}, 1);
 	}
 
 	@Override

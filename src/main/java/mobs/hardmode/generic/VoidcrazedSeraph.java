@@ -83,7 +83,7 @@ public class VoidcrazedSeraph implements CustomMob {
 					block.setType(Material.BEACON);
 					beacons.add(block);
 					Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
-					Utils.applyToAllNearbyPlayers(voidgloom, 32, p -> p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Destroy it or die!", 0, 200, 0));
+					Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Destroy it or die!", 0, 200, 0));
 					Utils.scheduleTask(() -> {
 						if(!voidgloom.isDead() && block.getType() == Material.BEACON) {
 							Utils.spawnTNT(voidgloom, block.getLocation(), 0, 32, 500, new ArrayList<>());
