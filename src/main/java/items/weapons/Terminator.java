@@ -183,7 +183,7 @@ public class Terminator implements AbilityItem {
 			arrow.addScoreboardTag("TerminatorArrow");
 		}
 
-		p.playSound(p.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0F, 2.0F);
+		p.playSound(p.getLocation(), Sound.ENTITY_ARROW_SHOOT, 1.0F, 1.0F);
 
 		return false;
 	}
