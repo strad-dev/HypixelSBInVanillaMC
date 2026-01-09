@@ -35,7 +35,7 @@ public class OldRegen implements Listener {
 				StringBuilder newName;
 				try {
 					String[] oldName = Objects.requireNonNull(entity.getCustomName()).split(" ");
-					int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount());
+					int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount() + e.getAmount());
 					int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
 					oldName[oldName.length - 1] = ChatColor.YELLOW + "" + health + "/" + maxHealth;
 					newName = new StringBuilder(oldName[0]);
@@ -44,7 +44,7 @@ public class OldRegen implements Listener {
 					}
 				} catch(Exception exception) {
 					// add health to the entity name
-					int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount());
+					int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount() + e.getAmount());
 					int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
 					newName = new StringBuilder(String.valueOf(ChatColor.AQUA)).append(entity.getName()).append(" ").append(ChatColor.RED).append("❤ ").append(ChatColor.YELLOW).append(health).append("/").append(maxHealth);
 					// " ♥ 20/20";

@@ -280,15 +280,6 @@ public class CustomDamage implements Listener {
 
 			double absorption = damagee.getAbsorptionAmount();
 			double oldHealth = damagee.getHealth();
-			boolean doesDie = finalDamage >= oldHealth + absorption;
-
-			// fire aspect - should always apply
-			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
-				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
-				damagee.setFireTicks(level * 80);
-			} else if(data.flamingArrow) {
-				damagee.setFireTicks(100);
-			}
 
 			boolean isPhysicalHit = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL;
 			// handle particles and wind burst
@@ -320,32 +311,6 @@ public class CustomDamage implements Listener {
 
 				// damage weapon
 				Utils.damageItem(p, weapon, 1);
-			}
-
-			// handle raid mechanics
-			if(damagee instanceof Raider raider) {
-				net.minecraft.world.entity.raid.Raider nmsRaider = ((CraftRaider) raider).getHandle();
-				net.minecraft.world.entity.raid.Raid nmsRaid = nmsRaider.getCurrentRaid();
-
-				if(nmsRaid != null) {
-					if(damager instanceof Player player) {
-						ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
-						nmsRaid.addHeroOfTheVillage(nmsPlayer);
-					}
-				} else {
-					ServerLevel world = ((CraftWorld) raider.getWorld()).getHandle();
-					Raids raids = world.getRaids();
-
-					BlockPos pos = new BlockPos(raider.getLocation().getBlockX(), raider.getLocation().getBlockY(), raider.getLocation().getBlockZ());
-					net.minecraft.world.entity.raid.Raid raidAtPos = raids.getNearbyRaid(pos, 128);
-
-					if(raidAtPos != null) {
-						if(damager instanceof Player player) {
-							ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
-							raidAtPos.addHeroOfTheVillage(nmsPlayer);
-						}
-					}
-				}
 			}
 
 			// handle thorns
@@ -399,7 +364,46 @@ public class CustomDamage implements Listener {
 				}
 			}
 
-			if(doesDie) {
+			// armor stand override
+			if(damagee instanceof ArmorStand) {
+				finalDamage = 11;
+				type = DamageType.LETHAL_ABSOLUTE;
+			}
+
+			// fire aspect - should always apply
+			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
+				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
+				damagee.setFireTicks(level * 80);
+			} else if(data.flamingArrow) {
+				damagee.setFireTicks(100);
+			}
+
+			// handle raid mechanics
+			if(damagee instanceof Raider raider) {
+				net.minecraft.world.entity.raid.Raider nmsRaider = ((CraftRaider) raider).getHandle();
+				net.minecraft.world.entity.raid.Raid nmsRaid = nmsRaider.getCurrentRaid();
+
+				if(nmsRaid != null) {
+					if(damager instanceof Player player) {
+						ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+						nmsRaid.addHeroOfTheVillage(nmsPlayer);
+					}
+				} else {
+					ServerLevel world = ((CraftWorld) raider.getWorld()).getHandle();
+					Raids raids = world.getRaids();
+
+					BlockPos pos = new BlockPos(raider.getLocation().getBlockX(), raider.getLocation().getBlockY(), raider.getLocation().getBlockZ());
+					net.minecraft.world.entity.raid.Raid raidAtPos = raids.getNearbyRaid(pos, 128);
+
+					if(raidAtPos != null) {
+						if(damager instanceof Player player) {
+							ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+							raidAtPos.addHeroOfTheVillage(nmsPlayer);
+						}
+					}
+				}
+			}
+			if(finalDamage >= oldHealth + absorption) {
 				if(type != DamageType.LETHAL_ABSOLUTE && (damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING))) {
 					if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
 						damagee.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
@@ -539,6 +543,10 @@ public class CustomDamage implements Listener {
 
 				if(damagee instanceof Shulker shulker && damager instanceof Shulker) {
 					handleShulkerDuplication(shulker);
+				}
+
+				if(damagee instanceof ArmorStand armorStand) {
+					armorStand.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 255, true, false));
 				}
 
 				// special ender dragon knockback to make zero- and one-cycling possible
@@ -1104,7 +1112,7 @@ public class CustomDamage implements Listener {
 			e.setCancelled(true);
 			DamageType type;
 			switch(e.getCause()) {
-				case BLOCK_EXPLOSION, THORNS -> type = DamageType.MELEE;
+				case BLOCK_EXPLOSION -> type = DamageType.MELEE;
 				case POISON, WITHER -> type = DamageType.MAGIC;
 				case CONTACT, CRAMMING, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION,
 					 SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
