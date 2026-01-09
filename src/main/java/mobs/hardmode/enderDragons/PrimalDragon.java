@@ -154,7 +154,7 @@ public class PrimalDragon implements CustomDragon {
 				Utils.spawnTNT(dragon, FREEZE_LOCATION, 0, 128, 200, new ArrayList<>());
 				fireballSpam(dragon);
 				tntRain(dragon);
-				summonZealots(dragon);
+				Utils.scheduleTask(() -> summonZealots(dragon), 600);
 				dragon.setSilent(false);
 			}, 120);
 			return false;
@@ -172,8 +172,8 @@ public class PrimalDragon implements CustomDragon {
 				fireballSpam(dragon);
 				tntRain(dragon);
 				extremeTNTRainPlayer(dragon);
-				summonZealots(dragon);
-				theFinalTrick(dragon);
+				Utils.scheduleTask(() -> summonZealots(dragon), 400);
+				Utils.scheduleTask(() -> theFinalTrick(dragon), 600);
 				dragon.setSilent(false);
 			}, 240);
 			return false;
@@ -464,16 +464,14 @@ public class PrimalDragon implements CustomDragon {
 
 	private static void theFinalTrick(EnderDragon dragon) {
 		if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
-			if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
-				Location spawnLoc = Utils.randomLocation(new Location(dragon.getWorld(), 0, 64, 0), 24, true);
-				spawnLoc.setY(Utils.highestBlockY(spawnLoc) + 10 + random.nextInt(6));
-				dragon.getWorld().spawnEntity(spawnLoc, EntityType.END_CRYSTAL);
-				dragon.setHealth(dragon.getHealth() + 10);
-				Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.YELLOW + "" + ChatColor.BOLD + "IT'S A TRICK!", ChatColor.RED + "?" + ChatColor.GOLD + "?" + ChatColor.BLUE + "?", 0, 40, 0));
-				Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
-				Utils.changeName(dragon);
-				Utils.scheduleTask(() -> theFinalTrick(dragon), 600);
-			}
+			Location spawnLoc = Utils.randomLocation(new Location(dragon.getWorld(), 0, 64, 0), 24, true);
+			spawnLoc.setY(Utils.highestBlockY(spawnLoc) + 10 + random.nextInt(6));
+			dragon.getWorld().spawnEntity(spawnLoc, EntityType.END_CRYSTAL);
+			dragon.setHealth(dragon.getHealth() + 10);
+			Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.YELLOW + "" + ChatColor.BOLD + "IT'S A TRICK!", ChatColor.RED + "?" + ChatColor.GOLD + "?" + ChatColor.BLUE + "?", 0, 40, 0));
+			Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
+			Utils.changeName(dragon);
+			Utils.scheduleTask(() -> theFinalTrick(dragon), 600);
 		}
 	}
 

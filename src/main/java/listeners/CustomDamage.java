@@ -1034,6 +1034,13 @@ public class CustomDamage implements Listener {
 				return sources.spit(spit, (net.minecraft.world.entity.LivingEntity) nmsCausingEntity);
 			}
 			return sources.generic();
+		} else if(damageType == org.bukkit.damage.DamageType.SPEAR) {
+			if(nmsCausingEntity instanceof ServerPlayer player) {
+				return sources.playerAttack(player);
+			} else if(nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
+				return sources.mobAttack(living);
+			}
+			return sources.generic();
 		}
 		// Fallback for any unmapped damage types
 		else {
