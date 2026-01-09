@@ -14,7 +14,6 @@ import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
 public class ArrowMechanicsHandler implements Listener {
-
 	@EventHandler
 	public void onEntityExplode(EntityExplodeEvent e) {
 		if(e.getEntity() instanceof WindCharge windCharge && windCharge.getScoreboardTags().contains("Bonzo")) {
