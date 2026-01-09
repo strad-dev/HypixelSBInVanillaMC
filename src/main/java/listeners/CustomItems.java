@@ -163,7 +163,7 @@ public class CustomItems implements Listener {
 				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
 					e.setCancelled(true);
 				}
-				if(!p.getScoreboardTags().contains("AbilityCooldown") || item instanceof Terminator) {
+				if(!p.getScoreboardTags().contains("AbilityCooldown") || ((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && item instanceof Terminator)) {
 					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
 						if(!((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && !item.hasLeftClickAbility())) {
 							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
@@ -190,7 +190,7 @@ public class CustomItems implements Listener {
 							p.addScoreboardTag(item.cooldownTag());
 							Utils.scheduleTask(() -> p.removeScoreboardTag(item.cooldownTag()), item.cooldown());
 							p.addScoreboardTag("AbilityCooldown");
-							Utils.scheduleTask(() -> p.removeScoreboardTag("AbilityCooldown"), 2L);
+							Utils.scheduleTask(() -> p.removeScoreboardTag("AbilityCooldown"), 3L);
 						}
 					}
 				} else {

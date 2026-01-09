@@ -132,7 +132,7 @@ public class AtonedHorror implements CustomMob {
 			});
 			Utils.scheduleTask(() -> {
 				if(!zombie.isDead()) {
-					Utils.spawnTNT(zombie, zombie.getLocation(), 0, 64, 200, new ArrayList<>());
+					Utils.spawnTNT(zombie, zombie.getLocation(), 0, 16, 200, new ArrayList<>());
 				}
 				zombie.setAI(true);
 				zombie.removeScoreboardTag("Invulnerable");
