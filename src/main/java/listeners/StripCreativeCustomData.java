@@ -1,6 +1,5 @@
 package listeners;
 
-import misc.Plugin;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.CustomData;
 import org.bukkit.GameMode;
@@ -14,10 +13,7 @@ import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.logging.Logger;
-
 public class StripCreativeCustomData implements Listener {
-	private static final Logger log = Plugin.getInstance().getLogger();
 
 	@EventHandler
 	public void onCreativeInventory(InventoryCreativeEvent e) {
@@ -26,6 +22,7 @@ public class StripCreativeCustomData implements Listener {
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
+		if (e instanceof InventoryCreativeEvent) return; // already handled by onCreativeInventory
 		if (!(e.getWhoClicked() instanceof Player p) || p.getGameMode() != GameMode.CREATIVE) return;
 
 		stripEmpty(e.getCurrentItem(), e::setCurrentItem, "InventoryClickEvent/currentItem");
@@ -68,14 +65,11 @@ public class StripCreativeCustomData implements Listener {
 	 * Returns a copy with empty custom_data removed, or null if no stripping was needed.
 	 */
 	public static ItemStack stripEmptyCustomData(ItemStack item, String context) {
-		Logger log = Plugin.getInstance().getLogger();
-
 		if (item == null || item.getType().isAir()) {
 			return null;
 		}
 
 		net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
-		boolean hasComponent = nms.has(DataComponents.CUSTOM_DATA);
 		CustomData customData = nms.get(DataComponents.CUSTOM_DATA);
 
 		if (customData != null && customData.isEmpty()) {
