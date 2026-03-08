@@ -597,7 +597,7 @@ public class CustomDamage implements Listener {
 
 					// Apply knockback
 					Vector oldVelocity = damagee.getVelocity();
-					Vector newVelocity = new Vector(oldVelocity.getX() * 0.2 + knockbackDir.getX() * factor + factor * damager.getVelocity().getX(), (damagee.isOnGround() ? 0.4 * antiKB * (data.isTermArrow ? 0.5 : 1) : 0), oldVelocity.getZ() * 0.2 + knockbackDir.getZ() * factor + factor * damager.getVelocity().getZ());
+					Vector newVelocity = new Vector(oldVelocity.getX() * 0.2 + knockbackDir.getX() * factor + factor * damager.getVelocity().getX(), (damagee.isOnGround() ? 0.4 * antiKB * (data.isBlocking ? 0.5 : 1) * (data.isTermArrow ? 0.5 : 1) : 0), oldVelocity.getZ() * 0.2 + knockbackDir.getZ() * factor + factor * damager.getVelocity().getZ());
 
 					damagee.setVelocity(newVelocity);
 				}

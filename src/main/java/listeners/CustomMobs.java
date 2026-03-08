@@ -41,24 +41,22 @@ public class CustomMobs implements Listener {
 		}
 	}
 
-	@EventHandler
-	public void onEntitySpawn(EntitySpawnEvent e) {
-		Player p = Utils.getNearestPlayer(e.getEntity());
-		boolean hardMode = false;
-		if(p != null) {
-			// Hard Mode will apply if any player in a 64-block radius of the mob has the effect
-			// Otherwise, if the nearest player has the effect, Hard Mode will always take effect
-			hardMode = p.hasPotionEffect(PotionEffectType.BAD_OMEN);
-			if(!hardMode) {
-				for(Player p2 : e.getEntity().getWorld().getPlayers()) {
-					if(p2.getLocation().distanceSquared(e.getLocation()) <= 4096 && p2.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
-						hardMode = true;
-						p = p2;
-						break;
-					}
-				}
+	/**
+	 * Returns the player that triggers hard mode for this spawn, or null if not hard mode.
+	 */
+	private Player getHardModePlayer(Player nearest, EntitySpawnEvent e) {
+		if(nearest == null) return null;
+		if(nearest.hasPotionEffect(PotionEffectType.BAD_OMEN)) return nearest;
+		for(Player p2 : e.getEntity().getWorld().getPlayers()) {
+			if(p2.getLocation().distanceSquared(e.getLocation()) <= 4096 && p2.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
+				return p2;
 			}
 		}
+		return null;
+	}
+
+	@EventHandler
+	public void onEntitySpawn(EntitySpawnEvent e) {
 		if(e.getEntity() instanceof LivingEntity entity) {
 			String name = "";
 
@@ -66,10 +64,12 @@ public class CustomMobs implements Listener {
 			try {
 				switch(entity) {
 					case Wither wither -> {
+						Player p = Utils.getNearestPlayer(e.getEntity());
+						Player hardModePlayer = getHardModePlayer(p, e);
 						wither.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 						if(!isWitherLordFightActive) {
-							if(hardMode) {
-								p.removePotionEffect(PotionEffectType.BAD_OMEN);
+							if(hardModePlayer != null) {
+								hardModePlayer.removePotionEffect(PotionEffectType.BAD_OMEN);
 								Utils.scheduleTask(wither::remove, 1);
 								Utils.scheduleTask(() -> {
 									Wither wither2 = (Wither) wither.getWorld().spawnEntity(wither.getLocation(), EntityType.WITHER);
@@ -108,9 +108,11 @@ public class CustomMobs implements Listener {
 					}
 					case EnderDragon dragon -> {
 						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-							if(hardMode) {
-								p.removePotionEffect(PotionEffectType.BAD_OMEN);
-								name = new PrimalDragon().onSpawn(p, dragon);
+							Player p = Utils.getNearestPlayer(e.getEntity());
+							Player hardModePlayer = getHardModePlayer(p, e);
+							if(hardModePlayer != null) {
+								hardModePlayer.removePotionEffect(PotionEffectType.BAD_OMEN);
+								name = new PrimalDragon().onSpawn(hardModePlayer, dragon);
 							} else {
 								name = CustomDragon.spawnRandom().onSpawn(Utils.getNearestPlayer(dragon), dragon);
 								dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
