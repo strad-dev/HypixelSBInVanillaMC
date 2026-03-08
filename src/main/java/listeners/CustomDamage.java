@@ -367,8 +367,12 @@ public class CustomDamage implements Listener {
 
 			// armor stand override
 			if(damagee instanceof ArmorStand) {
-				finalDamage = 11;
-				type = DamageType.LETHAL_ABSOLUTE;
+				if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED) {
+					finalDamage = 11;
+					type = DamageType.LETHAL_ABSOLUTE;
+				} else {
+					return;
+				}
 			}
 
 			// fire aspect - should always apply if not blocking
