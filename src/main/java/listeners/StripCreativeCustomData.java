@@ -21,9 +21,6 @@ public class StripCreativeCustomData implements Listener {
 
 	@EventHandler
 	public void onCreativeInventory(InventoryCreativeEvent e) {
-		log.info("[CustomData] InventoryCreativeEvent fired for " + e.getWhoClicked().getName()
-				+ " | item: " + e.getCursor().getType()
-				+ " | hasItemMeta: " + e.getCursor().hasItemMeta());
 		stripEmpty(e.getCursor(), e::setCursor, "InventoryCreativeEvent/cursor");
 	}
 
@@ -31,10 +28,6 @@ public class StripCreativeCustomData implements Listener {
 	public void onInventoryClick(InventoryClickEvent e) {
 		if (!(e.getWhoClicked() instanceof Player p) || p.getGameMode() != GameMode.CREATIVE) return;
 
-		log.info("[CustomData] InventoryClickEvent (creative) fired for " + p.getName()
-				+ " | action: " + e.getAction()
-				+ " | currentItem: " + (e.getCurrentItem() != null ? e.getCurrentItem().getType() : "null")
-				+ " | cursor: " + e.getCursor().getType());
 		stripEmpty(e.getCurrentItem(), e::setCurrentItem, "InventoryClickEvent/currentItem");
 		stripEmpty(e.getCursor(), item -> e.getView().setCursor(item), "InventoryClickEvent/cursor");
 	}
@@ -43,8 +36,6 @@ public class StripCreativeCustomData implements Listener {
 	public void onInventoryDrag(InventoryDragEvent e) {
 		if (!(e.getWhoClicked() instanceof Player p) || p.getGameMode() != GameMode.CREATIVE) return;
 
-		log.info("[CustomData] InventoryDragEvent (creative) fired for " + p.getName()
-				+ " | slots: " + e.getNewItems().keySet());
 		stripEmpty(e.getCursor(), e::setCursor, "InventoryDragEvent/cursor");
 		for (int slot : e.getNewItems().keySet()) {
 			ItemStack slotItem = e.getView().getItem(slot);
@@ -57,9 +48,6 @@ public class StripCreativeCustomData implements Listener {
 		if (!(e.getEntity() instanceof Player p)) return;
 
 		ItemStack item = e.getItem().getItemStack();
-		log.info("[CustomData] EntityPickupItemEvent fired for " + p.getName()
-				+ " | item: " + item.getType()
-				+ " | hasItemMeta: " + item.hasItemMeta());
 		ItemStack stripped = stripEmptyCustomData(item, "EntityPickupItemEvent");
 		if (stripped != null) {
 			e.getItem().setItemStack(stripped);
@@ -83,7 +71,6 @@ public class StripCreativeCustomData implements Listener {
 		Logger log = Plugin.getInstance().getLogger();
 
 		if (item == null || item.getType().isAir()) {
-			log.info("[CustomData]   " + context + " -> skipped (null or air)");
 			return null;
 		}
 
@@ -91,18 +78,11 @@ public class StripCreativeCustomData implements Listener {
 		boolean hasComponent = nms.has(DataComponents.CUSTOM_DATA);
 		CustomData customData = nms.get(DataComponents.CUSTOM_DATA);
 
-		log.info("[CustomData]   " + context + " -> " + item.getType()
-				+ " | has CUSTOM_DATA component: " + hasComponent
-				+ " | customData: " + customData
-				+ " | isEmpty: " + (customData != null ? customData.isEmpty() : "N/A"));
-
 		if (customData != null && customData.isEmpty()) {
 			nms.remove(DataComponents.CUSTOM_DATA);
-			log.info("[CustomData]   " + context + " -> STRIPPED empty custom_data from " + item.getType());
 			return CraftItemStack.asBukkitCopy(nms);
 		}
 
-		log.info("[CustomData]   " + context + " -> no action needed");
 		return null;
 	}
 
