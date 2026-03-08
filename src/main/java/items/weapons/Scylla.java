@@ -288,11 +288,7 @@ public class Scylla implements AbilityItem {
 		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		// wither shield
-		int absorptionLevel = -1;
-		if(p.hasPotionEffect(PotionEffectType.ABSORPTION)) {
-			absorptionLevel = p.getPotionEffect(PotionEffectType.ABSORPTION).getAmplifier();
-		}
-		if(absorptionLevel != 2) { // absorption shield
+		if(!p.getScoreboardTags().contains("WitherShield")) { // reduced damage
 			p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 101, 2));
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 0.66666F);
 			Location finalL = l;
@@ -300,8 +296,6 @@ public class Scylla implements AbilityItem {
 				p.setHealth(Math.min(p.getHealth() + (p.getAbsorptionAmount() / 2), p.getAttribute(Attribute.MAX_HEALTH).getValue()));
 				p.playSound(finalL, Sound.ENTITY_PLAYER_LEVELUP, 2.0F, 2.0F);
 			}, 101L);
-		}
-		if(!p.getScoreboardTags().contains("WitherShield")) { // reduced damage
 			p.addScoreboardTag("WitherShield");
 			Utils.scheduleTask(() -> p.removeScoreboardTag("WitherShield"), 101);
 		}
