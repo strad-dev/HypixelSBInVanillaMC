@@ -79,6 +79,7 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new WitherKingDragonCustomAI(), this);
 		getServer().getPluginManager().registerEvents(new CustomMining(), this);
 		getServer().getPluginManager().registerEvents(new CreativeMenu(), this);
+		getServer().getPluginManager().registerEvents(new StripCreativeCustomData(), this);
 
 		getServer().addRecipe(AddRecipes.addScyllaRecipe(this));
 		getServer().addRecipe(AddRecipes.addClaymoreRecipe(this));

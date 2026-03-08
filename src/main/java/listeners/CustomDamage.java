@@ -371,12 +371,14 @@ public class CustomDamage implements Listener {
 				type = DamageType.LETHAL_ABSOLUTE;
 			}
 
-			// fire aspect - should always apply
-			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
-				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
-				damagee.setFireTicks(level * 80);
-			} else if(data.flamingArrow) {
-				damagee.setFireTicks(100);
+			// fire aspect - should always apply if not blocking
+			if(!data.isBlocking) {
+				if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.FIRE_ASPECT)) {
+					int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.FIRE_ASPECT);
+					damagee.setFireTicks(level * 80);
+				} else if(data.flamingArrow) {
+					damagee.setFireTicks(100);
+				}
 			}
 
 			// handle raid mechanics

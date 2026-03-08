@@ -66,6 +66,15 @@ public class PlayerLoginHandler implements Listener {
 		p.removeScoreboardTag("HolyIce");
 
 		this.inventory = p.getInventory();
+
+		// Strip empty custom_data from all items in the player's inventory
+		for(int i = 0; i < inventory.getSize(); i++) {
+			ItemStack stripped = StripCreativeCustomData.stripEmptyCustomData(inventory.getItem(i), "PlayerJoin/slot" + i);
+			if(stripped != null) {
+				inventory.setItem(i, stripped);
+			}
+		}
+
 		for(int i = 0; i < inventory.getSize(); i++) {
 			ItemStack item = inventory.getItem(i);
 			try {
