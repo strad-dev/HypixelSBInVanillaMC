@@ -1,14 +1,17 @@
 package listeners;
 
+import misc.Utils;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.inventory.view.AnvilView;
 
 import java.util.List;
@@ -20,6 +23,7 @@ public class BetterAnvil implements Listener {
 		List<HumanEntity> viewers = e.getViewers();
 		if(viewers.isEmpty()) return;
 		AnvilView view = e.getView();
+		view.setMaximumRepairCost(2147483647);
 
 		ItemStack FIRST_ITEM = view.getItem(0);
 		ItemStack SECOND_ITEM = view.getItem(1);
@@ -40,14 +44,27 @@ public class BetterAnvil implements Listener {
 						}
 					}
 				}
+				ItemMeta resultMeta = result.getItemMeta();
+				if(resultMeta instanceof Repairable repairable) {
+					if(repairable.getRepairCost() > 50) {
+						repairable.setRepairCost(50);
+					}
+					result.setItemMeta(resultMeta);
+				}
 				e.setResult(result);
 			}
 		}
-
-		view.setMaximumRepairCost(50);
 		if(view.getRepairCost() > 50) {
 			view.setRepairCost(50);
 		}
+
+		Utils.scheduleTask(() -> {
+			for(HumanEntity viewer : e.getViewers()) {
+				if(viewer instanceof Player player) {
+					player.updateInventory();
+				}
+			}
+		}, 1);
 	}
 
 	public boolean canEnchant(ItemStack itemStack, Enchantment enchantment) {

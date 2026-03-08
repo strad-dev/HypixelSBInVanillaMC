@@ -290,12 +290,13 @@ public class CustomDamage implements Listener {
 
 				// Critical hit particles
 				if(isCrit) {
-					damagee.getWorld().spawnParticle(Particle.CRIT, particleLoc, 80);
+					damagee.getWorld().spawnParticle(Particle.CRIT, particleLoc, 32);
+					damagee.getWorld().playSound(damagee, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0F, 1.0F);
 				}
 
 				// Enchanted hit particles
 				if(!weapon.getEnchantments().isEmpty() && isPhysicalHit) {
-					damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, particleLoc, Math.min((int) (data.originalDamage * 8), 80));
+					damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, particleLoc, Math.min((int) (data.originalDamage * 8), 32));
 				}
 
 				// Damage Indicator particles
@@ -329,11 +330,11 @@ public class CustomDamage implements Listener {
 							eq.getBoots()
 					};
 
-					for (ItemStack armor : armorPieces) {
-						if (armor == null || armor.getType() == Material.AIR) continue;
+					for(ItemStack armor : armorPieces) {
+						if(armor == null || armor.getType() == Material.AIR) continue;
 
 						int thornsLevel = armor.getEnchantmentLevel(Enchantment.THORNS);
-						if (thornsLevel > 0) {
+						if(thornsLevel > 0) {
 							totalThornsLevel += thornsLevel;
 							thornsArmor.add(armor);
 						}
@@ -355,7 +356,7 @@ public class CustomDamage implements Listener {
 
 							customMobs((LivingEntity) damager, damagee, thornsDamage, DamageType.PLAYER_MAGIC);
 
-							if (!thornsArmor.isEmpty()) {
+							if(!thornsArmor.isEmpty()) {
 								ItemStack armorToDamage = thornsArmor.get(random.nextInt(thornsArmor.size()));
 								Utils.damageItem(damagee, armorToDamage, 1);
 							}
@@ -477,13 +478,7 @@ public class CustomDamage implements Listener {
 								Utils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 							}
 							dragon.setSilent(true);
-							for(int i = 181; i < 201; i++) {
-								int finalI = i;
-								Utils.scheduleTask(() -> {
-									ExperienceOrb orb = (ExperienceOrb) dragon.getWorld().spawnEntity(dragon.getLocation(), EntityType.EXPERIENCE_ORB);
-									orb.setExperience(dragon.getScoreboardTags().contains("HardMode") ? 31991 + (finalI - 180) : 3191 + (finalI - 180));
-								}, i);
-							}
+							Utils.scheduleTask(() -> spawnDragonXP(dragon.getLocation(), dragon.getScoreboardTags().contains("HardMode") ? 640000 : 64000), 190);
 						} else {
 							damagee.setHealth(0.0);
 						}
@@ -567,24 +562,21 @@ public class CustomDamage implements Listener {
 
 					if(damager instanceof LivingEntity livingEntity) {
 						if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK) && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
-							enchantments += 0.66667 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
+							enchantments += 0.33333 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
 						} else if(data.punchArrow > 0) {
-							enchantments += 0.66667 * data.punchArrow;
+							enchantments += 0.33333 * data.punchArrow;
 						}
 					}
 
-					double factor = 0.33333 * antiKB * enchantments;
+					double factor = 0.5 * antiKB * enchantments;
 
 					// Apply type-specific modifiers
 					if(damager.getFallDistance() > 0) {
 						factor *= 1.2;
 					}
 
-					if(type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) {
+					if(data.isTermArrow) {
 						factor *= 0.25;
-						if(data.isTermArrow) {
-							factor *= 0.5;
-						}
 					}
 
 					if(data.isBlocking) {
@@ -603,7 +595,7 @@ public class CustomDamage implements Listener {
 
 					// Apply knockback
 					Vector oldVelocity = damagee.getVelocity();
-					Vector newVelocity = new Vector(oldVelocity.getX() + knockbackDir.getX() * factor + factor * damager.getVelocity().getX(), 0.2 * antiKB, oldVelocity.getZ() + knockbackDir.getZ() * factor + factor * damager.getVelocity().getZ());
+					Vector newVelocity = new Vector(oldVelocity.getX() * 0.2 + knockbackDir.getX() * factor + factor * damager.getVelocity().getX(), (damagee.isOnGround() ? 0.4 * antiKB * (data.isTermArrow ? 0.5 : 1) : 0), oldVelocity.getZ() * 0.2 + knockbackDir.getZ() * factor + factor * damager.getVelocity().getZ());
 
 					damagee.setVelocity(newVelocity);
 				}
@@ -613,6 +605,20 @@ public class CustomDamage implements Listener {
 				triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 			}
 		}
+	}
+
+	public static void spawnDragonXP(Location deathLocation, int totalXP) {
+		ServerLevel level = ((CraftWorld) deathLocation.getWorld()).getHandle();
+		Vec3 pos = new Vec3(deathLocation.getX(), deathLocation.getY(), deathLocation.getZ());
+
+		// 10 waves of 8%, every 5 ticks starting at tick 0
+		for(int wave = 0; wave < 10; wave++) {
+			int delay = wave * 5;
+			Utils.scheduleTask(() -> net.minecraft.world.entity.ExperienceOrb.award(level, pos, (int) Math.floor((float) totalXP * 0.08F)), delay);
+		}
+
+		// Final wave of 20% at tick 50
+		Utils.scheduleTask(() -> net.minecraft.world.entity.ExperienceOrb.award(level, pos, (int) Math.floor((float) totalXP * 0.2F)), 50);
 	}
 
 	private static void triggerAllRelevantAdvancements(LivingEntity victim, Entity attacker, DamageType type, double originalDamage, double finalDamage, boolean wasBlocked, boolean wasKilled, DamageData data) {
@@ -809,7 +815,7 @@ public class CustomDamage implements Listener {
 		Filter originalFilter = logger.getFilter();
 
 		logger.setFilter(record -> {
-			if (record.getMessage().contains("PostProcessing")) {
+			if(record.getMessage().contains("PostProcessing")) {
 				return false;
 			}
 			return originalFilter == null || originalFilter.isLoggable(record);
