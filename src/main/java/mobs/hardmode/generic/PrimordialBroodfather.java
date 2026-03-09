@@ -31,6 +31,7 @@ public class PrimordialBroodfather implements CustomMob {
 		}
 
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Primordial Broodfather" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		spider.eject();
 		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
 		spider.setHealth(200.0);
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.67);
@@ -72,6 +73,7 @@ public class PrimordialBroodfather implements CustomMob {
 		} else if(health - finalDamage < 0 && !damagee.isDead()) {
 			damagee.remove();
 			Spider spider = (Spider) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.SPIDER);
+			spider.eject();
 			CustomMob.getMob("ConjoinedBrood", false).onSpawn(Utils.getNearestPlayer(damagee), spider);
 		} else if(health - finalDamage < 100 && damagee.getScoreboardTags().contains("50Trigger")) {
 			damagee.setHealth(100.0);

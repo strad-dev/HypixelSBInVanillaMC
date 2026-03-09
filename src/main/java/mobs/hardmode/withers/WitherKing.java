@@ -117,6 +117,7 @@ public class WitherKing implements CustomWither {
 
 	private void spawnHenchman(Wither wither, String which) {
 		WitherSkeleton witherSkeleton = (WitherSkeleton) wither.getWorld().spawnEntity(wither.getLocation(), EntityType.WITHER_SKELETON);
+		witherSkeleton.getEquipment().clear();
 		Player p = Utils.getNearestPlayer(wither);
 
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
@@ -201,6 +202,7 @@ public class WitherKing implements CustomWither {
 			int health = 150 - countHenchmenLeft() * 10;
 			for(int i = 0; i < 4 - countHenchmenLeft() / 2; i++) {
 				WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
+				e.getEquipment().clear();
 				ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 				sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 5);
 				ItemStack shield = new ItemStack(Material.SHIELD);
