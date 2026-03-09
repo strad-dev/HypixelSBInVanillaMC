@@ -14,8 +14,4 @@ public class DiscordForwarder {
 		DiscordUtil.sendMessage(DiscordSRV.getPlugin().getMainTextChannel(), message);
 	}
 
-	public static void forwardAdvancement(String playerName, String advancementTitle) {
-		DiscordUtil.sendMessage(DiscordSRV.getPlugin().getMainTextChannel(),
-			playerName + " has made the advancement " + advancementTitle);
-	}
 }

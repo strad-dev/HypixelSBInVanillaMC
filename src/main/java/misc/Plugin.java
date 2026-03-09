@@ -24,21 +24,18 @@
 
 package misc;
 
-import com.fren_gor.ultimateAdvancementAPI.AdvancementTab;
-import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI;
-import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;
-import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
-import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
-import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
-import com.fren_gor.ultimateAdvancementAPI.events.PlayerLoadingCompletedEvent;
 import commands.*;
 import listeners.*;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.advancement.Advancement;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.Score;
@@ -46,9 +43,8 @@ import org.bukkit.scoreboard.Score;
 import java.util.Objects;
 
 @SuppressWarnings({"unused"})
-public class Plugin extends JavaPlugin {
+public class Plugin extends JavaPlugin implements Listener {
 	private static Plugin instance;
-	private static UltimateAdvancementAPI advancementAPI;
 
 	@Override
 	public void onEnable() {
@@ -80,6 +76,7 @@ public class Plugin extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new CustomMining(), this);
 		getServer().getPluginManager().registerEvents(new CreativeMenu(), this);
 		getServer().getPluginManager().registerEvents(new StripCreativeCustomData(), this);
+		getServer().getPluginManager().registerEvents(this, this);
 
 		getServer().addRecipe(AddRecipes.addScyllaRecipe(this));
 		getServer().addRecipe(AddRecipes.addClaymoreRecipe(this));
@@ -118,42 +115,92 @@ public class Plugin extends JavaPlugin {
 		Utils.scheduleTask(() -> passiveIntel(0), 20L);
 	}
 
+	@SuppressWarnings("deprecation")
 	private static void setupAdvancements() {
-		advancementAPI = UltimateAdvancementAPI.getInstance(Plugin.getInstance());
+		// Root advancement
+		loadAdvancement("root", null, "minecraft:nether_star", "SkyBlock", "Can you beat all the bosses?", "task", false, false, 0, 3, "minecraft:block/light_blue_concrete");
 
-		AdvancementTab tab = advancementAPI.createAdvancementTab("skyblock");
+		// Chickzilla branch (y=6)
+		loadAdvancement("defeat_chickzilla", "skyblock:root", "minecraft:cooked_chicken", "Cooked Chicken", "Yummy food.", "task", true, true, 1, 6, null);
+		loadAdvancement("defeat_hard_chickzilla", "skyblock:defeat_chickzilla", "minecraft:campfire", "Still Cooked", "Always a good day to have cooked chicken.", "task", true, true, 2, 6, null);
 
-		RootAdvancement root = new RootAdvancement(tab, "root", new AdvancementDisplay(Material.NETHER_STAR, "SkyBlock", AdvancementFrameType.TASK, false, false, 0, 3, "Can you beat all the bosses?"), "textures/block/light_blue_concrete.png");
-		BaseAdvancement defeatChickzilla = new BaseAdvancement("defeat_chickzilla", new AdvancementDisplay(Material.COOKED_CHICKEN, "Cooked Chicken", AdvancementFrameType.TASK, true, true, 1, 6, "Yummy food."), root, 1);
-		BaseAdvancement defeatHardChickzilla = new BaseAdvancement("defeat_hard_chickzilla", new AdvancementDisplay(Material.CAMPFIRE, "Still Cooked", AdvancementFrameType.TASK, true, true, 2, 6, "Always a good day to have cooked chicken."), defeatChickzilla, 1);
-		BaseAdvancement defeatBroodfather = new BaseAdvancement("defeat_tarantula_broodfather", new AdvancementDisplay(Material.SPIDER_EYE, "Spider Squasher", AdvancementFrameType.TASK, true, true, 1, 5, "It will never know what hit it."), root, 1);
-		BaseAdvancement defeatPrimordialBroodfather = new BaseAdvancement("defeat_primordial_broodfather", new AdvancementDisplay(Material.FERMENTED_SPIDER_EYE, "Saving Austrailia", AdvancementFrameType.CHALLENGE, true, true, 2, 5, "One less scary spider."), defeatBroodfather, 1);
-		BaseAdvancement defeatRevenant = new BaseAdvancement("defeat_revenant_horror", new AdvancementDisplay(Material.ROTTEN_FLESH, "Trolling the Reaper", AdvancementFrameType.TASK, true, true, 1, 4, "Trololololol"), root, 1);
-		BaseAdvancement defeatAtonedHorror = new BaseAdvancement("defeat_atoned_horror", new AdvancementDisplay(Material.ZOMBIE_HEAD, "The Dead Truly Die", AdvancementFrameType.TASK, true, true, 2, 4, "Who knew!"), defeatRevenant, 1);
-		BaseAdvancement defeatSadan = new BaseAdvancement("defeat_sadan", new AdvancementDisplay(Material.WRITABLE_BOOK, "The Apprentice Necromancer", AdvancementFrameType.TASK, true, true, 3, 4, "I guess the dead don't die after all."), defeatAtonedHorror, 1);
-		BaseAdvancement defeatHardSadan = new BaseAdvancement("defeat_hard_sadan", new AdvancementDisplay(Material.ENCHANTED_BOOK, "The Master Necromancer", AdvancementFrameType.CHALLENGE, true, true, 4, 4, "Nevermind, they truly die after all."), defeatSadan, 1);
-		BaseAdvancement defeatWitherLords = new BaseAdvancement("defeat_wither_lords", new AdvancementDisplay(Material.WITHER_SKELETON_SKULL, "Slayer of Withers, Master of Worlds", AdvancementFrameType.CHALLENGE, true, true, 1, 3, "You are a mighty warrior."), root, 1);
-		BaseAdvancement defeatmeloGnorI = new BaseAdvancement("defeat_melog_nori", new AdvancementDisplay(Material.WRITABLE_BOOK, "Master's in Antimatter", AdvancementFrameType.TASK, true, true, 1, 2, "Granted by the University of SkyBlock."), root, 1);
-		BaseAdvancement defeatHardmeloGnorI = new BaseAdvancement("defeat_hard_melog_nori", new AdvancementDisplay(Material.ENCHANTED_BOOK, "Doctorate in Antimatter", AdvancementFrameType.TASK, true, true, 2, 2, "Also granted by the University of SkyBlock."), defeatmeloGnorI, 1);
-		BaseAdvancement defeatZealot = new BaseAdvancement("defeat_zealot", new AdvancementDisplay(Material.ENDER_PEARL, "The End?", AdvancementFrameType.TASK, true, true, 1, 1, "???"), root, 1);
-		BaseAdvancement defeatBrusier = new BaseAdvancement("defeat_zealot_brusier", new AdvancementDisplay(Material.ENDER_EYE, "The End.", AdvancementFrameType.TASK, true, true, 2, 1, "Or is it?"), defeatZealot, 1);
-		BaseAdvancement defeatVoidgloom = new BaseAdvancement("defeat_voidgloom_seraph", new AdvancementDisplay(Material.END_CRYSTAL, "Ender of Ender", AdvancementFrameType.TASK, true, true, 3, 1.5f, "Silence falls across the land."), defeatBrusier, 1);
-		BaseAdvancement defeatVoidcrazedSeraph = new BaseAdvancement("defeat_voidcrazed_seraph", new AdvancementDisplay(Material.BEACON, "The Line Between Genius and Insanity", AdvancementFrameType.CHALLENGE, true, true, 4, 1.5f, "??????????!!!!!!!!!!"), defeatVoidgloom, 1);
-		BaseAdvancement defeatPrimalDragon = new BaseAdvancement("defeat_primal_dragon", new AdvancementDisplay(Material.DRAGON_EGG, "The Beginning.", AdvancementFrameType.CHALLENGE, true, true, 3, 0.5f, "The start of something new."), defeatBrusier, 1);
+		// Broodfather branch (y=5)
+		loadAdvancement("defeat_tarantula_broodfather", "skyblock:root", "minecraft:spider_eye", "Spider Squasher", "It will never know what hit it.", "task", true, true, 1, 5, null);
+		loadAdvancement("defeat_primordial_broodfather", "skyblock:defeat_tarantula_broodfather", "minecraft:fermented_spider_eye", "Saving Austrailia", "One less scary spider.", "challenge", true, true, 2, 5, null);
 
-		tab.registerAdvancements(root, defeatChickzilla, defeatHardChickzilla, defeatBroodfather, defeatPrimordialBroodfather, defeatmeloGnorI, defeatHardmeloGnorI, defeatWitherLords, defeatRevenant, defeatAtonedHorror, defeatSadan, defeatHardSadan, defeatZealot, defeatBrusier, defeatVoidgloom, defeatVoidcrazedSeraph, defeatPrimalDragon);
+		// Revenant branch (y=4)
+		loadAdvancement("defeat_revenant_horror", "skyblock:root", "minecraft:rotten_flesh", "Trolling the Reaper", "Trololololol", "task", true, true, 1, 4, null);
+		loadAdvancement("defeat_atoned_horror", "skyblock:defeat_revenant_horror", "minecraft:zombie_head", "The Dead Truly Die", "Who knew!", "task", true, true, 2, 4, null);
+		loadAdvancement("defeat_sadan", "skyblock:defeat_atoned_horror", "minecraft:writable_book", "The Apprentice Necromancer", "I guess the dead don't die after all.", "task", true, true, 3, 4, null);
+		loadAdvancement("defeat_hard_sadan", "skyblock:defeat_sadan", "minecraft:enchanted_book", "The Master Necromancer", "Nevermind, they truly die after all.", "challenge", true, true, 4, 4, null);
 
-		tab.getEventManager().register(tab, PlayerLoadingCompletedEvent.class, event -> {
-			tab.showTab(event.getPlayer());
-			tab.grantRootAdvancement(event.getPlayer());
-		});
+		// Wither Lords (y=3)
+		loadAdvancement("defeat_wither_lords", "skyblock:root", "minecraft:wither_skeleton_skull", "Slayer of Withers, Master of Worlds", "You are a mighty warrior.", "challenge", true, true, 1, 3, null);
+
+		// meloG norI branch (y=2)
+		loadAdvancement("defeat_melog_nori", "skyblock:root", "minecraft:writable_book", "Master's in Antimatter", "Granted by the University of SkyBlock.", "task", true, true, 1, 2, null);
+		loadAdvancement("defeat_hard_melog_nori", "skyblock:defeat_melog_nori", "minecraft:enchanted_book", "Doctorate in Antimatter", "Also granted by the University of SkyBlock.", "task", true, true, 2, 2, null);
+
+		// Zealot / Ender branch (y=1)
+		loadAdvancement("defeat_zealot", "skyblock:root", "minecraft:ender_pearl", "The End?", "???", "task", true, true, 1, 1, null);
+		loadAdvancement("defeat_zealot_brusier", "skyblock:defeat_zealot", "minecraft:ender_eye", "The End.", "Or is it?", "task", true, true, 2, 1, null);
+		loadAdvancement("defeat_voidgloom_seraph", "skyblock:defeat_zealot_brusier", "minecraft:end_crystal", "Ender of Ender", "Silence falls across the land.", "task", true, true, 3, 1.5f, null);
+		loadAdvancement("defeat_voidcrazed_seraph", "skyblock:defeat_voidgloom_seraph", "minecraft:beacon", "The Line Between Genius and Insanity", "??????????!!!!!!!!!!", "challenge", true, true, 4, 1.5f, null);
+		loadAdvancement("defeat_primal_dragon", "skyblock:defeat_zealot_brusier", "minecraft:dragon_egg", "The Beginning.", "The start of something new.", "challenge", true, true, 3, 0.5f, null);
+	}
+
+	@SuppressWarnings("deprecation")
+	private static void loadAdvancement(String name, String parent, String icon, String title, String description, String frame, boolean showToast, boolean announceToChat, float x, float y, String background) {
+		NamespacedKey key = new NamespacedKey(instance, name);
+
+		// Remove if already registered (e.g. from a reload)
+		if(Bukkit.getAdvancement(key) != null) {
+			Bukkit.getUnsafe().removeAdvancement(key);
+		}
+
+		StringBuilder json = new StringBuilder();
+		json.append("{");
+
+		// Display
+		json.append("\"display\":{");
+		json.append("\"icon\":{\"id\":\"").append(icon).append("\"},");
+		json.append("\"title\":\"").append(title).append("\",");
+		json.append("\"description\":\"").append(description).append("\",");
+		json.append("\"frame\":\"").append(frame).append("\",");
+		json.append("\"show_toast\":").append(showToast).append(",");
+		json.append("\"announce_to_chat\":").append(announceToChat);
+		if(background != null) {
+			json.append(",\"background\":\"").append(background).append("\"");
+		}
+		json.append("},");
+
+		// Parent
+		if(parent != null) {
+			json.append("\"parent\":\"").append(parent).append("\",");
+		}
+
+		// Single impossible criterion that we grant manually
+		json.append("\"criteria\":{\"requirement\":{\"trigger\":\"minecraft:impossible\"}}");
+		json.append("}");
+
+		Bukkit.getUnsafe().loadAdvancement(key, json.toString());
+	}
+
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		// Grant root advancement on join so the tab is visible
+		Advancement root = Bukkit.getAdvancement(new NamespacedKey(instance, "root"));
+		if(root != null) {
+			event.getPlayer().getAdvancementProgress(root).awardCriteria("requirement");
+		}
 	}
 
 	public static void grantAdvancement(String key, Player player) {
-		advancementAPI.getAdvancement(key).incrementProgression(player);
-		if(ChatListener.isDiscordSRVPresent()) {
-			String title = advancementAPI.getAdvancement(key).getDisplay().getTitle();
-			DiscordForwarder.forwardAdvancement(player.getName(), title);
+		// key format is "skyblock:advancement_name" - extract the name part
+		String name = key.contains(":") ? key.split(":")[1] : key;
+		Advancement adv = Bukkit.getAdvancement(new NamespacedKey(instance, name));
+		if(adv != null) {
+			player.getAdvancementProgress(adv).awardCriteria("requirement");
 		}
 	}
 
@@ -167,7 +214,7 @@ public class Plugin extends JavaPlugin {
 					}
 					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500"));
 				} else {
-					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(TextComponent.fromLegacyText(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE")));
+					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + "" + ChatColor.BOLD + "MAX INTELLIGENCE"));
 				}
 			} catch(Exception exception) {
 				Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
@@ -194,7 +241,4 @@ public class Plugin extends JavaPlugin {
 		return instance;
 	}
 
-	public static UltimateAdvancementAPI getAdvancementAPI() {
-		return advancementAPI;
-	}
 }
