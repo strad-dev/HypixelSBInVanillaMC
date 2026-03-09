@@ -204,25 +204,35 @@ public class Plugin extends JavaPlugin implements Listener {
 		}
 	}
 
+	public static Score getIntelligence(Player p) {
+		return Objects.requireNonNull(Objects.requireNonNull(
+			Plugin.getInstance().getServer().getScoreboardManager())
+			.getMainScoreboard().getObjective("Intelligence"))
+			.getScore(p.getName());
+	}
+
+	public static void sendIntelligenceBar(Player p, Score score) {
+		TextComponent intel = new TextComponent("Intelligence: " + score.getScore() + "/2500");
+		intel.setColor(net.md_5.bungee.api.ChatColor.AQUA);
+
+		if(score.getScore() >= 2500) {
+			TextComponent max = new TextComponent(" MAX INTELLIGENCE");
+			max.setColor(net.md_5.bungee.api.ChatColor.RED);
+			max.setBold(true);
+			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, intel, max);
+		} else {
+			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, intel);
+		}
+	}
+
 	public static void passiveIntel(int second) {
 		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
 			try {
-				Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
+				Score score = Plugin.getIntelligence(p);
 				if(score.getScore() < 2500 && second == 5) {
 					score.setScore(score.getScore() + 1);
 				}
-
-				TextComponent intel = new TextComponent("Intelligence: " + score.getScore() + "/2500");
-				intel.setColor(net.md_5.bungee.api.ChatColor.AQUA);
-
-				if(score.getScore() >= 2500) {
-					TextComponent max = new TextComponent(" MAX INTELLIGENCE");
-					max.setColor(net.md_5.bungee.api.ChatColor.RED);
-					max.setBold(true);
-					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, intel, max);
-				} else {
-					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, intel);
-				}
+				Plugin.sendIntelligenceBar(p, score);
 			} catch(Exception exception) {
 				Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
 				Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
