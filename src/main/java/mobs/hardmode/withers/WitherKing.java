@@ -363,7 +363,7 @@ public class WitherKing implements CustomWither {
 
 		p.sendMessage(ChatColor.GOLD + "You have defeated the Wither Lords.  Congratulations!");
 		Utils.playGlobalSound(Sound.UI_TOAST_CHALLENGE_COMPLETE);
-		Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_wither_lords").incrementProgression(p);
+		Plugin.grantAdvancement("skyblock:defeat_wither_lords", p);
 	}
 
 	@Override

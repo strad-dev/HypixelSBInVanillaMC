@@ -7,7 +7,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class ChatListener implements Listener {
-	static final boolean DISCORDSRV_PRESENT = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null;
+	private static final boolean DISCORDSRV_PRESENT = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null;
 
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent e) {
@@ -26,5 +26,9 @@ public class ChatListener implements Listener {
 		if(DISCORDSRV_PRESENT) {
 			DiscordForwarder.forward(e.getPlayer(), message);
 		}
+	}
+
+	public static boolean isDiscordSRVPresent() {
+		return DISCORDSRV_PRESENT;
 	}
 }

@@ -186,7 +186,7 @@ public class PrimalDragon implements CustomDragon {
 			}
 
 			Utils.playGlobalSound(Sound.UI_TOAST_CHALLENGE_COMPLETE);
-			Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_primal_dragon").incrementProgression(p);
+			Plugin.grantAdvancement("skyblock:defeat_primal_dragon", p);
 
 			dragon.addScoreboardTag("Dead");
 			dialogue("Centuries of training down the drain...");
