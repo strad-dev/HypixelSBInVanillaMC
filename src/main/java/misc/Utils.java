@@ -289,6 +289,7 @@ public class Utils {
 	public static void spawnGuards(LivingEntity entity, int num) {
 		for(int i = 0; i < num; i++) {
 			WitherSkeleton e = (WitherSkeleton) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.WITHER_SKELETON);
+			e.getEquipment().clear();
 			ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 			sword.addEnchantment(Enchantment.KNOCKBACK, 1);
 			ItemStack shield = new ItemStack(Material.SHIELD);

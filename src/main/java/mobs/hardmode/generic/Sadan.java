@@ -35,6 +35,9 @@ public class Sadan implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
+		zombie.getEquipment().clear();
+		zombie.setAdult();
+		zombie.eject();
 		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1200.0);
 		zombie.setHealth(1200.0);
 		zombie.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
@@ -47,7 +50,6 @@ public class Sadan implements CustomMob {
 		zombie.addScoreboardTag("DummySadan");
 		zombie.addScoreboardTag("HardMode");
 		zombie.addScoreboardTag("Invulnerable");
-		zombie.setAdult();
 		Bukkit.getLogger().info(p.getName() + " has summoned the M6 Bossfight.");
 		zombie.setPersistent(true);
 		zombie.setRemoveWhenFarAway(false);
@@ -126,8 +128,11 @@ public class Sadan implements CustomMob {
 
 	private static Husk spawnTerracotta(Location l) {
 		Husk terracotta = (Husk) l.getWorld().spawnEntity(l, EntityType.HUSK);
+		terracotta.setAdult();
+		terracotta.eject();
 
 		EntityEquipment equipment = terracotta.getEquipment();
+		equipment.clear();
 		equipment.setItemInMainHand(new ItemStack(Material.POPPY));
 
 		terracotta.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
@@ -138,7 +143,6 @@ public class Sadan implements CustomMob {
 		terracotta.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		terracotta.setTarget(Utils.getNearestPlayer(terracotta));
 		terracotta.setCustomNameVisible(true);
-		terracotta.setAdult();
 		terracotta.addScoreboardTag("SkyblockBoss");
 		terracotta.addScoreboardTag("Terracotta");
 		terracotta.addScoreboardTag("HardMode");
@@ -222,8 +226,11 @@ public class Sadan implements CustomMob {
 
 	private static Zombie spawnGiant(Zombie sadan) {
 		Zombie zombie = (Zombie) sadan.getWorld().spawnEntity(Utils.randomLocation(sadan.getLocation(), 12, false), EntityType.ZOMBIE);
+		zombie.setAdult();
+		zombie.eject();
 
 		EntityEquipment equipment = zombie.getEquipment();
+		equipment.clear();
 		equipment.setItem(EquipmentSlot.HEAD, setArmorColor(new ItemStack(Material.LEATHER_HELMET)));
 		equipment.setItem(EquipmentSlot.CHEST, setArmorColor(new ItemStack(Material.LEATHER_CHESTPLATE)));
 		equipment.setItem(EquipmentSlot.LEGS, setArmorColor(new ItemStack(Material.LEATHER_LEGGINGS)));
@@ -244,7 +251,6 @@ public class Sadan implements CustomMob {
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.setTarget(Utils.getNearestPlayer(zombie));
 		zombie.setCustomNameVisible(true);
-		zombie.setAdult();
 		zombie.addScoreboardTag("SkyblockBoss");
 		zombie.addScoreboardTag("MutantGiant");
 		zombie.addScoreboardTag("HardMode");

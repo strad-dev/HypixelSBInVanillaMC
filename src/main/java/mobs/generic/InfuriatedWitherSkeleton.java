@@ -28,10 +28,11 @@ public class InfuriatedWitherSkeleton implements CustomMob {
 		}
 
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Highly Infuriated Wither Skeleton" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		Objects.requireNonNull(witherSkeleton.getEquipment()).clear();
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addEnchantment(Enchantment.KNOCKBACK, 2);
 
-		Objects.requireNonNull(witherSkeleton.getEquipment()).setItemInMainHand(sword);
+		witherSkeleton.getEquipment().setItemInMainHand(sword);
 		witherSkeleton.getEquipment().setItemInMainHandDropChance(0.0F);
 		witherSkeleton.getEquipment().setItemInOffHand(sword);
 		witherSkeleton.getEquipment().setItemInOffHandDropChance(0.0F);
