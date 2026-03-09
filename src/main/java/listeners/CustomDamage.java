@@ -524,7 +524,7 @@ public class CustomDamage implements Listener {
 							}
 						}
 						Bukkit.broadcastMessage(deathMessage);
-						if(ChatListener.DISCORDSRV_PRESENT) {
+						if(ChatListener.isDiscordSRVPresent()) {
 							DiscordForwarder.forwardDeathMessage(deathMessage);
 						}
 					}
