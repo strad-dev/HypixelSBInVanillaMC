@@ -25,6 +25,7 @@ public class TacticalInsertion implements AbilityItem {
 		ItemStack tac = new ItemStack(Material.BLAZE_ROD);
 
 		ItemMeta data = tac.getItemMeta();
+		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.DARK_PURPLE + "Tactical Insertion");
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "TacModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);

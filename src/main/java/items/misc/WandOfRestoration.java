@@ -30,6 +30,7 @@ public class WandOfRestoration implements AbilityItem {
 		wand.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = wand.getItemMeta();
+		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.DARK_PURPLE + "Wand of Restoration");
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "Wand2Modifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);

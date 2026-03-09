@@ -35,6 +35,7 @@ public class IceSpray implements AbilityItem {
 		iceSpray.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = iceSpray.getItemMeta();
+		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.GOLD + "Ice Spray Wand");
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "IceSprayWandModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);

@@ -26,6 +26,7 @@ public class BonzoStaff implements AbilityItem {
 		ItemStack bonzoStaff = new ItemStack(Material.BREEZE_ROD);
 
 		ItemMeta data = bonzoStaff.getItemMeta();
+		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.BLUE + "Bonzo's Staff");
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "BonzoModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
