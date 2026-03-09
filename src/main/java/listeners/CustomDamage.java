@@ -31,11 +31,13 @@ import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -50,6 +52,8 @@ import java.util.logging.Filter;
 import java.util.logging.Logger;
 
 public class CustomDamage implements Listener {
+
+	static String nextDeathMessage = null;
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		customMobs(damagee, damager, originalDamage, type, new DamageData(damagee, damager, originalDamage));
@@ -486,48 +490,43 @@ public class CustomDamage implements Listener {
 							dragon.setSilent(true);
 							Utils.scheduleTask(() -> spawnDragonXP(dragon.getLocation(), dragon.getScoreboardTags().contains("HardMode") ? 640000 : 64000), 190);
 						} else {
+							// build death message before setHealth(0) so the PlayerDeathEvent handler can use it
+							if(damagee instanceof Player p) {
+								String deathMessage;
+								if(data.e != null) {
+									DamageSource damageSource = convertBukkitDamageSource(data.e.getDamageSource(), p);
+									ServerPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
+									Component message = damageSource.getLocalizedDeathMessage(nmsPlayer);
+									deathMessage = message.getString();
+								} else {
+									String damagerName;
+									if(damager != null) {
+										damagerName = damager.getCustomName();
+									} else {
+										damagerName = "absolutely no one";
+									}
+									if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) {
+										deathMessage = p.getName() + " was slain by " + damagerName;
+									} else if(type == DamageType.RANGED) {
+										deathMessage = p.getName() + " was shot by " + damagerName;
+									} else if(type == DamageType.RANGED_SPECIAL) {
+										deathMessage = p.getName() + " was killed by " + damagerName + "'s lasers";
+									} else if(type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC) {
+										deathMessage = p.getName() + " was killed by " + damagerName + "'s magic";
+									} else if(type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
+										deathMessage = p.getName() + " was killed by the world";
+									} else if(type == DamageType.FALL) {
+										deathMessage = p.getName() + " fell to their death";
+									} else if(type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE) {
+										deathMessage = p.getName() + " fell out of the world";
+									} else {
+										deathMessage = p.getName() + " died";
+									}
+								}
+								nextDeathMessage = deathMessage;
+							}
 							damagee.setHealth(0.0);
 						}
-					}
-
-					// player death messages
-					if(damagee instanceof Player p) {
-						String deathMessage;
-						if(data.e != null) {
-							DamageSource damageSource = convertBukkitDamageSource(data.e.getDamageSource(), p);
-							ServerPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
-							Component message = damageSource.getLocalizedDeathMessage(nmsPlayer);
-							deathMessage = message.getString();
-						} else {
-							String damagerName;
-							if(damager != null) {
-								damagerName = damager.getCustomName();
-							} else {
-								damagerName = "absolutely no one";
-							}
-							if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) {
-								deathMessage = p.getName() + " was slain by " + damagerName;
-							} else if(type == DamageType.RANGED) {
-								deathMessage = p.getName() + " was shot by " + damagerName;
-							} else if(type == DamageType.RANGED_SPECIAL) {
-								deathMessage = p.getName() + " was killed by " + damagerName + "'s lasers";
-							} else if(type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC) {
-								deathMessage = p.getName() + " was killed by " + damagerName + "'s magic";
-							} else if(type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
-								deathMessage = p.getName() + " was killed by the world";
-							} else if(type == DamageType.FALL) {
-								deathMessage = p.getName() + " fell to their death";
-							} else if(type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE) {
-								deathMessage = p.getName() + " fell out of the world";
-							} else {
-								deathMessage = p.getName() + " died";
-							}
-						}
-						Bukkit.broadcastMessage(deathMessage);
-						if(ChatListener.isDiscordSRVPresent()) {
-							DiscordForwarder.forwardDeathMessage(deathMessage);
-						}
-					}
 				}
 			} else {
 				// absorption
@@ -1176,5 +1175,15 @@ public class CustomDamage implements Listener {
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent e) {
 		noDamageTimes.remove(e.getEntity());
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onPlayerDeath(PlayerDeathEvent e) {
+		if(nextDeathMessage != null) {
+			e.setDeathMessage(nextDeathMessage);
+			nextDeathMessage = null;
+		} else {
+			e.setDeathMessage(null);
+		}
 	}
 }

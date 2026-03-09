@@ -208,13 +208,20 @@ public class Plugin extends JavaPlugin implements Listener {
 		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
 			try {
 				Score score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
-				if(score.getScore() < 2500) {
-					if(second == 5) {
-						score.setScore(score.getScore() + 1);
-					}
-					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500"));
+				if(score.getScore() < 2500 && second == 5) {
+					score.setScore(score.getScore() + 1);
+				}
+
+				TextComponent intel = new TextComponent("Intelligence: " + score.getScore() + "/2500");
+				intel.setColor(net.md_5.bungee.api.ChatColor.AQUA);
+
+				if(score.getScore() >= 2500) {
+					TextComponent max = new TextComponent(" MAX INTELLIGENCE");
+					max.setColor(net.md_5.bungee.api.ChatColor.RED);
+					max.setBold(true);
+					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, intel, max);
 				} else {
-					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + "" + ChatColor.BOLD + "MAX INTELLIGENCE"));
+					p.spigot().sendMessage(ChatMessageType.ACTION_BAR, intel);
 				}
 			} catch(Exception exception) {
 				Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
