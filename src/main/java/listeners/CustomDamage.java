@@ -171,7 +171,7 @@ public class CustomDamage implements Listener {
 
 			// shield logic (for weirdos)
 			if(data.isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL)) {
-				finalDamage *= 0.5;
+				finalDamage *= 0.4;
 			}
 
 			double breach = 0;
@@ -230,7 +230,7 @@ public class CustomDamage implements Listener {
 
 				if(chestplate != null) {
 					prots += chestplate.getEnchantmentLevel(Enchantment.PROTECTION);
-					if(affectedByArmor) {
+					if(affectedByArmor && chestplate.getType() != Material.ELYTRA) {
 						Utils.damageItem(damagee, chestplate, Math.max(0.25, data.originalDamage / 12.5));
 					}
 				}
@@ -1033,7 +1033,7 @@ public class CustomDamage implements Listener {
 			return sources.generic();
 		} else if(damageType == org.bukkit.damage.DamageType.MACE_SMASH) {
 			if(nmsCausingEntity instanceof ServerPlayer player) {
-				return sources.playerAttack(player);
+				return sources.mace(player);
 			}
 			return sources.generic();
 		}
