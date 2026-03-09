@@ -31,6 +31,7 @@ import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
 import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
 import com.fren_gor.ultimateAdvancementAPI.events.PlayerLoadingCompletedEvent;
+import com.fren_gor.ultimateAdvancementAPI.events.advancement.AdvancementProgressionUpdateEvent;
 import commands.*;
 import listeners.*;
 import net.md_5.bungee.api.ChatMessageType;
@@ -146,6 +147,16 @@ public class Plugin extends JavaPlugin {
 		tab.getEventManager().register(tab, PlayerLoadingCompletedEvent.class, event -> {
 			tab.showTab(event.getPlayer());
 			tab.grantRootAdvancement(event.getPlayer());
+		});
+
+		tab.getEventManager().register(tab, AdvancementProgressionUpdateEvent.class, event -> {
+			if(event.getNewProgression() >= event.getAdvancement().getMaxProgression()) {
+				String title = event.getAdvancement().getDisplay().getTitle();
+				Player player = event.getTeamProgression().getAnOnlineMember(advancementAPI.getDatabaseManager());
+				if(player != null && ChatListener.DISCORDSRV_PRESENT) {
+					DiscordForwarder.forwardAdvancement(player.getName(), title);
+				}
+			}
 		});
 	}
 
