@@ -26,9 +26,13 @@ package misc;
 
 import commands.*;
 import listeners.*;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.advancement.Advancement;
@@ -212,17 +216,15 @@ public class Plugin extends JavaPlugin implements Listener {
 	}
 
 	public static void sendIntelligenceBar(Player p, Score score) {
-		TextComponent intel = new TextComponent("Intelligence: " + score.getScore() + "/2500");
-		intel.setColor(net.md_5.bungee.api.ChatColor.AQUA);
+		MutableComponent message = Component.literal("Intelligence: " + score.getScore() + "/2500")
+			.withStyle(Style.EMPTY.withColor(ChatFormatting.AQUA));
 
 		if(score.getScore() >= 2500) {
-			TextComponent max = new TextComponent(" MAX INTELLIGENCE");
-			max.setColor(net.md_5.bungee.api.ChatColor.RED);
-			max.setBold(true);
-			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, intel, max);
-		} else {
-			p.spigot().sendMessage(ChatMessageType.ACTION_BAR, intel);
+			message.append(Component.literal(" MAX INTELLIGENCE")
+				.withStyle(Style.EMPTY.withColor(ChatFormatting.RED).withBold(true)));
 		}
+
+		((CraftPlayer) p).getHandle().connection.send(new ClientboundSetActionBarTextPacket(message));
 	}
 
 	public static void passiveIntel(int second) {
