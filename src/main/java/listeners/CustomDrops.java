@@ -127,14 +127,14 @@ public class CustomDrops implements Listener {
 						chicken.getWorld().dropItem(chicken.getLocation(), item);
 						sendRareDropMessage(p, "Braided Feather");
 					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_chickzilla").incrementProgression(p);
+					Plugin.grantAdvancement("skyblock:defeat_chickzilla", p);
 				} else if(chicken.getScoreboardTags().contains("EnragedChickzilla")) {
 					if(random.nextDouble() < 0.25 * rngLootingBonus) {
 						item = BraidedFeather.getItem();
 						chicken.getWorld().dropItem(chicken.getLocation(), item);
 						sendRareDropMessage(p, "Braided Feather");
 					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_chickzilla").incrementProgression(p);
+					Plugin.grantAdvancement("skyblock:defeat_hard_chickzilla", p);
 				} else if(random.nextDouble() < 0.02 * rngLootingBonus && p != null) {
 					item = OmegaEgg.getItem();
 					chicken.getWorld().dropItem(chicken.getLocation(), item);
@@ -326,7 +326,7 @@ public class CustomDrops implements Listener {
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Null Ovoid");
 					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_voidgloom_seraph").incrementProgression(p);
+					Plugin.grantAdvancement("skyblock:defeat_voidgloom_seraph", p);
 				} else if(enderman.getScoreboardTags().contains("VoidcrazedSeraph")) {
 					if(random.nextDouble() < 0.25 * rngLootingBonus) {
 						item = Core.getItem();
@@ -338,21 +338,21 @@ public class CustomDrops implements Listener {
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Null Ovoid");
 					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_voidcrazed_seraph").incrementProgression(p);
+					Plugin.grantAdvancement("skyblock:defeat_voidcrazed_seraph", p);
 				} else if(enderman.getScoreboardTags().contains("Zealot")) {
 					if(random.nextDouble() < 0.05 * rngLootingBonus) {
 						item = TessellatedPearl.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tessellated Ender Pearl");
 					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_zealot").incrementProgression(p);
+					Plugin.grantAdvancement("skyblock:defeat_zealot", p);
 				} else if(enderman.getScoreboardTags().contains("ZealotBrusier")) {
 					if(random.nextDouble() < 0.25 * rngLootingBonus) {
 						item = TessellatedPearl.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tessellated Ender Pearl");
 					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_zealot_brusier").incrementProgression(p);
+					Plugin.grantAdvancement("skyblock:defeat_zealot_brusier", p);
 				} else {
 					if((died.getWorld().getEnvironment().equals(World.Environment.THE_END) && random.nextDouble() < 0.005 * rngLootingBonus ||
 							!died.getWorld().getEnvironment().equals(World.Environment.THE_END) && random.nextDouble() < 0.03 * rngLootingBonus) && p != null) {
@@ -449,14 +449,14 @@ public class CustomDrops implements Listener {
 							world.dropItemNaturally(l, item);
 							sendRareDropMessage(p, "Null Blade");
 						}
-						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_melog_nori").incrementProgression(p);
+						Plugin.grantAdvancement("skyblock:defeat_melog_nori", p);
 					} else if(golem.getScoreboardTags().contains("ObfuscatedmeloGnorI")) {
 						if(random.nextDouble() < 0.25 * rngLootingBonus) {
 							item = NullBlade.getItem();
 							world.dropItemNaturally(l, item);
 							sendRareDropMessage(p, "Null Blade");
 						}
-						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_melog_nori").incrementProgression(p);
+						Plugin.grantAdvancement("skyblock:defeat_hard_melog_nori", p);
 					} else if(random.nextDouble() < 0.02 * rngLootingBonus && p != null) {
 						item = Antimatter.getItem();
 						world.dropItemNaturally(l, item);
@@ -674,14 +674,14 @@ public class CustomDrops implements Listener {
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tarantula Silk");
 					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_tarantula_broodfather").incrementProgression(p);
+					Plugin.grantAdvancement("skyblock:defeat_tarantula_broodfather", p);
 				} else if(spider.getScoreboardTags().contains("ConjoinedBrood")) {
 					if(random.nextDouble() < 0.25 * rngLootingBonus) {
 						item = TarantulaSilk.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tarantula Silk");
 					}
-					Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_primordial_broodfather").incrementProgression(p);
+					Plugin.grantAdvancement("skyblock:defeat_primordial_broodfather", p);
 				} else if(random.nextDouble() < 0.03 * rngLootingBonus && p != null) {
 					item = SpiderRelic.getItem();
 					world.dropItemNaturally(l, item);
@@ -948,14 +948,14 @@ public class CustomDrops implements Listener {
 							world.dropItemNaturally(l, item);
 							sendRareDropMessage(p, "Revenant Viscera");
 						}
-						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_revenant_horror").incrementProgression(p);
+						Plugin.grantAdvancement("skyblock:defeat_revenant_horror", p);
 					} else if(zombie.getScoreboardTags().contains("AtonedHorror")) {
 						if(random.nextDouble() < 0.25 * rngLootingBonus) {
 							item = Viscera.getItem();
 							world.dropItemNaturally(l, item);
 							sendRareDropMessage(p, "Revenant Viscera");
 						}
-						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_atoned_horror").incrementProgression(p);
+						Plugin.grantAdvancement("skyblock:defeat_atoned_horror", p);
 					} else if(zombie.getScoreboardTags().contains("Sadan")) {
 						if(random.nextDouble() < 0.05 * rngLootingBonus) {
 							item = GiantSwordRemnant.getItem();
@@ -963,7 +963,7 @@ public class CustomDrops implements Listener {
 							sendRareDropMessage(p, "Remnant of the Giant's Sword");
 						}
 						BossBarManager.removeBossBar(died);
-						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_sadan").incrementProgression(p);
+						Plugin.grantAdvancement("skyblock:defeat_sadan", p);
 					} else if(zombie.getScoreboardTags().contains("TheGiantOne")) {
 						if(random.nextDouble() < 0.25 * rngLootingBonus) {
 							item = GiantSwordRemnant.getItem();
@@ -976,7 +976,7 @@ public class CustomDrops implements Listener {
 							sendRareDropMessage(p, "Necromancer's Brooch");
 						}
 						BossBarManager.removeBossBar(died);
-						Plugin.getAdvancementAPI().getAdvancement("skyblock:defeat_hard_sadan").incrementProgression(p);
+						Plugin.grantAdvancement("skyblock:defeat_hard_sadan", p);
 						Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Sadan" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": NOOOOOOOOOO!!! THIS IS IMPOSSIBLE!!");
 						Utils.scheduleTask(() -> Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Sadan" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": FATHER, FORGIVE ME!!!"), 60);
 					} else if(random.nextDouble() < 0.005 * rngLootingBonus && p != null) {
