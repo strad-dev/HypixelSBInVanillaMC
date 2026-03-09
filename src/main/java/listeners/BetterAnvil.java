@@ -50,19 +50,20 @@ public class BetterAnvil implements Listener {
 					result.setItemMeta(resultMeta);
 				}
 				e.setResult(result);
-			}
-		}
-		if(view.getRepairCost() > 50) {
-			view.setRepairCost(50);
-		}
 
-		Utils.scheduleTask(() -> {
-			for(HumanEntity viewer : e.getViewers()) {
-				if(viewer instanceof Player player) {
-					player.updateInventory();
+				if(view.getRepairCost() > 50) {
+					view.setRepairCost(50);
 				}
+
+				Utils.scheduleTask(() -> {
+					for(HumanEntity viewer : e.getViewers()) {
+						if(viewer instanceof Player player) {
+							player.updateInventory();
+						}
+					}
+				}, 1);
 			}
-		}, 1);
+		}
 	}
 
 	public boolean canEnchant(ItemStack itemStack, Enchantment enchantment) {
