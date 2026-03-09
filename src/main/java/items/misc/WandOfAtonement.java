@@ -30,6 +30,7 @@ public class WandOfAtonement implements AbilityItem {
 		wandOfAtonement.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = wandOfAtonement.getItemMeta();
+		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.GOLD + "Wand of Atonement");
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "Wand1Modifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);

@@ -26,6 +26,7 @@ public class HolyIce implements AbilityItem {
 		holyIce.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = holyIce.getItemMeta();
+		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.BLUE + "Holy Ice");
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "HolyIceModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);

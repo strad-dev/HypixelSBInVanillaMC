@@ -30,6 +30,7 @@ public class GyrokineticWand implements AbilityItem {
 		ItemStack gyro = new ItemStack(Material.BLAZE_ROD);
 
 		ItemMeta data = gyro.getItemMeta();
+		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.DARK_PURPLE + "Gyrokinetic Wand");
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "GyroModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
