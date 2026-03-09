@@ -7,8 +7,6 @@ import items.weapons.Scylla;
 import items.weapons.Terminator;
 import misc.Plugin;
 import misc.Utils;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -144,7 +142,7 @@ public class CustomItems implements Listener {
 		}
 
 		try {
-			score = Objects.requireNonNull(Objects.requireNonNull(Plugin.getInstance().getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence")).getScore(p.getName());
+			score = Plugin.getIntelligence(p);
 		} catch(Exception exception) {
 			Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
 			Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
@@ -199,11 +197,7 @@ public class CustomItems implements Listener {
 					}
 				}
 			}
-			if(score.getScore() < 2500) {
-				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy("Intelligence: " + score.getScore() + "/2500", ChatColor.AQUA.asBungee()));
-			} else {
-				p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(TextComponent.fromLegacyText(ChatColor.AQUA + "Intelligence: " + score.getScore() + "/2500 " + ChatColor.RED + ChatColor.BOLD + "MAX INTELLIGENCE")));
-			}
+			Plugin.sendIntelligenceBar(p, score);
 		}
 	}
 }
