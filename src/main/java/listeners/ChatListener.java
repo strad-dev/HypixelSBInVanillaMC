@@ -7,6 +7,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class ChatListener implements Listener {
+	static final boolean DISCORDSRV_PRESENT = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null;
+
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent e) {
 		String player = e.getPlayer().getName();
@@ -20,5 +22,9 @@ public class ChatListener implements Listener {
 		sentMessage += player + ChatColor.WHITE + ": " + message;
 		Bukkit.broadcastMessage(sentMessage);
 		e.setCancelled(true);
+
+		if(DISCORDSRV_PRESENT) {
+			DiscordForwarder.forward(e.getPlayer(), message);
+		}
 	}
 }
