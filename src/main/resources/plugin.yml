@@ -22,3 +22,6 @@ commands:
 
 depend:
   - UltimateAdvancementAPI
+
+softdepend:
+  - DiscordSRV
