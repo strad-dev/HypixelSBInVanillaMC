@@ -42,8 +42,7 @@ public class Goldor implements CustomWither {
 		wither.addScoreboardTag("SkyblockBoss");
 		wither.setPersistent(true);
 		wither.setRemoveWhenFarAway(false);
-		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		Utils.changeName(wither);
+		Utils.changeName(wither, name);
 
 		damageAll(wither);
 

@@ -50,8 +50,7 @@ public class Storm implements CustomWither {
 		wither.addScoreboardTag("Survival2Trigger");
 		wither.setPersistent(true);
 		wither.setRemoveWhenFarAway(false);
-		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		Utils.changeName(wither);
+		Utils.changeName(wither, name);
 
 		spawnGuards(wither);
 		spawnLightning(wither);

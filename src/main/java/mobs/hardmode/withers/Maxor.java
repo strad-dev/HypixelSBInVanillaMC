@@ -44,8 +44,7 @@ public class Maxor implements CustomWither {
 		wither.addScoreboardTag("300Crystal");
 		wither.setPersistent(true);
 		wither.setRemoveWhenFarAway(false);
-		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		Utils.changeName(wither);
+		Utils.changeName(wither, name);
 
 		Utils.scheduleTask(() -> spawnGuards(wither), 300);
 

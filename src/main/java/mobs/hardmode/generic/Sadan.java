@@ -127,13 +127,12 @@ public class Sadan implements CustomMob {
 	private static Husk spawnTerracotta(Location l) {
 		Husk terracotta = (Husk) l.getWorld().spawnEntity(l, EntityType.HUSK);
 
-		terracotta.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Terracotta" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + "300/300");
-
 		EntityEquipment equipment = terracotta.getEquipment();
 		equipment.setItemInMainHand(new ItemStack(Material.POPPY));
 
 		terracotta.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
 		terracotta.setHealth(300.0);
+		Utils.changeName(terracotta, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Terracotta" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
 		terracotta.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(40.0);
 		terracotta.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.6);
 		terracotta.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
@@ -152,13 +151,12 @@ public class Sadan implements CustomMob {
 	private static IronGolem spawnGolem(Location l) {
 		IronGolem ironGolem = (IronGolem) l.getWorld().spawnEntity(l, EntityType.IRON_GOLEM);
 
-		ironGolem.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Woke Golem" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + "500/500");
-
 		EntityEquipment equipment = ironGolem.getEquipment();
 		equipment.setItemInMainHand(new ItemStack(Material.POPPY));
 
 		ironGolem.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
 		ironGolem.setHealth(500.0);
+		Utils.changeName(ironGolem, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Woke Golem" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
 		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(60.0);
 		ironGolem.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.6);
 		ironGolem.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
@@ -225,8 +223,6 @@ public class Sadan implements CustomMob {
 	private static Zombie spawnGiant(Zombie sadan) {
 		Zombie zombie = (Zombie) sadan.getWorld().spawnEntity(Utils.randomLocation(sadan.getLocation(), 12, false), EntityType.ZOMBIE);
 
-		zombie.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Mutant Giant" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + "800/800");
-
 		EntityEquipment equipment = zombie.getEquipment();
 		equipment.setItem(EquipmentSlot.HEAD, setArmorColor(new ItemStack(Material.LEATHER_HELMET)));
 		equipment.setItem(EquipmentSlot.CHEST, setArmorColor(new ItemStack(Material.LEATHER_CHESTPLATE)));
@@ -239,6 +235,7 @@ public class Sadan implements CustomMob {
 
 		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(800.0);
 		zombie.setHealth(800.0);
+		Utils.changeName(zombie, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Mutant Giant" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
 		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(60.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.75);
 		zombie.getAttribute(Attribute.ARMOR).setBaseValue(-7.0);

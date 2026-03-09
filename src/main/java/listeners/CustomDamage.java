@@ -539,7 +539,9 @@ public class CustomDamage implements Listener {
 				}
 
 				if(damagee instanceof Mob && damager instanceof LivingEntity) {
-					((Mob) damagee).setTarget((LivingEntity) damager);
+					if(!(damagee instanceof Wolf wolf && damager instanceof Player player && wolf.getOwner().getUniqueId().equals(player.getUniqueId()))) {
+						((Mob) damagee).setTarget((LivingEntity) damager);
+					}
 				}
 
 				if(damagee instanceof Shulker shulker && damager instanceof Shulker) {

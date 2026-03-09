@@ -35,8 +35,7 @@ public class ConjoinedBrood implements CustomMob {
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		spider.setPersistent(true);
 		spider.setRemoveWhenFarAway(false);
-		spider.setCustomName(newName + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		Utils.changeName(spider);
+		Utils.changeName(spider, newName);
 
 		return newName;
 	}

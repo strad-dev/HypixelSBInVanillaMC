@@ -19,6 +19,7 @@ import java.util.Objects;
 public class InfuriatedWitherSkeleton implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		// NOTE: The returned name is the base name (without health).  Callers must use Utils.changeName(entity, name) to set the full display name.
 		WitherSkeleton witherSkeleton;
 		if(e instanceof WitherSkeleton) {
 			witherSkeleton = (WitherSkeleton) e;
@@ -26,7 +27,7 @@ public class InfuriatedWitherSkeleton implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Highly Infuriated Wither Skeleton" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 100 + "/" + 100;
+		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Highly Infuriated Wither Skeleton" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addEnchantment(Enchantment.KNOCKBACK, 2);
 
