@@ -492,11 +492,12 @@ public class CustomDamage implements Listener {
 
 					// player death messages
 					if(damagee instanceof Player p) {
+						String deathMessage;
 						if(data.e != null) {
 							DamageSource damageSource = convertBukkitDamageSource(data.e.getDamageSource(), p);
 							ServerPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
 							Component message = damageSource.getLocalizedDeathMessage(nmsPlayer);
-							Bukkit.broadcastMessage(message.getString());
+							deathMessage = message.getString();
 						} else {
 							String damagerName;
 							if(damager != null) {
@@ -505,20 +506,26 @@ public class CustomDamage implements Listener {
 								damagerName = "absolutely no one";
 							}
 							if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) {
-								Bukkit.broadcastMessage(p.getName() + " was slain by " + damagerName);
+								deathMessage = p.getName() + " was slain by " + damagerName;
 							} else if(type == DamageType.RANGED) {
-								Bukkit.broadcastMessage(p.getName() + " was shot by " + damagerName);
+								deathMessage = p.getName() + " was shot by " + damagerName;
 							} else if(type == DamageType.RANGED_SPECIAL) {
-								Bukkit.broadcastMessage(p.getName() + " was killed by " + damagerName + "'s lasers");
+								deathMessage = p.getName() + " was killed by " + damagerName + "'s lasers";
 							} else if(type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC) {
-								Bukkit.broadcastMessage(p.getName() + " was killed by " + damagerName + "'s magic");
+								deathMessage = p.getName() + " was killed by " + damagerName + "'s magic";
 							} else if(type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
-								Bukkit.broadcastMessage(p.getName() + " was killed by the world");
+								deathMessage = p.getName() + " was killed by the world";
 							} else if(type == DamageType.FALL) {
-								Bukkit.broadcastMessage(p.getName() + " fell to their death");
+								deathMessage = p.getName() + " fell to their death";
 							} else if(type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE) {
-								Bukkit.broadcastMessage(p.getName() + " fell out of the world");
+								deathMessage = p.getName() + " fell out of the world";
+							} else {
+								deathMessage = p.getName() + " died";
 							}
+						}
+						Bukkit.broadcastMessage(deathMessage);
+						if(ChatListener.DISCORDSRV_PRESENT) {
+							DiscordForwarder.forwardDeathMessage(deathMessage);
 						}
 					}
 				}
