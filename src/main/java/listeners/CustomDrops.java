@@ -1039,8 +1039,7 @@ public class CustomDrops implements Listener {
 	@EventHandler
 	public void onEntityDeath(EntityDeathEvent e) {
 		LivingEntity died = e.getEntity();
-		if(e instanceof PlayerDeathEvent playerDeath) {
-			playerDeath.setDeathMessage("");
+		if(e instanceof PlayerDeathEvent) {
 			return;
 		}
 		if(died instanceof Player || died instanceof ArmorStand || died instanceof AbstractHorse) {
@@ -1069,12 +1068,6 @@ public class CustomDrops implements Listener {
 		}
 	}
 
-	@EventHandler
-	public void onPlayerDeath(PlayerDeathEvent e) {
-		if(e.getDeathMessage().contains(" died")) {
-			e.setDeathMessage("");
-		}
-	}
 
 	public static int calculateMobXP(LivingEntity mob) {
 		return switch(mob.getType()) {
