@@ -307,9 +307,42 @@ public class CustomDamage implements Listener {
 				}
 
 				// Wind Burst mechanics
-				//noinspection StatementWithEmptyBody
 				if(weapon.containsEnchantment(Enchantment.WIND_BURST) && p.getFallDistance() >= 1.5) {
-					// TODO implement wind burst mechanics
+					int level = weapon.getEnchantmentLevel(Enchantment.WIND_BURST);
+
+					// Launch player upward (scales with level and fall distance)
+					double upwardVelocity = Math.min(0.5 + level * 0.5, 3.0);
+					ServerPlayer serverPlayer = ((CraftPlayer) p).getHandle();
+					serverPlayer.setOnGround(false);
+					p.setVelocity(new Vector(p.getVelocity().getX(), upwardVelocity, p.getVelocity().getZ()));
+
+					// Knockback nearby entities (radial burst)
+					double radius = 3.0 + level;
+					for(Entity nearby : damagee.getNearbyEntities(radius, radius, radius)) {
+						if(nearby instanceof LivingEntity && nearby != p) {
+							Vector knockback = nearby.getLocation().toVector().subtract(p.getLocation().toVector());
+							knockback.setY(0);
+							double dist = knockback.length();
+							if(dist > 0) {
+								knockback.normalize().multiply(1.0 + level * 0.5);
+								knockback.setY(0.4);
+								nearby.setVelocity(knockback);
+							}
+						}
+					}
+					// Also knockback the hit target
+					Vector targetKB = damagee.getLocation().toVector().subtract(p.getLocation().toVector());
+					targetKB.setY(0);
+					if(targetKB.length() > 0) {
+						targetKB.normalize().multiply(1.0 + level * 0.5);
+						targetKB.setY(0.4);
+						damagee.setVelocity(targetKB);
+					}
+
+					// Effects
+					p.getWorld().spawnParticle(Particle.GUST_EMITTER_LARGE, p.getLocation(), 1);
+					p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WIND_CHARGE_WIND_BURST, 1.0F, 1.0F);
+					p.setFallDistance(0);
 				}
 
 				// damage weapon
@@ -325,12 +358,7 @@ public class CustomDamage implements Listener {
 					List<ItemStack> thornsArmor = new ArrayList<>();
 
 					// Check all armor pieces for thorns
-					ItemStack[] armorPieces = {
-							eq.getHelmet(),
-							eq.getChestplate(),
-							eq.getLeggings(),
-							eq.getBoots()
-					};
+					ItemStack[] armorPieces = {eq.getHelmet(), eq.getChestplate(), eq.getLeggings(), eq.getBoots()};
 
 					for(ItemStack armor : armorPieces) {
 						if(armor == null || armor.getType() == Material.AIR) continue;
@@ -525,6 +553,7 @@ public class CustomDamage implements Listener {
 							}
 							damagee.setHealth(0.0);
 						}
+					}
 				}
 			} else {
 				// absorption
@@ -633,7 +662,8 @@ public class CustomDamage implements Listener {
 		Utils.scheduleTask(() -> net.minecraft.world.entity.ExperienceOrb.award(level, pos, (int) Math.floor((float) totalXP * 0.2F)), 50);
 	}
 
-	private static void triggerAllRelevantAdvancements(LivingEntity victim, Entity attacker, DamageType type, double originalDamage, double finalDamage, boolean wasBlocked, boolean wasKilled, DamageData data) {
+	private static void triggerAllRelevantAdvancements(LivingEntity victim, Entity attacker, DamageType type,
+													   double originalDamage, double finalDamage, boolean wasBlocked, boolean wasKilled, DamageData data) {
 		DamageSource nmsSource;
 		Entity causingEntity;
 		if(data.e != null) {
@@ -713,7 +743,8 @@ public class CustomDamage implements Listener {
 		updatePlayerStatistics(victim, attacker, causingEntity, type, finalDamage, wasKilled);
 	}
 
-	private static void updatePlayerStatistics(LivingEntity victim, Entity attacker, Entity causingEntity, DamageType type, double finalDamage, boolean wasKilled) {
+	private static void updatePlayerStatistics(LivingEntity victim, Entity attacker, Entity
+			causingEntity, DamageType type, double finalDamage, boolean wasKilled) {
 		// Player as attacker statistics
 		Player attackingPlayer = null;
 		if(causingEntity instanceof Player) {
@@ -860,8 +891,7 @@ public class CustomDamage implements Listener {
 		// - Spawning new shulker with correct color
 		// - Teleport attempts
 		try {
-			Method hitByShulkerBulletMethod = net.minecraft.world.entity.monster.Shulker.class
-					.getDeclaredMethod("hitByShulkerBullet");
+			Method hitByShulkerBulletMethod = net.minecraft.world.entity.monster.Shulker.class.getDeclaredMethod("hitByShulkerBullet");
 			hitByShulkerBulletMethod.setAccessible(true);
 			hitByShulkerBulletMethod.invoke(nmsShulker);
 		} catch(Exception exception) {
@@ -869,7 +899,8 @@ public class CustomDamage implements Listener {
 		}
 	}
 
-	private static DamageSource convertBukkitDamageSource(org.bukkit.damage.DamageSource bukkitSource, LivingEntity victim) {
+	private static DamageSource convertBukkitDamageSource(org.bukkit.damage.DamageSource bukkitSource, LivingEntity
+			victim) {
 		DamageSources sources = ((CraftLivingEntity) victim).getHandle().damageSources();
 
 		org.bukkit.damage.DamageType damageType = bukkitSource.getDamageType();
@@ -1137,8 +1168,8 @@ public class CustomDamage implements Listener {
 			switch(e.getCause()) {
 				case BLOCK_EXPLOSION -> type = DamageType.MELEE;
 				case POISON, WITHER -> type = DamageType.MAGIC;
-				case CONTACT, CRAMMING, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING, STARVATION,
-					 SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
+				case CONTACT, CRAMMING, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING,
+					 STARVATION, SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
 				case CUSTOM -> type = DamageType.IFRAME_ENVIRONMENTAL;
 				case FALL, FLY_INTO_WALL -> type = DamageType.FALL;
 				case KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.LETHAL_ABSOLUTE;
