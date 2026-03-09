@@ -170,9 +170,7 @@ public class WitherKing implements CustomWither {
 	}
 
 	public static void defeatHenchman(String which) {
-		System.out.println("Defeated " + which);
 		if(witherKing.removeScoreboardTag(which + "Undefeated")) {
-			System.out.println(witherKing.getScoreboardTags());
 			int left = countHenchmenLeft();
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			switch(left) {
