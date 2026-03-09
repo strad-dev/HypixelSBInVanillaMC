@@ -23,8 +23,7 @@ public class WitherSkeletonMartial implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		witherSkeleton.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Martial Arts" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ a");
-		Utils.changeName(witherSkeleton);
+		Utils.changeName(witherSkeleton, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Martial Arts" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
 		witherSkeleton.addScoreboardTag("Martial");
 
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);

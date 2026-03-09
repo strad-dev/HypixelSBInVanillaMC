@@ -53,6 +53,20 @@ public class Utils {
 	}
 
 	/**
+	 * Sets the entity's custom name to the given base name with health appended.
+	 *
+	 * @param entity   The entity in question.
+	 * @param baseName The base display name (without health).
+	 */
+	public static void changeName(LivingEntity entity, String baseName) {
+		if(!(entity instanceof Player)) {
+			int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount());
+			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
+			entity.setCustomName(baseName + " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + maxHealth);
+		}
+	}
+
+	/**
 	 * Gets the closest non-Spectator Player to the provided Entity<br>If all players on the server are in Spectator, a semi-random Player will be returned.
 	 *
 	 * @param e the entity
@@ -275,7 +289,6 @@ public class Utils {
 	public static void spawnGuards(LivingEntity entity, int num) {
 		for(int i = 0; i < num; i++) {
 			WitherSkeleton e = (WitherSkeleton) entity.getWorld().spawnEntity(entity.getLocation(), EntityType.WITHER_SKELETON);
-			e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + 50 + "/" + 50);
 			ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 			sword.addEnchantment(Enchantment.KNOCKBACK, 1);
 			ItemStack shield = new ItemStack(Material.SHIELD);
@@ -288,6 +301,7 @@ public class Utils {
 			//noinspection DuplicatedCode
 			e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(50.0);
 			e.setHealth(50.0);
+			Utils.changeName(e, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
 			e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 			e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
 			e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));

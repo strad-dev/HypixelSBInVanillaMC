@@ -49,8 +49,7 @@ public class Necron implements CustomWither {
 		wither.addScoreboardTag("300Frenzy");
 		wither.setPersistent(true);
 		wither.setRemoveWhenFarAway(false);
-		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
-		Utils.changeName(wither);
+		Utils.changeName(wither, name);
 
 		return name;
 	}

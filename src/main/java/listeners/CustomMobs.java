@@ -17,7 +17,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.List;
-import java.util.Objects;
 
 public class CustomMobs implements Listener {
 	private static boolean isWitherLordFightActive = false;
@@ -132,16 +131,14 @@ public class CustomMobs implements Listener {
 				// do nothing
 			}
 			// add health to the entity name if it doesn't exist already
-			int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
-			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
 			if(name.isEmpty()) {
 				name = ChatColor.AQUA + entity.getName();
 			}
 			if(!name.contains("❤")) {
-				name += " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + maxHealth;
+				Utils.changeName(entity, name);
+			} else {
+				entity.setCustomName(name);
 			}
-			// " ♥ 20/20";
-			entity.setCustomName(name);
 			entity.setCustomNameVisible(true);
 		}
 	}

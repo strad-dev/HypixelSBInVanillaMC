@@ -444,7 +444,7 @@ public class PrimalDragon implements CustomDragon {
 			enderman.addScoreboardTag("SkyblockBoss");
 			enderman.setPersistent(true);
 			enderman.setRemoveWhenFarAway(false);
-			enderman.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " 66/66");
+			Utils.changeName(enderman, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
 		}
 		if(spawnBruiser) {
 			Enderman enderman = (Enderman) dragon.getWorld().spawnEntity(spawnLoc, EntityType.ENDERMAN);
@@ -458,7 +458,7 @@ public class PrimalDragon implements CustomDragon {
 			enderman.addScoreboardTag("SkyblockBoss");
 			enderman.setPersistent(true);
 			enderman.setRemoveWhenFarAway(false);
-			enderman.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot Bruiser" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " 133/133");
+			Utils.changeName(enderman, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot Bruiser" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
 		}
 	}
 

@@ -6,7 +6,6 @@ package listeners;
  */
 
 import misc.Utils;
-import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -32,26 +31,7 @@ public class OldRegen implements Listener {
 					e.setCancelled(true);
 					return;
 				}
-				StringBuilder newName;
-				try {
-					String[] oldName = Objects.requireNonNull(entity.getCustomName()).split(" ");
-					int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount() + e.getAmount());
-					int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
-					oldName[oldName.length - 1] = ChatColor.YELLOW + "" + health + "/" + maxHealth;
-					newName = new StringBuilder(oldName[0]);
-					for(int i = 1; i < oldName.length; i++) {
-						newName.append(" ").append(oldName[i]);
-					}
-				} catch(Exception exception) {
-					// add health to the entity name
-					int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount() + e.getAmount());
-					int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
-					newName = new StringBuilder(String.valueOf(ChatColor.AQUA)).append(entity.getName()).append(" ").append(ChatColor.RED).append("❤ ").append(ChatColor.YELLOW).append(health).append("/").append(maxHealth);
-					// " ♥ 20/20";
-					entity.setCustomName(newName.toString());
-					entity.setCustomNameVisible(true);
-				}
-				entity.setCustomName(newName.toString());
+				Utils.scheduleTask(() -> Utils.changeName(entity), 1L);
 			}
 			return;
 		} else if(e.getRegainReason() != EntityRegainHealthEvent.RegainReason.SATIATED) {

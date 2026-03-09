@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,7 +18,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @SuppressWarnings("DataFlowIssue")
 public class CustomItemUses implements Listener {
@@ -68,11 +66,7 @@ public class CustomItemUses implements Listener {
 					}
 					newName = mob.onSpawn(p, entity);
 				}
-				int health = (int) (entity.getHealth() + entity.getAbsorptionAmount());
-				int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
-				newName += " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + maxHealth;
-				// " ♥ 20/20";
-				entity.setCustomName(newName);
+				Utils.changeName(entity, newName);
 				entity.setCustomNameVisible(true);
 
 				if(!p.getGameMode().equals(GameMode.CREATIVE)) {

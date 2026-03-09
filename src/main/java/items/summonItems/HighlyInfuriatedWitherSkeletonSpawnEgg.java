@@ -1,6 +1,7 @@
 package items.summonItems;
 
 import items.AbilityItem;
+import misc.Utils;
 import mobs.generic.InfuriatedWitherSkeleton;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -52,7 +53,8 @@ public class HighlyInfuriatedWitherSkeletonSpawnEgg implements AbilityItem, Summ
 	@Override
 	public boolean onRightClick(Player p) {
 		WitherSkeleton skeleton = (WitherSkeleton) p.getWorld().spawnEntity(p.getLocation(), EntityType.WITHER_SKELETON);
-		skeleton.setCustomName(new InfuriatedWitherSkeleton().onSpawn(p, skeleton));
+		String name = new InfuriatedWitherSkeleton().onSpawn(p, skeleton);
+		Utils.changeName(skeleton, name);
 		skeleton.setCustomNameVisible(true);
 		if(p.getGameMode() != GameMode.CREATIVE) {
 			p.getInventory().getItemInMainHand().setAmount(p.getInventory().getItemInMainHand().getAmount() - 1);

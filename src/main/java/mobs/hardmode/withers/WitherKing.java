@@ -59,9 +59,8 @@ public class WitherKing implements CustomWither {
 		wither.setRemoveWhenFarAway(false);
 		wither.setAI(false);
 		wither.setSilent(true);
-		wither.setCustomName(name + " " + ChatColor.RESET + ChatColor.RED + "❤" + ChatColor.YELLOW + " a");
 		teleport(wither, 0, false);
-		Utils.changeName(wither);
+		Utils.changeName(wither, name);
 
 		ArrayList<String> ordering = new ArrayList<>();
 		ordering.add("Power");
@@ -202,7 +201,6 @@ public class WitherKing implements CustomWither {
 			int health = 150 - countHenchmenLeft() * 10;
 			for(int i = 0; i < 4 - countHenchmenLeft() / 2; i++) {
 				WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
-				e.setCustomName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿ " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + health);
 				ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 				sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 5);
 				ItemStack shield = new ItemStack(Material.SHIELD);
@@ -214,6 +212,7 @@ public class WitherKing implements CustomWither {
 
 				e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(health);
 				e.setHealth(health);
+				Utils.changeName(e, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
 				//noinspection DuplicatedCode
 				e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 				e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
