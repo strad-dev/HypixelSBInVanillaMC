@@ -11,8 +11,6 @@ import misc.Utils;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.OminousBottleAmplifier;
 import org.bukkit.*;
-import org.bukkit.block.banner.Pattern;
-import org.bukkit.block.banner.PatternType;
 import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -22,9 +20,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -559,27 +555,6 @@ public class CustomDrops implements Listener {
 						item = CraftItemStack.asBukkitCopy(nmsStack);
 						world.dropItemNaturally(l, item);
 					}
-					item = new ItemStack(Material.WHITE_BANNER);
-					BannerMeta meta = (BannerMeta) item.getItemMeta();
-
-					// Add all the banner patterns in the correct order
-					meta.addPattern(new Pattern(DyeColor.CYAN, PatternType.RHOMBUS));
-					meta.addPattern(new Pattern(DyeColor.LIGHT_GRAY, PatternType.STRIPE_BOTTOM));
-					meta.addPattern(new Pattern(DyeColor.GRAY, PatternType.STRIPE_CENTER));
-					meta.addPattern(new Pattern(DyeColor.LIGHT_GRAY, PatternType.HALF_HORIZONTAL));
-					meta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRIPE_MIDDLE));
-					meta.addPattern(new Pattern(DyeColor.LIGHT_GRAY, PatternType.HALF_HORIZONTAL));
-					meta.addPattern(new Pattern(DyeColor.LIGHT_GRAY, PatternType.CIRCLE));
-					meta.addPattern(new Pattern(DyeColor.BLACK, PatternType.BORDER));
-
-					// Set custom name (gold color, not italic)
-					meta.setDisplayName(ChatColor.GOLD + "" + ChatColor.ITALIC + "Ominous Banner");
-
-					// Hide additional tooltip
-					meta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-
-					item.setItemMeta(meta);
-					world.dropItemNaturally(l, item);
 				}
 			}
 			// no drops
