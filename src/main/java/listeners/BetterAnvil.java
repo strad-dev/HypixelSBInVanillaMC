@@ -28,9 +28,7 @@ public class BetterAnvil implements Listener {
 		ItemStack FIRST_ITEM = view.getItem(0);
 		ItemStack SECOND_ITEM = view.getItem(1);
 
-		if((FIRST_ITEM == null) || (SECOND_ITEM == null)) return;
-
-		if(SECOND_ITEM.getType() == Material.ENCHANTED_BOOK) {
+		if(FIRST_ITEM != null && SECOND_ITEM != null && SECOND_ITEM.getType() == Material.ENCHANTED_BOOK) {
 			if(FIRST_ITEM.getType() != Material.ENCHANTED_BOOK) {
 				ItemStack result = FIRST_ITEM.clone();
 				ItemMeta bookMeta = SECOND_ITEM.getItemMeta();

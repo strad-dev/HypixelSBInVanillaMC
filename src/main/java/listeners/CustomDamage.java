@@ -176,7 +176,7 @@ public class CustomDamage implements Listener {
 
 			double breach = 0;
 			if(damager instanceof LivingEntity entity && entity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.BREACH)) {
-				breach = entity.getItemInUse().getEnchantmentLevel(Enchantment.BREACH);
+				breach = entity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.BREACH);
 			}
 
 			// Attribute.ARMOR reduces damage taken by 4% per level, up to 15 points (-60%)
@@ -304,6 +304,12 @@ public class CustomDamage implements Listener {
 				// Damage Indicator particles
 				if(data.originalDamage > 2 && isPhysicalHit) {
 					damagee.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, particleLoc, Math.min((int) (data.originalDamage / 2), 32));
+				}
+
+				// Density enchantment - bonus smash damage on falling hits
+				if(weapon.containsEnchantment(Enchantment.DENSITY) && p.getFallDistance() >= 1.5) {
+					int densityLevel = weapon.getEnchantmentLevel(Enchantment.DENSITY);
+					data.originalDamage += densityLevel * 0.5 * p.getFallDistance();
 				}
 
 				// Wind Burst mechanics
@@ -1023,6 +1029,11 @@ public class CustomDamage implements Listener {
 					return sources.windCharge(windCharge, living);
 				}
 				return sources.windCharge(windCharge, null);
+			}
+			return sources.generic();
+		} else if(damageType == org.bukkit.damage.DamageType.MACE_SMASH) {
+			if(nmsCausingEntity instanceof ServerPlayer player) {
+				return sources.playerAttack(player);
 			}
 			return sources.generic();
 		}

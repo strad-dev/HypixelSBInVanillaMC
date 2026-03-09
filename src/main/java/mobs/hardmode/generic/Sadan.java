@@ -38,8 +38,8 @@ public class Sadan implements CustomMob {
 		zombie.getEquipment().clear();
 		zombie.setAdult();
 		zombie.eject();
-		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1200.0);
-		zombie.setHealth(1200.0);
+		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(2000.0);
+		zombie.setHealth(2000.0);
 		zombie.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 		zombie.getAttribute(Attribute.SCALE).setBaseValue(0.625);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
