@@ -303,7 +303,7 @@ public class Sadan implements CustomMob {
 				Location l = p.getLocation();
 				l.setY(l.getY() - 1);
 				p.teleport(l);
-				CustomDamage.customMobs(p, giant, finalPhase ? 90 : 70, DamageType.MELEE);
+				CustomDamage.customMobs(p, giant, finalPhase ? 90 : 70, DamageType.AOE);
 			});
 			Utils.playGlobalSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 2.0F);
 			Utils.scheduleTask(() -> bigfoot(giant, finalPhase), finalPhase ? 200 : 320);

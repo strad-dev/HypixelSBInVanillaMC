@@ -63,7 +63,7 @@ public class VoidcrazedSeraph implements CustomMob {
 	private static void dissonance(Enderman voidgloom) {
 		if(!voidgloom.isDead()) {
 			if(!voidgloom.getScoreboardTags().contains("Invulnerable")) {
-				Utils.applyToAllNearbyPlayers(voidgloom, 16, p -> CustomDamage.customMobs(p, voidgloom, 30, DamageType.MELEE));
+				Utils.applyToAllNearbyPlayers(voidgloom, 16, p -> CustomDamage.customMobs(p, voidgloom, 30, DamageType.AOE));
 			}
 			Utils.scheduleTask(() -> dissonance(voidgloom), 20);
 		}
