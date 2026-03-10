@@ -16,6 +16,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffectType;
 
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.server.level.ServerPlayer;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,11 +58,13 @@ public class CustomItemUses implements Listener {
 			case Mob entity when e.getHand().equals(EquipmentSlot.HAND) -> {
 				CustomMob mob = SummonItem.spawnABoss(entity, id, e.getPlayer().hasPotionEffect(PotionEffectType.BAD_OMEN));
 				e.getPlayer().removePotionEffect(PotionEffectType.BAD_OMEN);
+				boolean isNameTag = false;
 				String newName;
 				if(mob == null) {
 					if(item.getType().equals(Material.NAME_TAG)) {
 						e.setCancelled(true);
 						newName = item.getItemMeta().getDisplayName();
+						isNameTag = true;
 					} else {
 						return;
 					}
@@ -72,6 +80,15 @@ public class CustomItemUses implements Listener {
 
 				if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 					item.setAmount(item.getAmount() - 1);
+				}
+
+				if(isNameTag) {
+					ServerPlayer serverPlayer = ((CraftPlayer) p).getHandle();
+					CriteriaTriggers.PLAYER_INTERACTED_WITH_ENTITY.trigger(
+						serverPlayer,
+						CraftItemStack.asNMSCopy(item),
+						((CraftEntity) entity).getHandle()
+					);
 				}
 			}
 			default -> {
