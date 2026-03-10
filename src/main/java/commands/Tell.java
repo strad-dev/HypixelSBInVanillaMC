@@ -13,6 +13,10 @@ public class Tell implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+		return sendWhisper(commandSender, strings);
+	}
+
+	public static boolean sendWhisper(CommandSender commandSender, String[] strings) {
 		Player player;
 		try {
 			player = getServer().getPlayer(strings[0]);

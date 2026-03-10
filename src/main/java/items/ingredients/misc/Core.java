@@ -3,7 +3,6 @@ package items.ingredients.misc;
 import items.ingredients.Ingredients;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,9 +13,9 @@ import java.util.List;
 public class Core implements Ingredients {
 	public static ItemStack getItem() {
 		ItemStack core = new ItemStack(Material.CHISELED_QUARTZ_BLOCK);
-		core.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = core.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Judgement Core");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);

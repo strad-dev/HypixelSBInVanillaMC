@@ -8,7 +8,6 @@ import misc.Utils;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -32,9 +31,9 @@ public class IceSpray implements AbilityItem {
 
 	public static ItemStack getItem() {
 		ItemStack iceSpray = new ItemStack(Material.STICK);
-		iceSpray.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = iceSpray.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.GOLD + "Ice Spray Wand");

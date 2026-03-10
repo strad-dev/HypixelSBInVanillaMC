@@ -2,7 +2,6 @@ package items.summonItems;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -13,9 +12,8 @@ import java.util.List;
 public class SuperiorRemnant implements SummonItem {
 	public static ItemStack getItem() {
 		ItemStack supRemnant = new ItemStack(Material.QUARTZ);
-		supRemnant.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
 		ItemMeta data = supRemnant.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Remnant of the Superior Dragon");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);

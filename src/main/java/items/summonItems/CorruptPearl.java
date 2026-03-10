@@ -2,7 +2,6 @@ package items.summonItems;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -13,9 +12,8 @@ import java.util.List;
 public class CorruptPearl implements SummonItem {
 	public static ItemStack getItem() {
 		ItemStack corruptPearl = new ItemStack(Material.ENDER_EYE);
-		corruptPearl.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
 		ItemMeta data = corruptPearl.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + "Corrupted Pearl");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);

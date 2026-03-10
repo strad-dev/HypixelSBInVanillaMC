@@ -2,7 +2,6 @@ package items.summonItems;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,9 +13,8 @@ public class OmegaEgg implements SummonItem {
 	public static ItemStack getItem() {
 
 		ItemStack omegaEgg = new ItemStack(Material.EGG);
-		omegaEgg.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
 		ItemMeta data = omegaEgg.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + "Omega Egg");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
