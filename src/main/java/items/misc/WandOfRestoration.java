@@ -42,8 +42,8 @@ public class WandOfRestoration implements AbilityItem {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Heal " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Gain + " + ChatColor.RED + "0.5❤" + ChatColor.GRAY + " every " + ChatColor.GREEN + "1.25");
-		lore.add(ChatColor.GRAY + " seconds for " + ChatColor.GREEN + "3" + ChatColor.GRAY + " seconds!");
+		lore.add(ChatColor.GRAY + "Gain +" + ChatColor.RED + "0.5❤" + ChatColor.GRAY + " every " + ChatColor.GREEN + "1.25");
+		lore.add(ChatColor.GRAY + "seconds for " + ChatColor.GREEN + "2.5" + ChatColor.GRAY + " seconds!");
 		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
 		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + COOLDOWN / 20 + "s");
 		lore.add("");

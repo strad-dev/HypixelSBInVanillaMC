@@ -42,8 +42,8 @@ public class WandOfAtonement implements AbilityItem {
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Ability: Big Heal " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Gain + " + ChatColor.RED + "0.5❤" + ChatColor.GRAY + " every " + ChatColor.GREEN + "0.6");
-		lore.add(ChatColor.GRAY + " seconds for " + ChatColor.GREEN + "3" + ChatColor.GRAY + " seconds!");
+		lore.add(ChatColor.GRAY + "Gain +" + ChatColor.RED + "0.5❤" + ChatColor.GRAY + " every " + ChatColor.GREEN + "0.75");
+		lore.add(ChatColor.GRAY + "seconds for " + ChatColor.GREEN + "3" + ChatColor.GRAY + " seconds!");
 		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
 		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + COOLDOWN / 20 + "s");
 		lore.add("");
@@ -63,7 +63,7 @@ public class WandOfAtonement implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		double maxHealth = p.getAttribute(Attribute.MAX_HEALTH).getValue();
-		for(int i = 0; i < 61; i += 12) {
+		for(int i = 0; i < 61; i += 15) {
 			Utils.scheduleTask(() -> p.setHealth(Math.min(p.getHealth() + 1, maxHealth)), i);
 		}
 		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);
