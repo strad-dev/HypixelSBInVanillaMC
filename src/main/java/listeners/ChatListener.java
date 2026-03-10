@@ -2,6 +2,8 @@ package listeners;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -11,21 +13,23 @@ public class ChatListener implements Listener {
 
 	@EventHandler
 	public void onPlayerChat(AsyncPlayerChatEvent e) {
-		String player = e.getPlayer().getName();
-		String message = e.getMessage();
-		String sentMessage = "";
-		if(player.equals("Beethoven_")) {
-			sentMessage += ChatColor.BLUE;
-		} else {
-			sentMessage += ChatColor.GREEN;
-		}
-		sentMessage += player + ChatColor.WHITE + ": " + message;
-		Bukkit.broadcastMessage(sentMessage);
+		sendChat(e.getPlayer(), e.getMessage());
 		e.setCancelled(true);
+	}
 
-		if(DISCORDSRV_PRESENT) {
-			DiscordForwarder.forward(e.getPlayer(), message);
+	public static void sendChat(CommandSender sender, String message) {
+		String formatted;
+		if (sender instanceof Player player) {
+			String color = player.getName().equals("Beethoven_")
+				? ChatColor.BLUE.toString() : ChatColor.GREEN.toString();
+			formatted = color + player.getName() + ChatColor.WHITE + ": " + message;
+			if (DISCORDSRV_PRESENT) {
+				DiscordForwarder.forward(player, message);
+			}
+		} else {
+			formatted = ChatColor.RED + "" + ChatColor.BOLD + "Server" + ChatColor.WHITE + ": " + message;
 		}
+		Bukkit.broadcastMessage(formatted);
 	}
 
 	public static boolean isDiscordSRVPresent() {

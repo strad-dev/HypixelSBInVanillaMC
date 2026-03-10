@@ -10,6 +10,12 @@ commands:
   w:
     description: Whisper messages to another player!
     usage: /w [player] [message]
+  tell:
+    description: Whisper messages to another player!
+    usage: /tell [player] [message]
+  msg:
+    description: Whisper messages to another player!
+    usage: /msg [player] [message]
   locateplayer:
     description: Locate a player on the server!
     usage: /locateplayer [player]
@@ -19,6 +25,12 @@ commands:
   m7tasactivatewitherfight:
     description: Utilized by the M7 TAS plugin to set the Wither Lords fight to active.  Also useful for admins to disable custom Withers (but why)
     usage: /m7tasactivatewitherfight
+  say:
+    description: Broadcast a message to the server
+    usage: /say [message]
+  me:
+    description: Send an action message
+    usage: /me [action]
 
 softdepend:
   - DiscordSRV

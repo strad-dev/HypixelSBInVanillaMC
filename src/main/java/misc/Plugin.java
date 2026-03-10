@@ -56,8 +56,12 @@ public class Plugin extends JavaPlugin implements Listener {
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
 		Objects.requireNonNull(this.getCommand("locateplayer")).setExecutor(new LocatePlayer());
 		Objects.requireNonNull(this.getCommand("w")).setExecutor(new Tell());
+		Objects.requireNonNull(this.getCommand("tell")).setExecutor(new Tell());
+		Objects.requireNonNull(this.getCommand("msg")).setExecutor(new Tell());
 		Objects.requireNonNull(this.getCommand("resetwitherfight")).setExecutor(new ResetWitherFight());
 		Objects.requireNonNull(this.getCommand("m7tasactivatewitherfight")).setExecutor(new ActivateWitherFight());
+		Objects.requireNonNull(this.getCommand("say")).setExecutor(new Say());
+		Objects.requireNonNull(this.getCommand("me")).setExecutor(new Me());
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
 		getServer().getPluginManager().registerEvents(new BetterAnvil(), this);
@@ -80,6 +84,7 @@ public class Plugin extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new CustomMining(), this);
 		getServer().getPluginManager().registerEvents(new CreativeMenu(), this);
 		getServer().getPluginManager().registerEvents(new StripCreativeCustomData(), this);
+		getServer().getPluginManager().registerEvents(new CommandInterceptor(), this);
 		getServer().getPluginManager().registerEvents(this, this);
 
 		getServer().addRecipe(AddRecipes.addScyllaRecipe(this));

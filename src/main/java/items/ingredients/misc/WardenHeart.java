@@ -3,7 +3,6 @@ package items.ingredients.misc;
 import items.ingredients.Ingredients;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,9 +14,9 @@ public class WardenHeart implements Ingredients {
 	public static ItemStack getItem() {
 
 		ItemStack wardenHeart = new ItemStack(Material.REDSTONE_BLOCK);
-		wardenHeart.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = wardenHeart.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Warden Heart");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);

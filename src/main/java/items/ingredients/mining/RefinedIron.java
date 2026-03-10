@@ -3,7 +3,6 @@ package items.ingredients.mining;
 import items.ingredients.Ingredients;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,9 +13,9 @@ import java.util.List;
 public class RefinedIron implements Ingredients {
 	public static ItemStack getItem() {
 		ItemStack refinedIron = new ItemStack(Material.IRON_INGOT);
-		refinedIron.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = refinedIron.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Refined Iron");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);

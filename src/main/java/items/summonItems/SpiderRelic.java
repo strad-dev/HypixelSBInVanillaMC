@@ -2,7 +2,6 @@ package items.summonItems;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -13,9 +12,8 @@ import java.util.List;
 public class SpiderRelic implements SummonItem {
 	public static ItemStack getItem() {
 		ItemStack spiderRelic = new ItemStack(Material.FERMENTED_SPIDER_EYE);
-		spiderRelic.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
 		ItemMeta data = spiderRelic.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + "Spider Relic");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);

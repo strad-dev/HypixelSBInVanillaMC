@@ -3,7 +3,6 @@ package items.ingredients.misc;
 import items.ingredients.Ingredients;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,9 +13,9 @@ import java.util.List;
 public class TessellatedPearl implements Ingredients {
 	public static ItemStack getItem() {
 		ItemStack tessellated = new ItemStack(Material.ENDER_PEARL);
-		tessellated.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = tessellated.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Tessellated Ender Pearl");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);

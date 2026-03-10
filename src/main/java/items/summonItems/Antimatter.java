@@ -2,7 +2,6 @@ package items.summonItems;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,9 +13,8 @@ public class Antimatter implements SummonItem {
 	public static ItemStack getItem() {
 
 		ItemStack antimatter = new ItemStack(Material.WARPED_FUNGUS);
-		antimatter.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
 		ItemMeta data = antimatter.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Antimatter");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);

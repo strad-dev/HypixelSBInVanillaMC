@@ -9,7 +9,6 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
@@ -26,9 +25,9 @@ public class WandOfAtonement implements AbilityItem {
 
 	public static ItemStack getItem() {
 		ItemStack wandOfAtonement = new ItemStack(Material.STICK);
-		wandOfAtonement.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = wandOfAtonement.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.GOLD + "Wand of Atonement");

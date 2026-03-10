@@ -3,7 +3,6 @@ package items.ingredients.mining;
 import items.ingredients.Ingredients;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,9 +13,9 @@ import java.util.List;
 public class RefinedNetherite implements Ingredients {
 	public static ItemStack getItem() {
 		ItemStack refinedNetherite = new ItemStack(Material.NETHERITE_SCRAP);
-		refinedNetherite.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = refinedNetherite.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Refined Netherite");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);

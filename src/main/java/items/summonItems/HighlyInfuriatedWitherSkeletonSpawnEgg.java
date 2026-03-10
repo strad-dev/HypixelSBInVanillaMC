@@ -6,7 +6,6 @@ import mobs.generic.InfuriatedWitherSkeleton;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.WitherSkeleton;
@@ -20,9 +19,8 @@ import java.util.List;
 public class HighlyInfuriatedWitherSkeletonSpawnEgg implements AbilityItem, SummonItem {
 	public static ItemStack getItem() {
 		ItemStack egg = new ItemStack(Material.WITHER_SKELETON_SPAWN_EGG);
-		egg.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
 		ItemMeta data = egg.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Highly Infuriated Wither Skeleton Spawn Egg");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);

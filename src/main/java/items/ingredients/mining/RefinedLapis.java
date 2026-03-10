@@ -3,7 +3,6 @@ package items.ingredients.mining;
 import items.ingredients.Ingredients;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -14,9 +13,9 @@ import java.util.List;
 public class RefinedLapis implements Ingredients {
 	public static ItemStack getItem() {
 		ItemStack refinedLapis = new ItemStack(Material.LAPIS_LAZULI);
-		refinedLapis.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
 
 		ItemMeta data = refinedLapis.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Refined Lapis");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
