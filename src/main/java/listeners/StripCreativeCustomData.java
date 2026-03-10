@@ -150,9 +150,11 @@ public class StripCreativeCustomData implements Listener {
 
 		if (newItem == null) return null;
 
-		// Preserve enchantments and stack size from the original item
-		Map<Enchantment, Integer> enchants = item.getEnchantments();
-		newItem.addUnsafeEnchantments(enchants);
+		// Only preserve enchantments for items that don't use glint override (real enchantable weapons)
+		if (!newItem.getItemMeta().hasEnchantmentGlintOverride()) {
+			Map<Enchantment, Integer> enchants = item.getEnchantments();
+			newItem.addUnsafeEnchantments(enchants);
+		}
 		newItem.setAmount(item.getAmount());
 		return newItem;
 	}

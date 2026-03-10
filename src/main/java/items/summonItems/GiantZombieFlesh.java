@@ -12,9 +12,8 @@ import java.util.List;
 public class GiantZombieFlesh implements SummonItem {
 	public static ItemStack getItem() {
 		ItemStack giantZombieFlesh = new ItemStack(Material.ROTTEN_FLESH);
-		giantZombieFlesh.addUnsafeEnchantment(Enchantment.KNOCKBACK, 1);
-
 		ItemMeta data = giantZombieFlesh.getItemMeta();
+		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Giant Zombie Flesh");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
