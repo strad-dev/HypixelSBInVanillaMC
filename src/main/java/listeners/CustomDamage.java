@@ -180,7 +180,7 @@ public class CustomDamage implements Listener {
 			}
 
 			// Attribute.ARMOR reduces damage taken by 4% per level, up to 15 points (-60%)
-			// The Breach enchantment removes 1.25 armor points per level, up to -5 points at Breach IV
+			// The Breach enchantment lowers the cap by 2 points per level, with Breach 4 only allowing 7 points (-28%))
 			// Examples
 			// Iron Armor (15 points) reduces damage by 60%
 			// Diamond Armor (20 points) also reduces damage by 60%
@@ -188,18 +188,18 @@ public class CustomDamage implements Listener {
 			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
 			if(affectedByArmor) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
-				armor -= breach * 1.25;
-				finalDamage *= Math.max(0.4, 1 - armor * 0.04);
+				double minMultipler = 0.4 + breach * 0.1;
+				finalDamage *= Math.max(minMultipler, 1 - armor * 0.04);
 			}
 
 			// Attribute.ARMOR_TOUGHNESS further reduces damage taken by 5% per level, up to 16 points (-80%)
-			// Not affected by Breach
+			// Breach reduces Armor Toughness by 1.25 for each level
 			// Examples
 			// Iron Armor (0 toughness) does not work here
 			// Diamond Armor (8 toughness) reduces damage by 40%
 			// Netherite Armor (12 toughness) reduces damage by 60%
 			// 3/4 Netherite + Elytra (9 toughness) reduces damage by 45%
-			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR_TOUGHNESS)).getValue(), 0);
+			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR_TOUGHNESS)).getValue(), 0) - breach * 1.25;
 			finalDamage *= Math.max(0.2, 1 - toughness * 0.05);
 
 			// The Resistance status effect reduces damage by 20% per level.
@@ -310,6 +310,11 @@ public class CustomDamage implements Listener {
 				if(weapon.containsEnchantment(Enchantment.DENSITY) && p.getFallDistance() >= 1.5) {
 					int densityLevel = weapon.getEnchantmentLevel(Enchantment.DENSITY);
 					data.originalDamage += densityLevel * 0.5 * p.getFallDistance();
+				}
+
+				// Reset fall distance on Mace smash attack
+				if(weapon.getType() == Material.MACE && p.getFallDistance() >= 1.5) {
+					p.setFallDistance(0);
 				}
 
 				// Wind Burst mechanics
@@ -609,9 +614,9 @@ public class CustomDamage implements Listener {
 
 					if(damager instanceof LivingEntity livingEntity) {
 						if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK) && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
-							enchantments += 0.33333 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
+							enchantments += 0.3 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
 						} else if(data.punchArrow > 0) {
-							enchantments += 0.33333 * data.punchArrow;
+							enchantments += 0.3 * data.punchArrow;
 						}
 					}
 
@@ -642,7 +647,7 @@ public class CustomDamage implements Listener {
 
 					// Apply knockback
 					Vector oldVelocity = damagee.getVelocity();
-					Vector newVelocity = new Vector(oldVelocity.getX() * 0.2 + knockbackDir.getX() * factor + factor * damager.getVelocity().getX(), (damagee.isOnGround() ? 0.4 * antiKB * (data.isBlocking ? 0.5 : 1) * (data.isTermArrow ? 0.5 : 1) : 0), oldVelocity.getZ() * 0.2 + knockbackDir.getZ() * factor + factor * damager.getVelocity().getZ());
+					Vector newVelocity = new Vector(oldVelocity.getX() * 0.1 + knockbackDir.getX() * factor + factor * damager.getVelocity().getX(), (damagee.isOnGround() ? 0.4 * antiKB * (data.isBlocking ? 0.5 : 1) * (data.isTermArrow ? 0.5 : 1) : 0), oldVelocity.getZ() * 0.1 + knockbackDir.getZ() * factor + factor * damager.getVelocity().getZ());
 
 					damagee.setVelocity(newVelocity);
 				}
