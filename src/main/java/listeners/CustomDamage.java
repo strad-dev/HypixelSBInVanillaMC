@@ -356,8 +356,10 @@ public class CustomDamage implements Listener {
 					p.setFallDistance(0);
 				}
 
-				// damage weapon
-				Utils.damageItem(p, weapon, 1);
+				// damage weapon if direct melee attack
+				if(type == DamageType.MELEE) {
+					Utils.damageItem(p, weapon, 1);
+				}
 			}
 
 			// handle thorns
