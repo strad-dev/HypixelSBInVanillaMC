@@ -64,7 +64,8 @@ public class CustomItemUses implements Listener {
 					if(entity.getScoreboardTags().contains("SkyblockBoss")) {
 						return;
 					}
-					newName = mob.onSpawn(p, entity);
+					entity.leaveVehicle();
+				newName = mob.onSpawn(p, entity);
 				}
 				Utils.changeName(entity, newName);
 				entity.setCustomNameVisible(true);
