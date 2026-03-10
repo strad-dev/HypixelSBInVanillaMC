@@ -16,6 +16,8 @@ import net.minecraft.world.entity.boss.enderdragon.phases.DragonDeathPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
+import net.minecraft.world.entity.projectile.hurtingprojectile.Fireball;
+import net.minecraft.world.entity.projectile.hurtingprojectile.WitherSkull;
 import net.minecraft.world.entity.projectile.hurtingprojectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.item.Items;
@@ -185,7 +187,7 @@ public class CustomDamage implements Listener {
 			// Iron Armor (15 points) reduces damage by 60%
 			// Diamond Armor (20 points) also reduces damage by 60%
 			// 3/4 Diamond + Elytra (12 points) reduces damage by 48%
-			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
+			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.AOE || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
 			if(affectedByArmor) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
 				double minMultipler = 0.4 + breach * 0.1;
@@ -264,7 +266,7 @@ public class CustomDamage implements Listener {
 	}
 
 	private static void dealDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
-		if(!damagee.isDead() && finalDamage > 0 && (damagee.getNoDamageTicks() == 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC || type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE)) {
+		if(!damagee.isDead() && (finalDamage > 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) && (damagee.getNoDamageTicks() == 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC || type == DamageType.AOE || type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE)) {
 			// sweeping edge
 			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.SWEEPING_EDGE)) {
 				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SWEEPING_EDGE);
@@ -544,7 +546,7 @@ public class CustomDamage implements Listener {
 									} else {
 										damagerName = "absolutely no one";
 									}
-									if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) {
+									if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.AOE) {
 										deathMessage = p.getName() + " was slain by " + damagerName;
 									} else if(type == DamageType.RANGED) {
 										deathMessage = p.getName() + " was shot by " + damagerName;
@@ -686,6 +688,7 @@ public class CustomDamage implements Listener {
 			org.bukkit.damage.DamageType bukkitType = switch(type) {
 				case MELEE -> org.bukkit.damage.DamageType.MOB_ATTACK;
 				case MELEE_SWEEP -> org.bukkit.damage.DamageType.PLAYER_ATTACK;
+				case AOE -> org.bukkit.damage.DamageType.MOB_ATTACK_NO_AGGRO;
 				case RANGED -> org.bukkit.damage.DamageType.ARROW;
 				case RANGED_SPECIAL -> org.bukkit.damage.DamageType.SONIC_BOOM;
 				case MAGIC, PLAYER_MAGIC -> org.bukkit.damage.DamageType.MAGIC;
@@ -819,14 +822,14 @@ public class CustomDamage implements Listener {
 
 		switch(type) {
 			case RANGED -> {
-				if(attacker instanceof org.bukkit.entity.Arrow) {
+				if(attacker instanceof Arrow) {
 					// Bow/Crossbow usage
 					if(weapon.getItem() == Items.BOW) {
 						player.awardStat(Stats.ITEM_USED.get(Items.BOW));
 					} else if(weapon.getItem() == Items.CROSSBOW) {
 						player.awardStat(Stats.ITEM_USED.get(Items.CROSSBOW));
 					}
-				} else if(attacker instanceof org.bukkit.entity.Trident) {
+				} else if(attacker instanceof Trident) {
 					player.awardStat(Stats.ITEM_USED.get(Items.TRIDENT));
 				}
 			}
@@ -944,13 +947,13 @@ public class CustomDamage implements Listener {
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.FIREBALL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.Fireball fireball) {
+			if(nmsDirectEntity instanceof Fireball fireball) {
 				return sources.fireball(fireball, nmsCausingEntity);
 			}
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.UNATTRIBUTED_FIREBALL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.Fireball fireball) {
+			if(nmsDirectEntity instanceof Fireball fireball) {
 				return sources.fireball(fireball, nmsCausingEntity);
 			}
 			return sources.generic();
@@ -983,7 +986,7 @@ public class CustomDamage implements Listener {
 			return sources.generic();
 
 		} else if(damageType == org.bukkit.damage.DamageType.WITHER_SKULL) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.hurtingprojectile.WitherSkull witherSkull) {
+			if(nmsDirectEntity instanceof WitherSkull witherSkull) {
 				return sources.witherSkull(witherSkull, nmsCausingEntity);
 			}
 			return sources.generic();

@@ -70,7 +70,7 @@ public class RevenantHorror implements CustomMob {
 			List<Entity> entities = zombie.getNearbyEntities(8, 8, 8);
 			entities.forEach(entity -> {
 				if(entity instanceof Player p) {
-					CustomDamage.customMobs(p, zombie, zombie.getHealth() / zombie.getAttribute(Attribute.MAX_HEALTH).getValue() < 0.5 ? 20 : 10, DamageType.MELEE);
+					CustomDamage.customMobs(p, zombie, zombie.getHealth() / zombie.getAttribute(Attribute.MAX_HEALTH).getValue() < 0.5 ? 20 : 10, DamageType.AOE);
 				}
 			});
 			Utils.scheduleTask(() -> aoe(zombie), 20);

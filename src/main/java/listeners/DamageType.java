@@ -18,6 +18,17 @@ public enum DamageType {
 	 * Used for all damage caused by Sweep attacks
 	 */
 
+	AOE,
+	/*
+	 * AOE Damage Type
+	 * ------------------
+	 * Used for boss AOE attacks that hit all nearby players
+	 * Affected by: Armor, Toughness, Protection, Resistance
+	 * Knockback: None
+	 * I-Frames: None
+	 * Shields: No
+	 */
+
 	RANGED,
 	/*
 	 * Ranged Damage Type
@@ -117,6 +128,9 @@ public enum DamageType {
 			}
 			case MELEE_SWEEP -> {
 				return "Sweep Damage";
+			}
+			case AOE -> {
+				return "AOE Damage";
 			}
 			case RANGED, RANGED_SPECIAL -> {
 				return "Ranged Damage";
