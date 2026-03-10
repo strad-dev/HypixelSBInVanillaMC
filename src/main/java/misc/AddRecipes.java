@@ -414,7 +414,7 @@ public class AddRecipes {
 		ShapelessRecipe featherFalling5Recipe = new ShapelessRecipe(featherFalling5Key, featherFalling5);
 
 		featherFalling5Recipe.addIngredient(new RecipeChoice.ExactChoice(featherFalling4));
-		featherFalling5Recipe.addIngredient(new RecipeChoice.ExactChoice(featherFalling5));
+		featherFalling5Recipe.addIngredient(new RecipeChoice.ExactChoice(featherFalling4));
 		featherFalling5Recipe.addIngredient(new RecipeChoice.ExactChoice(feather));
 
 		return featherFalling5Recipe;
