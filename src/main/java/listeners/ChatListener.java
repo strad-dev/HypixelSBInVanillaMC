@@ -29,7 +29,7 @@ public class ChatListener implements Listener {
 		} else {
 			formatted = ChatColor.RED + "" + ChatColor.BOLD + "Server" + ChatColor.RESET + ChatColor.WHITE + ChatColor.BOLD + ": " + message;
 			if (DISCORDSRV_PRESENT) {
-				DiscordForwarder.forward("**Server: " + message);
+				DiscordForwarder.forward("**Server: " + message + "**");
 			}
 		}
 		Bukkit.broadcastMessage(formatted);
