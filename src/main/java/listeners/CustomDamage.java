@@ -1061,6 +1061,8 @@ public class CustomDamage implements Listener {
 			return sources.lava();
 		} else if(damageType == org.bukkit.damage.DamageType.HOT_FLOOR) {
 			return sources.hotFloor();
+		} else if(damageType == org.bukkit.damage.DamageType.CAMPFIRE) {
+			return sources.campfire();
 		} else if(damageType == org.bukkit.damage.DamageType.IN_WALL) {
 			return sources.inWall();
 		} else if(damageType == org.bukkit.damage.DamageType.CRAMMING) {
@@ -1189,8 +1191,8 @@ public class CustomDamage implements Listener {
 			switch(e.getCause()) {
 				case BLOCK_EXPLOSION -> type = DamageType.MELEE;
 				case POISON, WITHER -> type = DamageType.MAGIC;
-				case CONTACT, CRAMMING, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA, MELTING,
-					 STARVATION, SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
+				case CAMPFIRE, CONTACT, CRAMMING, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA,
+					 MELTING, STARVATION, SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
 				case CUSTOM -> type = DamageType.IFRAME_ENVIRONMENTAL;
 				case FALL, FLY_INTO_WALL -> type = DamageType.FALL;
 				case KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.LETHAL_ABSOLUTE;
