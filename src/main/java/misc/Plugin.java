@@ -208,7 +208,7 @@ public class Plugin extends JavaPlugin implements Listener {
 		// key format is "skyblock:advancement_name" - extract the name part
 		String name = key.contains(":") ? key.split(":")[1] : key;
 		Advancement adv = Bukkit.getAdvancement(new NamespacedKey(instance, name));
-		if(adv != null) {
+		if(adv != null && player != null) {
 			player.getAdvancementProgress(adv).awardCriteria("requirement");
 		}
 	}
