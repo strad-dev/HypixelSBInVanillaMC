@@ -136,7 +136,7 @@ public class CustomDamage implements Listener {
 			doContinue = false;
 		}
 
-		if(DamageType.isAbsoluteDamage(type) || doContinue) {
+		if(type == DamageType.LETHAL_ABSOLUTE || doContinue) {
 			calculateFinalDamage(damagee, damager, originalDamage, type, data);
 		}
 	}
