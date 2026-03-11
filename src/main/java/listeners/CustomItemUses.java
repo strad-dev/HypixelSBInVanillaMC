@@ -78,10 +78,6 @@ public class CustomItemUses implements Listener {
 				Utils.changeName(entity, newName);
 				entity.setCustomNameVisible(true);
 
-				if(!p.getGameMode().equals(GameMode.CREATIVE)) {
-					item.setAmount(item.getAmount() - 1);
-				}
-
 				if(isNameTag) {
 					ServerPlayer serverPlayer = ((CraftPlayer) p).getHandle();
 					CriteriaTriggers.PLAYER_INTERACTED_WITH_ENTITY.trigger(
@@ -89,6 +85,10 @@ public class CustomItemUses implements Listener {
 						CraftItemStack.asNMSCopy(item),
 						((CraftEntity) entity).getHandle()
 					);
+				}
+
+				if(!p.getGameMode().equals(GameMode.CREATIVE)) {
+					item.setAmount(item.getAmount() - 1);
 				}
 			}
 			default -> {

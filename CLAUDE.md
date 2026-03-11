@@ -102,3 +102,4 @@ src/main/resources/
 
 ## Other Instructions
 - NEVER build/compile
+- python3 does not exist, use python instead.
