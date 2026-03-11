@@ -44,7 +44,7 @@ public class PlayerLoginHandler implements Listener {
 		for(int i = 0; i < inventory.getSize(); i++) {
 			ItemStack item = inventory.getItem(i);
 			if(item == null) continue;
-			ItemStack stripped = StripCreativeCustomData.stripEmptyCustomData(item, "PlayerJoin/slot" + i);
+			ItemStack stripped = StripCreativeCustomData.stripEmptyCustomData(item);
 			if(stripped != null) {
 				item = stripped;
 			}

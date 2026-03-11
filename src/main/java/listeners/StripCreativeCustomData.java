@@ -30,7 +30,7 @@ public class StripCreativeCustomData implements Listener {
 
 	@EventHandler
 	public void onCreativeInventory(InventoryCreativeEvent e) {
-		stripEmpty(e.getCursor(), e::setCursor, "InventoryCreativeEvent/cursor");
+		stripEmpty(e.getCursor(), e::setCursor);
 	}
 
 	@EventHandler
@@ -38,18 +38,20 @@ public class StripCreativeCustomData implements Listener {
 		if (e instanceof InventoryCreativeEvent) return; // already handled by onCreativeInventory
 		if (!(e.getWhoClicked() instanceof Player p) || p.getGameMode() != GameMode.CREATIVE) return;
 
-		stripEmpty(e.getCurrentItem(), e::setCurrentItem, "InventoryClickEvent/currentItem");
-		stripEmpty(e.getCursor(), item -> e.getView().setCursor(item), "InventoryClickEvent/cursor");
+		stripEmpty(e.getCurrentItem(), e::setCurrentItem);
+		stripEmpty(e.getCursor(), item -> e.getView().setCursor(item));
+
+		refreshItem(e.getCurrentItem());
 	}
 
 	@EventHandler
 	public void onInventoryDrag(InventoryDragEvent e) {
 		if (!(e.getWhoClicked() instanceof Player p) || p.getGameMode() != GameMode.CREATIVE) return;
 
-		stripEmpty(e.getCursor(), e::setCursor, "InventoryDragEvent/cursor");
+		stripEmpty(e.getCursor(), e::setCursor);
 		for (int slot : e.getNewItems().keySet()) {
 			ItemStack slotItem = e.getView().getItem(slot);
-			stripEmpty(slotItem, item -> e.getView().setItem(slot, item), "InventoryDragEvent/slot" + slot);
+			stripEmpty(slotItem, item -> e.getView().setItem(slot, item));
 		}
 	}
 
@@ -58,7 +60,7 @@ public class StripCreativeCustomData implements Listener {
 		if (!(e.getEntity() instanceof Player p)) return;
 
 		ItemStack item = e.getItem().getItemStack();
-		ItemStack stripped = stripEmptyCustomData(item, "EntityPickupItemEvent");
+		ItemStack stripped = stripEmptyCustomData(item);
 		if (stripped != null) {
 			item = stripped;
 		}
@@ -162,8 +164,8 @@ public class StripCreativeCustomData implements Listener {
 	/**
 	 * Strips empty custom_data from the given item and applies the result via the setter.
 	 */
-	private void stripEmpty(ItemStack item, java.util.function.Consumer<ItemStack> setter, String context) {
-		ItemStack stripped = stripEmptyCustomData(item, context);
+	private void stripEmpty(ItemStack item, java.util.function.Consumer<ItemStack> setter) {
+		ItemStack stripped = stripEmptyCustomData(item);
 		if (stripped != null) {
 			setter.accept(stripped);
 		}
@@ -172,7 +174,7 @@ public class StripCreativeCustomData implements Listener {
 	/**
 	 * Returns a copy with empty custom_data removed, or null if no stripping was needed.
 	 */
-	public static ItemStack stripEmptyCustomData(ItemStack item, String context) {
+	public static ItemStack stripEmptyCustomData(ItemStack item) {
 		if (item == null || item.getType().isAir()) {
 			return null;
 		}
@@ -186,12 +188,5 @@ public class StripCreativeCustomData implements Listener {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Overload without context for backwards compatibility with PlayerLoginHandler.
-	 */
-	public static ItemStack stripEmptyCustomData(ItemStack item) {
-		return stripEmptyCustomData(item, "unknown");
 	}
 }
