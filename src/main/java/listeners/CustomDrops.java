@@ -19,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
@@ -674,12 +675,28 @@ public class CustomDrops implements Listener {
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tarantula Silk");
 					}
+					if(random.nextDouble() < 0.02 * rngLootingBonus) {
+						item = new ItemStack(Material.ENCHANTED_BOOK);
+						EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+						meta.addStoredEnchant(Enchantment.BANE_OF_ARTHROPODS, 6, true);
+						item.setItemMeta(meta);
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Bane of Arthropods VI");
+					}
 					Plugin.grantAdvancement("skyblock:defeat_tarantula_broodfather", p);
 				} else if(spider.getScoreboardTags().contains("ConjoinedBrood")) {
 					if(random.nextDouble() < 0.25 * rngLootingBonus) {
 						item = TarantulaSilk.getItem();
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Tarantula Silk");
+					}
+					if(random.nextDouble() < 0.1 * rngLootingBonus) {
+						item = new ItemStack(Material.ENCHANTED_BOOK);
+						EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+						meta.addStoredEnchant(Enchantment.BANE_OF_ARTHROPODS, 7, true);
+						item.setItemMeta(meta);
+						world.dropItemNaturally(l, item);
+						sendRareDropMessage(p, "Bane of Arthropods VII");
 					}
 					Plugin.grantAdvancement("skyblock:defeat_primordial_broodfather", p);
 				} else if(random.nextDouble() < 0.03 * rngLootingBonus && p != null) {
@@ -948,12 +965,28 @@ public class CustomDrops implements Listener {
 							world.dropItemNaturally(l, item);
 							sendRareDropMessage(p, "Revenant Viscera");
 						}
+						if(random.nextDouble() < 0.02 * rngLootingBonus) {
+							item = new ItemStack(Material.ENCHANTED_BOOK);
+							EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+							meta.addStoredEnchant(Enchantment.SMITE, 6, true);
+							item.setItemMeta(meta);
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Smite VI");
+						}
 						Plugin.grantAdvancement("skyblock:defeat_revenant_horror", p);
 					} else if(zombie.getScoreboardTags().contains("AtonedHorror")) {
 						if(random.nextDouble() < 0.25 * rngLootingBonus) {
 							item = Viscera.getItem();
 							world.dropItemNaturally(l, item);
 							sendRareDropMessage(p, "Revenant Viscera");
+						}
+						if(random.nextDouble() < 0.1 * rngLootingBonus) {
+							item = new ItemStack(Material.ENCHANTED_BOOK);
+							EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
+							meta.addStoredEnchant(Enchantment.SMITE, 7, true);
+							item.setItemMeta(meta);
+							world.dropItemNaturally(l, item);
+							sendRareDropMessage(p, "Smite VII");
 						}
 						Plugin.grantAdvancement("skyblock:defeat_atoned_horror", p);
 					} else if(zombie.getScoreboardTags().contains("Sadan")) {

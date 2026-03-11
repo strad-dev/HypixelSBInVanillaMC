@@ -63,20 +63,6 @@ public class CustomChestLoot implements Listener {
 				book.setItemMeta(meta);
 
 				chest.getBlockInventory().addItem(book);
-			} else if(random.nextDouble() < 0.07) { // 1%
-				ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
-				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
-				meta.addStoredEnchant(Enchantment.SMITE, 6, true);
-				book.setItemMeta(meta);
-
-				chest.getBlockInventory().addItem(book);
-			} else if(random.nextDouble() < 0.08) { // 1%
-				ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
-				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
-				meta.addStoredEnchant(Enchantment.BANE_OF_ARTHROPODS, 6, true);
-				book.setItemMeta(meta);
-
-				chest.getBlockInventory().addItem(book);
 			}
 		} else if(e.getInventoryHolder() instanceof StorageMinecart minecart) {
 			if(random.nextDouble() < 0.025) {
