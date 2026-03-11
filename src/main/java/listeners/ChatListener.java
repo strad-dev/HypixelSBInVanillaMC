@@ -27,9 +27,9 @@ public class ChatListener implements Listener {
 				DiscordForwarder.forward(player, message);
 			}
 		} else {
-			formatted = ChatColor.RED + "" + ChatColor.BOLD + "Server" + ChatColor.WHITE + ": " + message;
+			formatted = ChatColor.RED + "" + ChatColor.BOLD + "Server" + ChatColor.RESET + ChatColor.WHITE + ChatColor.BOLD + ": " + message;
 			if (DISCORDSRV_PRESENT) {
-				DiscordForwarder.forward("**Server: " + message + "**");
+				DiscordForwarder.forward("**Server: " + message);
 			}
 		}
 		Bukkit.broadcastMessage(formatted);
