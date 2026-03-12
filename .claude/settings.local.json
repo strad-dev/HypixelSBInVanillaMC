@@ -6,7 +6,9 @@
       "WebSearch",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:minecraft.wiki)",
-      "WebFetch(domain:gist.github.com)"
+      "WebFetch(domain:gist.github.com)",
+      "WebFetch(domain:hub.spigotmc.org)",
+      "WebFetch(domain:bugs.mojang.com)"
     ]
   }
 }

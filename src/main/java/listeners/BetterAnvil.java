@@ -1,14 +1,6 @@
 package listeners;
 
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelDuplexHandler;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelPromise;
 import misc.Utils;
-import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
-import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
-import net.minecraft.network.protocol.game.ServerboundContainerClickPacket;
-import net.minecraft.network.protocol.game.ServerboundRenameItemPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AnvilMenu;
 import org.bukkit.Material;
@@ -18,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
@@ -27,122 +18,20 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.Repairable;
 
-import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class BetterAnvil implements Listener {
-	private static final String HANDLER_NAME = "better_anvil_rename_fix";
-
-	private static Channel getChannel(ServerPlayer serverPlayer) {
-		try {
-			// ServerCommonPacketListenerImpl.connection is protected
-			Field connectionField = serverPlayer.connection.getClass().getSuperclass().getDeclaredField("connection");
-			connectionField.setAccessible(true);
-			Object connection = connectionField.get(serverPlayer.connection);
-			// Connection.channel
-			Field channelField = connection.getClass().getDeclaredField("channel");
-			channelField.setAccessible(true);
-			return (Channel) channelField.get(connection);
-		} catch(Exception ex) {
-			ex.printStackTrace();
-			return null;
-		}
-	}
 
 	@EventHandler
 	public void onAnvilOpen(InventoryOpenEvent e) {
 		if(e.getInventory().getType() != InventoryType.ANVIL) return;
 		if(!(e.getPlayer() instanceof Player player)) return;
 
-		// containerMenu isn't AnvilMenu yet at open time — delay by 1 tick
 		Utils.scheduleTask(() -> {
 			ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
 			if(!(serverPlayer.containerMenu instanceof AnvilMenu anvilMenu)) return;
-
 			anvilMenu.maximumRepairCost = Integer.MAX_VALUE;
-
-			int containerId = anvilMenu.containerId;
-			Channel channel = getChannel(serverPlayer);
-			if(channel == null) return;
-
-			// Remove existing handler if present
-			if(channel.pipeline().get(HANDLER_NAME) != null) {
-				channel.pipeline().remove(HANDLER_NAME);
-			}
-
-			// Intercept packets to prevent rename text field reset
-			channel.pipeline().addBefore("packet_handler", HANDLER_NAME, new ChannelDuplexHandler() {
-				private boolean renaming = false;
-				private String renameText = null;
-
-				@Override
-				public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-					if(msg instanceof ServerboundRenameItemPacket renamePacket) {
-						renaming = true;
-						renameText = renamePacket.getName();
-					} else if(msg instanceof ServerboundContainerClickPacket) {
-						renaming = false;
-						renameText = null;
-					}
-					super.channelRead(ctx, msg);
-				}
-
-				@Override
-				public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
-					if(renaming) {
-						// Suppress individual slot 0 updates during rename
-						if(msg instanceof ClientboundContainerSetSlotPacket slotPacket) {
-							if(slotPacket.getContainerId() == containerId && slotPacket.getSlot() == 0) {
-								promise.setSuccess();
-								return;
-							}
-						}
-						// Replace full container updates — send slot 0 with rename text as display name
-						if(msg instanceof ClientboundContainerSetContentPacket(
-								int id, int stateId, java.util.List<net.minecraft.world.item.ItemStack> items,
-								net.minecraft.world.item.ItemStack carriedItem
-						)) {
-							if(id == containerId) {
-								// Send slot 0 with modified display name so client text field stays correct
-								if(!items.isEmpty() && renameText != null) {
-									net.minecraft.world.item.ItemStack slot0 = items.getFirst().copy();
-									slot0.set(
-										net.minecraft.core.component.DataComponents.CUSTOM_NAME,
-										net.minecraft.network.chat.Component.literal(renameText)
-									);
-									ctx.write(new ClientboundContainerSetSlotPacket(containerId, stateId, 0, slot0));
-								}
-								for(int i = 1; i < items.size() - 1; i++) {
-									ctx.write(new ClientboundContainerSetSlotPacket(containerId, stateId, i, items.get(i)));
-								}
-								if(items.size() > 1) {
-									ctx.write(new ClientboundContainerSetSlotPacket(
-										containerId, stateId, items.size() - 1, items.getLast()
-									), promise);
-								}
-								return;
-							}
-						}
-					}
-					super.write(ctx, msg, promise);
-				}
-			});
 		}, 1);
-	}
-
-	@EventHandler
-	public void onAnvilClose(InventoryCloseEvent e) {
-		if(e.getInventory().getType() != InventoryType.ANVIL) return;
-		if(!(e.getPlayer() instanceof Player player)) return;
-
-		ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-		Channel channel = getChannel(serverPlayer);
-		if(channel == null) return;
-		channel.eventLoop().execute(() -> {
-			if(channel.pipeline().get(HANDLER_NAME) != null) {
-				channel.pipeline().remove(HANDLER_NAME);
-			}
-		});
 	}
 
 	@EventHandler

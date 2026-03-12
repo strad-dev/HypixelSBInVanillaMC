@@ -83,7 +83,7 @@ public class Plugin extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new WitherKingDragonCustomAI(), this);
 		getServer().getPluginManager().registerEvents(new CustomMining(), this);
 		getServer().getPluginManager().registerEvents(new CreativeMenu(), this);
-		getServer().getPluginManager().registerEvents(new StripCreativeCustomData(), this);
+		getServer().getPluginManager().registerEvents(new ItemReloader(), this);
 		getServer().getPluginManager().registerEvents(new CommandInterceptor(), this);
 		getServer().getPluginManager().registerEvents(this, this);
 

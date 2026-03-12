@@ -37,7 +37,7 @@ src/main/resources/
 - **First lore line = item ID** (namespaced: `skyblock/{category}/{name}`)
 - Ability items implement `AbilityItem` (right/left click, mana cost, cooldown)
 - Glint-only items use `setEnchantmentGlintOverride(true)` — do NOT add Knockback 1
-- `StripCreativeCustomData.refreshItem()` rebuilds items from `getItem()` on login; only preserves enchantments for items without glint override
+- `ItemReloader.refreshItem()` rebuilds items from `getItem()` on login; only preserves enchantments for items without glint override
 
 ### Mobs
 - Implement `mobs.CustomMob` interface; register in `CustomMob.MobRegistry`
@@ -81,7 +81,7 @@ src/main/resources/
 2. Implement `CustomItem` (or `AbilityItem` for abilities)
 3. Add static `getItem()` with lore ID as first line
 4. Register in `CustomItem.ItemRegistry`
-5. Add to `StripCreativeCustomData.refreshItem()` switch
+5. Add to `ItemReloader.refreshItem()` switch
 6. Optionally add recipe in `AddRecipes`
 
 ### New Boss
