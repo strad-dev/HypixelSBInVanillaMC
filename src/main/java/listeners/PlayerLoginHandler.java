@@ -8,8 +8,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 public class PlayerLoginHandler implements Listener {
 
@@ -38,22 +36,5 @@ public class PlayerLoginHandler implements Listener {
 		p.removeScoreboardTag("WitherShield");
 		p.removeScoreboardTag("HolyIce");
 
-		PlayerInventory inventory = p.getInventory();
-
-		// Strip empty custom_data and refresh custom items
-		for(int i = 0; i < inventory.getSize(); i++) {
-			ItemStack item = inventory.getItem(i);
-			if(item == null) continue;
-			ItemStack stripped = StripCreativeCustomData.stripEmptyCustomData(item);
-			if(stripped != null) {
-				item = stripped;
-			}
-			ItemStack refreshed = StripCreativeCustomData.refreshItem(item);
-			if(refreshed != null) {
-				inventory.setItem(i, refreshed);
-			} else if(stripped != null) {
-				inventory.setItem(i, stripped);
-			}
-		}
 	}
 }

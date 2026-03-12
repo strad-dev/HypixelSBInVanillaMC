@@ -7,6 +7,7 @@ import mobs.CustomMob;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
@@ -464,15 +465,14 @@ public class CustomDamage implements Listener {
 					}
 
 					if(damagee instanceof Player p) {
-						p.sendTitle(ChatColor.BOLD + "" + ChatColor.YELLOW + "\uD83D\uDC7C", ChatColor.DARK_GREEN + "Totem of Undying Used!", 2, 36, 2);
 						ServerPlayer serverPlayer = ((CraftPlayer) p).getHandle();
+						serverPlayer.level().broadcastEntityEvent(serverPlayer, (byte) 35);
+
 						ItemStack totemStack = new ItemStack(Material.TOTEM_OF_UNDYING);
 						net.minecraft.world.item.ItemStack nmsTotem = CraftItemStack.asNMSCopy(totemStack);
 						CriteriaTriggers.USED_TOTEM.trigger(serverPlayer, nmsTotem);
 						serverPlayer.awardStat(Stats.ITEM_USED.get(nmsTotem.getItem()));
 					}
-					damagee.getWorld().playSound(damagee, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
-					damagee.getWorld().spawnParticle(Particle.TOTEM_OF_UNDYING, damagee.getLocation(), 512);
 
 					damagee.setHealth(1.0);
 					damagee.getActivePotionEffects().forEach(effect -> damagee.removePotionEffect(effect.getType()));

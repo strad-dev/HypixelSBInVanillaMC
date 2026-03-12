@@ -9,67 +9,43 @@ import items.summonItems.*;
 import items.weapons.Claymore;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
-import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.item.component.CustomData;
-import org.bukkit.GameMode;
-import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCreativeEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import java.util.List;
 import java.util.Map;
 
-public class StripCreativeCustomData implements Listener {
-
-	@EventHandler
-	public void onCreativeInventory(InventoryCreativeEvent e) {
-		stripEmpty(e.getCursor(), e::setCursor);
-	}
-
-	@EventHandler
-	public void onInventoryClick(InventoryClickEvent e) {
-		if (e instanceof InventoryCreativeEvent) return; // already handled by onCreativeInventory
-		if (!(e.getWhoClicked() instanceof Player p) || p.getGameMode() != GameMode.CREATIVE) return;
-
-		stripEmpty(e.getCurrentItem(), e::setCurrentItem);
-		stripEmpty(e.getCursor(), item -> e.getView().setCursor(item));
-
-		refreshItem(e.getCurrentItem());
-	}
-
-	@EventHandler
-	public void onInventoryDrag(InventoryDragEvent e) {
-		if (!(e.getWhoClicked() instanceof Player p) || p.getGameMode() != GameMode.CREATIVE) return;
-
-		stripEmpty(e.getCursor(), e::setCursor);
-		for (int slot : e.getNewItems().keySet()) {
-			ItemStack slotItem = e.getView().getItem(slot);
-			stripEmpty(slotItem, item -> e.getView().setItem(slot, item));
-		}
-	}
+public class ItemReloader implements Listener {
 
 	@EventHandler
 	public void onItemPickup(EntityPickupItemEvent e) {
 		if (!(e.getEntity() instanceof Player p)) return;
 
 		ItemStack item = e.getItem().getItemStack();
-		ItemStack stripped = stripEmptyCustomData(item);
-		if (stripped != null) {
-			item = stripped;
-		}
-
 		ItemStack refreshed = refreshItem(item);
 		if (refreshed != null) {
 			e.getItem().setItemStack(refreshed);
-		} else if (stripped != null) {
-			e.getItem().setItemStack(stripped);
+		}
+	}
+
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent e) {
+		Player p = e.getPlayer();
+		PlayerInventory inventory = p.getInventory();
+
+		for (int i = 0; i < inventory.getSize(); i++) {
+			ItemStack item = inventory.getItem(i);
+			if (item == null) continue;
+			ItemStack refreshed = refreshItem(item);
+			if (refreshed != null) {
+				inventory.setItem(i, refreshed);
+			}
 		}
 	}
 
@@ -159,34 +135,5 @@ public class StripCreativeCustomData implements Listener {
 		}
 		newItem.setAmount(item.getAmount());
 		return newItem;
-	}
-
-	/**
-	 * Strips empty custom_data from the given item and applies the result via the setter.
-	 */
-	private void stripEmpty(ItemStack item, java.util.function.Consumer<ItemStack> setter) {
-		ItemStack stripped = stripEmptyCustomData(item);
-		if (stripped != null) {
-			setter.accept(stripped);
-		}
-	}
-
-	/**
-	 * Returns a copy with empty custom_data removed, or null if no stripping was needed.
-	 */
-	public static ItemStack stripEmptyCustomData(ItemStack item) {
-		if (item == null || item.getType().isAir()) {
-			return null;
-		}
-
-		net.minecraft.world.item.ItemStack nms = CraftItemStack.asNMSCopy(item);
-		CustomData customData = nms.get(DataComponents.CUSTOM_DATA);
-
-		if (customData != null && customData.isEmpty()) {
-			nms.remove(DataComponents.CUSTOM_DATA);
-			return CraftItemStack.asBukkitCopy(nms);
-		}
-
-		return null;
 	}
 }
