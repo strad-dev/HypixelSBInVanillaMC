@@ -84,8 +84,10 @@ public class VoidcrazedSeraph implements CustomMob {
 					for(int i = 0; i < 180; i += 20) {
 						int finalI = i;
 						Utils.scheduleTask(() -> {
-							Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Mine it or die!\n" + ChatColor.BOLD + (200 - finalI) / 20, 0, 21, 0));
-							Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
+							if(block.getType() == Material.BEACON) {
+								Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Mine it or die!!!  " + ChatColor.BOLD + (200 - finalI) / 20, 0, 21, 0));
+								Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
+							}
 						}, i);
 					}
 					Utils.scheduleTask(() -> {
