@@ -133,9 +133,18 @@ public class Storm implements CustomWither {
 	private void spamSkulls(Wither wither, Player p, int i) {
 		Utils.scheduleTask(() -> {
 			if(!wither.isDead()) {
-				Vector directionMain = p.getLocation().toVector().subtract(wither.getLocation().toVector()).normalize();
-				Vector directionLeft = p.getLocation().toVector().subtract(wither.getLocation().add(1, 0, 0).toVector()).normalize();
-				Vector directionRight = p.getLocation().toVector().subtract(wither.getLocation().add(-1, 0, 0).toVector()).normalize();
+				Vector directionMain;
+				Vector directionLeft;
+				Vector directionRight;
+				if(p != null && !p.isDead()) {
+					directionMain = p.getLocation().toVector().subtract(wither.getLocation().toVector()).normalize();
+					directionLeft = p.getLocation().toVector().subtract(wither.getLocation().add(1, 0, 0).toVector()).normalize();
+					directionRight = p.getLocation().toVector().subtract(wither.getLocation().add(-1, 0, 0).toVector()).normalize();
+				} else {
+					directionMain = wither.getLocation().getDirection();
+					directionLeft = wither.getLocation().add(1, 0, 0).getDirection();
+					directionRight = wither.getLocation().add(-1, 0, 0).getDirection();
+				}
 				WitherSkull skullMain = (WitherSkull) wither.getWorld().spawnEntity(wither.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL);
 				skullMain.setDirection(directionMain);
 				skullMain.setShooter(wither);
