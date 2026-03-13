@@ -112,7 +112,7 @@ public class WitherKing implements CustomWither {
 					}
 				}
 			}
-			Utils.scheduleTask(WitherKing::henchmanChecker, 1);
+			Utils.scheduleTask(WitherKing::henchmanChecker, 20);
 		}
 	}
 

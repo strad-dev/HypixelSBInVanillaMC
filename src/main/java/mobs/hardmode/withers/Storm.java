@@ -56,7 +56,7 @@ public class Storm implements CustomWither {
 		spawnGuards(wither);
 		spawnLightning(wither);
 		for(int i = 0; i < 600; i += 15) {
-			spamSkulls(wither, p, i);
+			spamSkulls(wither, Utils.getNearestPlayer(wither), i);
 		}
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
