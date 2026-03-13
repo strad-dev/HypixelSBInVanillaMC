@@ -77,6 +77,7 @@ public class Plugin extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new ChatListener(), this);
 		getServer().getPluginManager().registerEvents(new CustomItemUses(), this);
 		getServer().getPluginManager().registerEvents(new StopBossesTeleporting(), this);
+		getServer().getPluginManager().registerEvents(new StopBossesEnteringVehicles(), this);
 		getServer().getPluginManager().registerEvents(new PlayerLoginHandler(), this);
 		getServer().getPluginManager().registerEvents(new AllMobsHaveNames(), this);
 		getServer().getPluginManager().registerEvents(new CustomChestLoot(), this);
