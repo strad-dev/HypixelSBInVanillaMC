@@ -49,7 +49,7 @@ public class RevenantHorror implements CustomMob {
 
 		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(100.0);
 		zombie.setHealth(100.0);
-		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(14.0);
+		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(15.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.setTarget(p);
@@ -71,7 +71,7 @@ public class RevenantHorror implements CustomMob {
 			List<Entity> entities = zombie.getNearbyEntities(8, 8, 8);
 			entities.forEach(entity -> {
 				if(entity instanceof Player p) {
-					CustomDamage.customMobs(p, zombie, zombie.getHealth() / zombie.getAttribute(Attribute.MAX_HEALTH).getValue() < 0.5 ? 20 : 10, DamageType.AOE);
+					CustomDamage.customMobs(p, zombie, zombie.getHealth() / zombie.getAttribute(Attribute.MAX_HEALTH).getValue() < 0.5 ? 20 : 10, DamageType.PLAYER_MAGIC);
 				}
 			});
 			Utils.scheduleTask(() -> aoe(zombie), 20);

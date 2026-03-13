@@ -27,7 +27,7 @@ public class EnragedChickzilla implements CustomMob {
 		e.addScoreboardTag("EnragedChickzilla");
 		e.addScoreboardTag("HardMode");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Omega Egg hatches into the Enraged Chickzilla!");
-		Bukkit.getLogger().info(p.getName() + " has summoned Enraged Chickzilla.");
+		Bukkit.getLogger().info(p.getName() + " has summoned Enraged Chickzilla!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		((Ageable) e).setAdult();
 		e.setPersistent(true);

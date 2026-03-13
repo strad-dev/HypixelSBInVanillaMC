@@ -29,7 +29,7 @@ public class TarantulaBroodfather implements CustomMob {
 		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(100.0);
 		spider.setHealth(100.0);
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
-		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(8.0);
+		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(10.0);
 		spider.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		spider.setTarget(p);
 		spider.setCustomNameVisible(true);

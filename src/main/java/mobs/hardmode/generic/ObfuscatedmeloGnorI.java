@@ -38,7 +38,7 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 		e.addScoreboardTag("ObfuscatedmeloGnorI");
 		e.addScoreboardTag("HardMode");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Antimatter has done strange things to this Iron Golem...");
-		Bukkit.getLogger().info(p.getName() + " has summoned the meloG norI.");
+		Bukkit.getLogger().info(p.getName() + " has summoned the " + ChatColor.MAGIC + "meloG norI" + ChatColor.RESET + "!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		e.setPersistent(true);
 		e.setRemoveWhenFarAway(false);
@@ -54,7 +54,7 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 				CustomDamage.customMobs(p, ironGolem, 50, DamageType.PLAYER_MAGIC);
 				p.setVelocity(new Vector(0, 1, 0));
 			});
-			ironGolem.getWorld().playSound(ironGolem.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0F, 2.0F);
+			ironGolem.getWorld().playSound(ironGolem.getLocation(), Sound.BLOCK_ANVIL_PLACE, 2.0F, 0.5F);
 			Utils.scheduleTask(() -> launch(ironGolem), 100);
 		}
 	}

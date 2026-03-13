@@ -49,7 +49,7 @@ public class VoidgloomSeraph implements CustomMob {
 
 	private static void dissonance(Enderman voidgloom) {
 		if(!voidgloom.isDead()) {
-			Utils.applyToAllNearbyPlayers(voidgloom, 16, p -> CustomDamage.customMobs(p, voidgloom, 12, DamageType.AOE));
+			Utils.applyToAllNearbyPlayers(voidgloom, 16, p -> CustomDamage.customMobs(p, voidgloom, 15, DamageType.PLAYER_MAGIC));
 			Utils.scheduleTask(() -> dissonance(voidgloom), 20);
 		}
 	}

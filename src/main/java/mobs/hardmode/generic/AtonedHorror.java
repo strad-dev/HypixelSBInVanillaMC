@@ -48,7 +48,7 @@ public class AtonedHorror implements CustomMob {
 
 		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
 		zombie.setHealth(200.0);
-		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(18.0);
+		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(-6.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.setTarget(p);
@@ -57,13 +57,13 @@ public class AtonedHorror implements CustomMob {
 		zombie.addScoreboardTag("AtonedHorror");
 		zombie.addScoreboardTag("HardMode");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Atoned Horror has risen from the depths!");
-		Bukkit.getLogger().info(p.getName() + " has summoned the Atoned Horror.");
+		Bukkit.getLogger().info(p.getName() + " has summoned the Atoned Horror!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		zombie.setAdult();
 		zombie.setPersistent(true);
 		zombie.setRemoveWhenFarAway(false);
 
-		Utils.scheduleTask(() -> healing(zombie), 8);
+		Utils.scheduleTask(() -> healing(zombie), 7);
 		Utils.scheduleTask(() -> summonTNT(zombie), 60);
 		Utils.scheduleTask(() -> nuclearExplosion(zombie), 600);
 
@@ -76,7 +76,7 @@ public class AtonedHorror implements CustomMob {
 				zombie.setHealth(Math.min(zombie.getHealth() + 1, 200));
 				Utils.changeName(zombie);
 			}
-			Utils.scheduleTask(() -> healing(zombie), 8);
+			Utils.scheduleTask(() -> healing(zombie), 7);
 		}
 	}
 
@@ -84,7 +84,7 @@ public class AtonedHorror implements CustomMob {
 		if(!zombie.isDead()) {
 			Player p = Utils.getNearestPlayer(zombie, 64);
 			if(p != null) {
-				Utils.spawnTNT(zombie, p.getLocation(), 20, 5, 25, new ArrayList<>());
+				Utils.spawnTNT(zombie, p.getLocation(), 20, 5, 30, new ArrayList<>());
 			}
 			Utils.scheduleTask(() -> summonTNT(zombie), 60);
 		}
@@ -135,7 +135,7 @@ public class AtonedHorror implements CustomMob {
 			});
 			Utils.scheduleTask(() -> {
 				if(!zombie.isDead()) {
-					Utils.spawnTNT(zombie, zombie.getLocation(), 0, 16, 200, new ArrayList<>());
+					Utils.spawnTNT(zombie, zombie.getLocation(), 0, 16, 250, new ArrayList<>());
 				}
 				zombie.setAI(true);
 				zombie.removeScoreboardTag("Invulnerable");
@@ -165,7 +165,7 @@ public class AtonedHorror implements CustomMob {
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(type == DamageType.MELEE) {
-			Utils.spawnTNT(damager, damagee.getLocation(), 20, 5, 20, new ArrayList<>());
+			Utils.spawnTNT(damager, damagee.getLocation(), 20, 5, 39, new ArrayList<>());
 		}
 		return true;
 	}
