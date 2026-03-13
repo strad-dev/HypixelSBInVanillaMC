@@ -54,7 +54,7 @@ public class BetterAnvil implements Listener {
 			result = handleBookToItem(first, second);
 		} else if(firstIsBook && secondIsBook) {
 			result = handleBookToBook(first, second);
-		} else if(!firstIsBook && !secondIsBook) {
+		} else if(!firstIsBook) {
 			result = handleItemToItem(first, second);
 		} else {
 			return;
@@ -63,16 +63,6 @@ public class BetterAnvil implements Listener {
 		if(result == null) {
 			e.setResult(null);
 			return;
-		}
-
-		// Preserve rename from anvil text
-		String renameText = anvil.getRenameText();
-		if(renameText != null && !renameText.isEmpty()) {
-			ItemMeta rm = result.getItemMeta();
-			if(rm != null) {
-				rm.setDisplayName(renameText);
-				result.setItemMeta(rm);
-			}
 		}
 
 		// Cap repair cost
@@ -85,12 +75,90 @@ public class BetterAnvil implements Listener {
 		}
 
 		e.setResult(result);
+
+		// Fix XP cost — vanilla may not compute a valid cost for custom results
+		int fallbackCost = computeCost(first, second, result);
+		if(e.getView().getPlayer() instanceof Player player) {
+			Utils.scheduleTask(() -> {
+				ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+				if(serverPlayer.containerMenu instanceof AnvilMenu anvilMenu) {
+					int vanillaCost = anvilMenu.cost.get();
+					if(vanillaCost <= 0) {
+						anvilMenu.cost.set(fallbackCost);
+					} else if(vanillaCost > 50) {
+						anvilMenu.cost.set(50);
+					}
+				}
+				player.updateInventory();
+			}, 1);
+		}
+	}
+
+	private int computeCost(ItemStack first, ItemStack second, ItemStack result) {
+		int cost = 0;
+
+		// Prior work penalty
+		int penalty1 = 0;
+		int penalty2 = 0;
+		if(first.getItemMeta() instanceof Repairable r) penalty1 = r.getRepairCost();
+		if(second.getItemMeta() instanceof Repairable r) penalty2 = r.getRepairCost();
+		cost += penalty1 + penalty2;
+
+		// Enchantment cost: count each enchant that was added or upgraded
+		Map<Enchantment, Integer> firstEnchants = getEnchants(first);
+		Map<Enchantment, Integer> resultEnchants = getEnchants(result);
+
+		for(Map.Entry<Enchantment, Integer> entry : resultEnchants.entrySet()) {
+			Enchantment ench = entry.getKey();
+			int resultLevel = entry.getValue();
+			int firstLevel = firstEnchants.getOrDefault(ench, 0);
+
+			if(resultLevel > firstLevel) {
+				// Enchant was added or upgraded — cost is the new level
+				cost += resultLevel;
+			}
+		}
+
+		return Math.max(1, Math.min(cost, 50));
+	}
+
+	private Map<Enchantment, Integer> getEnchants(ItemStack item) {
+		if(item.getItemMeta() instanceof EnchantmentStorageMeta meta) {
+			return meta.getStoredEnchants();
+		}
+		return item.getEnchantments();
 	}
 
 	@EventHandler
 	public void onAnvilClick(InventoryClickEvent e) {
 		if(e.getInventory().getType() != InventoryType.ANVIL) return;
 		if(!(e.getWhoClicked() instanceof Player player)) return;
+
+		// Handle clicking the result slot (slot 2) — vanilla may block custom results
+		if(e.getRawSlot() == 2) {
+			ItemStack result = e.getInventory().getItem(2);
+			if(result != null && result.getType() != Material.AIR) {
+				ItemStack cursor = e.getCursor();
+				if(cursor != null && cursor.getType() != Material.AIR) return;
+
+				e.setCancelled(true);
+				player.setItemOnCursor(result);
+				e.getInventory().setItem(0, null);
+				e.getInventory().setItem(1, null);
+				e.getInventory().setItem(2, null);
+
+				// Deduct XP cost
+				ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+				if(serverPlayer.containerMenu instanceof AnvilMenu anvilMenu) {
+					int cost = anvilMenu.cost.get();
+					if(player.getGameMode() != org.bukkit.GameMode.CREATIVE) {
+						player.setLevel(Math.max(0, player.getLevel() - cost));
+					}
+				}
+
+				player.getWorld().playSound(player.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
+			}
+		}
 
 		Utils.scheduleTask(() -> {
 			ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
@@ -132,7 +200,7 @@ public class BetterAnvil implements Listener {
 				anyApplied = true;
 			} else if(bookLevel == itemLevel) {
 				int combined = bookLevel + 1;
-				if(!isOverleveled(enchantment, combined)) {
+				if(notOverlevelled(enchantment, combined)) {
 					result.addUnsafeEnchantment(enchantment, combined);
 					anyApplied = true;
 				}
@@ -175,7 +243,7 @@ public class BetterAnvil implements Listener {
 				anyChanged = true;
 			} else if(level2 == level1) {
 				int combined = level2 + 1;
-				if(!isOverleveled(enchantment, combined)) {
+				if(notOverlevelled(enchantment, combined)) {
 					enchants1.put(enchantment, combined);
 					anyChanged = true;
 				}
@@ -221,7 +289,7 @@ public class BetterAnvil implements Listener {
 				anyApplied = true;
 			} else if(sourceLevel == targetLevel) {
 				int combined = sourceLevel + 1;
-				if(!isOverleveled(enchantment, combined)) {
+				if(notOverlevelled(enchantment, combined)) {
 					result.addUnsafeEnchantment(enchantment, combined);
 					anyApplied = true;
 				}
@@ -235,7 +303,7 @@ public class BetterAnvil implements Listener {
 			int remaining2 = maxDurability - dmg2.getDamage();
 			int repaired = Math.min(remaining1 + remaining2 + (int)(maxDurability * 0.12), maxDurability);
 			dmg1.setDamage(maxDurability - repaired);
-			result.setItemMeta((ItemMeta) dmg1);
+			result.setItemMeta(dmg1);
 			return result;
 		}
 
@@ -243,8 +311,8 @@ public class BetterAnvil implements Listener {
 		return result;
 	}
 
-	private boolean isOverleveled(Enchantment enchantment, int level) {
-		return level > enchantment.getMaxLevel();
+	private boolean notOverlevelled(Enchantment enchantment, int level) {
+		return level <= enchantment.getMaxLevel();
 	}
 
 	private boolean canApplyToItem(ItemStack item, Enchantment enchantment) {
