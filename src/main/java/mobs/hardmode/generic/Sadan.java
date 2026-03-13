@@ -51,7 +51,7 @@ public class Sadan implements CustomMob {
 		zombie.addScoreboardTag("DummySadan");
 		zombie.addScoreboardTag("HardMode");
 		zombie.addScoreboardTag("Invulnerable");
-		Bukkit.getLogger().info(p.getName() + " has summoned the M6 Bossfight.");
+		Bukkit.getLogger().info(p.getName() + " has initiated the M6 boss fight!");
 		zombie.setPersistent(true);
 		zombie.setRemoveWhenFarAway(false);
 		zombie.setAI(false);
@@ -311,7 +311,7 @@ public class Sadan implements CustomMob {
 				Location l = p.getLocation();
 				l.setY(l.getY() - 1);
 				p.teleport(l);
-				CustomDamage.customMobs(p, giant, finalPhase ? 90 : 70, DamageType.AOE);
+				CustomDamage.customMobs(p, giant, finalPhase ? 90 : 70, DamageType.PLAYER_MAGIC);
 			});
 			Utils.playGlobalSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1.0F, 2.0F);
 			Utils.scheduleTask(() -> bigfoot(giant, finalPhase), finalPhase ? 200 : 320);
@@ -320,11 +320,11 @@ public class Sadan implements CustomMob {
 
 	private static void lasr(Zombie giant, boolean finalPhase) {
 		// Giants Phase: Every 10 ticks for 80 ticks (9 total procs), dealing 8 damage (72 total damage)
-		// Sadan Phase: Every 5 ticks for 40 ticks (9 total procs), dealing 10 damage (90 total damage)
+		// Sadan Phase: Every 5 ticks for 40 ticks (9 total procs), dealing 11 damage (99 total damage)
 		if(!giant.isDead()) {
 			for(int i = 0; i <= (finalPhase ? 40 : 80); i += (finalPhase ? 5 : 10)) {
 				Utils.scheduleTask(() -> {
-					Utils.shootBeam(giant, Utils.getNearestPlayer(giant, 64), Color.RED, 64, 1, finalPhase ? 10 : 8);
+					Utils.shootBeam(giant, Utils.getNearestPlayer(giant, 64), Color.RED, 64, 1, finalPhase ? 11 : 8);
 
 					Utils.playGlobalSound(Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 				}, i);
@@ -353,7 +353,7 @@ public class Sadan implements CustomMob {
 			sadan.getAttribute(Attribute.MAX_HEALTH).setBaseValue(2000.0);
 			sadan.setHealth(2000.0);
 			sadan.getAttribute(Attribute.ARMOR).setBaseValue(-7.0);
-			sadan.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(93.0);
+			sadan.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(94.0);
 			sadan.getAttribute(Attribute.SCALE).setBaseValue(6.0);
 			sadan.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(1.0);
 			sadan.removePotionEffect(PotionEffectType.INVISIBILITY);

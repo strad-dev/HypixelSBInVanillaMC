@@ -183,7 +183,7 @@ public class CustomDamage implements Listener {
 				breach = entity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.BREACH);
 			}
 
-			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.AOE || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
+			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
 			if(affectedByArmor) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
 				armor = Math.max(0, armor - breach * 2.5);
@@ -253,7 +253,7 @@ public class CustomDamage implements Listener {
 
 				if(type == DamageType.FALL) {
 					double featherFalling = boots.getEnchantmentLevel(Enchantment.FEATHER_FALLING);
-					finalDamage *= Math.max(0.5, (1 - featherFalling * 0.1) * damagee.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).getValue());
+					finalDamage *= Math.max(0.8, (1 - featherFalling * 0.16) * damagee.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).getValue());
 					if(finalDamage < 1) {
 						finalDamage = 0;
 					}
@@ -264,7 +264,7 @@ public class CustomDamage implements Listener {
 	}
 
 	private static void dealDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
-		if(!damagee.isDead() && (finalDamage > 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) && (damagee.getNoDamageTicks() == 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC || type == DamageType.AOE || type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE)) {
+		if(!damagee.isDead() && (finalDamage > 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) && (damagee.getNoDamageTicks() == 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC || type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE)) {
 			// sweeping edge
 			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.SWEEPING_EDGE)) {
 				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SWEEPING_EDGE);
@@ -544,7 +544,7 @@ public class CustomDamage implements Listener {
 									} else {
 										damagerName = "absolutely no one";
 									}
-									if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.AOE) {
+									if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) {
 										deathMessage = p.getName() + " was slain by " + damagerName;
 									} else if(type == DamageType.RANGED) {
 										deathMessage = p.getName() + " was shot by " + damagerName;
@@ -686,7 +686,6 @@ public class CustomDamage implements Listener {
 			org.bukkit.damage.DamageType bukkitType = switch(type) {
 				case MELEE -> org.bukkit.damage.DamageType.MOB_ATTACK;
 				case MELEE_SWEEP -> org.bukkit.damage.DamageType.PLAYER_ATTACK;
-				case AOE -> org.bukkit.damage.DamageType.MOB_ATTACK_NO_AGGRO;
 				case RANGED -> org.bukkit.damage.DamageType.ARROW;
 				case RANGED_SPECIAL -> org.bukkit.damage.DamageType.SONIC_BOOM;
 				case MAGIC, PLAYER_MAGIC -> org.bukkit.damage.DamageType.MAGIC;

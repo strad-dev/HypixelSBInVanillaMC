@@ -18,7 +18,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 public class VoidcrazedSeraph implements CustomMob {
@@ -35,9 +37,9 @@ public class VoidcrazedSeraph implements CustomMob {
 		}
 
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Voidcrazed Seraph" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(999.9);
-		enderman.setHealth(999.9);
-		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(50.0);
+		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1666.0);
+		enderman.setHealth(1666.0);
+		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(55.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		enderman.setTarget(p);
@@ -45,9 +47,9 @@ public class VoidcrazedSeraph implements CustomMob {
 		enderman.addScoreboardTag("SkyblockBoss");
 		enderman.addScoreboardTag("VoidcrazedSeraph");
 		enderman.addScoreboardTag("HardMode");
-		enderman.addScoreboardTag("499Trigger");
+		enderman.addScoreboardTag("833Trigger");
 		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "From the ashes of the Superior Dragon rises the terrifying Voidcrazed Seraph!");
-		Bukkit.getLogger().info(p.getName() + " has summoned the Voidcrazed Seraph.");
+		Bukkit.getLogger().info(p.getName() + " has summoned the Voidcrazed Seraph!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		enderman.setPersistent(true);
 		enderman.setRemoveWhenFarAway(false);
@@ -64,7 +66,7 @@ public class VoidcrazedSeraph implements CustomMob {
 	private static void dissonance(Enderman voidgloom) {
 		if(!voidgloom.isDead()) {
 			if(!voidgloom.getScoreboardTags().contains("Invulnerable")) {
-				Utils.applyToAllNearbyPlayers(voidgloom, 16, p -> CustomDamage.customMobs(p, voidgloom, 30, DamageType.AOE));
+				Utils.applyToAllNearbyPlayers(voidgloom, 16, p -> CustomDamage.customMobs(p, voidgloom, 30, DamageType.PLAYER_MAGIC));
 			}
 			Utils.scheduleTask(() -> dissonance(voidgloom), 20);
 		}
@@ -72,22 +74,25 @@ public class VoidcrazedSeraph implements CustomMob {
 
 	private static void yangGlyph(Enderman voidgloom) {
 		if(!voidgloom.isDead()) {
-			if(voidgloom.getHealth() < 666) {
+			if(voidgloom.getHealth() < 1111) {
 				voidgloom.setCarriedBlock(Material.BEACON.createBlockData());
 			}
 
 			Utils.scheduleTask(() -> {
-				if(!voidgloom.isDead() && voidgloom.getHealth() < 666) {
+				if(!voidgloom.isDead() && voidgloom.getHealth() < 1111) {
 					voidgloom.setCarriedBlock(Material.AIR.createBlockData());
-					voidgloom.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.333);
+					voidgloom.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.1);
 					Block block = Utils.randomLocation(voidgloom.getLocation(), 16, false).getBlock();
 					block.setType(Material.BEACON);
 					beacons.add(block);
-					Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
-					Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Destroy it or die!", 0, 200, 0));
+					for(int i = 0; i < 180; i += 20) {
+						int finalI = i;
+						Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Mine it or die!  " + (200 - finalI) / 10, 0, 21, 0)), i);
+						Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
+					}
 					Utils.scheduleTask(() -> {
 						if(!voidgloom.isDead() && block.getType() == Material.BEACON) {
-							Utils.spawnTNT(voidgloom, block.getLocation(), 0, 32, 500, new ArrayList<>());
+							Utils.spawnTNT(voidgloom, block.getLocation(), 0, 64, 1000, new ArrayList<>());
 						}
 						voidgloom.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 						block.setType(Material.AIR);
@@ -111,20 +116,31 @@ public class VoidcrazedSeraph implements CustomMob {
 			}
 			damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			return false;
-		} else if(damagee.getHealth() - originalDamage < 499 && damagee.getScoreboardTags().contains("499Trigger")) {
+		} else if(damagee.getHealth() - originalDamage < 833 && damagee.getScoreboardTags().contains("833Trigger")) {
 			damagee.addScoreboardTag("Invulnerable");
-			damagee.removeScoreboardTag("499Trigger");
-			damagee.setHealth(499.0);
+			damagee.removeScoreboardTag("833Trigger");
+			damagee.setHealth(833.0);
 			Utils.changeName(damagee);
 			damagee.setAI(false);
 
 			// Spinning flame beams
 			final int[] tickCounter = {0};
 			Location center = damagee.getLocation();
+			Map<Player, Location> playerLocations = new HashMap<>();
 
 			BukkitTask beamTask = Bukkit.getScheduler().runTaskTimer(Plugin.getInstance(), () -> {
 				if(!damagee.isValid() || damagee.isDead()) {
 					return;
+				}
+
+				// Cache player locations every 10 ticks
+				if(tickCounter[0] % 10 == 0) {
+					playerLocations.clear();
+					for(Player player : Bukkit.getOnlinePlayers()) {
+						if(player.getWorld().equals(center.getWorld())) {
+							playerLocations.put(player, player.getLocation());
+						}
+					}
 				}
 
 				// Calculate rotation angle (full rotation over DURATION ticks)
@@ -138,7 +154,6 @@ public class VoidcrazedSeraph implements CustomMob {
 					for(int height = 0; height < 3; height++) {
 						double y = center.getY() + height + 0.5;
 
-						// Create 3 beams per set (120 degrees apart within the set)
 						// Draw the beam with particles
 						for(double distance = 0; distance < 16; distance += 0.2) {
 							double x = center.getX() + Math.cos(angle) * distance;
@@ -152,18 +167,14 @@ public class VoidcrazedSeraph implements CustomMob {
 									0  // speed
 							);
 
-							// Check for player collision every few particles to optimize
-							for(Player player : Bukkit.getOnlinePlayers()) {
-								if(player.getNoDamageTicks() == 0 && player.getWorld().equals(center.getWorld())) {
-									Location playerLoc = player.getLocation();
-									// Check if player is within 0.8 blocks of the beam particle
-									if(playerLoc.distanceSquared(particleLocation) < 0.64) { // 0.8^2
-										// Check vertical alignment (player is ~2 blocks tall)
-										if(Math.abs(playerLoc.getY() - y) < 2.0 || Math.abs(playerLoc.getY() + 1 - y) < 1.0) {
-											// Deal absolute damage
-											CustomDamage.customMobs(player, damagee, 4, DamageType.ABSOLUTE);
-											player.setNoDamageTicks(9);
-										}
+							// Check cached player locations for collision
+							for(Map.Entry<Player, Location> entry : playerLocations.entrySet()) {
+								Location playerLoc = entry.getValue();
+								// Check if player is within 1 block of the beam particle
+								if(playerLoc.distanceSquared(particleLocation) < 1.0) { // 1.0^2
+									// Check vertical alignment (player is ~2 blocks tall)
+									if(Math.abs(playerLoc.getY() - y) < 2.0 || Math.abs(playerLoc.getY() + 1 - y) < 1.0) {
+										CustomDamage.customMobs(entry.getKey(), damagee, 4, DamageType.ABSOLUTE);
 									}
 								}
 							}

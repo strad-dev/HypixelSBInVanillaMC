@@ -53,7 +53,7 @@ public class Sadan implements CustomMob {
 		zombie.setHealth(400.0);
 		zombie.getAttribute(Attribute.ARMOR).setBaseValue(-20.0);
 		zombie.getAttribute(Attribute.ARMOR_TOUGHNESS).setBaseValue(-8.0);
-		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
+		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(24.0);
 		zombie.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		zombie.getAttribute(Attribute.SCALE).setBaseValue(6.0);

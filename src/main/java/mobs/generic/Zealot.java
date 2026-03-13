@@ -28,7 +28,7 @@ public class Zealot implements CustomMob {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(130.0);
 		enderman.setHealth(130.0);
-		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(18.0);
+		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(20.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		enderman.setTarget(p);

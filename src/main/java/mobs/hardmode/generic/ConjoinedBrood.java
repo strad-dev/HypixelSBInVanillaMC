@@ -26,7 +26,7 @@ public class ConjoinedBrood implements CustomMob {
 		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
 		spider.setHealth(500.0);
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.67);
-		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(30.0);
+		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(35.0);
 		spider.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		spider.setTarget(p);
 		spider.setCustomNameVisible(true);

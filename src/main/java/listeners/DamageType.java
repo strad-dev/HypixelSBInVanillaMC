@@ -6,7 +6,7 @@ public enum DamageType {
 	 * Melee Damage Type
 	 * ------------------
 	 * Used for all damage via Melee Weapons and Thorns
-	 * Affected by: Armor, Toughness, Protection, Resistance
+	 * Affected by: Armor, Protection, Resistance
 	 * Knockback: Normal
 	 * I-Frames: Normal
 	 */
@@ -18,23 +18,12 @@ public enum DamageType {
 	 * Used for all damage caused by Sweep attacks
 	 */
 
-	AOE,
-	/*
-	 * AOE Damage Type
-	 * ------------------
-	 * Used for boss AOE attacks that hit all nearby players
-	 * Affected by: Armor, Toughness, Protection, Resistance
-	 * Knockback: None
-	 * I-Frames: None
-	 * Shields: No
-	 */
-
 	RANGED,
 	/*
 	 * Ranged Damage Type
 	 * ------------------
 	 * Used for all damage via Ranged Weapons (e.g. Bows, Tridents, Wither Skulls)
-	 * Affected by: Armor, Toughness, Protection, Resistance
+	 * Affected by: Armor, Protection, Resistance
 	 * Knockback: Reduced
 	 * I-Frames: None
 	 */
@@ -43,7 +32,7 @@ public enum DamageType {
 	 * Ranged Special Damage Type
 	 * ------------------
 	 * Used for custom Ranged damage from other sources (e.g. Terminator beam)
-	 * Affected by: Armor, Toughness, Protection, Resistance
+	 * Affected by: Armor, Protection, Resistance
 	 * Knockback: Reduced
 	 * I-Frames: None
 	 */
@@ -52,7 +41,7 @@ public enum DamageType {
 	 * Magic Damage Type
 	 * ------------------
 	 * Used for all damage via Potions, Enchantments, and Status Effects
-	 * Affected by: Toughness, Protection, Resistance
+	 * Affected by: Protection, Resistance
 	 * Knockback: None
 	 * I-Frames: None
 	 */
@@ -62,7 +51,7 @@ public enum DamageType {
 	 * Player Magic Damage Type
 	 * ------------------
 	 * Used for all other Magic damage - either Player Abilities (e.g. Wither Impact, Ice Spray) or other Magical attacks (e.g. MASTER Goldor AOE, Customly-Spawned TNT)
-	 * Affected by: Armor, Toughness, Protection, Resistance
+	 * Affected by: Armor, Protection, Resistance
 	 * Knockback: None
 	 * I-Frames: None
 	 */
@@ -72,7 +61,7 @@ public enum DamageType {
 	 * Environmental Damage Type
 	 * ------------------
 	 * Used for all damage via other methods (e.g. Fire)
-	 * Affected by: Armor, Toughness, Protection, Resistance
+	 * Affected by: Armor, Protection, Resistance
 	 * Knockback: None
 	 * I-Frames: Special
 	 */
@@ -82,7 +71,7 @@ public enum DamageType {
 	 * I-Frame Environmental Damage Type
 	 * ------------------
 	 * Used for all environmental damage that should proc normal I-Frames
-	 * Affected by: Armor, Toughness, Protection, Resistance
+	 * Affected by: Armor, Protection, Resistance
 	 * Knockback: None
 	 * I-Frames: Normal
 	 */
@@ -92,7 +81,7 @@ public enum DamageType {
 	 * Fall Damage Type
 	 * ------------------
 	 * Used for Fall & Physics-Induced Damage
-	 * Affected by: Feather Falling, Toughness, Protection, Resistance
+	 * Affected by: Feather Falling, Protection, Resistance
 	 * Knockback: None
 	 * I-Frames: Normal
 	 */
@@ -128,9 +117,6 @@ public enum DamageType {
 			}
 			case MELEE_SWEEP -> {
 				return "Sweep Damage";
-			}
-			case AOE -> {
-				return "AOE Damage";
 			}
 			case RANGED, RANGED_SPECIAL -> {
 				return "Ranged Damage";
