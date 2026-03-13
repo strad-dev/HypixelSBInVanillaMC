@@ -9,14 +9,22 @@ import items.summonItems.*;
 import items.weapons.Claymore;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
+import misc.Utils;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 import java.util.Map;
@@ -24,12 +32,14 @@ import java.util.Map;
 public class ItemReloader implements Listener {
 	@EventHandler
 	public void onItemPickup(EntityPickupItemEvent e) {
-		if (!(e.getEntity() instanceof Player p)) return;
+		if(!(e.getEntity() instanceof Player p)) return;
 
 		ItemStack item = e.getItem().getItemStack();
 		ItemStack refreshed = refreshItem(item);
-		if (refreshed != null) {
+		if(refreshed != null) {
 			e.getItem().setItemStack(refreshed);
+		} else {
+			modifyVanillaArmor(e.getItem().getItemStack());
 		}
 	}
 
@@ -38,14 +48,127 @@ public class ItemReloader implements Listener {
 		Player p = e.getPlayer();
 		PlayerInventory inventory = p.getInventory();
 
-		for (int i = 0; i < inventory.getSize(); i++) {
+		for(int i = 0; i < inventory.getSize(); i++) {
 			ItemStack item = inventory.getItem(i);
-			if (item == null) continue;
+			if(item == null) continue;
 			ItemStack refreshed = refreshItem(item);
-			if (refreshed != null) {
+			if(refreshed != null) {
 				inventory.setItem(i, refreshed);
+			} else {
+				modifyVanillaArmor(item);
 			}
 		}
+	}
+
+	@EventHandler
+	public void onInventoryClick(InventoryClickEvent e) {
+		if(!(e.getWhoClicked() instanceof Player p)) return;
+
+		Utils.scheduleTask(() -> {
+			ItemStack cursor = p.getItemOnCursor();
+			if(!cursor.getType().isAir()) {
+				ItemStack refreshed = refreshItem(cursor);
+				if(refreshed != null) {
+					p.setItemOnCursor(refreshed);
+				} else {
+					modifyVanillaArmor(cursor);
+				}
+			}
+
+			ItemStack current = e.getCurrentItem();
+			if(current != null && !current.getType().isAir()) {
+				ItemStack refreshed = refreshItem(current);
+				if(refreshed != null) {
+					e.setCurrentItem(refreshed);
+				} else {
+					modifyVanillaArmor(current);
+				}
+			}
+		}, 1);
+	}
+
+	public static void modifyVanillaArmor(ItemStack item) {
+		if(item == null || item.getType().isAir()) return;
+		if(item.hasItemMeta() && item.getItemMeta().hasLore()) {
+			List<String> lore = item.getItemMeta().getLore();
+			if(lore != null && !lore.isEmpty() && lore.getFirst().startsWith("skyblock/")) return;
+		}
+
+		Material mat = item.getType();
+		String slotKey;
+		double armorValue;
+		EquipmentSlotGroup slotGroup;
+
+		switch(mat) {
+			case DIAMOND_HELMET -> {
+				slotKey = "armor.helmet";
+				armorValue = 3;
+				slotGroup = EquipmentSlotGroup.HEAD;
+			}
+			case DIAMOND_CHESTPLATE -> {
+				slotKey = "armor.chestplate";
+				armorValue = 8;
+				slotGroup = EquipmentSlotGroup.CHEST;
+			}
+			case DIAMOND_LEGGINGS -> {
+				slotKey = "armor.leggings";
+				armorValue = 6;
+				slotGroup = EquipmentSlotGroup.LEGS;
+			}
+			case DIAMOND_BOOTS -> {
+				slotKey = "armor.boots";
+				armorValue = 3;
+				slotGroup = EquipmentSlotGroup.FEET;
+			}
+			case NETHERITE_HELMET -> {
+				slotKey = "armor.helmet";
+				armorValue = 4;
+				slotGroup = EquipmentSlotGroup.HEAD;
+			}
+			case NETHERITE_CHESTPLATE -> {
+				slotKey = "armor.chestplate";
+				armorValue = 10;
+				slotGroup = EquipmentSlotGroup.CHEST;
+			}
+			case NETHERITE_LEGGINGS -> {
+				slotKey = "armor.leggings";
+				armorValue = 7;
+				slotGroup = EquipmentSlotGroup.LEGS;
+			}
+			case NETHERITE_BOOTS -> {
+				slotKey = "armor.boots";
+				armorValue = 4;
+				slotGroup = EquipmentSlotGroup.FEET;
+			}
+			case ELYTRA -> {
+				slotKey = "armor.chestplate";
+				armorValue = 4;
+				slotGroup = EquipmentSlotGroup.CHEST;
+			}
+			default -> {
+				return;
+			}
+		}
+
+		ItemMeta meta = item.getItemMeta();
+
+		// Remove existing armor modifiers
+		if(meta.getAttributeModifiers(Attribute.ARMOR) != null) {
+			for(AttributeModifier mod : List.copyOf(meta.getAttributeModifiers(Attribute.ARMOR))) {
+				meta.removeAttributeModifier(Attribute.ARMOR, mod);
+			}
+		}
+		// Remove existing toughness modifiers
+		if(meta.getAttributeModifiers(Attribute.ARMOR_TOUGHNESS) != null) {
+			for(AttributeModifier mod : List.copyOf(meta.getAttributeModifiers(Attribute.ARMOR_TOUGHNESS))) {
+				meta.removeAttributeModifier(Attribute.ARMOR_TOUGHNESS, mod);
+			}
+		}
+
+		// Add correct armor value
+		meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(NamespacedKey.minecraft(slotKey), armorValue, AttributeModifier.Operation.ADD_NUMBER, slotGroup));
+
+		item.setItemMeta(meta);
 	}
 
 	/**
@@ -53,20 +176,20 @@ public class ItemReloader implements Listener {
 	 * preserving enchantments and stack size. Returns null if the item is not a custom item.
 	 */
 	public static ItemStack refreshItem(ItemStack item) {
-		if (item == null || item.getType().isAir()) return null;
-		if (!item.hasItemMeta() || !item.getItemMeta().hasLore()) return null;
+		if(item == null || item.getType().isAir()) return null;
+		if(!item.hasItemMeta() || !item.getItemMeta().hasLore()) return null;
 
 		List<String> lore = item.getItemMeta().getLore();
 		String key = lore.getFirst();
 
 		Enchantment ench = Enchantment.SHARPNESS;
-		if (item.getEnchantments().containsKey(Enchantment.SMITE)) {
+		if(item.getEnchantments().containsKey(Enchantment.SMITE)) {
 			ench = Enchantment.SMITE;
-		} else if (item.getEnchantments().containsKey(Enchantment.BANE_OF_ARTHROPODS)) {
+		} else if(item.getEnchantments().containsKey(Enchantment.BANE_OF_ARTHROPODS)) {
 			ench = Enchantment.BANE_OF_ARTHROPODS;
 		}
 
-		ItemStack newItem = switch (key) {
+		ItemStack newItem = switch(key) {
 			case "skyblock/combat/aspect_of_the_void" -> AOTV.getItem();
 			case "skyblock/combat/scylla" -> Scylla.getItem(ench, item.getEnchantmentLevel(ench));
 			case "skyblock/combat/terminator" -> Terminator.getItem(item.getEnchantmentLevel(Enchantment.POWER));
@@ -125,10 +248,10 @@ public class ItemReloader implements Listener {
 			default -> null;
 		};
 
-		if (newItem == null) return null;
+		if(newItem == null) return null;
 
 		// Only preserve enchantments for items that don't use glint override (real enchantable weapons)
-		if (!newItem.getItemMeta().hasEnchantmentGlintOverride()) {
+		if(!newItem.getItemMeta().hasEnchantmentGlintOverride()) {
 			Map<Enchantment, Integer> enchants = item.getEnchantments();
 			newItem.addUnsafeEnchantments(enchants);
 		}
