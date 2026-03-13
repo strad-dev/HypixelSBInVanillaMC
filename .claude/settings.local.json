@@ -8,7 +8,8 @@
       "WebFetch(domain:minecraft.wiki)",
       "WebFetch(domain:gist.github.com)",
       "WebFetch(domain:hub.spigotmc.org)",
-      "WebFetch(domain:bugs.mojang.com)"
+      "WebFetch(domain:bugs.mojang.com)",
+      "WebFetch(domain:www.spigotmc.org)"
     ]
   }
 }

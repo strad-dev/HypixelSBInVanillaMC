@@ -183,32 +183,20 @@ public class CustomDamage implements Listener {
 				breach = entity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.BREACH);
 			}
 
-			// Attribute.ARMOR reduces damage taken by 4% per level, up to 15 points (-60%)
-			// The Breach enchantment lowers the cap by 2 points per level, with Breach 4 only allowing 7 points (-28%))
-			// Examples
-			// Iron Armor (15 points) reduces damage by 60%
-			// Diamond Armor (20 points) also reduces damage by 60%
-			// 3/4 Diamond + Elytra (12 points) reduces damage by 48%
 			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.AOE || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
 			if(affectedByArmor) {
 				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
-				double minMultipler = 0.4 + breach * 0.1;
-				finalDamage *= Math.max(minMultipler, 1 - armor * 0.04);
+				armor = Math.max(0, armor - breach * 2.5);
+				double reduction;
+				if(armor < 15) {
+					reduction = armor * 0.04;
+				} else {
+					reduction = 1.0 - 1.0 / (1.0 + 0.00014666 * Math.pow(armor, 3.409));
+				}
+				finalDamage *= (1.0 - reduction);
 			}
 
 			System.out.println("After armor: " + finalDamage);
-
-			// Attribute.ARMOR_TOUGHNESS further reduces damage taken by 5% per level, up to 16 points (-80%)
-			// Breach reduces Armor Toughness by 1.25 for each level
-			// Examples
-			// Iron Armor (0 toughness) does not work here
-			// Diamond Armor (8 toughness) reduces damage by 40%
-			// Netherite Armor (12 toughness) reduces damage by 60%
-			// 3/4 Netherite + Elytra (9 toughness) reduces damage by 45%
-			double toughness = Math.max(Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR_TOUGHNESS)).getValue(), 0) - breach * 1.25;
-			finalDamage *= Math.max(0.2, 1 - toughness * 0.05);
-
-			System.out.println("After toughness: " + finalDamage);
 
 			// The Resistance status effect reduces damage by 20% per level.
 			// At level 5 and higher, the damagee is immune to damage.
