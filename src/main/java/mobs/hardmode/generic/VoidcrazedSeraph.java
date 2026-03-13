@@ -17,11 +17,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class VoidcrazedSeraph implements CustomMob {
 	private static final List<Block> beacons = new ArrayList<>();
@@ -87,8 +83,10 @@ public class VoidcrazedSeraph implements CustomMob {
 					beacons.add(block);
 					for(int i = 0; i < 180; i += 20) {
 						int finalI = i;
-						Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Mine it or die!  " + (200 - finalI) / 10, 0, 21, 0)), i);
-						Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
+						Utils.scheduleTask(() -> {
+							Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Mine it or die!\n" + ChatColor.BOLD + (200 - finalI) / 20, 0, 21, 0));
+							Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
+						}, i);
 					}
 					Utils.scheduleTask(() -> {
 						if(!voidgloom.isDead() && block.getType() == Material.BEACON) {
@@ -126,21 +124,9 @@ public class VoidcrazedSeraph implements CustomMob {
 			// Spinning flame beams
 			final int[] tickCounter = {0};
 			Location center = damagee.getLocation();
-			Map<Player, Location> playerLocations = new HashMap<>();
-
 			BukkitTask beamTask = Bukkit.getScheduler().runTaskTimer(Plugin.getInstance(), () -> {
 				if(!damagee.isValid() || damagee.isDead()) {
 					return;
-				}
-
-				// Cache player locations every 10 ticks
-				if(tickCounter[0] % 10 == 0) {
-					playerLocations.clear();
-					for(Player player : Bukkit.getOnlinePlayers()) {
-						if(player.getWorld().equals(center.getWorld())) {
-							playerLocations.put(player, player.getLocation());
-						}
-					}
 				}
 
 				// Calculate rotation angle (full rotation over DURATION ticks)
@@ -166,15 +152,33 @@ public class VoidcrazedSeraph implements CustomMob {
 									0, 0, 0,  // offset
 									0  // speed
 							);
+						}
+					}
+				}
 
-							// Check cached player locations for collision
-							for(Map.Entry<Player, Location> entry : playerLocations.entrySet()) {
-								Location playerLoc = entry.getValue();
-								// Check if player is within 1 block of the beam particle
-								if(playerLoc.distanceSquared(particleLocation) < 1.0) { // 1.0^2
-									// Check vertical alignment (player is ~2 blocks tall)
-									if(Math.abs(playerLoc.getY() - y) < 2.0 || Math.abs(playerLoc.getY() + 1 - y) < 1.0) {
-										CustomDamage.customMobs(entry.getKey(), damagee, 4, DamageType.ABSOLUTE);
+				// Check collision every 10 ticks
+				if(tickCounter[0] % 10 == 0) {
+					Set<Player> damagedPlayers = new HashSet<>();
+					for(Player player : Bukkit.getOnlinePlayers()) {
+						if(!player.getWorld().equals(center.getWorld())) continue;
+						Location playerLoc = player.getLocation();
+
+						for(int direction = 0; direction < 4; direction++) {
+							double angle = (direction * Math.PI / 2) + rotationAngle;
+
+							for(int height = 0; height < 3; height++) {
+								double y = center.getY() + height + 0.5;
+
+								for(double distance = 0; distance < 16; distance += 0.2) {
+									double x = center.getX() + Math.cos(angle) * distance;
+									double z = center.getZ() + Math.sin(angle) * distance;
+
+									Location particleLocation = new Location(center.getWorld(), x, y, z);
+									if(!damagedPlayers.contains(player) && playerLoc.distanceSquared(particleLocation) < 1.0) {
+										if(Math.abs(playerLoc.getY() - y) < 2.0 || Math.abs(playerLoc.getY() + 1 - y) < 1.0) {
+											CustomDamage.customMobs(player, damagee, 4, DamageType.ABSOLUTE);
+											damagedPlayers.add(player);
+										}
 									}
 								}
 							}
