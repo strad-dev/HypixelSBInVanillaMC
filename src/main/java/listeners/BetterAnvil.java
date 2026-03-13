@@ -65,12 +65,13 @@ public class BetterAnvil implements Listener {
 			return;
 		}
 
-		// Cap repair cost
+		// Update prior work penalty on result (vanilla formula: max(cost1, cost2) * 2 + 1)
+		int penalty1 = first.getItemMeta() instanceof Repairable r ? r.getRepairCost() : 0;
+		int penalty2 = second.getItemMeta() instanceof Repairable r ? r.getRepairCost() : 0;
+		int newRepairCost = Math.min(Math.max(penalty1, penalty2) * 2 + 1, 64);
 		ItemMeta resultMeta = result.getItemMeta();
 		if(resultMeta instanceof Repairable repairable) {
-			if(repairable.getRepairCost() > 50) {
-				repairable.setRepairCost(50);
-			}
+			repairable.setRepairCost(newRepairCost);
 			result.setItemMeta(resultMeta);
 		}
 
