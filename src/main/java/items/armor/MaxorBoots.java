@@ -22,15 +22,13 @@ public class MaxorBoots implements Armor {
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Maxor's Boots");
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
-		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsArmor"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
-		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsToughness"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsArmor"), 4.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
 		AttributeModifier speed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsSpeed"), 3, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.FEET);
 		AttributeModifier antiFall = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsAntiFall"), -0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
 		data.addAttributeModifier(Attribute.MOVEMENT_SPEED, speed);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);
-		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
 		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addAttributeModifier(Attribute.FALL_DAMAGE_MULTIPLIER, antiFall);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
@@ -39,8 +37,7 @@ public class MaxorBoots implements Armor {
 		lore.add("skyblock/combat/maxor_boots");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
-		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
+		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+4.5");
 		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+10%");
 		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x4");
 		lore.add(ChatColor.GRAY + "Fall Damage: " + ChatColor.RED + "-10%");

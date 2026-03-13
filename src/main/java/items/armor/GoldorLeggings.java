@@ -22,12 +22,10 @@ public class GoldorLeggings implements Armor {
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Goldor's Leggings");
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
-		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsArmor"), 6, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
-		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsToughness"), 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsArmor"), 7.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);
-		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
 		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
@@ -35,8 +33,7 @@ public class GoldorLeggings implements Armor {
 		lore.add("skyblock/combat/goldor_pants");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
-		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+6");
-		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+4");
+		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+7.5");
 		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+20%");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Goldor has spent centuries");

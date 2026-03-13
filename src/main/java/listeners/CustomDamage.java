@@ -1134,6 +1134,14 @@ public class CustomDamage implements Listener {
 		} else if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
 			if(!entity.isDead()) {
+				// Prevent boss-on-boss friendly fire (e.g. Sadan golems vs terracottas, giants vs giants)
+				if(e.getDamager() instanceof Mob damagerMob && entity instanceof Mob entityMob
+						&& damagerMob.getScoreboardTags().contains("SkyblockBoss")
+						&& entityMob.getScoreboardTags().contains("SkyblockBoss")) {
+					damagerMob.setTarget(Utils.getNearestPlayer(damagerMob));
+					entityMob.setTarget(Utils.getNearestPlayer(entityMob));
+					return;
+				}
 				DamageType type;
 				switch(e.getCause()) {
 					case ENTITY_ATTACK, ENTITY_EXPLOSION, THORNS -> type = DamageType.MELEE;
@@ -1165,6 +1173,20 @@ public class CustomDamage implements Listener {
 					}
 
 					Entity damager = e.getDamager();
+
+					// Normalize custom boss damage to remove vanilla difficulty scaling
+					// Easy = 0.5x, Normal = 1x, Hard = 1.5x
+					if(damager instanceof Mob && damager.getScoreboardTags().contains("SkyblockBoss") && (type == DamageType.MELEE || type == DamageType.RANGED)) {
+						Difficulty difficulty = damager.getWorld().getDifficulty();
+						double difficultyMultiplier = switch(difficulty) {
+							case EASY -> 0.5;
+							case HARD -> 1.5;
+							default -> 1.0;
+						};
+						if(difficultyMultiplier != 1.0) {
+							e.setDamage(e.getDamage() / difficultyMultiplier);
+						}
+					}
 
 					if(damager instanceof LivingEntity livingEntity) {
 						int sharpness = livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SHARPNESS);

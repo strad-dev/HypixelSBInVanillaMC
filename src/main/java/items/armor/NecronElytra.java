@@ -22,12 +22,10 @@ public class NecronElytra implements Armor {
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Necron's Elytra");
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
-		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraArmor"), 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
-		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraToughness"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraArmor"), 10, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);
-		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
 		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
@@ -35,8 +33,7 @@ public class NecronElytra implements Armor {
 		lore.add("skyblock/combat/necron_elytra");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
-		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+8");
-		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
+		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+10");
 		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+10%");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "This Elytra has the stats of a Netherite");
