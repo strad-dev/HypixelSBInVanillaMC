@@ -8,6 +8,7 @@ import org.bukkit.entity.*;
 public class MutantGiant implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		return "";
 	}
 

@@ -7,7 +7,6 @@ import mobs.CustomMob;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
@@ -483,7 +482,7 @@ public class CustomDamage implements Listener {
 				} else {
 					if(damagee instanceof EnderDragon dragon && data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
 						if(damager == null) {
-							damager = Utils.getNearestPlayer(dragon);
+							damager = Utils.getNearestPlayer(dragon, 16);
 						}
 					}
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, true, data);
@@ -525,9 +524,7 @@ public class CustomDamage implements Listener {
 								// Fallback
 								Bukkit.getLogger().warning("Failed to force Dragon death animation.");
 							}
-							if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-								Utils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
-							}
+							Utils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 							dragon.setSilent(true);
 							Utils.scheduleTask(() -> spawnDragonXP(dragon.getLocation(), dragon.getScoreboardTags().contains("HardMode") ? 640000 : 64000), 190);
 						} else {
@@ -609,7 +606,7 @@ public class CustomDamage implements Listener {
 						} else {
 							dragon.setVelocity(new Vector(v.getX(), 0.333333, v.getZ()));
 						}
-						damager = Utils.getNearestPlayer(dragon);
+						damager = Utils.getNearestPlayer(dragon, 16);
 					}
 				} else if(isPhysicalHit && damager != null) {
 					// apply knockback

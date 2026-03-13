@@ -47,7 +47,7 @@ public class CustomMobs implements Listener {
 		if(nearest == null) return null;
 		if(nearest.hasPotionEffect(PotionEffectType.BAD_OMEN)) return nearest;
 		for(Player p2 : e.getEntity().getWorld().getPlayers()) {
-			if(p2.getLocation().distanceSquared(e.getLocation()) <= 4096 && p2.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
+			if(p2.hasPotionEffect(PotionEffectType.BAD_OMEN)) {
 				return p2;
 			}
 		}
@@ -63,7 +63,7 @@ public class CustomMobs implements Listener {
 			try {
 				switch(entity) {
 					case Wither wither -> {
-						Player p = Utils.getNearestPlayer(e.getEntity());
+						Player p = Utils.getNearestPlayer(e.getEntity(), 64);
 						Player hardModePlayer = getHardModePlayer(p, e);
 						wither.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 						if(!isWitherLordFightActive) {
@@ -72,7 +72,7 @@ public class CustomMobs implements Listener {
 								Utils.scheduleTask(wither::remove, 1);
 								Utils.scheduleTask(() -> {
 									Wither wither2 = (Wither) wither.getWorld().spawnEntity(wither.getLocation(), EntityType.WITHER);
-									new Maxor().onSpawn(Utils.getNearestPlayer(wither2), wither2);
+									new Maxor().onSpawn(p, wither2);
 								}, 240);
 								isWitherLordFightActive = true;
 								Utils.scheduleTask(() -> {
@@ -93,9 +93,9 @@ public class CustomMobs implements Listener {
 								}, 200);
 								Bukkit.getLogger().info("A player has initiated the Wither Lords fight!");
 							} else {
-								name = CustomWither.spawnRandom().onSpawn(Utils.getNearestPlayer(wither), wither);
+								name = CustomWither.spawnRandom().onSpawn(p, wither);
 								wither.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-								wither.setTarget(Utils.getNearestPlayer(wither));
+								wither.setTarget(p);
 								wither.setCustomNameVisible(true);
 								wither.setPersistent(true);
 								wither.setRemoveWhenFarAway(false);
@@ -106,22 +106,20 @@ public class CustomMobs implements Listener {
 						}
 					}
 					case EnderDragon dragon -> {
-						if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-							Player p = Utils.getNearestPlayer(e.getEntity());
-							Player hardModePlayer = getHardModePlayer(p, e);
-							if(hardModePlayer != null) {
-								hardModePlayer.removePotionEffect(PotionEffectType.BAD_OMEN);
-								name = new PrimalDragon().onSpawn(hardModePlayer, dragon);
-							} else {
-								name = CustomDragon.spawnRandom().onSpawn(Utils.getNearestPlayer(dragon), dragon);
-								dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
-								dragon.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-								dragon.setTarget(Utils.getNearestPlayer(dragon));
-								dragon.setCustomNameVisible(true);
-								dragon.setPersistent(true);
-								dragon.setRemoveWhenFarAway(false);
-								dragon.addScoreboardTag("SkyblockBoss");
-							}
+						Player p = Utils.getNearestPlayer(e.getEntity(), 128);
+						Player hardModePlayer = getHardModePlayer(p, e);
+						if(hardModePlayer != null) {
+							hardModePlayer.removePotionEffect(PotionEffectType.BAD_OMEN);
+							name = new PrimalDragon().onSpawn(hardModePlayer, dragon);
+						} else {
+							name = CustomDragon.spawnRandom().onSpawn(p, dragon);
+							dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
+							dragon.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
+							dragon.setTarget(p);
+							dragon.setCustomNameVisible(true);
+							dragon.setPersistent(true);
+							dragon.setRemoveWhenFarAway(false);
+							dragon.addScoreboardTag("SkyblockBoss");
 						}
 					}
 					default -> {

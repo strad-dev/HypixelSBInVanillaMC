@@ -26,6 +26,7 @@ public class VoidcrazedSeraph implements CustomMob {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Enderman enderman;
 		if(e instanceof Enderman) {
 			enderman = (Enderman) e;
@@ -39,7 +40,7 @@ public class VoidcrazedSeraph implements CustomMob {
 		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(50.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		enderman.setTarget(Utils.getNearestPlayer(enderman));
+		enderman.setTarget(p);
 		enderman.setCustomNameVisible(true);
 		enderman.addScoreboardTag("SkyblockBoss");
 		enderman.addScoreboardTag("VoidcrazedSeraph");

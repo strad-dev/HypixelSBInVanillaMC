@@ -22,6 +22,7 @@ import java.util.ArrayList;
 public class AtonedHorror implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Zombie zombie;
 		if(e instanceof Zombie) {
 			zombie = (Zombie) e;
@@ -50,7 +51,7 @@ public class AtonedHorror implements CustomMob {
 		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(18.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		zombie.setTarget(Utils.getNearestPlayer(zombie));
+		zombie.setTarget(p);
 		zombie.setCustomNameVisible(true);
 		zombie.addScoreboardTag("SkyblockBoss");
 		zombie.addScoreboardTag("AtonedHorror");
@@ -81,7 +82,7 @@ public class AtonedHorror implements CustomMob {
 
 	private static void summonTNT(Zombie zombie) {
 		if(!zombie.isDead()) {
-			Player p = Utils.getNearestPlayer(zombie);
+			Player p = Utils.getNearestPlayer(zombie, 64);
 			Utils.spawnTNT(zombie, p.getLocation(), 20, 5, 25, new ArrayList<>());
 			Utils.scheduleTask(() -> summonTNT(zombie), 60);
 		}

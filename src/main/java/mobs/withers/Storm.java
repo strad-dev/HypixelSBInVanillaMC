@@ -15,6 +15,7 @@ import static listeners.CustomMobs.spawnLightning;
 public class Storm implements CustomWither {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Wither wither;
 		if(e instanceof Wither) {
 			wither = (Wither) e;

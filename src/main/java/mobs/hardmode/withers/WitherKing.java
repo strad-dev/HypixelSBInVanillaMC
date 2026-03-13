@@ -31,6 +31,7 @@ public class WitherKing implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Wither wither;
 		if(e instanceof Wither) {
 			wither = (Wither) e;
@@ -118,7 +119,6 @@ public class WitherKing implements CustomWither {
 	private void spawnHenchman(Wither wither, String which) {
 		WitherSkeleton witherSkeleton = (WitherSkeleton) wither.getWorld().spawnEntity(wither.getLocation(), EntityType.WITHER_SKELETON);
 		witherSkeleton.getEquipment().clear();
-		Player p = Utils.getNearestPlayer(wither);
 
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
@@ -135,7 +135,7 @@ public class WitherKing implements CustomWither {
 		witherSkeleton.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		witherSkeleton.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
 		witherSkeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		witherSkeleton.setTarget(p);
+		witherSkeleton.setTarget(Utils.getNearestPlayer(witherSkeleton));
 		witherSkeleton.teleport(wither);
 		witherSkeleton.setCustomNameVisible(true);
 		witherSkeleton.addScoreboardTag("SkyblockBoss");
@@ -143,7 +143,7 @@ public class WitherKing implements CustomWither {
 		witherSkeleton.addScoreboardTag("HardMode");
 		witherSkeleton.setPersistent(true);
 		witherSkeleton.setRemoveWhenFarAway(false);
-		CustomMob.getMob(which, false).onSpawn(Utils.getNearestPlayer(wither), witherSkeleton);
+		CustomMob.getMob(which, false).onSpawn(Utils.getNearestPlayer(witherSkeleton), witherSkeleton);
 		witherSkeleton.addScoreboardTag(which);
 		henchmen.add(witherSkeleton);
 	}
@@ -196,34 +196,34 @@ public class WitherKing implements CustomWither {
 
 	private void spawnGuards(Mob mob) {
 		if(!mob.isDead() && !(mob.getScoreboardTags().contains("Dead"))) {
-			Player p = Utils.getNearestPlayer(mob);
 			int health = 150 - countHenchmenLeft() * 10;
 			for(int i = 0; i < 4 - countHenchmenLeft() / 2; i++) {
-				WitherSkeleton e = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
-				e.getEquipment().clear();
+				WitherSkeleton witherSkeleton = (WitherSkeleton) mob.getWorld().spawnEntity(mob.getLocation(), EntityType.WITHER_SKELETON);
+				witherSkeleton.setCanPickupItems(false);
+				witherSkeleton.getEquipment().clear();
 				ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 				sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 5);
 				ItemStack shield = new ItemStack(Material.SHIELD);
 
-				Objects.requireNonNull(e.getEquipment()).setItemInMainHand(sword);
-				e.getEquipment().setItemInMainHandDropChance(0.0F);
-				e.getEquipment().setItemInOffHand(shield);
-				e.getEquipment().setItemInOffHandDropChance(0.0F);
+				Objects.requireNonNull(witherSkeleton.getEquipment()).setItemInMainHand(sword);
+				witherSkeleton.getEquipment().setItemInMainHandDropChance(0.0F);
+				witherSkeleton.getEquipment().setItemInOffHand(shield);
+				witherSkeleton.getEquipment().setItemInOffHandDropChance(0.0F);
 
-				e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(health);
-				e.setHealth(health);
-				Utils.changeName(e, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+				witherSkeleton.getAttribute(Attribute.MAX_HEALTH).setBaseValue(health);
+				witherSkeleton.setHealth(health);
+				Utils.changeName(witherSkeleton, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
 				//noinspection DuplicatedCode
-				e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
-				e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
-				e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-				e.setTarget(p);
-				e.setCustomNameVisible(true);
-				e.addScoreboardTag("SkyblockBoss");
-				e.addScoreboardTag("GuardSkeleton");
-				e.addScoreboardTag("HardMode");
-				e.setPersistent(true);
-				e.setRemoveWhenFarAway(false);
+				witherSkeleton.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+				witherSkeleton.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
+				witherSkeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
+				witherSkeleton.setTarget(Utils.getNearestPlayer(witherSkeleton));
+				witherSkeleton.setCustomNameVisible(true);
+				witherSkeleton.addScoreboardTag("SkyblockBoss");
+				witherSkeleton.addScoreboardTag("GuardSkeleton");
+				witherSkeleton.addScoreboardTag("HardMode");
+				witherSkeleton.setPersistent(true);
+				witherSkeleton.setRemoveWhenFarAway(false);
 			}
 			Utils.playGlobalSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
 

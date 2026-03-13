@@ -17,6 +17,7 @@ import java.util.List;
 public class WitherSkeletonIce implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		WitherSkeleton witherSkeleton;
 		if(e instanceof WitherSkeleton) {
 			witherSkeleton = (WitherSkeleton) e;

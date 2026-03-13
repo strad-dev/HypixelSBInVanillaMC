@@ -22,6 +22,7 @@ public class Young implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		EnderDragon dragon;
 		if(e instanceof EnderDragon) {
 			dragon = (EnderDragon) e;

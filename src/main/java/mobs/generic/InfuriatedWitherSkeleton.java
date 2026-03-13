@@ -19,6 +19,7 @@ import java.util.Objects;
 public class InfuriatedWitherSkeleton implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		// NOTE: The returned name is the base name (without health).  Callers must use Utils.changeName(entity, name) to set the full display name.
 		WitherSkeleton witherSkeleton;
 		if(e instanceof WitherSkeleton) {

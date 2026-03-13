@@ -28,6 +28,7 @@ public class Sadan implements CustomMob {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Zombie zombie;
 		if(e instanceof Zombie) {
 			zombie = (Zombie) e;
@@ -44,7 +45,7 @@ public class Sadan implements CustomMob {
 		zombie.getAttribute(Attribute.SCALE).setBaseValue(0.625);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, -1, 255));
-		zombie.setTarget(Utils.getNearestPlayer(zombie));
+		zombie.setTarget(p);
 		zombie.setCustomNameVisible(true);
 		zombie.addScoreboardTag("SkyblockBoss");
 		zombie.addScoreboardTag("DummySadan");
@@ -128,6 +129,7 @@ public class Sadan implements CustomMob {
 
 	private static Husk spawnTerracotta(Location l) {
 		Husk terracotta = (Husk) l.getWorld().spawnEntity(l, EntityType.HUSK);
+		terracotta.setCanPickupItems(false);
 		terracotta.setAdult();
 		terracotta.eject();
 
@@ -154,6 +156,7 @@ public class Sadan implements CustomMob {
 
 	private static IronGolem spawnGolem(Location l) {
 		IronGolem ironGolem = (IronGolem) l.getWorld().spawnEntity(l, EntityType.IRON_GOLEM);
+		ironGolem.setCanPickupItems(false);
 
 		EntityEquipment equipment = ironGolem.getEquipment();
 		equipment.setItemInMainHand(new ItemStack(Material.POPPY));
@@ -226,6 +229,7 @@ public class Sadan implements CustomMob {
 
 	private static Zombie spawnGiant(Zombie sadan) {
 		Zombie zombie = (Zombie) sadan.getWorld().spawnEntity(Utils.randomLocation(sadan.getLocation(), 12, false), EntityType.ZOMBIE);
+		zombie.setCanPickupItems(false);
 		zombie.setAdult();
 		zombie.eject();
 
@@ -262,7 +266,7 @@ public class Sadan implements CustomMob {
 
 	private static void jollyPinkGiant(Zombie giant, boolean finalPhase) {
 		if(!giant.isDead()) {
-			Player p = Utils.getNearestPlayer(giant);
+			Player p = Utils.getNearestPlayer(giant, 64);
 			Block b = p.getLocation().getBlock();
 			int x = b.getX() - (finalPhase ? 3 : 2);
 			int y = b.getY() + 21;
@@ -289,7 +293,7 @@ public class Sadan implements CustomMob {
 
 	private static void diamondGiant(Zombie giant, boolean finalPhase) {
 		if(!giant.isDead()) {
-			Player p = Utils.getNearestPlayer(giant);
+			Player p = Utils.getNearestPlayer(giant, 64);
 			p.playSound(p, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
 			giant.swingMainHand();
 			CustomDamage.customMobs(p, giant, finalPhase ? 120 : 90, DamageType.MELEE);
@@ -312,11 +316,11 @@ public class Sadan implements CustomMob {
 
 	private static void lasr(Zombie giant, boolean finalPhase) {
 		// Giants Phase: Every 10 ticks for 80 ticks (9 total procs), dealing 8 damage (72 total damage)
-		// Sadan Phase: Every 4 ticks for 40 ticks (11 total procs), dealing 10 damage (110 total damage)
+		// Sadan Phase: Every 5 ticks for 40 ticks (9 total procs), dealing 10 damage (90 total damage)
 		if(!giant.isDead()) {
-			for(int i = 0; i <= (finalPhase ? 40 : 80); i += (finalPhase ? 4 : 10)) {
+			for(int i = 0; i <= (finalPhase ? 40 : 80); i += (finalPhase ? 5 : 10)) {
 				Utils.scheduleTask(() -> {
-					Utils.shootBeam(giant, Utils.getNearestPlayer(giant), Color.RED, 64, 1, finalPhase ? 10 : 8);
+					Utils.shootBeam(giant, Utils.getNearestPlayer(giant, 64), Color.RED, 64, 1, finalPhase ? 10 : 8);
 
 					Utils.playGlobalSound(Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 				}, i);
