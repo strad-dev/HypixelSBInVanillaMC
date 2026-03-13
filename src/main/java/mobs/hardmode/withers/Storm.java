@@ -18,7 +18,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.List;
 
-import static listeners.CustomDamage.customMobs;
+import static listeners.CustomDamage.calculateFinalDamage;
 import static misc.Utils.teleport;
 
 public class Storm implements CustomWither {
@@ -254,11 +254,11 @@ public class Storm implements CustomWither {
 			return false;
 		}
 		if(damager.getScoreboardTags().contains("Survival1")) {
-			customMobs(damagee, damager, 12, DamageType.RANGED);
+			calculateFinalDamage(damagee, damager, 12, DamageType.RANGED);
 		} else if(damager.getScoreboardTags().contains("Survival2")) {
-			customMobs(damagee, damager, 18, DamageType.RANGED);
+			calculateFinalDamage(damagee, damager, 18, DamageType.RANGED);
 		}
-		damagee.getWorld().spawnEntity(damager.getLocation(), EntityType.LIGHTNING_BOLT);
+		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
 		return true;
 	}
 
