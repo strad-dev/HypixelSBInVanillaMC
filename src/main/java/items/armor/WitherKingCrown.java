@@ -22,21 +22,18 @@ public class WitherKingCrown implements Armor {
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Crown of the Wither King");
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownDamage"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
-		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownArmor"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
-		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownToughness"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownArmor"), 4.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);
-		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
 		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();
 		lore.add("skyblock/combat/wither_king_crown");
 		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+3");
+		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+2");
+		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+4.5");
 		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+10%");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "The Wither King left behind this");

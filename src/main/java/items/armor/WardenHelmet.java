@@ -22,23 +22,20 @@ public class WardenHelmet implements Armor {
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Warden Helmet");
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
-		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetArmor"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
-		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetToughness"), 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetArmor"), 5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier speed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetSpeed"), -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.HEAD);
 		data.addAttributeModifier(Attribute.MOVEMENT_SPEED, speed);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);
-		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
 		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
 		List<String> lore = new ArrayList<>();
 		lore.add("skyblock/combat/warden_helmet");
 		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+2");
-		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+3");
-		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+4");
+		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
+		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+5");
 		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+20%");
 		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x0.5");
 		lore.add("");

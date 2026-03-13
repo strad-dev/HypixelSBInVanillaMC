@@ -22,12 +22,10 @@ public class PrimalDragonChestplate {
 		data.setUnbreakable(true);
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Primal Dragon Chestplate");
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "primalChestplateDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
-		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "primalChestplateArmor"), 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
-		AttributeModifier toughness = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "primalChestplateToughness"), 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "primalChestplateArmor"), 10.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "primalChestplateAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);
-		data.addAttributeModifier(Attribute.ARMOR_TOUGHNESS, toughness);
 		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
@@ -35,8 +33,7 @@ public class PrimalDragonChestplate {
 		lore.add("skyblock/combat/primal_chestplate");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+2");
-		lore.add(ChatColor.GRAY + "Defense: " + ChatColor.RED + "+8");
-		lore.add(ChatColor.GRAY + "Toughness: " + ChatColor.RED + "+4");
+		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+10.5");
 		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+20%");
 		lore.add("");
 		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "A powerful chestplate forged from");
