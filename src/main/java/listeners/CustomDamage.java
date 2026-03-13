@@ -176,8 +176,6 @@ public class CustomDamage implements Listener {
 				finalDamage *= 0.4;
 			}
 
-			System.out.println("Original Damage: " + finalDamage);
-
 			double breach = 0;
 			if(damager instanceof LivingEntity entity && entity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.BREACH)) {
 				breach = entity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.BREACH);
@@ -196,8 +194,6 @@ public class CustomDamage implements Listener {
 				finalDamage *= (1.0 - reduction);
 			}
 
-			System.out.println("After armor: " + finalDamage);
-
 			// The Resistance status effect reduces damage by 20% per level.
 			// At level 5 and higher, the damagee is immune to damage.
 			double resistance = 0;
@@ -205,8 +201,6 @@ public class CustomDamage implements Listener {
 				resistance = damagee.getPotionEffect(PotionEffectType.RESISTANCE).getAmplifier() + 1;
 			}
 			finalDamage *= Math.max(0.0, 1 - resistance * 0.2);
-
-			System.out.println("After resistance: " + finalDamage);
 
 			// The Protection enchantment reduces damage taken by 2.5% per level.
 			// A full set of Protection IV armor reduces damage by 40%
@@ -248,8 +242,6 @@ public class CustomDamage implements Listener {
 				}
 
 				finalDamage *= Math.max(0.5, 1 - prots * 0.025);
-
-				System.out.println("After enchants: " + finalDamage);
 
 				if(type == DamageType.FALL) {
 					double featherFalling = boots.getEnchantmentLevel(Enchantment.FEATHER_FALLING);
