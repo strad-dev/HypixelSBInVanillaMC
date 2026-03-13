@@ -101,5 +101,5 @@ src/main/resources/
 - **DiscordSRV** 1.30.4 (optional soft dependency)
 
 ## Other Instructions
-- NEVER build/compile
+- NEVER run mvn on this project, including subcommands like clean, build, or test.
 - python3 does not exist, use python instead.

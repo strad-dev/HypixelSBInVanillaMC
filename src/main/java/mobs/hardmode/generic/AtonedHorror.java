@@ -83,7 +83,9 @@ public class AtonedHorror implements CustomMob {
 	private static void summonTNT(Zombie zombie) {
 		if(!zombie.isDead()) {
 			Player p = Utils.getNearestPlayer(zombie, 64);
-			Utils.spawnTNT(zombie, p.getLocation(), 20, 5, 25, new ArrayList<>());
+			if(p != null) {
+				Utils.spawnTNT(zombie, p.getLocation(), 20, 5, 25, new ArrayList<>());
+			}
 			Utils.scheduleTask(() -> summonTNT(zombie), 60);
 		}
 	}

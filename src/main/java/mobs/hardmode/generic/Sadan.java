@@ -267,36 +267,40 @@ public class Sadan implements CustomMob {
 	private static void jollyPinkGiant(Zombie giant, boolean finalPhase) {
 		if(!giant.isDead()) {
 			Player p = Utils.getNearestPlayer(giant, 64);
-			Block b = p.getLocation().getBlock();
-			int x = b.getX() - (finalPhase ? 3 : 2);
-			int y = b.getY() + 21;
-			int z = b.getZ() - (finalPhase ? 3 : 2);
+			if(p != null) {
+				Block b = p.getLocation().getBlock();
+				int x = b.getX() - (finalPhase ? 3 : 2);
+				int y = b.getY() + 21;
+				int z = b.getZ() - (finalPhase ? 3 : 2);
 
-			for(int i = x; i < x + (finalPhase ? 7 : 5); i++) {
-				for(int j = z; j < z + (finalPhase ? 7 : 5); j++) {
-					Block temp = p.getWorld().getBlockAt(i, y, j);
-					if(temp.getType().equals(Material.AIR)) {
-						temp.setType(Material.DAMAGED_ANVIL);
-					}
-					if(finalPhase) {
-						temp = temp.getRelative(0, 21, 0);
+				for(int i = x; i < x + (finalPhase ? 7 : 5); i++) {
+					for(int j = z; j < z + (finalPhase ? 7 : 5); j++) {
+						Block temp = p.getWorld().getBlockAt(i, y, j);
 						if(temp.getType().equals(Material.AIR)) {
 							temp.setType(Material.DAMAGED_ANVIL);
 						}
+						if(finalPhase) {
+							temp = temp.getRelative(0, 21, 0);
+							if(temp.getType().equals(Material.AIR)) {
+								temp.setType(Material.DAMAGED_ANVIL);
+							}
+						}
 					}
 				}
+				p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F);
 			}
 			Utils.scheduleTask(() -> jollyPinkGiant(giant, finalPhase), finalPhase ? 200 : 320);
-			p.playSound(p, Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F);
 		}
 	}
 
 	private static void diamondGiant(Zombie giant, boolean finalPhase) {
 		if(!giant.isDead()) {
 			Player p = Utils.getNearestPlayer(giant, 64);
-			p.playSound(p, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
-			giant.swingMainHand();
-			CustomDamage.customMobs(p, giant, finalPhase ? 120 : 90, DamageType.MELEE);
+			if(p != null) {
+				p.playSound(p, Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
+				giant.swingMainHand();
+				CustomDamage.customMobs(p, giant, finalPhase ? 120 : 90, DamageType.MELEE);
+			}
 			Utils.scheduleTask(() -> diamondGiant(giant, finalPhase), finalPhase ? 200 : 320);
 		}
 	}
