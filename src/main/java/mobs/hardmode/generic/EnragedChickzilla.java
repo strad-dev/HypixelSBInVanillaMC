@@ -16,12 +16,13 @@ import org.bukkit.potion.PotionEffectType;
 public class EnragedChickzilla implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Enraged Chickzilla" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1000.0);
 		e.setHealth(1000.0);
 		e.getAttribute(Attribute.SCALE).setBaseValue(4.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(Utils.getNearestPlayer(e));
+		e.setTarget(p);
 		e.setCustomNameVisible(true);
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("EnragedChickzilla");

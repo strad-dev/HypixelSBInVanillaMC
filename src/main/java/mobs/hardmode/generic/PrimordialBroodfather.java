@@ -23,6 +23,7 @@ import static misc.Utils.teleport;
 public class PrimordialBroodfather implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Spider spider;
 		if(e instanceof Spider) {
 			spider = (Spider) e;
@@ -37,7 +38,7 @@ public class PrimordialBroodfather implements CustomMob {
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.67);
 		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(15.0);
 		spider.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		spider.setTarget(Utils.getNearestPlayer(spider));
+		spider.setTarget(p);
 		spider.setCustomNameVisible(true);
 		spider.addScoreboardTag("SkyblockBoss");
 		spider.addScoreboardTag("PrimordialBroodfather");
@@ -74,7 +75,7 @@ public class PrimordialBroodfather implements CustomMob {
 			damagee.remove();
 			Spider spider = (Spider) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.SPIDER);
 			spider.eject();
-			CustomMob.getMob("ConjoinedBrood", false).onSpawn(Utils.getNearestPlayer(damagee), spider);
+			CustomMob.getMob("ConjoinedBrood", false).onSpawn((damager instanceof Player p ? p : Utils.getNearestPlayer(spider)), spider);
 		} else if(health - finalDamage < 100 && damagee.getScoreboardTags().contains("50Trigger")) {
 			damagee.setHealth(100.0);
 			Utils.changeName(damagee);

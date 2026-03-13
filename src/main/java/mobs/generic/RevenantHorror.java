@@ -23,6 +23,7 @@ import java.util.List;
 public class RevenantHorror implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Zombie zombie;
 		if(e instanceof Zombie) {
 			zombie = (Zombie) e;

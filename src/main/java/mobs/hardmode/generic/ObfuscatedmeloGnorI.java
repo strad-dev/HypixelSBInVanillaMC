@@ -19,6 +19,7 @@ import java.util.Random;
 public class ObfuscatedmeloGnorI implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		IronGolem ironGolem;
 		if(e instanceof IronGolem) {
 			ironGolem = (IronGolem) e;
@@ -29,7 +30,7 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "meloG-norI" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(250.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(Utils.getNearestPlayer(e));
+		e.setTarget(p);
 		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(50.0);
 		e.setHealth(250.0);
 		e.setCustomNameVisible(true);

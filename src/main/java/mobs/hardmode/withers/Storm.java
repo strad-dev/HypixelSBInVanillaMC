@@ -26,6 +26,7 @@ public class Storm implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Wither wither;
 		if(e instanceof Wither) {
 			wither = (Wither) e;
@@ -177,7 +178,6 @@ public class Storm implements CustomWither {
 			damagee.addScoreboardTag("Invulnerable");
 			teleport(damagee, 0, false);
 
-			Player p = Utils.getNearestPlayer(damagee);
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
 			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You think you're funny?  Try surviving this!");
@@ -185,7 +185,7 @@ public class Storm implements CustomWither {
 			spawnMoreGuards((Wither) damagee);
 			spawnMoreLightning((Wither) damagee);
 			for(int i = 0; i < 600; i += 10) {
-				spamSkulls((Wither) damagee, p, i);
+				spamSkulls((Wither) damagee, Utils.getNearestPlayer(damagee), i);
 			}
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
@@ -241,7 +241,7 @@ public class Storm implements CustomWither {
 			}, 300);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				CustomMob.getMob("Goldor", true).onSpawn(Utils.getNearestPlayer(damagee), wither);
+				CustomMob.getMob("Goldor", true).onSpawn((damager instanceof Player p ? p : Utils.getNearestPlayer(damagee)), wither);
 			}, 340);
 			return false;
 		}
@@ -254,11 +254,11 @@ public class Storm implements CustomWither {
 			return false;
 		}
 		if(damager.getScoreboardTags().contains("Survival1")) {
-			customMobs(Utils.getNearestPlayer(damagee), damagee, 12, DamageType.RANGED);
+			customMobs(damagee, damager, 12, DamageType.RANGED);
 		} else if(damager.getScoreboardTags().contains("Survival2")) {
-			customMobs(Utils.getNearestPlayer(damagee), damagee, 18, DamageType.RANGED);
+			customMobs(damagee, damager, 18, DamageType.RANGED);
 		}
-		damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.LIGHTNING_BOLT);
+		damagee.getWorld().spawnEntity(damager.getLocation(), EntityType.LIGHTNING_BOLT);
 		return true;
 	}
 

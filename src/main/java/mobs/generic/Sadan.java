@@ -26,6 +26,7 @@ import static misc.Utils.shootBeam;
 public class Sadan implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Zombie zombie;
 		if(e instanceof Zombie) {
 			zombie = (Zombie) e;
@@ -58,7 +59,7 @@ public class Sadan implements CustomMob {
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		zombie.getAttribute(Attribute.SCALE).setBaseValue(6.0);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		zombie.setTarget(Utils.getNearestPlayer(zombie));
+		zombie.setTarget(p);
 		zombie.setCustomNameVisible(true);
 		zombie.addScoreboardTag("SkyblockBoss");
 		zombie.addScoreboardTag("Sadan");

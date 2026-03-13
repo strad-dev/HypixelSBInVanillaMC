@@ -42,6 +42,7 @@ public class PrimalDragon implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		EnderDragon dragon;
 		if(e instanceof EnderDragon) {
 			dragon = (EnderDragon) e;
@@ -308,7 +309,7 @@ public class PrimalDragon implements CustomDragon {
 	}
 
 	private static void shootFireballAtNearestPlayer(EnderDragon dragon) {
-		Player p = Utils.getNearestPlayer(dragon);
+		Player p = Utils.getNearestPlayer(dragon, 128);
 		if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
 			Vector direction = p.getLocation().add(0, 1, 0).subtract(dragon.getLocation()).toVector().normalize();
 			DragonFireball fireball = (DragonFireball) dragon.getWorld().spawnEntity(dragon.getLocation().add(direction.clone().multiply(5)), EntityType.DRAGON_FIREBALL);
@@ -390,7 +391,7 @@ public class PrimalDragon implements CustomDragon {
 	private static void extremeTNTRainPlayer(EnderDragon dragon) {
 		Utils.scheduleTask(() -> {
 			if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
-				Player p = Utils.getNearestPlayer(dragon);
+				Player p = Utils.getNearestPlayer(dragon, 128);
 				if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
 					if(notPerching(dragon)) {
 						Utils.spawnTNT(dragon, p.getLocation(), 20, 6, 40, new ArrayList<>());
@@ -424,7 +425,7 @@ public class PrimalDragon implements CustomDragon {
 	}
 
 	private static void spawnZealots(EnderDragon dragon, boolean spawnBruiser) {
-		Player p = Utils.getNearestPlayer(dragon);
+		Player p = Utils.getNearestPlayer(dragon, 128);
 		Location spawnLoc;
 		if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
 			spawnLoc = Utils.randomLocation(p.getLocation(), 16, false);
@@ -434,12 +435,13 @@ public class PrimalDragon implements CustomDragon {
 		}
 		for(int i = 0; i < 2; i++) {
 			Enderman enderman = (Enderman) dragon.getWorld().spawnEntity(spawnLoc, EntityType.ENDERMAN);
+			enderman.setCanPickupItems(false);
 			enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(66.0);
 			enderman.setHealth(66.0);
 			enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(15.0);
 			enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
 			enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-			enderman.setTarget(Utils.getNearestPlayer(enderman));
+			enderman.setTarget(p);
 			enderman.setCustomNameVisible(true);
 			enderman.addScoreboardTag("SkyblockBoss");
 			enderman.setPersistent(true);
@@ -448,12 +450,13 @@ public class PrimalDragon implements CustomDragon {
 		}
 		if(spawnBruiser) {
 			Enderman enderman = (Enderman) dragon.getWorld().spawnEntity(spawnLoc, EntityType.ENDERMAN);
+			enderman.setCanPickupItems(false);
 			enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(133.0);
 			enderman.setHealth(133.0);
 			enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
 			enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 			enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-			enderman.setTarget(Utils.getNearestPlayer(enderman));
+			enderman.setTarget(p);
 			enderman.setCustomNameVisible(true);
 			enderman.addScoreboardTag("SkyblockBoss");
 			enderman.setPersistent(true);

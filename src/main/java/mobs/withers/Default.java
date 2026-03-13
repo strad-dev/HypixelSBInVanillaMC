@@ -12,6 +12,7 @@ public class Default implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		return "";
 	}
 

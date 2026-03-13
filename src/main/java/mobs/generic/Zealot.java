@@ -18,6 +18,7 @@ import java.util.Random;
 public class Zealot implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Enderman enderman;
 		if(e instanceof Enderman) {
 			enderman = (Enderman) e;
@@ -31,7 +32,7 @@ public class Zealot implements CustomMob {
 		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(18.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		enderman.setTarget(Utils.getNearestPlayer(enderman));
+		enderman.setTarget(p);
 		enderman.setCustomNameVisible(true);
 		enderman.addScoreboardTag("SkyblockBoss");
 		enderman.addScoreboardTag("Zealot");

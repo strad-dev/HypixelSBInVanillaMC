@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffectType;
 public class ConjoinedBrood implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Spider spider;
 		if(e instanceof Spider) {
 			spider = (Spider) e;
@@ -27,7 +28,7 @@ public class ConjoinedBrood implements CustomMob {
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.67);
 		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(30.0);
 		spider.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		spider.setTarget(Utils.getNearestPlayer(spider));
+		spider.setTarget(p);
 		spider.setCustomNameVisible(true);
 		spider.addScoreboardTag("SkyblockBoss");
 		spider.addScoreboardTag("ConjoinedBrood");

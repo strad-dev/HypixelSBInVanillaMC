@@ -73,6 +73,17 @@ public class Utils {
 	 * @return the closest non-spectator player
 	 */
 	public static @Nullable Player getNearestPlayer(Entity e) {
+		return getNearestPlayer(e, 2147483647);
+	}
+
+	/**
+	 * Gets the closest non-Spectator Player to the provided Entity within a set amount of blocks.<br>If all players on the server are in Spectator, a semi-random Player will be returned.
+	 *
+	 * @param e      the entity
+	 * @param blocks the furthest distance a player can be
+	 * @return the closest non-spectator player
+	 */
+	public static @Nullable Player getNearestPlayer(Entity e, int blocks) {
 		World world = e.getWorld();
 		Location location = e.getLocation();
 		ArrayList<Player> playersInWorld = new ArrayList<>(world.getEntitiesByClass(Player.class));
@@ -139,7 +150,7 @@ public class Utils {
 			l = entity.getEyeLocation();
 		}
 		Vector v;
-		if(origin.equals(destination)) {
+		if(origin.equals(destination) || destination == null) {
 			v = l.getDirection();
 		} else {
 			Location destinationLocation = destination.getLocation().add(0, destination.getHeight() / 2, 0);

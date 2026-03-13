@@ -22,6 +22,7 @@ public class Maxor implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Wither wither;
 		if(e instanceof Wither) {
 			wither = (Wither) e;
@@ -173,7 +174,7 @@ public class Maxor implements CustomWither {
 			}, 300);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				CustomMob.getMob("Storm", true).onSpawn(Utils.getNearestPlayer(damagee), wither);
+				CustomMob.getMob("Storm", true).onSpawn((damager instanceof Player p ? p : Utils.getNearestPlayer(damagee)), wither);
 			}, 340);
 			return false;
 		}

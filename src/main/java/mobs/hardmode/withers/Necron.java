@@ -27,6 +27,7 @@ public class Necron implements CustomWither {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		Wither wither;
 		if(e instanceof Wither) {
 			wither = (Wither) e;
@@ -37,7 +38,6 @@ public class Necron implements CustomWither {
 		List<EntityType> immune = new ArrayList<>();
 		immune.add(EntityType.WITHER_SKELETON);
 		Utils.spawnTNT(wither, wither.getLocation(), 0, 32, 75, immune);
-		p = Utils.getNearestPlayer(wither);
 		p.getWorld().playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 
 		wither.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1400.0);
@@ -152,7 +152,7 @@ public class Necron implements CustomWither {
 			}, 480);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);
-				CustomMob.getMob("WitherKing", true).onSpawn(Utils.getNearestPlayer(damagee), wither);
+				CustomMob.getMob("WitherKing", true).onSpawn((damager instanceof Player p ? p : Utils.getNearestPlayer(damagee)), wither);
 			}, 540);
 			return false;
 		}

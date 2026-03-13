@@ -19,9 +19,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -43,10 +43,7 @@ public class CustomDrops implements Listener {
 				// do nothing
 			}
 		} else {
-			p = Utils.getNearestPlayer(died);
-			if(p != null && p.getLocation().distanceSquared(died.getLocation()) > 256) {
-				p = null;
-			}
+			p = Utils.getNearestPlayer(died, 16);
 		}
 		double rngLootingBonus = 1.0;
 		switch(lootingLevel) {
@@ -292,24 +289,22 @@ public class CustomDrops implements Listener {
 				}
 			}
 			case EnderDragon dragon -> {
-				if(!dragon.getScoreboardTags().contains("WitherKingDragon")) {
-					if(dragon.getScoreboardTags().contains("HardMode")) {
-						item = new ItemStack(Material.DRAGON_EGG);
+				if(dragon.getScoreboardTags().contains("HardMode")) {
+					item = new ItemStack(Material.DRAGON_EGG);
+					world.dropItemNaturally(l, item);
+					sendRareDropMessage(p, "Dragon Egg");
+					item = SuperiorRemnant.getItem();
+					world.dropItemNaturally(l, item);
+					sendRareDropMessage(p, "Remnant of the Superior Dragon");
+					if(random.nextDouble() < 0.25 * rngLootingBonus) {
+						item = AncientDragonEgg.getItem();
 						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Dragon Egg");
-						item = SuperiorRemnant.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Remnant of the Superior Dragon");
-						if(random.nextDouble() < 0.25 * rngLootingBonus) {
-							item = AncientDragonEgg.getItem();
-							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Ancient Dragon Egg");
-						}
-					} else if(dragon.getScoreboardTags().contains("SuperiorDragon") || random.nextDouble() < 0.02 * rngLootingBonus) {
-						item = SuperiorRemnant.getItem();
-						world.dropItemNaturally(l, item);
-						sendRareDropMessage(p, "Remnant of the Superior Dragon");
+						sendRareDropMessage(p, "Ancient Dragon Egg");
 					}
+				} else if(dragon.getScoreboardTags().contains("SuperiorDragon") || random.nextDouble() < 0.02 * rngLootingBonus) {
+					item = SuperiorRemnant.getItem();
+					world.dropItemNaturally(l, item);
+					sendRareDropMessage(p, "Remnant of the Superior Dragon");
 				}
 			}
 			case Enderman enderman -> {
@@ -842,50 +837,6 @@ public class CustomDrops implements Listener {
 						world.dropItemNaturally(l, item);
 						sendRareDropMessage(p, "Necron's Handle");
 					}
-				} else if(wither.getScoreboardTags().contains("WitherKing")) {
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[type=lightning_bolt]");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[tag=WitherKingDragon]");
-					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "kill @e[tag=GuardSkeleton]");
-					wither.getWorld().setThundering(false);
-					for(int i = 0; i < 1 * multiplier; i++) {
-						if(random.nextDouble() < 0.04 * rngLootingBonus) {
-							item = MaxorSecrets.getItem();
-							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Maxor's Secrets");
-						} else if(random.nextDouble() < 0.12 * rngLootingBonus) {
-							item = ShadowWarp.getItem();
-							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Shadow Warp");
-						} else if(random.nextDouble() < 0.16 * rngLootingBonus) {
-							item = StormSecrets.getItem();
-							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Storm's Secrets");
-						} else if(random.nextDouble() < 0.24 * rngLootingBonus) {
-							item = Implosion.getItem();
-							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Implosion");
-						} else if(random.nextDouble() < 0.28 * rngLootingBonus) {
-							item = GoldorSecrets.getItem();
-							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Goldor's Secrets");
-						} else if(random.nextDouble() < 0.36 * rngLootingBonus) {
-							item = WitherShield.getItem();
-							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Wither Shield");
-						} else if(random.nextDouble() < 0.4 * rngLootingBonus) {
-							item = NecronSecrets.getItem();
-							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Necron's Secrets");
-						} else if(random.nextDouble() < 0.48 * rngLootingBonus) {
-							item = Handle.getItem();
-							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Necron's Handle");
-						} else if(random.nextDouble() < 0.5 * rngLootingBonus) {
-							item = WitherKingCrown.getItem();
-							world.dropItemNaturally(l, item);
-							sendRareDropMessage(p, "Crown of the Wither King");
-						}
-					}
 				}
 			}
 			case WitherSkeleton skeleton -> {
@@ -1086,10 +1037,7 @@ public class CustomDrops implements Listener {
 		if(e.getEntity().getKiller() != null) {
 			p = e.getEntity().getKiller();
 		} else {
-			p = Utils.getNearestPlayer(died);
-			if(p != null && p.getLocation().distanceSquared(died.getLocation()) > 256) {
-				p = null;
-			}
+			p = Utils.getNearestPlayer(died, 16);
 		}
 
 		if(died.getScoreboardTags().contains("HardMode")) {

@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 public class WitherKingSkeleton implements CustomMob {
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		return "";
 	}
 

@@ -80,7 +80,6 @@ public class Plugin extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new PlayerLoginHandler(), this);
 		getServer().getPluginManager().registerEvents(new AllMobsHaveNames(), this);
 		getServer().getPluginManager().registerEvents(new CustomChestLoot(), this);
-		getServer().getPluginManager().registerEvents(new WitherKingDragonCustomAI(), this);
 		getServer().getPluginManager().registerEvents(new CustomMining(), this);
 		getServer().getPluginManager().registerEvents(new CreativeMenu(), this);
 		getServer().getPluginManager().registerEvents(new ItemReloader(), this);

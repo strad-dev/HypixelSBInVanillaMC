@@ -16,6 +16,7 @@ public class Strong implements CustomDragon {
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
+		e.setCanPickupItems(false);
 		EnderDragon dragon;
 		if(e instanceof EnderDragon) {
 			dragon = (EnderDragon) e;
@@ -37,7 +38,7 @@ public class Strong implements CustomDragon {
 
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		CustomDamage.calculateFinalDamage(damagee, Utils.getNearestPlayer(damagee), 4, DamageType.RANGED);
+		CustomDamage.calculateFinalDamage(damagee, damager, 4, DamageType.RANGED);
 		return true;
 	}
 }
