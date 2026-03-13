@@ -1052,8 +1052,8 @@ public class CustomDamage implements Listener {
 			}
 			return sources.generic();
 		} else if(damageType == org.bukkit.damage.DamageType.MACE_SMASH) {
-			if(nmsCausingEntity instanceof ServerPlayer player) {
-				return sources.mace(player);
+			if(nmsCausingEntity != null) {
+				return sources.mace(nmsCausingEntity);
 			}
 			return sources.generic();
 		}
@@ -1112,8 +1112,9 @@ public class CustomDamage implements Listener {
 		} else if(damageType == org.bukkit.damage.DamageType.ENDER_PEARL) {
 			return sources.enderPearl();
 		} else if(damageType == org.bukkit.damage.DamageType.SPIT) {
-			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.LlamaSpit spit) {
-				return sources.spit(spit, (net.minecraft.world.entity.LivingEntity) nmsCausingEntity);
+			if(nmsDirectEntity instanceof net.minecraft.world.entity.projectile.LlamaSpit spit
+					&& nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
+				return sources.spit(spit, living);
 			}
 			return sources.generic();
 		} else if(damageType == org.bukkit.damage.DamageType.SPEAR) {
