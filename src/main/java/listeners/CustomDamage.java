@@ -324,8 +324,11 @@ public class CustomDamage implements Listener {
 					data.originalDamage += densityLevel * 0.5 * p.getFallDistance();
 				}
 
-				// Reset fall distance on Mace smash attack
+				// Reset fall distance on Mace smash attack and spawn smash particles
 				if(weapon.getType() == Material.MACE && p.getFallDistance() >= 1.5) {
+					Location smashLoc = damagee.getLocation();
+					damagee.getWorld().spawnParticle(Particle.EXPLOSION, smashLoc, 1);
+					damagee.getWorld().spawnParticle(Particle.DUST_PLUME, smashLoc, 20, 0.5, 0.2, 0.5, 0.1);
 					p.setFallDistance(0);
 				}
 
@@ -1114,12 +1117,11 @@ public class CustomDamage implements Listener {
 			}
 			return sources.generic();
 		} else if(damageType == org.bukkit.damage.DamageType.SPEAR) {
-			if(nmsCausingEntity instanceof ServerPlayer player) {
-				return sources.playerAttack(player);
-			} else if(nmsCausingEntity instanceof net.minecraft.world.entity.LivingEntity living) {
-				return sources.mobAttack(living);
-			}
-			return sources.generic();
+			net.minecraft.core.Holder<net.minecraft.world.damagesource.DamageType> spearHolder =
+					((CraftLivingEntity) victim).getHandle().level().registryAccess()
+							.lookupOrThrow(net.minecraft.core.registries.Registries.DAMAGE_TYPE)
+							.getOrThrow(net.minecraft.world.damagesource.DamageTypes.SPEAR);
+			return new DamageSource(spearHolder, nmsDirectEntity, nmsCausingEntity);
 		}
 		// Fallback for any unmapped damage types
 		else {

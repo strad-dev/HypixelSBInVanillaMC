@@ -370,13 +370,20 @@ public class CustomDrops implements Listener {
 			}
 			// TODO fox drop whatever they're holding
 			// no drops
-			case Ghast ignored -> {
+			case Ghast ghast -> {
 				item = new ItemStack(Material.GHAST_TEAR);
 				item.setAmount(random.nextInt(2 + lootingLevel));
 				world.dropItemNaturally(l, item);
 				item = new ItemStack(Material.GUNPOWDER);
 				item.setAmount(random.nextInt(3 + lootingLevel));
 				world.dropItemNaturally(l, item);
+				// Tears disc drops when ghast is killed by its own reflected fireball (Return to Sender)
+				if(ghast.getLastDamageCause() instanceof org.bukkit.event.entity.EntityDamageByEntityEvent lastDamage
+						&& lastDamage.getDamager() instanceof org.bukkit.entity.Fireball) {
+					item = new ItemStack(Material.MUSIC_DISC_CREATOR_MUSIC_BOX);
+					world.dropItemNaturally(l, item);
+					sendRareDropMessage(p, "Tears");
+				}
 			}
 			case HappyGhast ghast -> {
 				item = ghast.getEquipment().getItem(EquipmentSlot.BODY);
@@ -907,6 +914,12 @@ public class CustomDrops implements Listener {
 					item = new ItemStack(Material.ZOMBIE_HEAD);
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Zombie Head");
+				}
+				// Lava Chicken disc drops from chicken jockeys (baby zombie riding a chicken)
+				if(!zombie.isAdult() && zombie.getVehicle() instanceof Chicken) {
+					item = new ItemStack(Material.MUSIC_DISC_PRECIPICE);
+					world.dropItemNaturally(l, item);
+					sendRareDropMessage(p, "Lava Chicken");
 				}
 				if(!zombie.getScoreboardTags().contains("MutantGiant")) {
 					if(zombie.getScoreboardTags().contains("RevenantHorror")) {

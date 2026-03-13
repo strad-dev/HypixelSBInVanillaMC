@@ -86,8 +86,8 @@ public class BetterAnvil implements Listener {
 					int vanillaCost = anvilMenu.cost.get();
 					if(vanillaCost <= 0) {
 						anvilMenu.cost.set(fallbackCost);
-					} else if(vanillaCost > 50) {
-						anvilMenu.cost.set(50);
+					} else if(vanillaCost > 64) {
+						anvilMenu.cost.set(64);
 					}
 				}
 				player.updateInventory();
@@ -120,7 +120,7 @@ public class BetterAnvil implements Listener {
 			}
 		}
 
-		return Math.max(1, Math.min(cost, 50));
+		return Math.max(1, Math.min(cost, 64));
 	}
 
 	private Map<Enchantment, Integer> getEnchants(ItemStack item) {
