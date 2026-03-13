@@ -1,6 +1,5 @@
 package listeners;
 
-import items.armor.WitherKingCrown;
 import items.ingredients.misc.*;
 import items.ingredients.witherLords.*;
 import items.misc.IceSpray;
