@@ -380,7 +380,7 @@ public class CustomDrops implements Listener {
 				// Tears disc drops when ghast is killed by its own reflected fireball (Return to Sender)
 				if(ghast.getLastDamageCause() instanceof org.bukkit.event.entity.EntityDamageByEntityEvent lastDamage
 						&& lastDamage.getDamager() instanceof org.bukkit.entity.Fireball) {
-					item = new ItemStack(Material.MUSIC_DISC_CREATOR_MUSIC_BOX);
+					item = new ItemStack(Material.MUSIC_DISC_TEARS);
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Tears");
 				}
@@ -917,7 +917,7 @@ public class CustomDrops implements Listener {
 				}
 				// Lava Chicken disc drops from chicken jockeys (baby zombie riding a chicken)
 				if(!zombie.isAdult() && zombie.getVehicle() instanceof Chicken) {
-					item = new ItemStack(Material.MUSIC_DISC_PRECIPICE);
+					item = new ItemStack(Material.MUSIC_DISC_LAVA_CHICKEN);
 					world.dropItemNaturally(l, item);
 					sendRareDropMessage(p, "Lava Chicken");
 				}
