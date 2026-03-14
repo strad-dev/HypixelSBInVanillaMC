@@ -2,3 +2,5 @@
 /shelf/
 .idea/
 target/
+wiki/site/
+wiki/venv/
