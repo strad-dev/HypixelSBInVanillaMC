@@ -97,6 +97,7 @@ public class ItemReloader implements Listener {
 		Material mat = item.getType();
 		String slotKey;
 		double armorValue;
+		double kbResistance = -1;
 		EquipmentSlotGroup slotGroup;
 
 		switch(mat) {
@@ -123,21 +124,25 @@ public class ItemReloader implements Listener {
 			case NETHERITE_HELMET -> {
 				slotKey = "armor.helmet";
 				armorValue = 4;
+				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.HEAD;
 			}
 			case NETHERITE_CHESTPLATE -> {
 				slotKey = "armor.chestplate";
 				armorValue = 10;
+				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.CHEST;
 			}
 			case NETHERITE_LEGGINGS -> {
 				slotKey = "armor.leggings";
 				armorValue = 7;
+				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.LEGS;
 			}
 			case NETHERITE_BOOTS -> {
 				slotKey = "armor.boots";
 				armorValue = 4;
+				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.FEET;
 			}
 			case ELYTRA -> {
@@ -164,9 +169,20 @@ public class ItemReloader implements Listener {
 				meta.removeAttributeModifier(Attribute.ARMOR_TOUGHNESS, mod);
 			}
 		}
+		// Remove existing knockback resistance modifiers
+		if(meta.getAttributeModifiers(Attribute.KNOCKBACK_RESISTANCE) != null) {
+			for(AttributeModifier mod : List.copyOf(meta.getAttributeModifiers(Attribute.KNOCKBACK_RESISTANCE))) {
+				meta.removeAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, mod);
+			}
+		}
 
 		// Add correct armor value
 		meta.addAttributeModifier(Attribute.ARMOR, new AttributeModifier(NamespacedKey.minecraft(slotKey), armorValue, AttributeModifier.Operation.ADD_NUMBER, slotGroup));
+
+		// Add knockback resistance for netherite
+		if(kbResistance > 0) {
+			meta.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, new AttributeModifier(NamespacedKey.minecraft(slotKey), kbResistance, AttributeModifier.Operation.ADD_NUMBER, slotGroup));
+		}
 
 		item.setItemMeta(meta);
 	}
