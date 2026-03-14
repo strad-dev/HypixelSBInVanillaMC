@@ -245,7 +245,7 @@ public class CustomDamage implements Listener {
 
 				if(type == DamageType.FALL) {
 					double featherFalling = boots.getEnchantmentLevel(Enchantment.FEATHER_FALLING);
-					finalDamage *= Math.max(0.8, (1 - featherFalling * 0.16) * damagee.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).getValue());
+					finalDamage *= Math.max(0.2, (1 - featherFalling * 0.16) * damagee.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).getValue());
 					if(finalDamage < 1) {
 						finalDamage = 0;
 					}
