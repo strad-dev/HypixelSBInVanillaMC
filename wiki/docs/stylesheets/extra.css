@@ -1,0 +1,310 @@
+/* ============================================
+   Minecraft Font (OFL-licensed recreation)
+   ============================================ */
+@font-face {
+	font-family: 'Minecraft';
+	src: url('../assets/fonts/Minecraft.otf') format('opentype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: 'Minecraft';
+	src: url('../assets/fonts/Minecraft-Bold.otf') format('opentype');
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+}
+
+/* Apply Minecraft font globally */
+* {
+	font-family: 'Minecraft', monospace !important;
+}
+
+/* ============================================
+   Minecraft Rarity Colors
+   ============================================ */
+.rarity-common { color: #FFFFFF; font-weight: bold; }
+.rarity-uncommon { color: #55FF55; font-weight: bold; }
+.rarity-rare { color: #5555FF; font-weight: bold; }
+.rarity-epic { color: #AA00AA; font-weight: bold; }
+.rarity-legendary { color: #FFAA00; font-weight: bold; }
+.rarity-mythic { color: #FF55FF; font-weight: bold; }
+.rarity-divine { color: #55FFFF; font-weight: bold; }
+.rarity-special { color: #FF5555; font-weight: bold; }
+
+/* ============================================
+   Stat Colors
+   ============================================ */
+.stat-damage { color: #FF5555; }
+.stat-health { color: #FF5555; }
+.stat-defense { color: #55FF55; }
+.stat-intelligence { color: #55FFFF; }
+.stat-speed { color: #FFFFFF; }
+.mana-cost { color: #55FFFF; }
+.cooldown { color: #55FF55; }
+
+/* ============================================
+   Minecraft Crafting Grid
+   ============================================ */
+.mc-crafting {
+	display: inline-block;
+	background: #c6c6c6;
+	border: 3px solid;
+	border-color: #fefefe #373737 #373737 #fefefe;
+	padding: 8px;
+	margin: 1em 0;
+	image-rendering: pixelated;
+}
+
+.mc-crafting-title {
+	font-size: 14px;
+	color: #404040;
+	margin-bottom: 6px;
+	font-family: 'Segoe UI', sans-serif;
+}
+
+.mc-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 48px);
+	gap: 2px;
+}
+
+.mc-slot {
+	width: 48px;
+	height: 48px;
+	background: #8b8b8b;
+	border: 2px solid;
+	border-color: #373737 #fefefe #fefefe #373737;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+.mc-slot img {
+	width: 43px;
+	height: 43px;
+	image-rendering: pixelated;
+}
+
+.mc-arrow {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 32px;
+	color: #404040;
+	padding: 0 12px;
+}
+
+.mc-result .mc-slot {
+	background: #8b8b8b;
+	border-color: #f3ca47 #6b5313 #6b5313 #f3ca47;
+}
+
+.mc-crafting-row {
+	display: flex;
+	align-items: center;
+	gap: 0;
+}
+
+/* Slot with item name label (fallback when no texture) */
+.mc-slot-label {
+	font-size: 9px;
+	color: #ffffff;
+	text-align: center;
+	line-height: 1.1;
+	text-shadow: 1px 1px 0 #000;
+	word-break: break-word;
+	padding: 2px;
+	max-width: 44px;
+}
+
+/* ============================================
+   Item Tooltip (hover to see stats)
+   ============================================ */
+.mc-tooltip-wrapper {
+	position: relative;
+	display: inline-block;
+	cursor: help;
+}
+
+.mc-tooltip {
+	visibility: hidden;
+	opacity: 0;
+	position: absolute;
+	z-index: 100;
+	bottom: calc(100% + 8px);
+	left: 50%;
+	transform: translateX(-50%);
+	background: #100010;
+	border: 2px solid;
+	border-image: linear-gradient(to bottom, #5000a0, #28007f) 1;
+	padding: 6px 8px;
+	min-width: 200px;
+	max-width: 300px;
+	white-space: nowrap;
+	font-family: 'Courier New', monospace;
+	font-size: 13px;
+	line-height: 1.4;
+	color: #AAAAAA;
+	transition: opacity 0.15s;
+	pointer-events: none;
+}
+
+.mc-tooltip-wrapper:hover .mc-tooltip {
+	visibility: visible;
+	opacity: 1;
+}
+
+.mc-tooltip .tt-name {
+	font-weight: bold;
+	margin-bottom: 2px;
+}
+
+.mc-tooltip .tt-stat {
+	color: #AAAAAA;
+}
+
+.mc-tooltip .tt-stat .tt-val {
+	color: #FF5555;
+}
+
+.mc-tooltip .tt-lore {
+	color: #555555;
+	font-style: italic;
+	margin-top: 4px;
+}
+
+.mc-tooltip .tt-ability {
+	color: #FFAA00;
+	margin-top: 4px;
+}
+
+.mc-tooltip .tt-rarity {
+	margin-top: 4px;
+	font-weight: bold;
+	text-align: center;
+}
+
+/* ============================================
+   Item Inline Icon + Name (with tooltip)
+   ============================================ */
+.mc-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	text-decoration: none;
+	border-bottom: 1px dotted currentColor;
+}
+
+.mc-item img {
+	width: 16px;
+	height: 16px;
+	image-rendering: pixelated;
+	vertical-align: middle;
+}
+
+/* ============================================
+   Compact Tables
+   ============================================ */
+.md-typeset table:not([class]) th,
+.md-typeset table:not([class]) td {
+	padding: 0.4em 0.8em;
+	font-size: 0.85em;
+}
+
+.compact-table th,
+.compact-table td {
+	padding: 0.3em 0.6em !important;
+	font-size: 0.85em !important;
+}
+
+/* ============================================
+   Stat Bar (inline compact stats)
+   ============================================ */
+.stat-line {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5em 1.5em;
+	margin: 0.5em 0;
+	font-size: 0.9em;
+}
+
+.stat-line .stat {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3em;
+}
+
+.stat-line .stat-label {
+	color: #AAAAAA;
+}
+
+.stat-line .stat-value {
+	font-weight: bold;
+}
+
+/* ============================================
+   Boss Drop Table
+   ============================================ */
+.drop-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.drop-table th {
+	text-align: left;
+	border-bottom: 2px solid var(--md-default-fg-color--lightest);
+	padding: 0.3em 0.6em;
+	font-size: 0.85em;
+}
+
+.drop-table td {
+	padding: 0.3em 0.6em;
+	font-size: 0.85em;
+	border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.drop-chance {
+	color: #FFAA00;
+	font-weight: bold;
+}
+
+/* ============================================
+   Warning / Info Banners
+   ============================================ */
+.unobtainable-banner {
+	background: rgba(255, 85, 85, 0.1);
+	border-left: 4px solid #FF5555;
+	padding: 0.5em 1em;
+	margin: 1em 0;
+	font-size: 0.9em;
+}
+
+.unobtainable-banner::before {
+	content: "⚠ ";
+	font-weight: bold;
+}
+
+/* ============================================
+   Minecraft-styled Page Headers
+   ============================================ */
+.item-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 0.5em;
+}
+
+.item-header img {
+	width: 48px;
+	height: 48px;
+	image-rendering: pixelated;
+}
+
+.item-header .item-title {
+	display: flex;
+	flex-direction: column;
+}

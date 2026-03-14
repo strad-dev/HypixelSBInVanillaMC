@@ -1,0 +1,123 @@
+site_name: "SkyBlock in Vanilla Wiki"
+site_url: "https://wiki.strad.dev"
+use_directory_urls: false
+
+theme:
+  name: material
+  palette:
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+plugins:
+  - search
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - toc:
+      permalink: true
+
+extra_css:
+  - stylesheets/extra.css
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Items:
+    - Overview: items/index.md
+    - Weapons:
+      - Overview: items/weapons/index.md
+      - Hyperion: items/weapons/hyperion.md
+      - Dark Claymore: items/weapons/dark-claymore.md
+      - Terminator: items/weapons/terminator.md
+    - Armor:
+      - Overview: items/armor/index.md
+      - Warden Helmet: items/armor/warden-helmet.md
+      - "Necron's Elytra": items/armor/necron-elytra.md
+      - Primal Dragon Chestplate: items/armor/primal-dragon-chestplate.md
+      - "Goldor's Leggings": items/armor/goldor-leggings.md
+      - Necromancer Lord Leggings: items/armor/necromancer-lord-leggings.md
+      - "Maxor's Boots": items/armor/maxor-boots.md
+      - Crown of the Wither King: items/armor/wither-king-crown.md
+    - Tools:
+      - Overview: items/tools/index.md
+      - Aspect of the Void: items/tools/aspect-of-the-void.md
+      - Ice Spray Wand: items/tools/ice-spray-wand.md
+      - Wand of Restoration: items/tools/wand-of-restoration.md
+      - Wand of Atonement: items/tools/wand-of-atonement.md
+      - Holy Ice: items/tools/holy-ice.md
+      - "Bonzo's Staff": items/tools/bonzo-staff.md
+      - Tactical Insertion: items/tools/tactical-insertion.md
+      - Gyrokinetic Wand: items/tools/gyrokinetic-wand.md
+      - "Divan's Pickaxe": items/tools/divan-pickaxe.md
+    - Ingredients:
+      - Overview: items/ingredients/index.md
+      - Mining Materials: items/ingredients/mining.md
+      - Misc Materials: items/ingredients/misc.md
+      - Wither Lord Materials: items/ingredients/wither-lords.md
+    - Summon Items:
+      - Overview: items/summon-items/index.md
+  - Bosses:
+    - Overview: bosses/index.md
+    - Ender Dragons:
+      - Overview: bosses/ender-dragons/index.md
+      - Holy Dragon: bosses/ender-dragons/holy.md
+      - Old Dragon: bosses/ender-dragons/old.md
+      - Protector Dragon: bosses/ender-dragons/protector.md
+      - Strong Dragon: bosses/ender-dragons/strong.md
+      - Superior Dragon: bosses/ender-dragons/superior.md
+      - Unstable Dragon: bosses/ender-dragons/unstable.md
+      - Wise Dragon: bosses/ender-dragons/wise.md
+      - Young Dragon: bosses/ender-dragons/young.md
+      - Primal Dragon: bosses/ender-dragons/primal.md
+    - Generic Bosses:
+      - Overview: bosses/generic/index.md
+      - Revenant Horror: bosses/generic/revenant-horror.md
+      - Tarantula Broodfather: bosses/generic/tarantula-broodfather.md
+      - Chickzilla: bosses/generic/chickzilla.md
+      - Zealot: bosses/generic/zealot.md
+      - "meloG norI": bosses/generic/melog-nori.md
+      - Sadan: bosses/generic/sadan.md
+      - Voidgloom Seraph: bosses/generic/voidgloom-seraph.md
+      - Infuriated Wither Skeleton: bosses/generic/infuriated-wither-skeleton.md
+    - Wither Lords:
+      - Overview: bosses/wither-lords/index.md
+      - Maxor: bosses/wither-lords/maxor.md
+      - Storm: bosses/wither-lords/storm.md
+      - Goldor: bosses/wither-lords/goldor.md
+      - Necron: bosses/wither-lords/necron.md
+    - Hard Mode:
+      - Overview: bosses/hard-mode/index.md
+      - Atoned Horror: bosses/hard-mode/atoned-horror.md
+      - Primordial Broodfather: bosses/hard-mode/primordial-broodfather.md
+      - Conjoined Brood: bosses/hard-mode/conjoined-brood.md
+      - Enraged Chickzilla: bosses/hard-mode/enraged-chickzilla.md
+      - Zealot Bruiser: bosses/hard-mode/zealot-bruiser.md
+      - "Obfuscated meloG norI": bosses/hard-mode/obfuscated-melog-nori.md
+      - Hard Sadan: bosses/hard-mode/hard-sadan.md
+      - Voidcrazed Seraph: bosses/hard-mode/voidcrazed-seraph.md
+      - Wither King: bosses/hard-mode/wither-king.md
+  - Mechanics:
+    - Overview: mechanics/index.md
+    - Damage System: mechanics/damage-system.md
+    - Mana System: mechanics/mana-system.md
+    - Custom Drops: mechanics/custom-drops.md
+    - Custom Mining: mechanics/custom-mining.md
+    - Crafting Recipes: mechanics/crafting-recipes.md
+    - Hard Mode: mechanics/hard-mode.md
+    - Item Abilities: mechanics/item-abilities.md
+  - Commands:
+    - Overview: commands/index.md
