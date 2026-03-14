@@ -33,16 +33,7 @@ public class Claymore implements CustomItem {
 
 		String loreDamage = "9";
 		if(ench.equals(Enchantment.SHARPNESS)) {
-			switch(enchLevel) {
-				case 1 -> loreDamage = "10";
-				case 2 -> loreDamage = "11";
-				case 3 -> loreDamage = "12";
-				case 4 -> loreDamage = "13";
-				case 5 -> loreDamage = "14";
-				case 6 -> loreDamage = "15";
-				case 7 -> loreDamage = "16";
-				default -> loreDamage = "9";
-			}
+			loreDamage = String.valueOf(9 + enchLevel);
 		}
 
 		List<String> lore = new ArrayList<>();
@@ -52,15 +43,7 @@ public class Claymore implements CustomItem {
 		lore.add(ChatColor.GRAY + "Swing Range: " + ChatColor.RED + "+2");
 		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
 			lore.add("");
-			switch(enchLevel) {
-				case 1 -> loreDamage = "2.5";
-				case 2 -> loreDamage = "5";
-				case 3 -> loreDamage = "7.5";
-				case 4 -> loreDamage = "10";
-				case 5 -> loreDamage = "12.5";
-				case 6 -> loreDamage = "15";
-				default -> loreDamage = "0";
-			}
+			loreDamage = String.valueOf(enchLevel * 2.5);
 			if(ench.equals(Enchantment.SMITE)) {
 				lore.add(ChatColor.GRAY + "Bonus Undead Damage: " + ChatColor.RED + "+" + loreDamage);
 			} else {

@@ -532,7 +532,7 @@ public class CustomDamage implements Listener {
 								} else {
 									String damagerName;
 									if(damager != null) {
-										damagerName = damager.getCustomName();
+										damagerName = damager.getName();
 									} else {
 										damagerName = "absolutely no one";
 									}
@@ -1097,11 +1097,18 @@ public class CustomDamage implements Listener {
 			}
 			return sources.generic();
 		} else if(damageType == org.bukkit.damage.DamageType.SPEAR) {
-			net.minecraft.core.Holder<net.minecraft.world.damagesource.DamageType> spearHolder =
-					((CraftLivingEntity) victim).getHandle().level().registryAccess()
-							.lookupOrThrow(net.minecraft.core.registries.Registries.DAMAGE_TYPE)
-							.getOrThrow(net.minecraft.world.damagesource.DamageTypes.SPEAR);
-			return new DamageSource(spearHolder, nmsDirectEntity, nmsCausingEntity);
+			try {
+				java.lang.reflect.Method sourceMethod = DamageSources.class.getDeclaredMethod("source",
+						net.minecraft.resources.ResourceKey.class,
+						net.minecraft.world.entity.Entity.class,
+						net.minecraft.world.entity.Entity.class);
+				sourceMethod.setAccessible(true);
+				return (DamageSource) sourceMethod.invoke(sources,
+						net.minecraft.world.damagesource.DamageTypes.SPEAR, nmsDirectEntity, nmsCausingEntity);
+			} catch(Exception ex) {
+				ex.printStackTrace();
+				return sources.generic();
+			}
 		}
 		// Fallback for any unmapped damage types
 		else {

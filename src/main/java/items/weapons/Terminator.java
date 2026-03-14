@@ -35,35 +35,14 @@ public class Terminator implements AbilityItem {
 		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Terminator");
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
 
-		String loreDamage;
-		switch(powerLevel) {
-			case 1 -> loreDamage = "2.75";
-			case 2 -> loreDamage = "3";
-			case 3 -> loreDamage = "3.25";
-			case 4 -> loreDamage = "3.5";
-			case 5 -> loreDamage = "3.75";
-			case 6 -> loreDamage = "4";
-			case 7 -> loreDamage = "4.5";
-			default -> loreDamage = "2.5";
-		}
-
-		String salvationDamage;
-		switch(powerLevel) {
-			case 1 -> salvationDamage = "4.5";
-			case 2 -> salvationDamage = "5";
-			case 3 -> salvationDamage = "5.5";
-			case 4 -> salvationDamage = "6";
-			case 5 -> salvationDamage = "6.5";
-			case 6 -> salvationDamage = "7";
-			case 7 -> salvationDamage = "8";
-			default -> salvationDamage = "4";
-		}
+		String loreDamage = powerLevel == 7 ? "4.5" : String.valueOf(2.5 + powerLevel * 0.25);
+		String salvationDamage = powerLevel == 7 ? "8" : String.valueOf(4 + powerLevel * 0.5);
 
 		List<String> lore = new ArrayList<>();
 		lore.add("skyblock/combat/terminator");
 		lore.add("");
 		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+" + loreDamage);
-		lore.add(ChatColor.GRAY + "Shot Cooldown: " + ChatColor.GREEN + "0.25s");
+		lore.add(ChatColor.GRAY + "Shot Cooldown: " + ChatColor.GREEN + "0.2s");
 		lore.add("");
 		lore.add(ChatColor.GOLD + "Shortbow: Instantly Shoots!");
 		lore.add(ChatColor.GRAY + "Shoots " + ChatColor.AQUA + "3" + ChatColor.GRAY + " arrows at once.");
