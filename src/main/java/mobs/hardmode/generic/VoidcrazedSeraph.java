@@ -176,7 +176,7 @@ public class VoidcrazedSeraph implements CustomMob {
 									double z = center.getZ() + Math.sin(angle) * distance;
 
 									Location particleLocation = new Location(center.getWorld(), x, y, z);
-									if(!damagedPlayers.contains(player) && playerLoc.distanceSquared(particleLocation) < 1.0) {
+									if(!damagedPlayers.contains(player) && playerLoc.distanceSquared(particleLocation) < 1.44) {
 										if(Math.abs(playerLoc.getY() - y) < 2.0 || Math.abs(playerLoc.getY() + 1 - y) < 1.0) {
 											CustomDamage.customMobs(player, damagee, 4, DamageType.ABSOLUTE);
 											damagedPlayers.add(player);

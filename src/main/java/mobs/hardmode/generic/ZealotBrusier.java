@@ -26,9 +26,9 @@ public class ZealotBrusier implements CustomMob {
 		}
 
 		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot Brusier" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
-		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(999.9);
-		enderman.setHealth(999.9);
-		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(50.0);
+		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(999.0);
+		enderman.setHealth(999.0);
+		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(45.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		enderman.setTarget(p);
@@ -50,7 +50,7 @@ public class ZealotBrusier implements CustomMob {
 		if(damager instanceof LivingEntity entity1) {
 			if(random.nextDouble() < 0.2) {
 				damager.teleport(damagee);
-				CustomDamage.customMobs(entity1, damagee, 35, DamageType.MELEE);
+				CustomDamage.customMobs(entity1, damagee, 30, DamageType.MELEE);
 				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Zealot Brusier's Dark Magic has caused you to teleport to it!  It also deals 35 damage to you!");
 			}
 		}
