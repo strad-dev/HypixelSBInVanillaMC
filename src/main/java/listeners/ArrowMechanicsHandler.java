@@ -1,5 +1,6 @@
 package listeners;
 
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
@@ -71,6 +72,12 @@ public class ArrowMechanicsHandler implements Listener {
 
 					serverPlayer.setOnGround(false);
 					p.setVelocity(direction);
+					// Send the motion packet NOW instead of waiting for hurtMarked to be serviced on the
+					// player's next aiStep — that deferral ships it a tick late (this fires in the windcharge's
+					// entity tick, after the player's own tick that frame), so the client integrates a tick late
+					// and the full first-tick rise is lost. Immediate send matches Hypixel (full 0.5 on tick 1).
+					serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(serverPlayer));
+					serverPlayer.hurtMarked = false;
 				}
 			}
 		}

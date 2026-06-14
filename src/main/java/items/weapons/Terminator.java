@@ -85,37 +85,21 @@ public class Terminator implements AbilityItem {
 		// Calculate spawn position
 		Location spawnLoc = p.getEyeLocation().add(baseDirection.clone());
 
-		// Calculate rotations
-		float baseYaw = p.getEyeLocation().getYaw();
-		float basePitch = p.getEyeLocation().getPitch();
-
 		// Create NMS arrows directly
 		net.minecraft.world.entity.projectile.arrow.Arrow nmsLeft = new net.minecraft.world.entity.projectile.arrow.Arrow(EntityType.ARROW, nmsWorld);
 		net.minecraft.world.entity.projectile.arrow.Arrow nmsMiddle = new net.minecraft.world.entity.projectile.arrow.Arrow(EntityType.ARROW, nmsWorld);
 		net.minecraft.world.entity.projectile.arrow.Arrow nmsRight = new net.minecraft.world.entity.projectile.arrow.Arrow(EntityType.ARROW, nmsWorld);
 
-		// Set positions and rotations directly
+		// Set positions
 		nmsLeft.setPos(spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ());
-		nmsLeft.setYRot(baseYaw - 5f);
-		nmsLeft.setXRot(basePitch);
-
 		nmsMiddle.setPos(spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ());
-		nmsMiddle.setYRot(baseYaw);
-		nmsMiddle.setXRot(basePitch);
-
 		nmsRight.setPos(spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ());
-		nmsRight.setYRot(baseYaw + 5f);
-		nmsRight.setXRot(basePitch);
 
-		// Set velocities
-		double speed = 4.0;
-		Vec3 leftVel = new Vec3(leftDirection.getX() * speed, leftDirection.getY() * speed, leftDirection.getZ() * speed);
-		Vec3 middleVel = new Vec3(baseDirection.getX() * speed, baseDirection.getY() * speed, baseDirection.getZ() * speed);
-		Vec3 rightVel = new Vec3(rightDirection.getX() * speed, rightDirection.getY() * speed, rightDirection.getZ() * speed);
-
-		nmsLeft.setDeltaMovement(leftVel);
-		nmsMiddle.setDeltaMovement(middleVel);
-		nmsRight.setDeltaMovement(rightVel);
+		// shoot() sets velocity AND derives rotation from the direction vector
+		float speed = 3.175f;
+		nmsLeft.shoot(leftDirection.getX(), leftDirection.getY(), leftDirection.getZ(), speed, 0);
+		nmsMiddle.shoot(baseDirection.getX(), baseDirection.getY(), baseDirection.getZ(), speed, 0);
+		nmsRight.shoot(rightDirection.getX(), rightDirection.getY(), rightDirection.getZ(), speed, 0);
 
 		// Set other properties
 		nmsLeft.setOwner(nmsPlayer);
