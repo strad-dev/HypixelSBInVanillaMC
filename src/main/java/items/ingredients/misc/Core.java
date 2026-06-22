@@ -1,7 +1,8 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,19 +18,19 @@ public class Core implements Ingredients {
 		ItemMeta data = core.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Judgement Core");
+		data.displayName(Utils.mm("<gold><bold>Judgement Core"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/judgement_core");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "A core so powerful that even");
-		lore.add(ChatColor.GRAY + "the most dedicated players");
-		lore.add(ChatColor.GRAY + "tremble at it's power.");
-		lore.add("");
-		lore.add(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " LEGENDARY " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/judgement_core"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>A core so powerful that even"));
+		lore.add(Utils.mm("<gray>the most dedicated players"));
+		lore.add(Utils.mm("<gray>tremble at it's power."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold><bold><obfuscated>a</obfuscated> LEGENDARY <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		core.setItemMeta(data);
 
 		return core;

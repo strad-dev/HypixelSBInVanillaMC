@@ -6,6 +6,7 @@ import misc.BossBarManager;
 import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
+import net.kyori.adventure.util.TriState;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
@@ -24,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Sadan implements CustomMob {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Sadan" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+	private static final String name = "<gold><bold>﴾ <red><bold>Sadan<gold><bold> ﴿";
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -72,7 +73,7 @@ public class Sadan implements CustomMob {
 
 	private static void antiFire(Zombie sadan) {
 		if(!sadan.isDead()) {
-			sadan.setVisualFire(false);
+			sadan.setVisualFire(TriState.FALSE);
 			sadan.setFireTicks(0);
 			Utils.scheduleTask(() ->  antiFire(sadan), 1);
 		}
@@ -139,7 +140,7 @@ public class Sadan implements CustomMob {
 
 		terracotta.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
 		terracotta.setHealth(300.0);
-		Utils.changeName(terracotta, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Terracotta" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+		Utils.changeName(terracotta, "<gold><bold>﴾ <red><bold>Terracotta<gold><bold> ﴿");
 		terracotta.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(40.0);
 		terracotta.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.6);
 		terracotta.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
@@ -163,7 +164,7 @@ public class Sadan implements CustomMob {
 
 		ironGolem.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
 		ironGolem.setHealth(500.0);
-		Utils.changeName(ironGolem, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Woke Golem" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+		Utils.changeName(ironGolem, "<gold><bold>﴾ <red><bold>Woke Golem<gold><bold> ﴿");
 		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(60.0);
 		ironGolem.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.6);
 		ironGolem.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
@@ -246,7 +247,7 @@ public class Sadan implements CustomMob {
 
 		zombie.getAttribute(Attribute.MAX_HEALTH).setBaseValue(800.0);
 		zombie.setHealth(800.0);
-		Utils.changeName(zombie, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Mutant Giant" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+		Utils.changeName(zombie, "<gold><bold>﴾ <red><bold>Mutant Giant<gold><bold> ﴿");
 		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(60.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.75);
 		zombie.getAttribute(Attribute.ARMOR).setBaseValue(-7.0);
@@ -416,7 +417,7 @@ public class Sadan implements CustomMob {
 	}
 
 	private static void sendChatMessage(String message) {
-		Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": " + message);
+		Bukkit.broadcast(Utils.msg(name + "<red><bold>: " + message));
 		Utils.playGlobalSound(Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR);
 	}
 

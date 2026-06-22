@@ -2,8 +2,8 @@ package mobs.enderDragons;
 
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 
 public class Wise implements CustomDragon {
@@ -22,9 +22,9 @@ public class Wise implements CustomDragon {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wise Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String name = "<gold><bold>﴾ <red><bold>Wise Dragon<gold><bold> ﴿";
 		dragon.addScoreboardTag("WiseDragon");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The WISE DRAGON has arrived to destroy you using smart tactics!");
+		Bukkit.broadcast(Utils.msg("<red><bold>The WISE DRAGON has arrived to destroy you using smart tactics!"));
 		Bukkit.getLogger().info("The Wise Dragon has been summoned!");
 		return name;
 	}

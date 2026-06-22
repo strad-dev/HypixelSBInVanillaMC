@@ -3,7 +3,7 @@ package items.summonItems;
 import items.AbilityItem;
 import misc.Utils;
 import mobs.generic.InfuriatedWitherSkeleton;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -22,22 +22,22 @@ public class HighlyInfuriatedWitherSkeletonSpawnEgg implements AbilityItem, Summ
 		ItemMeta data = egg.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Highly Infuriated Wither Skeleton Spawn Egg");
+		data.displayName(Utils.mm("<dark_purple><bold>Highly Infuriated Wither Skeleton Spawn Egg"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/summon/wither_skeleton_spawn_egg");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "This egg is full to the brim");
-		lore.add(ChatColor.GRAY + "with rage.  Do you have");
-		lore.add(ChatColor.GRAY + "what it takes to calm it?");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Use this to summon a Highly");
-		lore.add(ChatColor.GRAY + "Infuriated Wither Skeleton!");
-		lore.add("");
-		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/summon/wither_skeleton_spawn_egg"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>This egg is full to the brim"));
+		lore.add(Utils.mm("<gray>with rage.  Do you have"));
+		lore.add(Utils.mm("<gray>what it takes to calm it?"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Use this to summon a Highly"));
+		lore.add(Utils.mm("<gray>Infuriated Wither Skeleton!"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<dark_purple><bold><obfuscated>a</obfuscated> EPIC <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		egg.setItemMeta(data);
 
 		return egg;

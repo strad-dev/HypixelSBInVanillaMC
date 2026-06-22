@@ -1,7 +1,8 @@
 package items.ingredients.witherLords;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,20 +18,20 @@ public class ShadowWarp implements Ingredients {
 		ItemMeta data = shadowWarp.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Shadow Warp");
+		data.displayName(Utils.mm("<dark_purple><bold>Shadow Warp"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/shadow_warp");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "A rare Enchanted Book imbued");
-		lore.add(ChatColor.GRAY + "with the power of Maxor.");
-		lore.add(ChatColor.GRAY + "Grants the ability to teleport");
-		lore.add(ChatColor.GRAY + "10 blocks using Wither Impact.");
-		lore.add("");
-		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/shadow_warp"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>A rare Enchanted Book imbued"));
+		lore.add(Utils.mm("<gray>with the power of Maxor."));
+		lore.add(Utils.mm("<gray>Grants the ability to teleport"));
+		lore.add(Utils.mm("<gray>10 blocks using Wither Impact."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<dark_purple><bold><obfuscated>a</obfuscated> EPIC <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		shadowWarp.setItemMeta(data);
 
 		return shadowWarp;

@@ -6,15 +6,16 @@ import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
 import mobs.withers.CustomWither;
+import net.kyori.adventure.title.Title;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftWither;
+import org.bukkit.craftbukkit.entity.CraftWither;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +23,7 @@ import static listeners.CustomDamage.calculateFinalDamage;
 import static misc.Utils.teleport;
 
 public class Storm implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Storm" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+	private static final String name = "<gold><bold>﴾ <red><bold>Storm<gold><bold> ﴿";
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -60,19 +61,19 @@ public class Storm implements CustomWither {
 		}
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Are you enjoying the party?  I sure am while watching you suffer!");
+			Bukkit.broadcast(Utils.msg(name + "<red><bold>: Are you enjoying the party?  I sure am while watching you suffer!"));
 		}, 200);
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": When I'm not making lightning, I love creating explosions!");
+			Bukkit.broadcast(Utils.msg(name + "<red><bold>: When I'm not making lightning, I love creating explosions!"));
 		}, 480);
-		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "5", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 500);
-		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "4", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 520);
-		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "3", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 540);
-		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 560);
-		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0)), 580);
+		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>5"), Utils.msg("<yellow><bold>BOOM!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO)))), 500);
+		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>4"), Utils.msg("<yellow><bold>BOOM!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO)))), 520);
+		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>3"), Utils.msg("<yellow><bold>BOOM!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO)))), 540);
+		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>2"), Utils.msg("<yellow><bold>BOOM!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO)))), 560);
+		Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>1"), Utils.msg("<yellow><bold>BOOM!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO)))), 580);
 		Utils.scheduleTask(() -> {
-			Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BOOM!", "", 0, 21, 0));
+			Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>BOOM!"), Utils.msg(""), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO))));
 			Utils.spawnTNT(wither, wither.getLocation(), 0, 64, 200, immune);
 			wither.removeScoreboardTag("Survival1");
 			wither.removeScoreboardTag("Invulnerable");
@@ -161,7 +162,7 @@ public class Storm implements CustomWither {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
+		if(((Wither) damagee).getInvulnerableTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
 
@@ -173,7 +174,7 @@ public class Storm implements CustomWither {
 			Utils.changeName(damagee);
 			if(damagee.getScoreboardTags().contains("Dead")) {
 				if(damager instanceof Player p) {
-					p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Storm!", 0, 20, 0);
+					p.showTitle(Title.title(Utils.msg("<red><bold>IMMUNE"), Utils.msg("<yellow>You cannot damage Storm!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 				}
 				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			}
@@ -189,7 +190,7 @@ public class Storm implements CustomWither {
 
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You think you're funny?  Try surviving this!");
+			Bukkit.broadcast(Utils.msg(name + "<red><bold>: You think you're funny?  Try surviving this!"));
 
 			spawnMoreGuards((Wither) damagee);
 			spawnMoreLightning((Wither) damagee);
@@ -198,17 +199,17 @@ public class Storm implements CustomWither {
 			}
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Still alive?  You won’t survive what’s coming!");
+				Bukkit.broadcast(Utils.msg(name + "<red><bold>: Still alive?  You won’t survive what’s coming!"));
 			}, 200);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I wasn't giving my all in that last explosion.  Good luck getting past this one!");
+				Bukkit.broadcast(Utils.msg(name + "<red><bold>: I wasn't giving my all in that last explosion.  Good luck getting past this one!"));
 			}, 520);
-			Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "3", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 540);
-			Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 560);
-			Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", 0, 21, 0)), 580);
+			Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>3"), Utils.msg("<yellow><bold>BIGGER BOOM!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO)))), 540);
+			Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>2"), Utils.msg("<yellow><bold>BIGGER BOOM!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO)))), 560);
+			Utils.scheduleTask(() -> Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>1"), Utils.msg("<yellow><bold>BIGGER BOOM!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO)))), 580);
 			Utils.scheduleTask(() -> {
-				Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BIGGER BOOM!", "", 0, 21, 0));
+				Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>BIGGER BOOM!"), Utils.msg(""), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO))));
 				List<EntityType> immune = new ArrayList<>();
 				immune.add(EntityType.WITHER_SKELETON);
 				Utils.spawnTNT(damagee, damagee.getLocation(), 0, 64, 300, immune);
@@ -229,11 +230,11 @@ public class Storm implements CustomWither {
 			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
 			nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 1000);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I knew I should have prepared better.");
+			Bukkit.broadcast(Utils.msg(name + "<red><bold>: I knew I should have prepared better."));
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Have fun dealing with the others.");
+				Bukkit.broadcast(Utils.msg(name + "<red><bold>: Have fun dealing with the others."));
 			}, 60);
 			Utils.scheduleTask(() -> {
 				damagee.remove();
@@ -242,11 +243,11 @@ public class Storm implements CustomWither {
 			}, 100);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I hear some vermin prowling around my territory.");
+				Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Goldor<gold><bold> ﴿<red><bold>: I hear some vermin prowling around my territory."));
 			}, 240);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I hope you came prepared for a long fight!");
+				Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Goldor<gold><bold> ﴿<red><bold>: I hope you came prepared for a long fight!"));
 			}, 300);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);

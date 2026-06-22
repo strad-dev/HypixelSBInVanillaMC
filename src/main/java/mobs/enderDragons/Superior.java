@@ -2,8 +2,8 @@ package mobs.enderDragons;
 
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
@@ -33,13 +33,13 @@ public class Superior implements CustomDragon {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Superior Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String name = "<gold><bold>﴾ <red><bold>Superior Dragon<gold><bold> ﴿";
 		dragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(250.0);
 		dragon.setHealth(250.0);
 		dragon.getAttribute(Attribute.ARMOR).setBaseValue(5);
 		dragon.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
 		dragon.addScoreboardTag("SuperiorDragon");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The SUPERIOR DRAGON has arrived to utterly destroy you!");
+		Bukkit.broadcast(Utils.msg("<red><bold>The SUPERIOR DRAGON has arrived to utterly destroy you!"));
 		Bukkit.getLogger().info("The Superior Dragon has been summoned!");
 		return name;
 	}

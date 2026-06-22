@@ -1,7 +1,8 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -18,19 +19,19 @@ public class TarantulaSilk implements Ingredients {
 		ItemMeta data = taraSilk.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + "Tarantula Silk");
+		data.displayName(Utils.mm("<blue><bold>Tarantula Silk"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/tarantula_silk");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "A Web so perfect that even");
-		lore.add(ChatColor.GRAY + "the most powerful players");
-		lore.add(ChatColor.GRAY + "cannot escape it.");
-		lore.add("");
-		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/tarantula_silk"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>A Web so perfect that even"));
+		lore.add(Utils.mm("<gray>the most powerful players"));
+		lore.add(Utils.mm("<gray>cannot escape it."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<blue><bold><obfuscated>a</obfuscated> RARE <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		taraSilk.setItemMeta(data);
 
 		return taraSilk;

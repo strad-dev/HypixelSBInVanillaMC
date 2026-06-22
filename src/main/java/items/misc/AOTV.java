@@ -2,6 +2,8 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -26,28 +28,28 @@ public class AOTV implements AbilityItem {
 
 		ItemMeta data = aotv.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Aspect of the Void");
+		data.displayName(Utils.mm("<light_purple>Aspect of the Void"));
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "AOTVModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/aspect_of_the_void");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
-		lore.add("");
-		lore.add(ChatColor.GOLD + "Ability: Instant Transmission " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Teleport " + ChatColor.GREEN + "12 blocks" + ChatColor.GRAY + " ahead of you.");
-		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
-		lore.add("");
-		lore.add(ChatColor.GOLD + "Ability: Ether Transmission " + ChatColor.GREEN + ChatColor.BOLD + "SNEAK RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Teleport to your targetted block");
-		lore.add(ChatColor.GRAY + "up to " + ChatColor.GREEN + "61 blocks" + ChatColor.GRAY + " blocks away.");
-		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
-		lore.add("");
-		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC SHOVEL " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/aspect_of_the_void"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold>Ability: Instant Transmission <green><bold>RIGHT CLICK"));
+		lore.add(Utils.mm("<gray>Teleport <green>12 blocks<gray> ahead of you."));
+		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold>Ability: Ether Transmission <green><bold>SNEAK RIGHT CLICK"));
+		lore.add(Utils.mm("<gray>Teleport to your targetted block"));
+		lore.add(Utils.mm("<gray>up to <green>61 blocks<gray> blocks away."));
+		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC SHOVEL <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		aotv.setItemMeta(data);
 
 		return aotv;

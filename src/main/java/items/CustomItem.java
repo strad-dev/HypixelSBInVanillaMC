@@ -4,6 +4,7 @@ import items.misc.*;
 import items.summonItems.HighlyInfuriatedWitherSkeletonSpawnEgg;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
+import misc.Utils;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public interface CustomItem {
 		if(!item.hasItemMeta() || !item.getItemMeta().hasLore()) {
 			return null;
 		}
-		return getItem(item.getItemMeta().getLore().getFirst());
+		return getItem(Utils.firstLorePlain(item.getItemMeta()));
 	}
 
 	/**

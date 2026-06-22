@@ -10,7 +10,7 @@ import misc.Utils;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.component.OminousBottleAmplifier;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -72,9 +72,12 @@ public class CustomDrops implements Listener {
 				item.setAmount(random.nextInt(3 + lootingLevel));
 				world.dropItemNaturally(l, item);
 				if(random.nextDouble() < 0.5 * lootingLevel) {
-					Arrow arrow = (Arrow) new ItemStack(Material.ARROW);
-					arrow.addCustomEffect(new PotionEffect(PotionEffectType.POISON, 100, 0), true);
-					world.dropItemNaturally(l, (ItemStack) arrow);
+					// Bogged drops a poison-tipped arrow item (the old code cast an ItemStack to Arrow, which can't compile).
+					ItemStack tippedArrow = new ItemStack(Material.TIPPED_ARROW);
+					org.bukkit.inventory.meta.PotionMeta arrowMeta = (org.bukkit.inventory.meta.PotionMeta) tippedArrow.getItemMeta();
+					arrowMeta.addCustomEffect(new PotionEffect(PotionEffectType.POISON, 100, 0), true);
+					tippedArrow.setItemMeta(arrowMeta);
+					world.dropItemNaturally(l, tippedArrow);
 				}
 				if(killer instanceof Creeper c && c.isPowered()) {
 					item = new ItemStack(Material.SKELETON_SKULL);
@@ -368,7 +371,15 @@ public class CustomDrops implements Listener {
 				item.setAmount(random.nextInt(2 + lootingLevel));
 				world.dropItemNaturally(l, item);
 			}
-			// TODO fox drop whatever they're holding
+			case Fox fox -> {
+				// Foxes carry an item in their mouth (main-hand equipment) — drop it on death.
+				if(fox.getEquipment() != null) {
+					ItemStack held = fox.getEquipment().getItemInMainHand();
+					if(!held.getType().isAir()) {
+						world.dropItemNaturally(l, held.clone());
+					}
+				}
+			}
 			// no drops
 			case Ghast ghast -> {
 				item = new ItemStack(Material.GHAST_TEAR);
@@ -467,7 +478,7 @@ public class CustomDrops implements Listener {
 				}
 			}
 			case MagmaCube cube -> {
-				cube.setCustomName("Magma Cube");
+				cube.customName(Utils.msg("Magma Cube"));
 				item = new ItemStack(Material.MAGMA_CREAM);
 				item.setAmount(random.nextInt(1 + lootingLevel) + 1);
 				world.dropItemNaturally(l, item);
@@ -651,7 +662,7 @@ public class CustomDrops implements Listener {
 				}
 			}
 			case Slime slime -> {
-				slime.setCustomName("Slime");
+				slime.customName(Utils.msg("Slime"));
 				item = new ItemStack(Material.SLIME_BALL);
 				item.setAmount(random.nextInt(3 + lootingLevel));
 				world.dropItemNaturally(l, item);
@@ -973,8 +984,8 @@ public class CustomDrops implements Listener {
 						}
 						BossBarManager.removeBossBar(died);
 						Plugin.grantAdvancement("skyblock:defeat_hard_sadan", p);
-						Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Sadan" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": NOOOOOOOOOO!!! THIS IS IMPOSSIBLE!!");
-						Utils.scheduleTask(() -> Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Sadan" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": FATHER, FORGIVE ME!!!"), 60);
+						Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red>Sadan<gold> ﴿<reset><red><bold>: NOOOOOOOOOO!!! THIS IS IMPOSSIBLE!!"));
+						Utils.scheduleTask(() -> Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red>Sadan<gold> ﴿<reset><red><bold>: FATHER, FORGIVE ME!!!")), 60);
 					} else if(random.nextDouble() < 0.005 * rngLootingBonus && p != null) {
 						item = GiantZombieFlesh.getItem();
 						world.dropItemNaturally(l, item);

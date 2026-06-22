@@ -1,6 +1,7 @@
 package items.summonItems;
 
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -15,21 +16,21 @@ public class SpiderRelic implements SummonItem {
 		ItemMeta data = spiderRelic.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + "Spider Relic");
+		data.displayName(Utils.mm("<blue><bold>Spider Relic"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/summon/spider_relic");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "An ancient artifact left");
-		lore.add(ChatColor.GRAY + "by the Broodfather itself.");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Use this on a Spider to summon");
-		lore.add(ChatColor.GRAY + "the Tarantula Broodfather!");
-		lore.add("");
-		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/summon/spider_relic"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>An ancient artifact left"));
+		lore.add(Utils.mm("<gray>by the Broodfather itself."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Use this on a Spider to summon"));
+		lore.add(Utils.mm("<gray>the Tarantula Broodfather!"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<blue><bold><obfuscated>a</obfuscated> RARE <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		spiderRelic.setItemMeta(data);
 
 		return spiderRelic;

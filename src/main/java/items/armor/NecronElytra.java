@@ -1,7 +1,8 @@
 package items.armor;
 
 import misc.Plugin;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -20,7 +21,7 @@ public class NecronElytra implements Armor {
 
 		ItemMeta data = necronElytra.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Necron's Elytra");
+		data.displayName(Utils.mm("<light_purple>Necron's Elytra"));
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraArmor"), 10, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necronElytraAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
@@ -29,19 +30,19 @@ public class NecronElytra implements Armor {
 		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/necron_elytra");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
-		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+10");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+10%");
-		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "This Elytra has the stats of a Netherite");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Chestplate, while still allowing you to fly!");
-		lore.add("");
-		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC CHESTPLATE " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/necron_elytra"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>+1"));
+		lore.add(Utils.mm("<gray>Armor: <red>+10"));
+		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+10%"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray><italic>This Elytra has the stats of a Netherite"));
+		lore.add(Utils.mm("<gray><italic>Chestplate, while still allowing you to fly!"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC CHESTPLATE <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		necronElytra.setItemMeta(data);
 
 		return necronElytra;

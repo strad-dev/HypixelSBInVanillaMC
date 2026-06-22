@@ -1,7 +1,8 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,19 +18,19 @@ public class NullBlade implements Ingredients {
 		ItemMeta data = nullBlade.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Null Blade");
+		data.displayName(Utils.mm("<gold><bold>Null Blade"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/null_blade");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "A pair of Shears so null that even");
-		lore.add(ChatColor.GRAY + "the most intelligent players");
-		lore.add(ChatColor.GRAY + "are confused by it.");
-		lore.add("");
-		lore.add(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " LEGENDARY " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/null_blade"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>A pair of Shears so null that even"));
+		lore.add(Utils.mm("<gray>the most intelligent players"));
+		lore.add(Utils.mm("<gray>are confused by it."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold><bold><obfuscated>a</obfuscated> LEGENDARY <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		nullBlade.setItemMeta(data);
 
 		return nullBlade;

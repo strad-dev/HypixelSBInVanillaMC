@@ -4,13 +4,14 @@ import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import io.papermc.paper.event.entity.EntityKnockbackEvent;
+import io.papermc.paper.event.entity.EntityPushedByEntityAttackEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.EntityKnockbackByEntityEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.util.Vector;
 
@@ -22,9 +23,13 @@ public class ArrowMechanicsHandler implements Listener {
 		}
 	}
 
+	// 26.2: Bukkit's EntityKnockbackByEntityEvent is deprecated for removal. Paper's unified EntityKnockbackEvent
+	// delivers the by-entity case as EntityPushedByEntityAttackEvent, whose getPushedBy() replaces getSourceEntity().
 	@EventHandler
-	public void onEntityKnockbackByEntity(EntityKnockbackByEntityEvent e) {
-		if(e.getSourceEntity() instanceof WindCharge windCharge && windCharge.getScoreboardTags().contains("Bonzo")) {
+	public void onEntityKnockback(EntityKnockbackEvent e) {
+		if(e instanceof EntityPushedByEntityAttackEvent pushed
+				&& pushed.getPushedBy() instanceof WindCharge windCharge
+				&& windCharge.getScoreboardTags().contains("Bonzo")) {
 			e.setCancelled(true);
 		}
 	}

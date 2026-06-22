@@ -34,7 +34,7 @@ public class CustomMining implements Listener {
 		if(itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasEnchant(Enchantment.FORTUNE)) {
 			boolean dropDouble = false;
 			if(itemInHand.getItemMeta().hasLore()) {
-				dropDouble = itemInHand.getItemMeta().getLore().getFirst().contains("skyblock/combat/divan_pickaxe");
+				dropDouble = Utils.firstLorePlain(itemInHand.getItemMeta()).contains("skyblock/combat/divan_pickaxe");
 			}
 			int fortune = itemInHand.getItemMeta().getEnchantLevel(Enchantment.FORTUNE);
 

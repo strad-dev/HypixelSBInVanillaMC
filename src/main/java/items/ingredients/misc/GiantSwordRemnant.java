@@ -1,7 +1,8 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,19 +18,19 @@ public class GiantSwordRemnant implements Ingredients {
 		ItemMeta data = giantSwordRemnant.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Remnant of the Giant's Sword");
+		data.displayName(Utils.mm("<dark_purple><bold>Remnant of the Giant's Sword"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/giant_sword_remnant");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "A hilt with very strange properties.");
-		lore.add(ChatColor.GRAY + "Legend has it that it once belonged to");
-		lore.add(ChatColor.GRAY + "Sadan, but historians disagree on this.");
-		lore.add("");
-		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/giant_sword_remnant"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>A hilt with very strange properties."));
+		lore.add(Utils.mm("<gray>Legend has it that it once belonged to"));
+		lore.add(Utils.mm("<gray>Sadan, but historians disagree on this."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<dark_purple><bold><obfuscated>a</obfuscated> EPIC <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		giantSwordRemnant.setItemMeta(data);
 
 		return giantSwordRemnant;

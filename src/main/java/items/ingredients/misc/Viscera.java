@@ -1,7 +1,8 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,19 +18,19 @@ public class Viscera implements Ingredients {
 		ItemMeta data = viscera.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + "Revenant Viscera");
+		data.displayName(Utils.mm("<blue><bold>Revenant Viscera"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/revenant_viscera");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "The disgusting remains");
-		lore.add(ChatColor.GRAY + "of a horror that once");
-		lore.add(ChatColor.GRAY + "walked this world.");
-		lore.add("");
-		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/revenant_viscera"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>The disgusting remains"));
+		lore.add(Utils.mm("<gray>of a horror that once"));
+		lore.add(Utils.mm("<gray>walked this world."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<blue><bold><obfuscated>a</obfuscated> RARE <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		viscera.setItemMeta(data);
 
 		return viscera;

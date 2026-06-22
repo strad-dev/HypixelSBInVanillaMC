@@ -1,7 +1,8 @@
 package items.armor;
 
 import misc.Plugin;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -20,7 +21,7 @@ public class WardenHelmet implements Armor {
 
 		ItemMeta data = wardenHelmet.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Warden Helmet");
+		data.displayName(Utils.mm("<light_purple>Warden Helmet"));
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetArmor"), 5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
@@ -31,22 +32,22 @@ public class WardenHelmet implements Armor {
 		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/warden_helmet");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
-		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+5");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+20%");
-		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x0.5");
-		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "The brute force of the Warden");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "packed into a single helmet.");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "It grants you a lot of strength,");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "but makes you quite a bit sluggish.");
-		lore.add("");
-		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC HELMET " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/warden_helmet"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>+1"));
+		lore.add(Utils.mm("<gray>Armor: <red>+5"));
+		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+20%"));
+		lore.add(Utils.mm("<gray>Speed: <red>x0.5"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray><italic>The brute force of the Warden"));
+		lore.add(Utils.mm("<gray><italic>packed into a single helmet."));
+		lore.add(Utils.mm("<gray><italic>It grants you a lot of strength,"));
+		lore.add(Utils.mm("<gray><italic>but makes you quite a bit sluggish."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC HELMET <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		wardenHelmet.setItemMeta(data);
 
 		return wardenHelmet;

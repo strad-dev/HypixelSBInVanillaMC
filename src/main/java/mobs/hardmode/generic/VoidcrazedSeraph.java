@@ -6,17 +6,19 @@ import misc.DamageData;
 import misc.Plugin;
 import misc.Utils;
 import mobs.CustomMob;
+import net.kyori.adventure.title.Title;
 import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.monster.EnderMan;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftEnderman;
+import org.bukkit.craftbukkit.entity.CraftEnderman;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.time.Duration;
 import java.util.*;
 
 public class VoidcrazedSeraph implements CustomMob {
@@ -32,7 +34,7 @@ public class VoidcrazedSeraph implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Voidcrazed Seraph" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold>Voidcrazed Seraph<gold><bold> ﴿";
 		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(1666.0);
 		enderman.setHealth(1666.0);
 		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(55.0);
@@ -44,7 +46,7 @@ public class VoidcrazedSeraph implements CustomMob {
 		enderman.addScoreboardTag("VoidcrazedSeraph");
 		enderman.addScoreboardTag("HardMode");
 		enderman.addScoreboardTag("833Trigger");
-		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "From the ashes of the Superior Dragon rises the terrifying Voidcrazed Seraph!");
+		p.sendMessage(Utils.msg("<red><bold>From the ashes of the Superior Dragon rises the terrifying Voidcrazed Seraph!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Voidcrazed Seraph!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		enderman.setPersistent(true);
@@ -85,7 +87,7 @@ public class VoidcrazedSeraph implements CustomMob {
 						int finalI = i;
 						Utils.scheduleTask(() -> {
 							if(block.getType() == Material.BEACON) {
-								Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "YANG GLYPH", ChatColor.YELLOW + "Mine it or die!!!  " + ChatColor.BOLD + (200 - finalI) / 20, 0, 21, 0));
+								Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<red><bold>YANG GLYPH"), Utils.msg("<yellow>Mine it or die!!!  <bold>" + (200 - finalI) / 20), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO))));
 								Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 2.0F, 0.5F);
 							}
 						}, i);
@@ -112,7 +114,7 @@ public class VoidcrazedSeraph implements CustomMob {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			if(damager instanceof Player p) {
-				p.sendTitle("", ChatColor.YELLOW + "You cannot damage the Voidcrazed Seraph.", 0, 20, 0);
+				p.showTitle(Title.title(Utils.msg(""), Utils.msg("<yellow>You cannot damage the Voidcrazed Seraph."), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 			}
 			damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			return false;

@@ -6,6 +6,7 @@ import listeners.CustomItems;
 import listeners.DamageType;
 import misc.Plugin;
 import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -34,7 +35,7 @@ public class Scylla implements AbilityItem {
 
 		ItemMeta data = scylla.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Hyperion");
+		data.displayName(Utils.mm("<light_purple>Hyperion"));
 		AttributeModifier attackSpeed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "scyllaModifier"), 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "scyllaModifierDmg"), 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
@@ -46,36 +47,36 @@ public class Scylla implements AbilityItem {
 			loreDamage = String.valueOf(8 + enchLevel);
 		}
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/scylla");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+" + loreDamage);
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/scylla"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>+" + loreDamage));
 		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
-			lore.add("");
+			lore.add(Utils.mm(""));
 			loreDamage = String.valueOf(enchLevel * 2.5);
 			if(ench.equals(Enchantment.SMITE)) {
-				lore.add(ChatColor.GRAY + "Bonus Undead Damage: " + ChatColor.RED + "+" + loreDamage);
+				lore.add(Utils.mm("<gray>Bonus Undead Damage: <red>+" + loreDamage));
 			} else {
-				lore.add(ChatColor.GRAY + "Bonus Arthropod Damage: " + ChatColor.RED + "+" + loreDamage);
+				lore.add(Utils.mm("<gray>Bonus Arthropod Damage: <red>+" + loreDamage));
 			}
 		}
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Deals " + ChatColor.RED + "+4" + ChatColor.GRAY + " damage to Withers.");
-		lore.add("");
-		lore.add(ChatColor.GOLD + "Ability: Wither Impact " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Teleport " + ChatColor.GREEN + "10 blocks" + ChatColor.GRAY + " ahead of");
-		lore.add(ChatColor.GRAY + "you.  Then implode, dealing");
-		lore.add(ChatColor.RED + "51%" + ChatColor.GRAY + " of your Melee Damage to");
-		lore.add(ChatColor.GRAY + "nearby enemies.  Also applies");
-		lore.add(ChatColor.GRAY + "the Wither Shield Scroll Ability,");
-		lore.add(ChatColor.GRAY + "reducing damage taken and");
-		lore.add(ChatColor.GRAY + "granting an absorption shield");
-		lore.add(ChatColor.GRAY + "for " + ChatColor.YELLOW + "5 seconds.");
-		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
-		lore.add("");
-		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC SWORD " + ChatColor.MAGIC + "a");
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Deals <red>+4<gray> damage to Withers."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold>Ability: Wither Impact <green><bold>RIGHT CLICK"));
+		lore.add(Utils.mm("<gray>Teleport <green>10 blocks<gray> ahead of"));
+		lore.add(Utils.mm("<gray>you.  Then implode, dealing"));
+		lore.add(Utils.mm("<red>51%<gray> of your Melee Damage to"));
+		lore.add(Utils.mm("<gray>nearby enemies.  Also applies"));
+		lore.add(Utils.mm("<gray>the Wither Shield Scroll Ability,"));
+		lore.add(Utils.mm("<gray>reducing damage taken and"));
+		lore.add(Utils.mm("<gray>granting an absorption shield"));
+		lore.add(Utils.mm("<gray>for <yellow>5 seconds."));
+		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC SWORD <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		scylla.setItemMeta(data);
 
 		return scylla;
@@ -266,7 +267,7 @@ public class Scylla implements AbilityItem {
 			}
 		}
 		if(damaged > 0) {
-			p.sendMessage(ChatColor.RED + "Your Implosion hit " + damaged + " enemies for " + ((int) damage) + " damage.");
+			p.sendMessage(Utils.msg("<red>Your Implosion hit " + damaged + " enemies for " + ((int) damage) + " damage."));
 		}
 		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 

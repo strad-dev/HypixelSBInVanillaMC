@@ -1,7 +1,8 @@
 package items.ingredients.witherLords;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,22 +18,22 @@ public class StormSecrets implements Ingredients {
 		ItemMeta data = stormSecrets.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Storm's Secrets");
+		data.displayName(Utils.mm("<dark_purple><bold>Storm's Secrets"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/storm_secrets");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Despite being acquainted with the");
-		lore.add(ChatColor.GRAY + "power of lightning, Storm is also");
-		lore.add(ChatColor.GRAY + "acquainted with attacking players");
-		lore.add(ChatColor.GRAY + "from much further than they are");
-		lore.add(ChatColor.GRAY + "supposed to.  This paper contains");
-		lore.add(ChatColor.GRAY + "the essence of the research.");
-		lore.add("");
-		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/storm_secrets"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Despite being acquainted with the"));
+		lore.add(Utils.mm("<gray>power of lightning, Storm is also"));
+		lore.add(Utils.mm("<gray>acquainted with attacking players"));
+		lore.add(Utils.mm("<gray>from much further than they are"));
+		lore.add(Utils.mm("<gray>supposed to.  This paper contains"));
+		lore.add(Utils.mm("<gray>the essence of the research."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<dark_purple><bold><obfuscated>a</obfuscated> EPIC <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		stormSecrets.setItemMeta(data);
 
 		return stormSecrets;

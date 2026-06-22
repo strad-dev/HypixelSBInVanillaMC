@@ -1,6 +1,7 @@
 package items.summonItems;
 
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -15,21 +16,21 @@ public class AtonedFlesh implements SummonItem {
 		ItemMeta data = atonedFlesh.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + "Atoned Flesh");
+		data.displayName(Utils.mm("<blue><bold>Atoned Flesh"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/summon/atoned_flesh");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "A suspicious piece of flesh");
-		lore.add(ChatColor.GRAY + "left behind by an unknown being.");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Use this on a Zombie to");
-		lore.add(ChatColor.GRAY + "summon the Atoned Horror!");
-		lore.add("");
-		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/summon/atoned_flesh"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>A suspicious piece of flesh"));
+		lore.add(Utils.mm("<gray>left behind by an unknown being."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Use this on a Zombie to"));
+		lore.add(Utils.mm("<gray>summon the Atoned Horror!"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<blue><bold><obfuscated>a</obfuscated> RARE <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		atonedFlesh.setItemMeta(data);
 
 		return atonedFlesh;

@@ -9,8 +9,8 @@ import items.summonItems.*;
 import items.weapons.Claymore;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.enchantments.Enchantment;
@@ -21,6 +21,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -29,9 +30,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 public class CreativeMenu implements Listener {
-	private static final String GUI_TITLE = ChatColor.DARK_GRAY + "SkyBlock";
+	private static final String GUI_TITLE = "SkyBlock";
 	private static final Map<UUID, String> playerTabs = new HashMap<>();
 	private static final Map<UUID, Integer> playerPages = new HashMap<>();
+
+	/** Marker holder so the menu is identified by inventory identity, not by its (deprecated) title text. */
+	private static final class CreativeMenuHolder implements InventoryHolder {
+		private Inventory inventory;
+		@Override public Inventory getInventory() { return inventory; }
+	}
 
 	// Item categories
 	private static final Map<String, List<ItemStack>> ITEMS = new HashMap<>();
@@ -146,7 +153,9 @@ public class CreativeMenu implements Listener {
 		String currentTab = playerTabs.getOrDefault(player.getUniqueId(), "items");
 		int page = playerPages.getOrDefault(player.getUniqueId(), 0);
 
-		Inventory gui = Bukkit.createInventory(null, 54, GUI_TITLE + " " + tabIdToName(currentTab));
+		CreativeMenuHolder holder = new CreativeMenuHolder();
+		Inventory gui = Bukkit.createInventory(holder, 54, Utils.msg("<dark_gray>" + GUI_TITLE + " " + tabIdToName(currentTab)));
+		holder.inventory = gui;
 
 		// Add tabs at top
 		addTabs(gui, currentTab);
@@ -166,7 +175,7 @@ public class CreativeMenu implements Listener {
 		if (page > 0) {
 			ItemStack prevPage = new ItemStack(Material.ARROW);
 			ItemMeta prevMeta = prevPage.getItemMeta();
-			prevMeta.setDisplayName(ChatColor.GREEN + "Previous Page");
+			prevMeta.displayName(Utils.mm("<green>Previous Page"));
 			prevPage.setItemMeta(prevMeta);
 			gui.setItem(45, prevPage);
 		}
@@ -174,7 +183,7 @@ public class CreativeMenu implements Listener {
 		if (items != null && (page + 1) * 36 < items.size()) {
 			ItemStack nextPage = new ItemStack(Material.ARROW);
 			ItemMeta nextMeta = nextPage.getItemMeta();
-			nextMeta.setDisplayName(ChatColor.GREEN + "Next Page");
+			nextMeta.displayName(Utils.mm("<green>Next Page"));
 			nextPage.setItemMeta(nextMeta);
 			gui.setItem(53, nextPage);
 		}
@@ -186,7 +195,7 @@ public class CreativeMenu implements Listener {
 		// Combat tab
 		ItemStack items = new ItemStack(Material.DIAMOND_SWORD);
 		ItemMeta itemsMeta = items.getItemMeta();
-		itemsMeta.setDisplayName("Items");
+		itemsMeta.displayName(Utils.mm("Items"));
 		itemsMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
 
 		if (currentTab.equals("items")) {
@@ -199,7 +208,7 @@ public class CreativeMenu implements Listener {
 		// Ingredients tab
 		ItemStack ingredients = new ItemStack(Material.BLAZE_POWDER);
 		ItemMeta ingredientsMeta = ingredients.getItemMeta();
-		ingredientsMeta.setDisplayName("Ingredients");
+		ingredientsMeta.displayName(Utils.mm("Ingredients"));
 
 		if (currentTab.equals("ingredients")) {
 			ingredientsMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
@@ -211,7 +220,7 @@ public class CreativeMenu implements Listener {
 		// Summon items tab
 		ItemStack summon = new ItemStack(Material.ZOMBIE_SPAWN_EGG);
 		ItemMeta summonMeta = summon.getItemMeta();
-		summonMeta.setDisplayName("Summon Items");
+		summonMeta.displayName(Utils.mm("Summon Items"));
 
 		if (currentTab.equals("summon")) {
 			summonMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
@@ -223,7 +232,7 @@ public class CreativeMenu implements Listener {
 		// Enchantments items tab
 		ItemStack enchantment = new ItemStack(Material.ENCHANTED_BOOK);
 		ItemMeta enchantmentMeta = summon.getItemMeta();
-		summonMeta.setDisplayName("Enchantments");
+		summonMeta.displayName(Utils.mm("Enchantments"));
 
 		if (currentTab.equals("enchantments")) {
 			summonMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
@@ -235,7 +244,7 @@ public class CreativeMenu implements Listener {
 		// Fill rest of top row with glass
 		ItemStack glass = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
 		ItemMeta glassMeta = glass.getItemMeta();
-		glassMeta.setDisplayName(" ");
+		glassMeta.displayName(Utils.mm(" "));
 		glass.setItemMeta(glassMeta);
 
 		for (int i = 4; i < 9; i++) {
@@ -245,7 +254,7 @@ public class CreativeMenu implements Listener {
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
-		if (!e.getView().getTitle().startsWith(GUI_TITLE)) return;
+		if (!(e.getInventory().getHolder() instanceof CreativeMenuHolder)) return;
 
 		Player player = (Player) e.getWhoClicked();
 		ItemStack clicked = e.getCurrentItem();
@@ -323,7 +332,7 @@ public class CreativeMenu implements Listener {
 
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
-		if (event.getView().getTitle().startsWith(GUI_TITLE)) {
+		if (event.getInventory().getHolder() instanceof CreativeMenuHolder) {
 			Player player = (Player) event.getPlayer();
 
 			// Clear cursor item like creative does

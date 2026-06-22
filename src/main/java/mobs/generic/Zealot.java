@@ -3,9 +3,9 @@ package mobs.generic;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -25,7 +25,7 @@ public class Zealot implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold>Zealot<gold><bold> ﴿";
 		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(130.0);
 		enderman.setHealth(130.0);
 		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(20.0);
@@ -35,7 +35,7 @@ public class Zealot implements CustomMob {
 		enderman.setCustomNameVisible(true);
 		enderman.addScoreboardTag("SkyblockBoss");
 		enderman.addScoreboardTag("Zealot");
-		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Pearl corrupts the Enderman.  It has become a Zealot!");
+		p.sendMessage(Utils.msg("<red><bold>The Pearl corrupts the Enderman.  It has become a Zealot!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Zealot.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		enderman.setPersistent(true);
@@ -50,7 +50,7 @@ public class Zealot implements CustomMob {
 			if(random.nextDouble() < 0.2) {
 				damager.teleport(damagee);
 				CustomDamage.customMobs(entity1, damagee, 12, DamageType.MELEE);
-				damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Zealot's Dark Magic has caused you to teleport to it!  It also deals 12 damage to you!");
+				damager.sendMessage(Utils.msg("<red><bold>The Zealot's Dark Magic has caused you to teleport to it!  It also deals 12 damage to you!"));
 			}
 		}
 		return true;

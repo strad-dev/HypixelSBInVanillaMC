@@ -1,13 +1,14 @@
 package items.weapons;
 
 import items.AbilityItem;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
-import org.bukkit.craftbukkit.v1_21_R7.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
@@ -32,30 +33,30 @@ public class Terminator implements AbilityItem {
 
 		ItemMeta data = term.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Terminator");
+		data.displayName(Utils.mm("<light_purple>Terminator"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
 
 		String loreDamage = powerLevel == 7 ? "4.5" : String.valueOf(2.5 + powerLevel * 0.25);
 		String salvationDamage = powerLevel == 7 ? "8" : String.valueOf(4 + powerLevel * 0.5);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/terminator");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+" + loreDamage);
-		lore.add(ChatColor.GRAY + "Shot Cooldown: " + ChatColor.GREEN + "0.2s");
-		lore.add("");
-		lore.add(ChatColor.GOLD + "Shortbow: Instantly Shoots!");
-		lore.add(ChatColor.GRAY + "Shoots " + ChatColor.AQUA + "3" + ChatColor.GRAY + " arrows at once.");
-		lore.add("");
-		lore.add(ChatColor.GOLD + "Ability: Salvation " + ChatColor.GREEN + ChatColor.BOLD + "LEFT CLICK");
-		lore.add(ChatColor.GRAY + "Shoot a beam, penetrating up to");
-		lore.add(ChatColor.YELLOW + "5" + ChatColor.GRAY + " foes and dealing " + ChatColor.RED + salvationDamage);
-		lore.add(ChatColor.GRAY + "damage to each enemy.");
-		lore.add(ChatColor.GRAY + "Cooldown: " + ChatColor.GREEN + "1s");
-		lore.add("");
-		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC BOW " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/terminator"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>+" + loreDamage));
+		lore.add(Utils.mm("<gray>Shot Cooldown: <green>0.2s"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold>Shortbow: Instantly Shoots!"));
+		lore.add(Utils.mm("<gray>Shoots <aqua>3<gray> arrows at once."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold>Ability: Salvation <green><bold>LEFT CLICK"));
+		lore.add(Utils.mm("<gray>Shoot a beam, penetrating up to"));
+		lore.add(Utils.mm("<yellow>5<gray> foes and dealing <red>" + salvationDamage));
+		lore.add(Utils.mm("<gray>damage to each enemy."));
+		lore.add(Utils.mm("<gray>Cooldown: <green>1s"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC BOW <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		term.setItemMeta(data);
 
 		return term;
@@ -85,10 +86,10 @@ public class Terminator implements AbilityItem {
 		// Calculate spawn position
 		Location spawnLoc = p.getEyeLocation().add(baseDirection.clone());
 
-		// Create NMS arrows directly
-		net.minecraft.world.entity.projectile.arrow.Arrow nmsLeft = new net.minecraft.world.entity.projectile.arrow.Arrow(EntityType.ARROW, nmsWorld);
-		net.minecraft.world.entity.projectile.arrow.Arrow nmsMiddle = new net.minecraft.world.entity.projectile.arrow.Arrow(EntityType.ARROW, nmsWorld);
-		net.minecraft.world.entity.projectile.arrow.Arrow nmsRight = new net.minecraft.world.entity.projectile.arrow.Arrow(EntityType.ARROW, nmsWorld);
+		// Create NMS arrows directly (26.2: EntityType.ARROW constant removed; use the position+item constructor with a null weapon)
+		net.minecraft.world.entity.projectile.arrow.Arrow nmsLeft = new net.minecraft.world.entity.projectile.arrow.Arrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
+		net.minecraft.world.entity.projectile.arrow.Arrow nmsMiddle = new net.minecraft.world.entity.projectile.arrow.Arrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
+		net.minecraft.world.entity.projectile.arrow.Arrow nmsRight = new net.minecraft.world.entity.projectile.arrow.Arrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
 
 		// Set positions
 		nmsLeft.setPos(spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ());

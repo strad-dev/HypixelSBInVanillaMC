@@ -1,7 +1,8 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,19 +18,19 @@ public class TessellatedPearl implements Ingredients {
 		ItemMeta data = tessellated.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Tessellated Ender Pearl");
+		data.displayName(Utils.mm("<dark_purple><bold>Tessellated Ender Pearl"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/tessellated_pearl");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "An Ender Pearl so dense that even");
-		lore.add(ChatColor.GRAY + "the most knowledgeable players");
-		lore.add(ChatColor.GRAY + "are mystified by it.");
-		lore.add("");
-		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/tessellated_pearl"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>An Ender Pearl so dense that even"));
+		lore.add(Utils.mm("<gray>the most knowledgeable players"));
+		lore.add(Utils.mm("<gray>are mystified by it."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<dark_purple><bold><obfuscated>a</obfuscated> EPIC <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		tessellated.setItemMeta(data);
 
 		return tessellated;

@@ -1,6 +1,7 @@
 package items.summonItems;
 
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -15,21 +16,21 @@ public class CorruptPearl implements SummonItem {
 		ItemMeta data = corruptPearl.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + "Corrupted Pearl");
+		data.displayName(Utils.mm("<blue><bold>Corrupted Pearl"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/summon/corrupt_pearl");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "An interesting mutation");
-		lore.add(ChatColor.GRAY + "of Ender Pearls.");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Use this on an Enderman to");
-		lore.add(ChatColor.GRAY + "summon a Mutant Enderman!");
-		lore.add("");
-		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/summon/corrupt_pearl"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>An interesting mutation"));
+		lore.add(Utils.mm("<gray>of Ender Pearls."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Use this on an Enderman to"));
+		lore.add(Utils.mm("<gray>summon a Mutant Enderman!"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<blue><bold><obfuscated>a</obfuscated> RARE <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		corruptPearl.setItemMeta(data);
 
 		return corruptPearl;

@@ -3,6 +3,7 @@ package items.misc;
 import items.AbilityItem;
 import misc.Plugin;
 import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -27,25 +28,25 @@ public class HolyIce implements AbilityItem {
 		data.setEnchantmentGlintOverride(true);
 		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.BLUE + "Holy Ice");
+		data.displayName(Utils.mm("<blue>Holy Ice"));
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "HolyIceModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/holy_ice");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
-		lore.add("");
-		lore.add(ChatColor.GOLD + "Ability: Splash Yo Face " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Take " + ChatColor.GREEN + "75%" + ChatColor.GRAY + " less damage");
-		lore.add(ChatColor.GRAY + "for " + ChatColor.GREEN + "1" + ChatColor.GRAY + " second!");
-		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
-		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + COOLDOWN / 20 + "s");
-		lore.add("");
-		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/holy_ice"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold>Ability: Splash Yo Face <green><bold>RIGHT CLICK"));
+		lore.add(Utils.mm("<gray>Take <green>75%<gray> less damage"));
+		lore.add(Utils.mm("<gray>for <green>1<gray> second!"));
+		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
+		lore.add(Utils.mm("<dark_gray>Cooldown: <green>" + COOLDOWN / 20 + "s"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<blue><bold><obfuscated>a</obfuscated> RARE <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		holyIce.setItemMeta(data);
 
 		return holyIce;

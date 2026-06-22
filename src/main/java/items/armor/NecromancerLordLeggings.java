@@ -1,12 +1,12 @@
 package items.armor;
 
 import misc.Plugin;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.entity.IronGolem;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -21,7 +21,7 @@ public class NecromancerLordLeggings implements Armor {
 
 		ItemMeta data = necromancerLordLeggings.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Necromancer Lord Leggings");
+		data.displayName(Utils.mm("<light_purple>Necromancer Lord Leggings"));
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necromancerLeggingsDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necromancerLeggingsArmor"), 7, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necromancerLeggingsAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
@@ -29,20 +29,20 @@ public class NecromancerLordLeggings implements Armor {
 		data.addAttributeModifier(Attribute.ARMOR, armor);
 		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/necromancer_pants");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+2");
-		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+7");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+10%");
-		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "A powerful pair of pants that allow");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "the wearer to punch slightly harder.");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "However, it is not as sturdy.");
-		lore.add("");
-		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC LEGGINGS " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/necromancer_pants"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>+2"));
+		lore.add(Utils.mm("<gray>Armor: <red>+7"));
+		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+10%"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray><italic>A powerful pair of pants that allow"));
+		lore.add(Utils.mm("<gray><italic>the wearer to punch slightly harder."));
+		lore.add(Utils.mm("<gray><italic>However, it is not as sturdy."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC LEGGINGS <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		necromancerLordLeggings.setItemMeta(data);
 
 		return necromancerLordLeggings;

@@ -1,7 +1,8 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,19 +18,19 @@ public class BraidedFeather implements Ingredients {
 		ItemMeta data = braidedFeather.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Braided Feather");
+		data.displayName(Utils.mm("<dark_purple><bold>Braided Feather"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/braided_feather");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "A Feather so sturdy that even");
-		lore.add(ChatColor.GRAY + "the most powerful players");
-		lore.add(ChatColor.GRAY + "cannot destroy it.");
-		lore.add("");
-		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/braided_feather"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>A Feather so sturdy that even"));
+		lore.add(Utils.mm("<gray>the most powerful players"));
+		lore.add(Utils.mm("<gray>cannot destroy it."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<dark_purple><bold><obfuscated>a</obfuscated> EPIC <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		braidedFeather.setItemMeta(data);
 
 		return braidedFeather;

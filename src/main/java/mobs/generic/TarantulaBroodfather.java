@@ -3,9 +3,9 @@ package mobs.generic;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -25,7 +25,7 @@ public class TarantulaBroodfather implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Tarantula Broodfather" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold>Tarantula Broodfather<gold><bold> ﴿";
 		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(100.0);
 		spider.setHealth(100.0);
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
@@ -35,7 +35,7 @@ public class TarantulaBroodfather implements CustomMob {
 		spider.setCustomNameVisible(true);
 		spider.addScoreboardTag("SkyblockBoss");
 		spider.addScoreboardTag("TarantulaBroodfather");
-		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Spider Relic draws the attention of the Tarantula Broodfather!");
+		p.sendMessage(Utils.msg("<red><bold>The Spider Relic draws the attention of the Tarantula Broodfather!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Tarantula Broodfather.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		spider.setPersistent(true);

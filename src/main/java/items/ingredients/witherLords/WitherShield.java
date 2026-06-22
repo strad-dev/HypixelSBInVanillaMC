@@ -1,7 +1,8 @@
 package items.ingredients.witherLords;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,23 +18,23 @@ public class WitherShield implements Ingredients {
 		ItemMeta data = witherShield.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Wither Shield");
+		data.displayName(Utils.mm("<dark_purple><bold>Wither Shield"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/wither_shield");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "A rare Enchanted Book imbued");
-		lore.add(ChatColor.GRAY + "with the power of Goldor.");
-		lore.add(ChatColor.GRAY + "Grants the ability to summon");
-		lore.add(ChatColor.GRAY + "6 hearts of absorption and");
-		lore.add(ChatColor.GRAY + "take 10% less damage for 5 seconds.");
-		lore.add(ChatColor.GRAY + "Extra absorption is converted to");
-		lore.add(ChatColor.GRAY + "healing after 5 seconds.");
-		lore.add("");
-		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/wither_shield"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>A rare Enchanted Book imbued"));
+		lore.add(Utils.mm("<gray>with the power of Goldor."));
+		lore.add(Utils.mm("<gray>Grants the ability to summon"));
+		lore.add(Utils.mm("<gray>6 hearts of absorption and"));
+		lore.add(Utils.mm("<gray>take 10% less damage for 5 seconds."));
+		lore.add(Utils.mm("<gray>Extra absorption is converted to"));
+		lore.add(Utils.mm("<gray>healing after 5 seconds."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<dark_purple><bold><obfuscated>a</obfuscated> EPIC <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		witherShield.setItemMeta(data);
 
 		return witherShield;

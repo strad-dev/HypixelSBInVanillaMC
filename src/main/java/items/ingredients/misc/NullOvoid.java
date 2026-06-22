@@ -1,7 +1,8 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,19 +18,19 @@ public class NullOvoid implements Ingredients  {
 		ItemMeta data = ovoid.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + "Null Ovoid");
+		data.displayName(Utils.mm("<blue><bold>Null Ovoid"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/null_ovoid");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "The Zealots have utiliezed this");
-		lore.add(ChatColor.GRAY + "item to its fullest potential.");
-		lore.add(ChatColor.GRAY + "Maybe you can as well?");
-		lore.add("");
-		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/null_ovoid"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>The Zealots have utiliezed this"));
+		lore.add(Utils.mm("<gray>item to its fullest potential."));
+		lore.add(Utils.mm("<gray>Maybe you can as well?"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<blue><bold><obfuscated>a</obfuscated> RARE <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		ovoid.setItemMeta(data);
 
 		return ovoid;

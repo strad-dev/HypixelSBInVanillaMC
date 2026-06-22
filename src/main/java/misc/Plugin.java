@@ -32,10 +32,9 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.NamespacedKey;
 import org.bukkit.advancement.Advancement;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -114,7 +113,7 @@ public class Plugin extends JavaPlugin implements Listener {
 		setupAdvancements();
 
 		try {
-			Objects.requireNonNull(getServer().getScoreboardManager()).getMainScoreboard().registerNewObjective("Intelligence", Criteria.DUMMY, "Intelligence");
+			Objects.requireNonNull(getServer().getScoreboardManager()).getMainScoreboard().registerNewObjective("Intelligence", Criteria.DUMMY, net.kyori.adventure.text.Component.text("Intelligence"));
 			getLogger().info("Could not find Intelligence.  Adding to Scoreboard.");
 		} catch(Exception exception) {
 			Objects.requireNonNull(getServer().getScoreboardManager()).getMainScoreboard().getObjective("Intelligence");
@@ -124,7 +123,6 @@ public class Plugin extends JavaPlugin implements Listener {
 		Utils.scheduleTask(() -> passiveIntel(0), 20L);
 	}
 
-	@SuppressWarnings("deprecation")
 	private static void setupAdvancements() {
 		// Root advancement
 		loadAdvancement("root", null, "minecraft:nether_star", "SkyBlock", "Can you beat all the bosses?", "task", false, false, 0, 3, "minecraft:block/light_blue_concrete");
@@ -242,7 +240,7 @@ public class Plugin extends JavaPlugin implements Listener {
 				Plugin.sendIntelligenceBar(p, score);
 			} catch(Exception exception) {
 				Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
-				Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+				Bukkit.broadcast(Utils.msg("<red>Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin"));
 				return;
 			}
 		}

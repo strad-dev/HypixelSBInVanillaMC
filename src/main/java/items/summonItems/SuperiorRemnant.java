@@ -1,6 +1,7 @@
 package items.summonItems;
 
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -15,21 +16,21 @@ public class SuperiorRemnant implements SummonItem {
 		ItemMeta data = supRemnant.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Remnant of the Superior Dragon");
+		data.displayName(Utils.mm("<gold><bold>Remnant of the Superior Dragon"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/summon/superior_remnant");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "The remains of the strongest");
-		lore.add(ChatColor.GRAY + "Dragon to ever exist.");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Use this on an Enderman to summon");
-		lore.add(ChatColor.GRAY + "the terrifying Voidgloom Seraph!");
-		lore.add("");
-		lore.add(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " LEGENDARY " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/summon/superior_remnant"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>The remains of the strongest"));
+		lore.add(Utils.mm("<gray>Dragon to ever exist."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Use this on an Enderman to summon"));
+		lore.add(Utils.mm("<gray>the terrifying Voidgloom Seraph!"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold><bold><obfuscated>a</obfuscated> LEGENDARY <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		supRemnant.setItemMeta(data);
 
 		return supRemnant;

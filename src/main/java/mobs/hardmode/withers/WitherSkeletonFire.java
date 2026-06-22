@@ -4,7 +4,6 @@ import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -25,7 +24,7 @@ public class WitherSkeletonFire implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		Utils.changeName(witherSkeleton, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Fire" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+		Utils.changeName(witherSkeleton, "<gold><bold>﴾ <red><bold>Henchman of Fire<gold><bold> ﴿");
 		witherSkeleton.addScoreboardTag("Fire");
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);

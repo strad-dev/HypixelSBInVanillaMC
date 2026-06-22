@@ -5,8 +5,8 @@ import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -15,6 +15,7 @@ import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ public class PrimordialBroodfather implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Primordial Broodfather" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold>Primordial Broodfather<gold><bold> ﴿";
 		spider.eject();
 		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(200.0);
 		spider.setHealth(200.0);
@@ -44,7 +45,7 @@ public class PrimordialBroodfather implements CustomMob {
 		spider.addScoreboardTag("PrimordialBroodfather");
 		spider.addScoreboardTag("HardMode");
 		spider.addScoreboardTag("50Trigger");
-		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Spider Relic draws the attention of the Primordial Broodfather!");
+		p.sendMessage(Utils.msg("<red><bold>The Spider Relic draws the attention of the Primordial Broodfather!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Primordial Broodfather!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		spider.setPersistent(true);
@@ -67,7 +68,7 @@ public class PrimordialBroodfather implements CustomMob {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			if(damager instanceof Player p) {
-				p.sendTitle("", ChatColor.YELLOW + "You cannot damage the Primordial Broodfather.", 0, 20, 0);
+				p.showTitle(Title.title(Utils.msg(""), Utils.msg("<yellow>You cannot damage the Primordial Broodfather."), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 			}
 			damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			return false;

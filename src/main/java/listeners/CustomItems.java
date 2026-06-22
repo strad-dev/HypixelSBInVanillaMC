@@ -36,7 +36,7 @@ public class CustomItems implements Listener {
 			return "";
 		} else if(!item.getItemMeta().hasLore()) {
 			return "";
-		} else return item.getItemMeta().getLore().getFirst();
+		} else return Utils.firstLorePlain(item.getItemMeta());
 	}
 
 	public static List<EntityType> createList() {
@@ -135,7 +135,7 @@ public class CustomItems implements Listener {
 			}
 
 			if(meta.hasLore()) {
-				if(itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/summon") || itemInUse.getItemMeta().getLore().getFirst().contains("skyblock/ingredient")) {
+				if(Utils.firstLorePlain(itemInUse.getItemMeta()).contains("skyblock/summon") || Utils.firstLorePlain(itemInUse.getItemMeta()).contains("skyblock/ingredient")) {
 					e.setCancelled(true);
 				}
 			}
@@ -145,7 +145,7 @@ public class CustomItems implements Listener {
 			score = Plugin.getIntelligence(p);
 		} catch(Exception exception) {
 			Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
-			Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+			Bukkit.broadcast(Utils.msg("<red>Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin"));
 			return;
 		}
 
@@ -164,12 +164,12 @@ public class CustomItems implements Listener {
 				if(!p.getScoreboardTags().contains("AbilityCooldown") || ((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && item instanceof Terminator)) {
 					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
 						if(!((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && !item.hasLeftClickAbility())) {
-							p.sendMessage(ChatColor.RED + "You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost());
+							p.sendMessage(Utils.msg("<red>You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost()));
 							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 						}
 					} else if(p.getScoreboardTags().contains(item.cooldownTag()) && !(item.cooldownTag().equals("SalvationCooldown") && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))) {
 						if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
-							p.sendMessage(ChatColor.RED + "This ability is on cooldown!");
+							p.sendMessage(Utils.msg("<red>This ability is on cooldown!"));
 							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 						}
 					} else {
@@ -193,7 +193,7 @@ public class CustomItems implements Listener {
 					}
 				} else {
 					if(!(item instanceof AOTV) && !(item instanceof Scylla)) {
-						p.sendMessage(ChatColor.RED + "You are doing that too fast!");
+						p.sendMessage(Utils.msg("<red>You are doing that too fast!"));
 					}
 				}
 			}

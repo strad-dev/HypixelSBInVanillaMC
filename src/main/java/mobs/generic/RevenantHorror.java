@@ -6,7 +6,6 @@ import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -31,7 +30,7 @@ public class RevenantHorror implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Revenant Horror" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold>Revenant Horror<gold><bold> ﴿";
 		ItemStack sword = new ItemStack(Material.IRON_SWORD);
 		sword.addEnchantment(Enchantment.KNOCKBACK, 2);
 
@@ -56,7 +55,7 @@ public class RevenantHorror implements CustomMob {
 		zombie.setCustomNameVisible(true);
 		zombie.addScoreboardTag("SkyblockBoss");
 		zombie.addScoreboardTag("RevenantHorror");
-		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Revenant Horror has risen from the depths!");
+		p.sendMessage(Utils.msg("<red><bold>The Revenant Horror has risen from the depths!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Revenant Horror.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		zombie.setAdult();

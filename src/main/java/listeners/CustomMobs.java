@@ -6,7 +6,6 @@ import mobs.hardmode.enderDragons.PrimalDragon;
 import mobs.hardmode.withers.Maxor;
 import mobs.withers.CustomWither;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -77,19 +76,19 @@ public class CustomMobs implements Listener {
 								isWitherLordFightActive = true;
 								Utils.scheduleTask(() -> {
 									Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": WELL WELL WELL LOOK WHO'S BACK FOR A REMATCH!");
+									Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Maxor<gold><bold> ﴿<red><bold>: WELL WELL WELL LOOK WHO'S BACK FOR A REMATCH!"));
 								}, 20);
 								Utils.scheduleTask(() -> {
 									Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I HAVE BEEN PRACTISING 40 HOURS A DAY SINCE WE LAST MET!");
+									Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Maxor<gold><bold> ﴿<red><bold>: I HAVE BEEN PRACTISING 40 HOURS A DAY SINCE WE LAST MET!"));
 								}, 80);
 								Utils.scheduleTask(() -> {
 									Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": MY TRICKS ARE MORE SOPHISTICATED THAN EVER; YOU WILL NEVER GET AROUND THEM!");
+									Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Maxor<gold><bold> ﴿<red><bold>: MY TRICKS ARE MORE SOPHISTICATED THAN EVER; YOU WILL NEVER GET AROUND THEM!"));
 								}, 140);
 								Utils.scheduleTask(() -> {
 									Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-									Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": NOW LET'S HAVE SOME FUN HERE!");
+									Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Maxor<gold><bold> ﴿<red><bold>: NOW LET'S HAVE SOME FUN HERE!"));
 								}, 200);
 								Bukkit.getLogger().info("A player has initiated the Wither Lords fight!");
 							} else {
@@ -130,12 +129,12 @@ public class CustomMobs implements Listener {
 			}
 			// add health to the entity name if it doesn't exist already
 			if(name.isEmpty()) {
-				name = ChatColor.AQUA + entity.getName();
+				name = "<aqua>" + entity.getName();
 			}
 			if(!name.contains("❤")) {
 				Utils.changeName(entity, name);
 			} else {
-				entity.setCustomName(name);
+				entity.customName(Utils.msg(name));
 			}
 			entity.setCustomNameVisible(true);
 		}

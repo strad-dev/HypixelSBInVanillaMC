@@ -2,9 +2,9 @@ package mobs.generic;
 
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
@@ -28,7 +28,7 @@ public class InfuriatedWitherSkeleton implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Highly Infuriated Wither Skeleton" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold>Highly Infuriated Wither Skeleton<gold><bold> ﴿";
 		Objects.requireNonNull(witherSkeleton.getEquipment()).clear();
 		ItemStack sword = new ItemStack(Material.NETHERITE_SWORD);
 		sword.addEnchantment(Enchantment.KNOCKBACK, 2);
@@ -46,7 +46,7 @@ public class InfuriatedWitherSkeleton implements CustomMob {
 		witherSkeleton.setCustomNameVisible(true);
 		witherSkeleton.addScoreboardTag("SkyblockBoss");
 		witherSkeleton.addScoreboardTag("InfuriatedSkeleton");
-		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "From the ashes of the Wither Skeleton rises its reincarnation: a HIGHLY INFURIATED Wither Skeleton");
+		p.sendMessage(Utils.msg("<red><bold>From the ashes of the Wither Skeleton rises its reincarnation: a HIGHLY INFURIATED Wither Skeleton"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Highly Infuriated Wither Skeleton!.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		witherSkeleton.setPersistent(true);

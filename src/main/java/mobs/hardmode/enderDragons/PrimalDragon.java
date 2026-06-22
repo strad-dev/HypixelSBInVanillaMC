@@ -6,27 +6,28 @@ import misc.DamageData;
 import misc.Plugin;
 import misc.Utils;
 import mobs.enderDragons.CustomDragon;
+import net.kyori.adventure.title.Title;
 import net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket;
 import net.minecraft.world.entity.PositionMoveRotation;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftEnderDragon;
+import org.bukkit.craftbukkit.entity.CraftEnderDragon;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Set;
 
 public class PrimalDragon implements CustomDragon {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Primal Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+	private static final String name = "<gold><bold>﴾ <red><bold>Primal Dragon<gold><bold> ﴿";
 	private static Location FREEZE_LOCATION;
 	private static PositionMoveRotation NMS_FREEZE_LOCATION;
 	private static final Location[] PERCHED_TNT_RAIN_LOCATIONS = new Location[8];
@@ -112,7 +113,7 @@ public class PrimalDragon implements CustomDragon {
 		if(dragon.getScoreboardTags().contains("Invulnerable") || dragon.getScoreboardTags().contains("Dead")) {
 			if(damager instanceof Player p) {
 				if(!dragon.getScoreboardTags().contains("Dead")) {
-					p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Primal Dragon!", 0, 20, 0);
+					p.showTitle(Title.title(Utils.msg("<red><bold>IMMUNE"), Utils.msg("<yellow>You cannot damage Primal Dragon!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 				}
 				dragon.getWorld().playSound(dragon, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			}
@@ -235,7 +236,7 @@ public class PrimalDragon implements CustomDragon {
 	}
 
 	private static void dialogue(String message) {
-		Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": " + message);
+		Bukkit.broadcast(Utils.msg(name + "<reset><red><bold>: " + message));
 		Utils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_GROWL);
 	}
 
@@ -446,7 +447,7 @@ public class PrimalDragon implements CustomDragon {
 			enderman.addScoreboardTag("SkyblockBoss");
 			enderman.setPersistent(true);
 			enderman.setRemoveWhenFarAway(false);
-			Utils.changeName(enderman, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+			Utils.changeName(enderman, "<gold><bold>﴾ <red><bold>Zealot<gold><bold> ﴿");
 		}
 		if(spawnBruiser) {
 			Enderman enderman = (Enderman) dragon.getWorld().spawnEntity(spawnLoc, EntityType.ENDERMAN);
@@ -461,7 +462,7 @@ public class PrimalDragon implements CustomDragon {
 			enderman.addScoreboardTag("SkyblockBoss");
 			enderman.setPersistent(true);
 			enderman.setRemoveWhenFarAway(false);
-			Utils.changeName(enderman, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Zealot Bruiser" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+			Utils.changeName(enderman, "<gold><bold>﴾ <red><bold>Zealot Bruiser<gold><bold> ﴿");
 		}
 	}
 
@@ -471,7 +472,7 @@ public class PrimalDragon implements CustomDragon {
 			spawnLoc.setY(Utils.highestBlockY(spawnLoc) + 10 + random.nextInt(6));
 			dragon.getWorld().spawnEntity(spawnLoc, EntityType.END_CRYSTAL);
 			dragon.setHealth(dragon.getHealth() + 10);
-			Bukkit.getOnlinePlayers().forEach(p2 -> p2.sendTitle(ChatColor.YELLOW + "" + ChatColor.BOLD + "IT'S A TRICK!", ChatColor.RED + "?" + ChatColor.GOLD + "?" + ChatColor.BLUE + "?", 0, 40, 0));
+			Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<yellow><bold>IT'S A TRICK!"), Utils.msg("<red>?<gold>?<blue>?"), Title.Times.times(Duration.ZERO, Duration.ofMillis(40L * 50L), Duration.ZERO))));
 			Utils.playGlobalSound(Sound.ENTITY_ARROW_HIT_PLAYER, 1.0f, 0.5f);
 			Utils.changeName(dragon);
 			Utils.scheduleTask(() -> theFinalTrick(dragon), 600);

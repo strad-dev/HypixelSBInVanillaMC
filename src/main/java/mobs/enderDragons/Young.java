@@ -2,8 +2,8 @@ package mobs.enderDragons;
 
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
@@ -30,9 +30,9 @@ public class Young implements CustomDragon {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Young Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String name = "<gold><bold>﴾ <red><bold>Young Dragon<gold><bold> ﴿";
 		dragon.addScoreboardTag("YoungDragon");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The YOUNG DRAGON has arrived to destroy nons 1 second faster!");
+		Bukkit.broadcast(Utils.msg("<red><bold>The YOUNG DRAGON has arrived to destroy nons 1 second faster!"));
 		Bukkit.getLogger().info("The Young Dragon has been summoned!");
 		return name;
 	}
