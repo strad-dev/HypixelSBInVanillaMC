@@ -2,7 +2,8 @@ package items.weapons;
 
 import items.CustomItem;
 import misc.Plugin;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -22,7 +23,7 @@ public class Claymore implements CustomItem {
 
 		ItemMeta data = claymore.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Dark Claymore");
+		data.displayName(Utils.mm("<light_purple>Dark Claymore"));
 		AttributeModifier attackSpeed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "claymoreModifier"), 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "claymoreModifierDmg"), 9, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		AttributeModifier attackRange = new AttributeModifier(new NamespacedKey(Plugin.getInstance(),  "claymoreModifierRange"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
@@ -36,28 +37,28 @@ public class Claymore implements CustomItem {
 			loreDamage = String.valueOf(9 + enchLevel);
 		}
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/dark_claymore");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+" + loreDamage);
-		lore.add(ChatColor.GRAY + "Swing Range: " + ChatColor.RED + "+2");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/dark_claymore"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>+" + loreDamage));
+		lore.add(Utils.mm("<gray>Swing Range: <red>+2"));
 		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
-			lore.add("");
+			lore.add(Utils.mm(""));
 			loreDamage = String.valueOf(enchLevel * 2.5);
 			if(ench.equals(Enchantment.SMITE)) {
-				lore.add(ChatColor.GRAY + "Bonus Undead Damage: " + ChatColor.RED + "+" + loreDamage);
+				lore.add(Utils.mm("<gray>Bonus Undead Damage: <red>+" + loreDamage));
 			} else {
-				lore.add(ChatColor.GRAY + "Bonus Arthropod Damage: " + ChatColor.RED + "+" + loreDamage);
+				lore.add(Utils.mm("<gray>Bonus Arthropod Damage: <red>+" + loreDamage));
 			}
 		}
-		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "That thing was too big to be");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "called a sword, it was more like");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "a large hunk of stone.");
-		lore.add("");
-		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC SWORD " + ChatColor.MAGIC + "a");
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray><italic>That thing was too big to be"));
+		lore.add(Utils.mm("<gray><italic>called a sword, it was more like"));
+		lore.add(Utils.mm("<gray><italic>a large hunk of stone."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC SWORD <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		claymore.setItemMeta(data);
 
 		return claymore;

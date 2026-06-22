@@ -4,7 +4,6 @@ import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ public class WitherSkeletonSoul implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		Utils.changeName(witherSkeleton, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of the Soul" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+		Utils.changeName(witherSkeleton, "<gold><bold>﴾ <red><bold>Henchman of the Soul<gold><bold> ﴿");
 		witherSkeleton.addScoreboardTag("Soul");
 
 		witherSkeleton.setAI(false);

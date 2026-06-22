@@ -3,8 +3,8 @@ package mobs.withers;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 
 public class Necron implements CustomWither {
@@ -18,16 +18,16 @@ public class Necron implements CustomWither {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold>Necron<gold><bold> ﴿";
 		wither.addScoreboardTag("Necron");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "NECRON, the strongest Wither in the universe, has come to wipe you straight off the planet!");
+		Bukkit.broadcast(Utils.msg("<red><bold>NECRON, the strongest Wither in the universe, has come to wipe you straight off the planet!"));
 		Bukkit.getLogger().info("Necron has been summoned!");
 		return newName;
 	}
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		return (((Wither) damagee).getInvulnerabilityTicks() == 0 || type == DamageType.LETHAL_ABSOLUTE) && type != DamageType.IFRAME_ENVIRONMENTAL;
+		return (((Wither) damagee).getInvulnerableTicks() == 0 || type == DamageType.LETHAL_ABSOLUTE) && type != DamageType.IFRAME_ENVIRONMENTAL;
 	}
 
 	@Override

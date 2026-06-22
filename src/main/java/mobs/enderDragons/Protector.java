@@ -2,8 +2,8 @@ package mobs.enderDragons;
 
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 
@@ -23,10 +23,10 @@ public class Protector implements CustomDragon {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Protector Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String name = "<gold><bold>﴾ <red><bold>Protector Dragon<gold><bold> ﴿";
 		dragon.getAttribute(Attribute.ARMOR).setBaseValue(10.0);
 		dragon.addScoreboardTag("ProtectorDragon");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The PROTECTOR DRAGON has arrived to protect the End from Nons!");
+		Bukkit.broadcast(Utils.msg("<red><bold>The PROTECTOR DRAGON has arrived to protect the End from Nons!"));
 		Bukkit.getLogger().info("The Protector Dragon has been summoned!");
 		return name;
 	}

@@ -8,17 +8,16 @@ import mobs.CustomMob;
 import mobs.withers.CustomWither;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftWither;
+import org.bukkit.craftbukkit.entity.CraftWither;
 import org.bukkit.entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Goldor implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Goldor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+	private static final String name = "<gold><bold>﴾ <red><bold>Goldor<gold><bold> ﴿";
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -59,7 +58,7 @@ public class Goldor implements CustomWither {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
+		if(((Wither) damagee).getInvulnerableTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
 
@@ -78,11 +77,11 @@ public class Goldor implements CustomWither {
 			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
 			nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 1200);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": How did you break through my shield???");
+			Bukkit.broadcast(Utils.msg(name + "<red><bold>: How did you break through my shield???"));
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Either way I don't think you're getting past Necron.");
+				Bukkit.broadcast(Utils.msg(name + "<red><bold>: Either way I don't think you're getting past Necron."));
 			}, 60);
 			Utils.scheduleTask(() -> {
 				damagee.remove();
@@ -91,11 +90,11 @@ public class Goldor implements CustomWither {
 			}, 100);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I have heard a lot about you.");
+				Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Necron<gold><bold> ﴿<red><bold>: I have heard a lot about you."));
 			}, 240);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Your perseverence is immeasurable, but your journey ends here.  Goodbye.");
+				Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Necron<gold><bold> ﴿<red><bold>: Your perseverence is immeasurable, but your journey ends here.  Goodbye."));
 			}, 300);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);

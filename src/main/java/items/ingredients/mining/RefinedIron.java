@@ -1,7 +1,8 @@
 package items.ingredients.mining;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,18 +18,18 @@ public class RefinedIron implements Ingredients {
 		ItemMeta data = refinedIron.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Refined Iron");
+		data.displayName(Utils.mm("<dark_purple><bold>Refined Iron"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/refined_iron");
-		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "A shiny ingot in its purest form");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "straight from the mines.");
-		lore.add("");
-		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/refined_iron"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray><italic>A shiny ingot in its purest form"));
+		lore.add(Utils.mm("<gray><italic>straight from the mines."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<dark_purple><bold><obfuscated>a</obfuscated> EPIC <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		refinedIron.setItemMeta(data);
 
 		return refinedIron;

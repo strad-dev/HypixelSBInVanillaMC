@@ -6,7 +6,6 @@ import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -26,7 +25,7 @@ public class VoidgloomSeraph implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Voidgloom Seraph" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold>Voidgloom Seraph<gold><bold> ﴿";
 		enderman.getAttribute(Attribute.MAX_HEALTH).setBaseValue(250.0);
 		enderman.setHealth(250.0);
 		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
@@ -36,7 +35,7 @@ public class VoidgloomSeraph implements CustomMob {
 		enderman.setCustomNameVisible(true);
 		enderman.addScoreboardTag("SkyblockBoss");
 		enderman.addScoreboardTag("VoidgloomSeraph");
-		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "From the ashes of the Superior Dragon rises the terrifying Voidgloom Seraph!");
+		p.sendMessage(Utils.msg("<red><bold>From the ashes of the Superior Dragon rises the terrifying Voidgloom Seraph!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Voidgloom Seraph.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		enderman.setPersistent(true);

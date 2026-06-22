@@ -2,8 +2,8 @@ package mobs.enderDragons;
 
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 
 import java.util.Random;
@@ -29,10 +29,10 @@ public class Unstable implements CustomDragon {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Unstable Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String name = "<gold><bold>﴾ <red><bold>Unstable Dragon<gold><bold> ﴿";
 		spawnLightning(dragon, 128);
 		dragon.addScoreboardTag("UnstableDragon");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The UNSTABLE DRAGON has arrived to cause chaos!");
+		Bukkit.broadcast(Utils.msg("<red><bold>The UNSTABLE DRAGON has arrived to cause chaos!"));
 		Bukkit.getLogger().info("The Unstable Dragon has been summoned!");
 		return name;
 	}

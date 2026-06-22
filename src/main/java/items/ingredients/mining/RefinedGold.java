@@ -1,7 +1,8 @@
 package items.ingredients.mining;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,18 +18,18 @@ public class RefinedGold implements Ingredients {
 		ItemMeta data = refinedGold.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Refined Gold");
+		data.displayName(Utils.mm("<dark_purple><bold>Refined Gold"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/refined_gold");
-		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Piglins tremble at its");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "immense rarity and value.");
-		lore.add("");
-		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/refined_gold"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray><italic>Piglins tremble at its"));
+		lore.add(Utils.mm("<gray><italic>immense rarity and value."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<dark_purple><bold><obfuscated>a</obfuscated> EPIC <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		refinedGold.setItemMeta(data);
 
 		return refinedGold;

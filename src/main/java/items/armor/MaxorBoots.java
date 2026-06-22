@@ -1,7 +1,8 @@
 package items.armor;
 
 import misc.Plugin;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -20,7 +21,7 @@ public class MaxorBoots implements Armor {
 
 		ItemMeta data = maxorBoots.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Maxor's Boots");
+		data.displayName(Utils.mm("<light_purple>Maxor's Boots"));
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsArmor"), 4.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
@@ -33,20 +34,20 @@ public class MaxorBoots implements Armor {
 		data.addAttributeModifier(Attribute.FALL_DAMAGE_MULTIPLIER, antiFall);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/maxor_boots");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
-		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+4.5");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+10%");
-		lore.add(ChatColor.GRAY + "Speed: " + ChatColor.RED + "x4");
-		lore.add(ChatColor.GRAY + "Fall Damage: " + ChatColor.RED + "-10%");
-		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Zoooooooooooooooooooooooooooooom");
-		lore.add("");
-		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC BOOTS " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/maxor_boots"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>+1"));
+		lore.add(Utils.mm("<gray>Armor: <red>+4.5"));
+		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+10%"));
+		lore.add(Utils.mm("<gray>Speed: <red>x4"));
+		lore.add(Utils.mm("<gray>Fall Damage: <red>-10%"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray><italic>Zoooooooooooooooooooooooooooooom"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC BOOTS <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		maxorBoots.setItemMeta(data);
 
 		return maxorBoots;

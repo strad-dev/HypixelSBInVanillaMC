@@ -4,7 +4,7 @@ import misc.DamageData;
 import misc.Plugin;
 import misc.Utils;
 import mobs.CustomMob;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -25,9 +25,9 @@ import net.minecraft.world.level.block.SculkSpreader;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R7.CraftWorld;
-import org.bukkit.craftbukkit.v1_21_R7.entity.*;
-import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.entity.*;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -60,7 +60,7 @@ public class CustomDamage implements Listener {
 	}
 
 	private static void handleTridentHit(Trident trident, DamageData data) {
-		ItemStack tridentItem = trident.getItem();
+		ItemStack tridentItem = trident.getItemStack();
 		trident.setVelocity(new Vector(0, -0.1, 0)); // Small downward velocity to make it drop
 
 		// Riptide damage bonus (if thrown during rain/water)
@@ -132,7 +132,7 @@ public class CustomDamage implements Listener {
 			// continue
 		}
 
-		if((damagee instanceof Player p && (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR)) || (damagee instanceof Wither wither && wither.getInvulnerabilityTicks() > 0)) {
+		if((damagee instanceof Player p && (p.getGameMode() == GameMode.CREATIVE || p.getGameMode() == GameMode.SPECTATOR)) || (damagee instanceof Wither wither && wither.getInvulnerableTicks() > 0)) {
 			doContinue = false;
 		}
 
@@ -148,7 +148,7 @@ public class CustomDamage implements Listener {
 	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
 		if(!(DamageType.isAbsoluteDamage(type))) {
 			// bonus damage to withers from hyperion
-			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && p.getInventory().getItemInMainHand().hasItemMeta() && p.getInventory().getItemInMainHand().getItemMeta().hasLore() && p.getInventory().getItemInMainHand().getItemMeta().getLore().getFirst().equals("skyblock/combat/scylla")) {
+			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && p.getInventory().getItemInMainHand().hasItemMeta() && Utils.firstLorePlain(p.getInventory().getItemInMainHand().getItemMeta()).equals("skyblock/combat/scylla")) {
 				finalDamage += 4;
 			}
 
@@ -213,32 +213,24 @@ public class CustomDamage implements Listener {
 				ItemStack pants = eq.getLeggings();
 				ItemStack boots = eq.getBoots();
 
-				if(helmet != null) {
-					prots += helmet.getEnchantmentLevel(Enchantment.PROTECTION);
-					if(affectedByArmor) {
-						Utils.damageItem(damagee, helmet, Math.max(0.25, data.originalDamage / 33.33));
-					}
+				prots += helmet.getEnchantmentLevel(Enchantment.PROTECTION);
+				if(affectedByArmor) {
+					Utils.damageItem(damagee, helmet, Math.max(0.25, data.originalDamage / 33.33));
 				}
 
-				if(chestplate != null) {
-					prots += chestplate.getEnchantmentLevel(Enchantment.PROTECTION);
-					if(affectedByArmor && chestplate.getType() != Material.ELYTRA) {
-						Utils.damageItem(damagee, chestplate, Math.max(0.25, data.originalDamage / 12.5));
-					}
+				prots += chestplate.getEnchantmentLevel(Enchantment.PROTECTION);
+				if(affectedByArmor && chestplate.getType() != Material.ELYTRA) {
+					Utils.damageItem(damagee, chestplate, Math.max(0.25, data.originalDamage / 12.5));
 				}
 
-				if(pants != null) {
-					prots += pants.getEnchantmentLevel(Enchantment.PROTECTION);
-					if(affectedByArmor) {
-						Utils.damageItem(damagee, pants, Math.max(0.25, data.originalDamage / 16.67));
-					}
+				prots += pants.getEnchantmentLevel(Enchantment.PROTECTION);
+				if(affectedByArmor) {
+					Utils.damageItem(damagee, pants, Math.max(0.25, data.originalDamage / 16.67));
 				}
 
-				if(boots != null) {
-					prots += boots.getEnchantmentLevel(Enchantment.PROTECTION);
-					if(affectedByArmor) {
-						Utils.damageItem(damagee, boots, Math.max(0.25, data.originalDamage / 33.33));
-					}
+				prots += boots.getEnchantmentLevel(Enchantment.PROTECTION);
+				if(affectedByArmor) {
+					Utils.damageItem(damagee, boots, Math.max(0.25, data.originalDamage / 33.33));
 				}
 
 				finalDamage *= Math.max(0.5, 1 - prots * 0.025);
@@ -770,9 +762,7 @@ public class CustomDamage implements Listener {
 
 				// Specific entity kills
 				net.minecraft.world.entity.EntityType<?> entityType = getEntityType(victim);
-				if(entityType != null) {
-					serverPlayer.awardStat(Stats.ENTITY_KILLED.get(entityType));
-				}
+				serverPlayer.awardStat(Stats.ENTITY_KILLED.get(entityType));
 
 				// Player kills (if victim is player)
 				if(victim instanceof Player) {
@@ -798,9 +788,7 @@ public class CustomDamage implements Listener {
 				// Death by specific entity
 				if(attacker != null) {
 					net.minecraft.world.entity.EntityType<?> entityType = getEntityType(attacker);
-					if(entityType != null) {
-						serverPlayer.awardStat(Stats.ENTITY_KILLED_BY.get(entityType));
-					}
+					serverPlayer.awardStat(Stats.ENTITY_KILLED_BY.get(entityType));
 				}
 			}
 		}
@@ -878,7 +866,7 @@ public class CustomDamage implements Listener {
 			spreader.addCursors(deathPos, experience);
 
 			// Update the spreader (this triggers the actual spreading)
-			spreader.updateCursors(level, deathPos, level.random, true);
+			spreader.updateCursors(level, deathPos, level.getRandom(), true);
 		} finally {
 			logger.setFilter(originalFilter);
 		}
@@ -1126,7 +1114,7 @@ public class CustomDamage implements Listener {
 			if(e.getDamager() instanceof Player p) {
 				crystal.remove();
 				p.addScoreboardTag("HasCrystal");
-				p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!");
+				p.sendMessage(Utils.msg("<yellow>You have picked up an Energy Crystal!"));
 			}
 
 		} else if(e.getEntity() instanceof LivingEntity entity) {
@@ -1164,7 +1152,7 @@ public class CustomDamage implements Listener {
 								Plugin.sendIntelligenceBar(p, score);
 							} catch(Exception exception) {
 								Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
-								Bukkit.broadcastMessage(ChatColor.RED + "Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+								Bukkit.broadcast(Utils.msg("<red>Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin"));
 								return;
 							}
 						}
@@ -1248,10 +1236,10 @@ public class CustomDamage implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		if(nextDeathMessage != null) {
-			e.setDeathMessage(nextDeathMessage);
+			e.deathMessage(net.kyori.adventure.text.Component.text(nextDeathMessage));
 			nextDeathMessage = null;
 		} else {
-			e.setDeathMessage(null);
+			e.deathMessage(null);
 		}
 	}
 }

@@ -2,19 +2,26 @@ package misc;
 
 import listeners.CustomDamage;
 import listeners.DamageType;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.player.PlayerItemBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
@@ -27,6 +34,51 @@ import static listeners.CustomDamage.customMobs;
 
 public class Utils {
 	private static final Random random = new Random();
+	private static final MiniMessage MM = MiniMessage.miniMessage();
+	private static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.plainText();
+	private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
+
+	/** Item display-name / lore line from a MiniMessage string. The default item italic is suppressed unless the line
+	 *  explicitly sets italic itself (e.g. <italic> flavor text), so names/lore render non-italic like vanilla. */
+	public static Component mm(String s) {
+		return MM.deserialize(s).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
+	}
+
+	/** Chat message / entity custom-name component from a MiniMessage string (no forced italic). */
+	public static Component msg(String s) {
+		return MM.deserialize(s);
+	}
+
+	/** Chat component from a MiniMessage template with tag resolvers. Use Placeholder.unparsed(...) for untrusted
+	 *  input (player names, chat text) so it is inserted literally and cannot inject MiniMessage tags. */
+	public static Component msg(String template, TagResolver... resolvers) {
+		return MM.deserialize(template, resolvers);
+	}
+
+	/** Legacy §-coded string of a component — for Bukkit APIs that only accept a String (e.g. boss bar titles). */
+	public static String legacyString(Component c) {
+		return c == null ? "" : LEGACY.serialize(c);
+	}
+
+	/** MiniMessage string of a component — to round-trip a Component (e.g. an item display name) back through the
+	 *  MiniMessage-based helpers such as {@link #changeName(LivingEntity, String)} while preserving its formatting. */
+	public static String mmString(Component c) {
+		return c == null ? "" : MM.serialize(c);
+	}
+
+	/** Plain text (no formatting) of a component — e.g. reading a custom name or item ID. */
+	public static String plain(Component c) {
+		return c == null ? "" : PLAIN.serialize(c);
+	}
+
+	/** Plain text of an item's first lore line — used to read the custom-item ID. */
+	public static String firstLorePlain(ItemMeta meta) {
+		if(meta == null) {
+			return "";
+		}
+		List<Component> l = meta.lore();
+		return l == null || l.isEmpty() ? "" : PLAIN.serialize(l.getFirst());
+	}
 
 	/**
 	 * Updates the HP display of the given entity.
@@ -35,20 +87,16 @@ public class Utils {
 	 */
 	public static void changeName(LivingEntity entity) {
 		if(!(entity instanceof Player)) {
-			String[] oldName;
 			int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount());
 			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
-			try {
-				oldName = Objects.requireNonNull(entity.getCustomName()).split(" ");
-			} catch(Exception exception) {
-				oldName = (entity.getName() + " " + ChatColor.YELLOW + health + "/" + maxHealth).split(" ");
+			Component current = entity.customName();
+			if(current == null) {
+				changeName(entity, "<aqua>" + entity.getName());
+				return;
 			}
-			oldName[oldName.length - 1] = ChatColor.YELLOW + "" + health + "/" + maxHealth;
-			StringBuilder newName = new StringBuilder(oldName[0]);
-			for(int i = 1; i < oldName.length; i++) {
-				newName.append(" ").append(oldName[i]);
-			}
-			entity.setCustomName(newName.toString());
+			// Swap the trailing "HP/maxHP" of the existing name in place, preserving all surrounding colors/formatting.
+			String serialized = MM.serialize(current).replaceFirst("\\d+/\\d+(\\s*)$", health + "/" + maxHealth + "$1");
+			entity.customName(MM.deserialize(serialized));
 		}
 	}
 
@@ -62,7 +110,7 @@ public class Utils {
 		if(!(entity instanceof Player)) {
 			int health = (int) Math.ceil(entity.getHealth() + entity.getAbsorptionAmount());
 			int maxHealth = (int) Objects.requireNonNull(entity.getAttribute(Attribute.MAX_HEALTH)).getValue();
-			entity.setCustomName(baseName + " " + ChatColor.RED + "❤ " + ChatColor.YELLOW + health + "/" + maxHealth);
+			entity.customName(msg(baseName + " <!bold><red>❤ <yellow>" + health + "/" + maxHealth));
 		}
 	}
 
@@ -131,7 +179,7 @@ public class Utils {
 	 */
 	public static void sendRareDropMessage(Player p, String message) {
 		if(p != null) {
-			p.sendMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "RARE DROP!  " + ChatColor.RESET + message);
+			p.sendMessage(msg("<gold><bold>RARE DROP!  <reset>" + message));
 			Bukkit.getLogger().info(p.getName() + " dropped a " + message);
 			p.playSound(p.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1.0F, 1.0F);
 		}
@@ -316,7 +364,7 @@ public class Utils {
 			//noinspection DuplicatedCode
 			e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(50.0);
 			e.setHealth(50.0);
-			Utils.changeName(e, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+			Utils.changeName(e, "<gold><bold>﴾ <red><bold>Wither Guard<gold><bold> ﴿");
 			e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 			e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
 			e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));

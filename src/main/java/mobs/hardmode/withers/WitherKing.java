@@ -9,23 +9,28 @@ import misc.Plugin;
 import misc.Utils;
 import mobs.CustomMob;
 import mobs.withers.CustomWither;
+import net.kyori.adventure.title.Title;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftWither;
+import org.bukkit.craftbukkit.entity.CraftWither;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.time.Duration;
 import java.util.*;
 
 import static misc.Utils.sendRareDropMessage;
 import static misc.Utils.teleport;
 
 public class WitherKing implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+	// Entity custom-name: obfuscated shimmer is fine on the floating name above the boss.
+	private static final String name = "<gold><bold>﴾ <red><bold><obfuscated>Wither-King</obfuscated><gold><bold> ﴿";
+	// Chat/title/broadcast dialogue: rendered STATIC (no obfuscated) so it doesn't visibly spasm in the chat box.
+	private static final String chatName = "<gold><bold>﴾ <red><bold>Wither-King<gold><bold> ﴿";
 	private static Mob witherKing;
 	private static final List<WitherSkeleton> henchmen = new ArrayList<>();
 
@@ -72,23 +77,23 @@ public class WitherKing implements CustomWither {
 		Collections.shuffle(ordering);
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My henchmen are the best in the land.  They will defeat you swiftly!");
+			Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: My henchmen are the best in the land.  They will defeat you swiftly!"));
 			spawnHenchman(wither, ordering.getFirst());
 			spawnHenchman(wither, ordering.get(1));
 		}, 40);
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": One more to join the fray.  I hope you are having fun!");
+			Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: One more to join the fray.  I hope you are having fun!"));
 			spawnHenchman(wither, ordering.get(2));
 		}, 640);
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Another one can't hurt, can it?");
+			Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: Another one can't hurt, can it?"));
 			spawnHenchman(wither, ordering.get(3));
 		}, 1240);
 		Utils.scheduleTask(() -> {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My last Henchman.  Go forth and destroy the insolent players!");
+			Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: My last Henchman.  Go forth and destroy the insolent players!"));
 			spawnHenchman(wither, ordering.get(4));
 		}, 1840);
 
@@ -175,15 +180,15 @@ public class WitherKing implements CustomWither {
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			switch(left) {
 				case 4 ->
-						Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My most loyal henchman, what have they done to you?");
+						Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: My most loyal henchman, what have they done to you?"));
 				case 3 ->
-						Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": It seems my henchmen are not as powerful as I thought they were.  I suppose i must help them out.");
+						Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: It seems my henchmen are not as powerful as I thought they were.  I suppose i must help them out."));
 				case 2 ->
-						Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Are you this heartless?  Murdering my defenseless followers for no good reason.");
+						Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: Are you this heartless?  Murdering my defenseless followers for no good reason."));
 				case 1 ->
-						Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You are getting on my nerves.  Quit being annoying!");
+						Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: You are getting on my nerves.  Quit being annoying!"));
 				case 0 ->
-						Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My energy is waning...  I must use my last hurrah.");
+						Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: My energy is waning...  I must use my last hurrah."));
 			}
 			for(int i = 0; i < henchmen.size(); i++) {
 				if(henchmen.get(i).getScoreboardTags().contains(which)) {
@@ -212,7 +217,7 @@ public class WitherKing implements CustomWither {
 
 				witherSkeleton.getAttribute(Attribute.MAX_HEALTH).setBaseValue(health);
 				witherSkeleton.setHealth(health);
-				Utils.changeName(witherSkeleton, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Wither Guard" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+				Utils.changeName(witherSkeleton, "<gold><bold>﴾ <red><bold>Wither Guard<gold><bold> ﴿");
 				//noinspection DuplicatedCode
 				witherSkeleton.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 				witherSkeleton.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
@@ -235,17 +240,17 @@ public class WitherKing implements CustomWither {
 		if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
 			Utils.scheduleTask(() -> {
 				if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-					Bukkit.getOnlinePlayers().forEach(p -> p.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "2", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0));
+					Bukkit.getOnlinePlayers().forEach(p -> p.showTitle(Title.title(Utils.msg("<red><bold>2"), Utils.msg("<yellow><bold>BOOM!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO))));
 				}
 			}, 360 + countHenchmenLeft() * 40L);
 			Utils.scheduleTask(() -> {
 				if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-					Bukkit.getOnlinePlayers().forEach(p -> p.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "1", ChatColor.YELLOW + String.valueOf(ChatColor.BOLD) + "BOOM!", 0, 21, 0));
+					Bukkit.getOnlinePlayers().forEach(p -> p.showTitle(Title.title(Utils.msg("<red><bold>1"), Utils.msg("<yellow><bold>BOOM!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO))));
 				}
 			}, 380 + countHenchmenLeft() * 40L);
 			Utils.scheduleTask(() -> {
 				if(!e.isDead() && !e.getScoreboardTags().contains("Dead")) {
-					Bukkit.getOnlinePlayers().forEach(p -> p.sendTitle(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "BOOM!", "", 0, 21, 0));
+					Bukkit.getOnlinePlayers().forEach(p -> p.showTitle(Title.title(Utils.msg("<red><bold>BOOM!"), Utils.msg(""), Title.Times.times(Duration.ZERO, Duration.ofMillis(21L * 50L), Duration.ZERO))));
 					List<EntityType> immune = new ArrayList<>();
 					immune.add(EntityType.WITHER_SKELETON);
 					Utils.spawnTNT(e, e.getLocation(), 0, 48, 200 - countHenchmenLeft() * 20, immune);
@@ -258,7 +263,7 @@ public class WitherKing implements CustomWither {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
+		if(((Wither) damagee).getInvulnerableTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
 
@@ -273,7 +278,7 @@ public class WitherKing implements CustomWither {
 		} else if(hp - originalDamage < minHealth && countHenchmenLeft() != 0) {
 			if(hp == minHealth) {
 				if(damager instanceof Player p) {
-					p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage " + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GREEN + "!", 0, 20, 0);
+					p.showTitle(Title.title(Utils.msg("<red><bold>IMMUNE"), Utils.msg("<yellow>You cannot damage Wither-King<green>!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 				}
 				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			} else {
@@ -292,19 +297,19 @@ public class WitherKing implements CustomWither {
 			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
 			nmsWither.bossEvent.setProgress((float) (witherKing.getHealth() / 2000));
 			Utils.changeName(damagee);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have defeated me...  Centuries of preparation down the drain...");
+			Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: You have defeated me...  Centuries of preparation down the drain..."));
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Congratulations, you have proven yourself as a mighty warrior.");
+				Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: Congratulations, you have proven yourself as a mighty warrior."));
 			}, 80);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": My strength slips away... I can see the light at the end of the tunnel.");
+				Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: My strength slips away... I can see the light at the end of the tunnel."));
 			}, 160);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Goodbye cruel world!  I hope to never see it again!");
+				Bukkit.broadcast(Utils.msg(chatName + "<red><bold>: Goodbye cruel world!  I hope to never see it again!"));
 			}, 240);
 			Utils.scheduleTask(() -> {
 				damagee.remove();
@@ -359,7 +364,7 @@ public class WitherKing implements CustomWither {
 
 		CustomMobs.updateWitherLordFight(false);
 
-		p.sendMessage(ChatColor.GOLD + "You have defeated the Wither Lords.  Congratulations!");
+		p.sendMessage(Utils.msg("<gold>You have defeated the Wither Lords.  Congratulations!"));
 		Utils.playGlobalSound(Sound.UI_TOAST_CHALLENGE_COMPLETE);
 		Plugin.grantAdvancement("skyblock:defeat_wither_lords", p);
 	}

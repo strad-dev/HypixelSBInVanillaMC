@@ -2,8 +2,8 @@ package mobs.enderDragons;
 
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 
@@ -23,11 +23,11 @@ public class Old implements CustomDragon {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Old Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String name = "<gold><bold>﴾ <red><bold>Old Dragon<gold><bold> ﴿";
 		dragon.getAttribute(Attribute.MAX_HEALTH).setBaseValue(300.0);
 		dragon.setHealth(300.0);
 		dragon.addScoreboardTag("OldDragon");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The OLD DRAGON has arrived for one last battle!");
+		Bukkit.broadcast(Utils.msg("<red><bold>The OLD DRAGON has arrived for one last battle!"));
 		Bukkit.getLogger().info("The Old Dragon has been summoned!");
 		return name;
 	}

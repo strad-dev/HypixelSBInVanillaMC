@@ -1,6 +1,7 @@
 package items.summonItems;
 
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -16,21 +17,21 @@ public class OmegaEgg implements SummonItem {
 		ItemMeta data = omegaEgg.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + "Omega Egg");
+		data.displayName(Utils.mm("<blue><bold>Omega Egg"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/summon/omega_egg");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "A strange specimen used to");
-		lore.add(ChatColor.GRAY + "create the strongest Chickens.");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Use this on a Chicken");
-		lore.add(ChatColor.GRAY + "to summon Chickzilla!");
-		lore.add("");
-		lore.add(ChatColor.BLUE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " RARE " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/summon/omega_egg"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>A strange specimen used to"));
+		lore.add(Utils.mm("<gray>create the strongest Chickens."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Use this on a Chicken"));
+		lore.add(Utils.mm("<gray>to summon Chickzilla!"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<blue><bold><obfuscated>a</obfuscated> RARE <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		omegaEgg.setItemMeta(data);
 
 		return omegaEgg;

@@ -5,6 +5,8 @@ import listeners.CustomItems;
 import listeners.DamageType;
 import misc.Plugin;
 import misc.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -19,6 +21,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,29 +39,29 @@ public class IceSpray implements AbilityItem {
 		data.setEnchantmentGlintOverride(true);
 		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.GOLD + "Ice Spray Wand");
+		data.displayName(Utils.mm("<gold>Ice Spray Wand"));
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "IceSprayWandModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/ice_spray_wand");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
-		lore.add("");
-		lore.add(ChatColor.GOLD + "Ability: Ice Spray " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Produces a cone of ice in front");
-		lore.add(ChatColor.GRAY + "of the caster that deals");
-		lore.add(ChatColor.RED + "1" + ChatColor.GRAY + " damage to enemies and");
-		lore.add(ChatColor.GRAY + "slows them down for " + ChatColor.GREEN + "5");
-		lore.add(ChatColor.GRAY + "seconds!  Frozen enemies take");
-		lore.add(ChatColor.RED + "+10%" + ChatColor.GRAY + " increased damage!");
-		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
-		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + COOLDOWN / 20 + "s");
-		lore.add("");
-		lore.add(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " LEGENDARY WAND " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/ice_spray_wand"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold>Ability: Ice Spray <green><bold>RIGHT CLICK"));
+		lore.add(Utils.mm("<gray>Produces a cone of ice in front"));
+		lore.add(Utils.mm("<gray>of the caster that deals"));
+		lore.add(Utils.mm("<red>1<gray> damage to enemies and"));
+		lore.add(Utils.mm("<gray>slows them down for <green>5"));
+		lore.add(Utils.mm("<gray>seconds!  Frozen enemies take"));
+		lore.add(Utils.mm("<red>+10%<gray> increased damage!"));
+		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
+		lore.add(Utils.mm("<dark_gray>Cooldown: <green>" + COOLDOWN / 20 + "s"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold><bold><obfuscated>a</obfuscated> LEGENDARY WAND <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		iceSpray.setItemMeta(data);
 
 		return iceSpray;
@@ -91,17 +94,17 @@ public class IceSpray implements AbilityItem {
 					entity1.addScoreboardTag("IceSprayed");
 					Utils.scheduleTask(() -> entity1.removeScoreboardTag("IceSprayed"), 101L);
 					if(entity1 instanceof Player enemy) {
-						enemy.sendTitle(ChatColor.AQUA + "" + ChatColor.BOLD + "❄ ❅ ❆", ChatColor.BLUE + "Brrrr...", 0, 101, 0);
-						enemy.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + p.getName() + " has Ice Sprayed you for 5 seconds!");
+						enemy.showTitle(Title.title(Utils.msg("<aqua><bold>❄ ❅ ❆"), Utils.msg("<blue>Brrrr..."), Title.Times.times(Duration.ZERO, Duration.ofMillis(101L * 50L), Duration.ZERO)));
+						enemy.sendMessage(Utils.msg("<aqua><bold>" + p.getName() + " has Ice Sprayed you for 5 seconds!"));
 					}
 				}
 			}
 		}
 		if(damage > 0) {
-			p.sendMessage(ChatColor.RED + "Your Ice Spray debuffed " + damage + " enemies.");
+			p.sendMessage(Utils.msg("<red>Your Ice Spray debuffed " + damage + " enemies."));
 		}
 		if(alreadyDebuffed > 0) {
-			p.sendMessage(ChatColor.RED + String.valueOf(alreadyDebuffed) + " enemies have already been debuffed.");
+			p.sendMessage(Utils.msg("<red>" + alreadyDebuffed + " enemies have already been debuffed."));
 		}
 		p.playSound(p, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.0F);
 		return true;

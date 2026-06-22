@@ -3,7 +3,7 @@ package items.misc;
 import items.AbilityItem;
 import misc.Plugin;
 import misc.Utils;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Sound;
@@ -30,25 +30,25 @@ public class WandOfAtonement implements AbilityItem {
 		data.setEnchantmentGlintOverride(true);
 		data.setMaxStackSize(1);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.GOLD + "Wand of Atonement");
+		data.displayName(Utils.mm("<gold>Wand of Atonement"));
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "Wand1Modifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/wand_of_atonement");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "0");
-		lore.add("");
-		lore.add(ChatColor.GOLD + "Ability: Big Heal " + ChatColor.GREEN + ChatColor.BOLD + "RIGHT CLICK");
-		lore.add(ChatColor.GRAY + "Gain +" + ChatColor.RED + "0.5❤" + ChatColor.GRAY + " every " + ChatColor.GREEN + "0.75");
-		lore.add(ChatColor.GRAY + "seconds for " + ChatColor.GREEN + "3" + ChatColor.GRAY + " seconds!");
-		lore.add(ChatColor.DARK_GRAY + "Intelligence Cost: " + ChatColor.DARK_AQUA + MANA_COST);
-		lore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + COOLDOWN / 20 + "s");
-		lore.add("");
-		lore.add(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " LEGENDARY WAND " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/wand_of_atonement"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold>Ability: Big Heal <green><bold>RIGHT CLICK"));
+		lore.add(Utils.mm("<gray>Gain +<red>0.5❤<gray> every <green>0.75"));
+		lore.add(Utils.mm("<gray>seconds for <green>3<gray> seconds!"));
+		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
+		lore.add(Utils.mm("<dark_gray>Cooldown: <green>" + COOLDOWN / 20 + "s"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold><bold><obfuscated>a</obfuscated> LEGENDARY WAND <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		wandOfAtonement.setItemMeta(data);
 
 		return wandOfAtonement;

@@ -3,7 +3,7 @@ package listeners;
 import misc.AddRecipes;
 import misc.BossBarManager;
 import misc.Plugin;
-import org.bukkit.ChatColor;
+import misc.Utils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,13 +17,17 @@ public class PlayerLoginHandler implements Listener {
 		Player p = e.getPlayer();
 		BossBarManager.addPlayerToActiveBars(p);
 		p.discoverRecipes(AddRecipes.returnRecipes(Plugin.getInstance()));
-		p.sendMessage(" " + ChatColor.BLUE + ChatColor.BOLD + ChatColor.MAGIC + "E" + ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + " Hypixel SkyBlock in Vanilla Minecraft Plugin " + ChatColor.MAGIC + "E" + ChatColor.RESET + "\n" +
-				ChatColor.BLACK + "---" + ChatColor.DARK_BLUE + "---" + ChatColor.DARK_GREEN + "---" + ChatColor.DARK_AQUA + "---" + ChatColor.DARK_RED + "---" + ChatColor.DARK_PURPLE + "---" + ChatColor.GOLD + "---" + ChatColor.GRAY + "---" +
-				ChatColor.DARK_GRAY + "---" + ChatColor.BLUE + "---" + ChatColor.GREEN + "---" + ChatColor.AQUA + "---" + ChatColor.RED + "---" + ChatColor.LIGHT_PURPLE + "---" + ChatColor.YELLOW + "---" + ChatColor.WHITE + "---\n" +
-				ChatColor.RESET + ChatColor.AQUA + ChatColor.BOLD + "GITHUB: " + ChatColor.RESET + "https://github.com/strad-dev/HypixelSBInVanillaMC \n\n" +
-				ChatColor.RESET + ChatColor.BLUE + ChatColor.BOLD + "DISCORD: " + ChatColor.RESET + "https://discord.gg/gNfPwa8 \n\n" +
-				ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + "YOUTUBE: " + ChatColor.RESET + "https://www.youtube.com/@Stradivarius_Violin \n\n" +
-				ChatColor.RESET + ChatColor.YELLOW + "Found a bug?  Have a suggestion?  Make a ticket in the Github or contact stradivariusviolin on Discord.");
+		p.sendMessage(Utils.msg("""
+				 <blue><bold>✦ Hypixel SkyBlock in Vanilla Minecraft Plugin ✦<reset>
+				<black>---<dark_blue>---<dark_green>---<dark_aqua>---<dark_red>---<dark_purple>---<gold>---<gray>---\
+				<dark_gray>---<blue>---<green>---<aqua>---<red>---<light_purple>---<yellow>---<white>---
+				<reset><aqua><bold>GITHUB: <reset>https://github.com/strad-dev/HypixelSBInVanillaMC\s
+				
+				<reset><blue><bold>DISCORD: <reset>https://discord.gg/gNfPwa8\s
+				
+				<reset><red><bold>YOUTUBE: <reset>https://www.youtube.com/@Stradivarius_Violin\s
+				
+				<reset><yellow>Found a bug?  Have a suggestion?  Make a ticket in the Github or contact stradivariusviolin on Discord."""));
 		p.removeScoreboardTag("AbilityCooldown");
 		p.removeScoreboardTag("TerminatorCooldown");
 		p.removeScoreboardTag("IceSprayed");

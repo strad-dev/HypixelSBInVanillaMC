@@ -88,8 +88,8 @@ public class BossBarManager {
 
 		private String buildTitle() {
 
-			// The name already has formatting, just append health
-			return entity.getCustomName() != null ? entity.getCustomName() : entity.getName();
+			// The name already has formatting; serialize to legacy §-codes so the (String-only) boss-bar title keeps its colors.
+			return entity.customName() != null ? Utils.legacyString(entity.customName()) : entity.getName();
 		}
 
 		void start() {
@@ -114,7 +114,7 @@ public class BossBarManager {
 			bossBar.setTitle(buildTitle());
 
 			// Update progress
-			double progress = Math.max(0.0, Math.min(1.0, currentHealth / entity.getAttribute(Attribute.MAX_HEALTH).getValue()));
+			double progress = Math.clamp(currentHealth / entity.getAttribute(Attribute.MAX_HEALTH).getValue(), 0.0, 1.0);
 			bossBar.setProgress(progress);
 
 			// Update player visibility

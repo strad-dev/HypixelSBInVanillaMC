@@ -2,8 +2,8 @@ package mobs.enderDragons;
 
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -25,10 +25,10 @@ public class Holy implements CustomDragon {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Holy Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String name = "<gold><bold>﴾ <red><bold>Holy Dragon<gold><bold> ﴿";
 		dragon.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 0));
 		dragon.addScoreboardTag("HolyDragon");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The HOLY DRAGON has arrived to cleanse the world of evil!");
+		Bukkit.broadcast(Utils.msg("<red><bold>The HOLY DRAGON has arrived to cleanse the world of evil!"));
 		Bukkit.getLogger().info("The Holy Dragon has been summoned!");
 
 		return name;

@@ -1,7 +1,8 @@
 package items.ingredients.witherLords;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -18,22 +19,22 @@ public class GoldorSecrets implements Ingredients {
 		ItemMeta data = goldorSecrets.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + "Goldor's Secrets");
+		data.displayName(Utils.mm("<dark_purple><bold>Goldor's Secrets"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/goldor_secrets");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "A piece of research that has over three");
-		lore.add(ChatColor.GRAY + "centuries of work, studying how to grant");
-		lore.add(ChatColor.GRAY + "just one more of a stat deemed to already");
-		lore.add(ChatColor.GRAY + "have been completely maxed out.  Unfortunately,");
-		lore.add(ChatColor.GRAY + "Goldor was a but flustered at being defeated,");
-		lore.add(ChatColor.GRAY + "and dropped this research behind him.");
-		lore.add("");
-		lore.add(ChatColor.DARK_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.DARK_PURPLE + ChatColor.BOLD + " EPIC " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/goldor_secrets"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>A piece of research that has over three"));
+		lore.add(Utils.mm("<gray>centuries of work, studying how to grant"));
+		lore.add(Utils.mm("<gray>just one more of a stat deemed to already"));
+		lore.add(Utils.mm("<gray>have been completely maxed out.  Unfortunately,"));
+		lore.add(Utils.mm("<gray>Goldor was a but flustered at being defeated,"));
+		lore.add(Utils.mm("<gray>and dropped this research behind him."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<dark_purple><bold><obfuscated>a</obfuscated> EPIC <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		goldorSecrets.setItemMeta(data);
 
 		return goldorSecrets;

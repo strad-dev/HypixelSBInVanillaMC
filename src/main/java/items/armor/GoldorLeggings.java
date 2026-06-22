@@ -1,7 +1,8 @@
 package items.armor;
 
 import misc.Plugin;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -20,7 +21,7 @@ public class GoldorLeggings implements Armor {
 
 		ItemMeta data = goldorLeggings.getItemMeta();
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.LIGHT_PURPLE + "Goldor's Leggings");
+		data.displayName(Utils.mm("<light_purple>Goldor's Leggings"));
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsArmor"), 7.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
@@ -29,20 +30,20 @@ public class GoldorLeggings implements Armor {
 		data.addAttributeModifier(Attribute.KNOCKBACK_RESISTANCE, antiKB);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/combat/goldor_pants");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "Damage: " + ChatColor.RED + "+1");
-		lore.add(ChatColor.GRAY + "Armor: " + ChatColor.RED + "+7.5");
-		lore.add(ChatColor.GRAY + "Knockback Resistance: " + ChatColor.RED + "+20%");
-		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Goldor has spent centuries");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "researching how to make Netherite");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "Leggings that are even tougher!");
-		lore.add("");
-		lore.add(ChatColor.LIGHT_PURPLE + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " MYTHIC LEGGINGS " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/combat/goldor_pants"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>Damage: <red>+1"));
+		lore.add(Utils.mm("<gray>Armor: <red>+7.5"));
+		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+20%"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray><italic>Goldor has spent centuries"));
+		lore.add(Utils.mm("<gray><italic>researching how to make Netherite"));
+		lore.add(Utils.mm("<gray><italic>Leggings that are even tougher!"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC LEGGINGS <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		goldorLeggings.setItemMeta(data);
 
 		return goldorLeggings;

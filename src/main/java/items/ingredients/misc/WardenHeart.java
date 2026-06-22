@@ -1,7 +1,8 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -18,19 +19,19 @@ public class WardenHeart implements Ingredients {
 		ItemMeta data = wardenHeart.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Warden Heart");
+		data.displayName(Utils.mm("<gold><bold>Warden Heart"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/warden_heart");
-		lore.add("");
-		lore.add(ChatColor.GRAY + "The heart of a powerful creature,");
-		lore.add(ChatColor.GRAY + "dropped by the Warden.");
-		lore.add(ChatColor.GRAY + "(NOT the Atoned Horror)");
-		lore.add("");
-		lore.add(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " LEGENDARY " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/warden_heart"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray>The heart of a powerful creature,"));
+		lore.add(Utils.mm("<gray>dropped by the Warden."));
+		lore.add(Utils.mm("<gray>(NOT the Atoned Horror)"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold><bold><obfuscated>a</obfuscated> LEGENDARY <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		wardenHeart.setItemMeta(data);
 
 		return wardenHeart;

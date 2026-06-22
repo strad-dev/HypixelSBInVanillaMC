@@ -3,15 +3,14 @@ package listeners;
 import items.summonItems.SummonItem;
 import misc.Utils;
 import mobs.CustomMob;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_21_R7.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.entity.CraftEntity;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,7 +33,7 @@ public class CustomItemUses implements Listener {
 		ItemStack item = inventory.getItemInMainHand();
 		String id;
 		try {
-			id = item.getItemMeta().getLore().getFirst();
+			id = Utils.firstLorePlain(item.getItemMeta());
 		} catch(Exception exception) {
 			id = "";
 		}
@@ -44,11 +43,11 @@ public class CustomItemUses implements Listener {
 			case EnderCrystal crystal when crystal.getScoreboardTags().contains("SkyblockBoss") -> {
 				crystal.remove();
 				p.addScoreboardTag("HasCrystal");
-				p.sendMessage(ChatColor.YELLOW + "You have picked up an Energy Crystal!");
+				p.sendMessage(Utils.msg("<yellow>You have picked up an Energy Crystal!"));
 			}
 			case Wither wither when wither.getScoreboardTags().contains("Maxor") && p.getScoreboardTags().contains("HasCrystal") -> {
 				wither.removeScoreboardTag("Invulnerable");
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": OUCH!  HOW DID YOU FIGURE IT OUT???.");
+				Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Maxor<gold><bold> ﴿<red><bold>: OUCH!  HOW DID YOU FIGURE IT OUT???."));
 				List<EntityType> immune = new ArrayList<>();
 				immune.add(EntityType.WITHER_SKELETON);
 				Utils.spawnTNT(wither, wither.getLocation(), 0, 8, 10, immune);
@@ -62,7 +61,7 @@ public class CustomItemUses implements Listener {
 				if(mob == null) {
 					if(item.getType().equals(Material.NAME_TAG)) {
 						e.setCancelled(true);
-						newName = item.getItemMeta().getDisplayName();
+						newName = Utils.mmString(item.getItemMeta().displayName());
 						isNameTag = true;
 					} else {
 						return;

@@ -1,7 +1,8 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
-import org.bukkit.ChatColor;
+import misc.Utils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -17,18 +18,18 @@ public class EnchantmentUpgrader implements Ingredients {
 		ItemMeta data = upgrader.getItemMeta();
 		data.setEnchantmentGlintOverride(true);
 		data.setUnbreakable(true);
-		data.setDisplayName(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "Exceedingly Rare Enchantment Upgrader");
+		data.displayName(Utils.mm("<gold><bold>Exceedingly Rare Enchantment Upgrader"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ARMOR_TRIM, ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
 
-		List<String> lore = new ArrayList<>();
-		lore.add("skyblock/ingredient/enchantment_upgrader");
-		lore.add("");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "The item name is long both as a reference");
-		lore.add(ChatColor.GRAY + String.valueOf(ChatColor.ITALIC) + "but also because the devs found it funny.");
-		lore.add("");
-		lore.add(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + ChatColor.MAGIC + "a" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " LEGENDARY " + ChatColor.MAGIC + "a");
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("skyblock/ingredient/enchantment_upgrader"));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gray><italic>The item name is long both as a reference"));
+		lore.add(Utils.mm("<gray><italic>but also because the devs found it funny."));
+		lore.add(Utils.mm(""));
+		lore.add(Utils.mm("<gold><bold><obfuscated>a</obfuscated> LEGENDARY <obfuscated>a</obfuscated>"));
 
-		data.setLore(lore);
+		data.lore(lore);
 		upgrader.setItemMeta(data);
 
 		return upgrader;

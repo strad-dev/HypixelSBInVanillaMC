@@ -1,5 +1,6 @@
 package listeners;
 
+import misc.Utils;
 import org.bukkit.entity.Enderman;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,7 +12,7 @@ public class StopBossesTeleporting implements Listener {
 	@EventHandler
 	public void onEntityTeleport(EntityTeleportEvent e) {
 		if(e.getEntity() instanceof Enderman enderman) {
-			String name = enderman.getCustomName();
+			String name = Utils.plain(enderman.customName());
 			try {
 				if(enderman.getFireTicks() > 0 || enderman.getScoreboardTags().contains("IceSprayed") || Objects.requireNonNull(name).contains("Voidgloom Seraph") || name.contains("Mutant Enderman")) {
 					e.setCancelled(true);

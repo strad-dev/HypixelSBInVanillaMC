@@ -8,22 +8,23 @@ import misc.Utils;
 import mobs.CustomMob;
 import mobs.withers.CustomWither;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftWither;
+import org.bukkit.craftbukkit.entity.CraftWither;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
 import static misc.Utils.teleport;
 
 public class Necron implements CustomWither {
-	private static final String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Necron" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+	private static final String name = "<gold><bold>﴾ <red><bold>Necron<gold><bold> ﴿";
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -74,12 +75,12 @@ public class Necron implements CustomWither {
 		if(which == 1100) {
 			wither.removeScoreboardTag("1100Frenzy");
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": WITNESS MY RAW NUCLEAR POWER!");
+			Bukkit.broadcast(Utils.msg(name + "<red><bold>: WITNESS MY RAW NUCLEAR POWER!"));
 			wither.setHealth(1100.0);
 		} else {
 			wither.removeScoreboardTag("300Frenzy");
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Sometimes when you have a problem, you just need to destroy it and start again!");
+			Bukkit.broadcast(Utils.msg(name + "<red><bold>: Sometimes when you have a problem, you just need to destroy it and start again!"));
 			wither.setHealth(300.0);
 		}
 		WitherBoss nmsWither = ((CraftWither) wither).getHandle();
@@ -88,7 +89,7 @@ public class Necron implements CustomWither {
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
+		if(((Wither) damagee).getInvulnerableTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
 
@@ -99,7 +100,7 @@ public class Necron implements CustomWither {
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			Utils.changeName(damagee);
 			if(damager instanceof Player p && !damagee.getScoreboardTags().contains("Dead")) {
-				p.sendTitle(ChatColor.RED + "" + ChatColor.BOLD + "IMMUNE", ChatColor.YELLOW + "You cannot damage Necron!", 0, 20, 0);
+				p.showTitle(Title.title(Utils.msg("<red><bold>IMMUNE"), Utils.msg("<yellow>You cannot damage Necron!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 			}
 				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 			return false;
@@ -123,11 +124,11 @@ public class Necron implements CustomWither {
 			WitherBoss nmsWither = ((CraftWither) damagee).getHandle();
 			nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 1400);
 			damager.getWorld().playSound(damager, Sound.ENTITY_WITHER_HURT, 1.0F, 1.0F);
-			Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": You have destroyed us... but you have not destroyed our forefather.");
+			Bukkit.broadcast(Utils.msg(name + "<red><bold>: You have destroyed us... but you have not destroyed our forefather."));
 			Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-				Bukkit.broadcastMessage(name + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": He is a very powerful being.  If you wish to defeat Him, tread carefully.");
+				Bukkit.broadcast(Utils.msg(name + "<red><bold>: He is a very powerful being.  If you wish to defeat Him, tread carefully."));
 			}, 60);
 			Utils.scheduleTask(() -> {
 				damagee.remove();
@@ -136,19 +137,19 @@ public class Necron implements CustomWither {
 			}, 100);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Who dares wake me from my slumber?");
+				Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Wither-King<gold><bold> ﴿<red><bold>: Who dares wake me from my slumber?"));
 			}, 240);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Foolish players!  You do not know who you are dealing with!");
+				Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Wither-King<gold><bold> ﴿<red><bold>: Foolish players!  You do not know who you are dealing with!"));
 			}, 320);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": I do not wish to fight, but you leave me no choice.");
+				Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Wither-King<gold><bold> ﴿<red><bold>: I do not wish to fight, but you leave me no choice."));
 			}, 400);
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 1.0F, 0.667F);
-				Bukkit.broadcastMessage(ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "Wither-King" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿" + ChatColor.RESET + ChatColor.RED + ChatColor.BOLD + ": Prepare to meet your ultimate demise.");
+				Bukkit.broadcast(Utils.msg("<gold><bold>﴾ <red><bold>Wither-King<gold><bold> ﴿<red><bold>: Prepare to meet your ultimate demise."));
 			}, 480);
 			Utils.scheduleTask(() -> {
 				Wither wither = (Wither) damagee.getWorld().spawnEntity(damagee.getLocation(), EntityType.WITHER);

@@ -5,8 +5,8 @@ import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -14,6 +14,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import java.time.Duration;
 import java.util.Random;
 
 public class ObfuscatedmeloGnorI implements CustomMob {
@@ -27,7 +28,7 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + ChatColor.MAGIC + "meloG-norI" + ChatColor.RESET + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold><obfuscated>meloG-norI</obfuscated><gold><bold> ﴿";
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(250.0);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		e.setTarget(p);
@@ -37,8 +38,8 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 		e.addScoreboardTag("SkyblockBoss");
 		e.addScoreboardTag("ObfuscatedmeloGnorI");
 		e.addScoreboardTag("HardMode");
-		p.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The Antimatter has done strange things to this Iron Golem...");
-		Bukkit.getLogger().info(p.getName() + " has summoned the " + ChatColor.MAGIC + "meloG norI" + ChatColor.RESET + "!");
+		p.sendMessage(Utils.msg("<red><bold>The Antimatter has done strange things to this Iron Golem..."));
+		Bukkit.getLogger().info(p.getName() + " has summoned the meloG norI!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		e.setPersistent(true);
 		e.setRemoveWhenFarAway(false);
@@ -67,11 +68,11 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 					if(damagee.getHealth() + (originalDamage - 10.0) > 250) {
 						damagee.setHealth(250);
 						CustomDamage.customMobs(entity1, damagee, originalDamage - 10, DamageType.MELEE);
-						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt is at full health and has REFLECTED " + (originalDamage - 10) + " Damage back to you!");
+						damager.sendMessage(Utils.msg("<red><bold>You have done too much damage to the meloG norI!\nIt is at full health and has REFLECTED " + (originalDamage - 10) + " Damage back to you!"));
 					} else {
 						damagee.setHealth(damagee.getHealth() + (originalDamage - 10.0));
 						Utils.changeName(damagee);
-						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "You have done too much damage to the meloG norI!\nIt has HEALED ITSELF by " + (originalDamage - 10) + " HP!");
+						damager.sendMessage(Utils.msg("<red><bold>You have done too much damage to the meloG norI!\nIt has HEALED ITSELF by " + (originalDamage - 10) + " HP!"));
 					}
 					damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 					damagee.setNoDamageTicks(9);
@@ -82,17 +83,17 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 						CustomDamage.customMobs(entity1, damagee, 20, DamageType.MELEE);
 						damagee.swingMainHand();
 						damagee.swingOffHand();
-						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The meloG norI becomes enraged and deals extra damage to you!");
+						damager.sendMessage(Utils.msg("<red><bold>The meloG norI becomes enraged and deals extra damage to you!"));
 					} else if(random.nextDouble() < 0.25) {
 						damagee.teleport(damager);
-						damager.sendMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The meloG norI's unstableness has caused it to teleport to you!");
+						damager.sendMessage(Utils.msg("<red><bold>The meloG norI's unstableness has caused it to teleport to you!"));
 					}
 					return true;
 				}
 			}
 		} else {
 			if(damager instanceof Player p) {
-				p.sendTitle("", ChatColor.YELLOW + "You cannot deal " + DamageType.toString(type) + " to the meloG norI.", 0, 20, 0);
+				p.showTitle(Title.title(Utils.msg(""), Utils.msg("<yellow>You cannot deal " + DamageType.toString(type) + " to the meloG norI."), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 			}
 			damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
 		}

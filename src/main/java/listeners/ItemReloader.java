@@ -90,8 +90,7 @@ public class ItemReloader implements Listener {
 	public static void modifyVanillaArmor(ItemStack item) {
 		if(item == null || item.getType().isAir()) return;
 		if(item.hasItemMeta() && item.getItemMeta().hasLore()) {
-			List<String> lore = item.getItemMeta().getLore();
-			if(lore != null && !lore.isEmpty() && lore.getFirst().startsWith("skyblock/")) return;
+			if(Utils.firstLorePlain(item.getItemMeta()).startsWith("skyblock/")) return;
 		}
 
 		Material mat = item.getType();
@@ -195,8 +194,7 @@ public class ItemReloader implements Listener {
 		if(item == null || item.getType().isAir()) return null;
 		if(!item.hasItemMeta() || !item.getItemMeta().hasLore()) return null;
 
-		List<String> lore = item.getItemMeta().getLore();
-		String key = lore.getFirst();
+		String key = Utils.firstLorePlain(item.getItemMeta());
 
 		Enchantment ench = Enchantment.SHARPNESS;
 		if(item.getEnchantments().containsKey(Enchantment.SMITE)) {

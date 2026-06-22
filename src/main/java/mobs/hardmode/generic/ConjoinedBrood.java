@@ -4,7 +4,6 @@ import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
@@ -22,7 +21,7 @@ public class ConjoinedBrood implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Conjoined Brood" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold>Conjoined Brood<gold><bold> ﴿";
 		spider.getAttribute(Attribute.MAX_HEALTH).setBaseValue(500.0);
 		spider.setHealth(500.0);
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.67);

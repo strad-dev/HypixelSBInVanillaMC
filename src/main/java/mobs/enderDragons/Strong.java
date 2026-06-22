@@ -2,8 +2,8 @@ package mobs.enderDragons;
 
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.*;
 
 import static listeners.CustomDamage.calculateFinalDamage;
@@ -24,9 +24,9 @@ public class Strong implements CustomDragon {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String name = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Strong Dragon" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String name = "<gold><bold>﴾ <red><bold>Strong Dragon<gold><bold> ﴿";
 		dragon.addScoreboardTag("StrongDragon");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "The STRONG DRAGON has arrived to pulverize you!");
+		Bukkit.broadcast(Utils.msg("<red><bold>The STRONG DRAGON has arrived to pulverize you!"));
 		Bukkit.getLogger().info("The Strong Dragon has been summoned!");
 		return name;
 	}

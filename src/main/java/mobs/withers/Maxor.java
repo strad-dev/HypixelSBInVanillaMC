@@ -2,8 +2,8 @@ package mobs.withers;
 
 import listeners.DamageType;
 import misc.DamageData;
+import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.util.Vector;
@@ -23,18 +23,18 @@ public class Maxor implements CustomWither {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		String newName = ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Maxor" + ChatColor.GOLD + ChatColor.BOLD + " ﴿";
+		String newName = "<gold><bold>﴾ <red><bold>Maxor<gold><bold> ﴿";
 		wither.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(2.0);
 		wither.getAttribute(Attribute.FLYING_SPEED).setBaseValue(2.0);
 		wither.addScoreboardTag("Maxor");
-		Bukkit.broadcastMessage(ChatColor.RED + String.valueOf(ChatColor.BOLD) + "MAXOR, the fastest Wither in the universe, has come to destroy you 0.01 seconds faster than all other Withers!");
+		Bukkit.broadcast(Utils.msg("<red><bold>MAXOR, the fastest Wither in the universe, has come to destroy you 0.01 seconds faster than all other Withers!"));
 		Bukkit.getLogger().info("Maxor has been summoned!");
 		return newName;
 	}
 
 	@Override
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		if(((Wither) damagee).getInvulnerabilityTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
+		if(((Wither) damagee).getInvulnerableTicks() != 0 && type != DamageType.LETHAL_ABSOLUTE || type == DamageType.IFRAME_ENVIRONMENTAL) {
 			return false;
 		}
 		Random random = new Random();

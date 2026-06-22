@@ -4,7 +4,7 @@ import misc.Utils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AnvilMenu;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_21_R7.entity.CraftPlayer;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -120,7 +120,7 @@ public class BetterAnvil implements Listener {
 			}
 		}
 
-		return Math.max(1, Math.min(cost, 64));
+		return Math.clamp(cost, 1, 64);
 	}
 
 	private Map<Enchantment, Integer> getEnchants(ItemStack item) {
@@ -140,7 +140,7 @@ public class BetterAnvil implements Listener {
 			ItemStack result = e.getInventory().getItem(2);
 			if(result != null && result.getType() != Material.AIR) {
 				ItemStack cursor = e.getCursor();
-				if(cursor != null && cursor.getType() != Material.AIR) return;
+				if(cursor.getType() != Material.AIR) return;
 
 				e.setCancelled(true);
 				player.setItemOnCursor(result);

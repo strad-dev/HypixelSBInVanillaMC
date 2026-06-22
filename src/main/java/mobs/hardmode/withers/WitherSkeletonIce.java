@@ -4,13 +4,14 @@ import listeners.DamageType;
 import misc.DamageData;
 import misc.Utils;
 import mobs.CustomMob;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.title.Title;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class WitherSkeletonIce implements CustomMob {
 			throw new IllegalStateException("Uh oh!  Wrong mob type!");
 		}
 
-		Utils.changeName(witherSkeleton, ChatColor.GOLD + String.valueOf(ChatColor.BOLD) + "﴾ " + ChatColor.RED + ChatColor.BOLD + "Henchman of Ice" + ChatColor.GOLD + ChatColor.BOLD + " ﴿");
+		Utils.changeName(witherSkeleton, "<gold><bold>﴾ <red><bold>Henchman of Ice<gold><bold> ﴿");
 		witherSkeleton.addScoreboardTag("Ice");
 		return "";
 	}
@@ -53,8 +54,8 @@ public class WitherSkeletonIce implements CustomMob {
 			damagee.getWorld().playSound(damagee, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.0F);
 			damagee.getWorld().spawnParticle(Particle.SNOWFLAKE, damagee.getLocation(), 1000);
 			if(damagee instanceof Player p) {
-				p.sendTitle(ChatColor.AQUA + "" + ChatColor.BOLD + "❄ ❅ ❆", ChatColor.BLUE + "Brrrr...", 0, 201, 0);
-				p.sendMessage(ChatColor.AQUA + "" + ChatColor.BOLD + "The Henchman of Ice Ice Sprayed you for 10 seconds!");
+				p.showTitle(Title.title(Utils.msg("<aqua><bold>❄ ❅ ❆"), Utils.msg("<blue>Brrrr..."), Title.Times.times(Duration.ZERO, Duration.ofMillis(201L * 50L), Duration.ZERO)));
+				p.sendMessage(Utils.msg("<aqua><bold>The Henchman of Ice Ice Sprayed you for 10 seconds!"));
 			}
 		}
 		return true;
