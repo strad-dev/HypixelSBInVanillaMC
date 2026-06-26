@@ -74,11 +74,11 @@ public class AOTV implements AbilityItem {
 				l.setPitch(p.getEyeLocation().getPitch());
 				p.setFallDistance(0);
 				p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
-				// Defer the teleport one tick so it does NOT fire inside the interaction packet. Teleporting
-				// mid-interaction desyncs the client (a 26.x client behavior change) and makes vanilla flash a
-				// spurious "build.tooHigh" action bar. Running it next tick lets the packet fully resolve first.
+				// Teleport on the same tick. The 1-tick defer was meant to suppress the spurious
+				// "build.tooHigh" action bar, but it still shows regardless — so the defer only added
+				// latency (badly noticeable during server lag spikes). Reverted to an immediate teleport.
 				Location dest = l;
-				Utils.scheduleTask(() -> p.teleport(dest), 1L);
+				p.teleport(dest);
 				return true;
 			}
 			return false;
@@ -159,7 +159,7 @@ public class AOTV implements AbilityItem {
 				targetLoc.setYaw(origin.getYaw());
 				targetLoc.setPitch(origin.getPitch());
 				Location dest = targetLoc;
-				Utils.scheduleTask(() -> p.teleport(dest), 1L);
+				p.teleport(dest);
 			} else {
 				switch(result.getHitBlockFace()) {
 					case SELF -> {
@@ -170,14 +170,14 @@ public class AOTV implements AbilityItem {
 						l.setYaw(origin.getYaw());
 						l.setPitch(origin.getPitch());
 						Location dest = l;
-						Utils.scheduleTask(() -> p.teleport(dest), 1L);
+						p.teleport(dest);
 					}
 					case DOWN -> {
 						Location l = result.getHitBlock().getLocation().add(0.5, -2, 0.5);
 						l.setYaw(origin.getYaw());
 						l.setPitch(origin.getPitch());
 						Location dest = l;
-						Utils.scheduleTask(() -> p.teleport(dest), 1L);
+						p.teleport(dest);
 					}
 					default -> {
 						// Hit a side face - backtrack until we find a safe spot
@@ -218,7 +218,7 @@ public class AOTV implements AbilityItem {
 									l.setYaw(origin.getYaw());
 									l.setPitch(origin.getPitch());
 									Location dest = l;
-									Utils.scheduleTask(() -> p.teleport(dest), 1L);
+									p.teleport(dest);
 									break;
 								}
 							}
@@ -230,7 +230,7 @@ public class AOTV implements AbilityItem {
 							l.setYaw(origin.getYaw());
 							l.setPitch(origin.getPitch());
 							Location dest = l;
-							Utils.scheduleTask(() -> p.teleport(dest), 1L);
+							p.teleport(dest);
 						}
 					}
 				}

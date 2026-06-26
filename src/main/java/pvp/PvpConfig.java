@@ -91,9 +91,12 @@ public class PvpConfig {
 	}
 
 	public Path statsFile() {
-		String f = cfg().getString("pvp.stats.file", "../data/pvp-stats.json");
+		// Default to this plugin's own data folder (plugins/SkyBlock/pvp-stats.json) so SkyBlock stays
+		// self-contained. Relative paths resolve against that folder; set an ABSOLUTE path (e.g. the
+		// network's shared ~/data) if you want stats shared across servers.
+		String f = cfg().getString("pvp.stats.file", "pvp-stats.json");
 		Path p = Paths.get(f);
-		if (!p.isAbsolute()) p = plugin.getServer().getWorldContainer().toPath().resolve(f);
+		if (!p.isAbsolute()) p = plugin.getDataFolder().toPath().resolve(f);
 		return p.normalize();
 	}
 
