@@ -55,18 +55,18 @@ public class Utils {
 		return MM.deserialize(template, resolvers);
 	}
 
-	/** Legacy §-coded string of a component — for Bukkit APIs that only accept a String (e.g. boss bar titles). */
+	/** Legacy §-coded string of a component for Bukkit APIs that only accept a String (e.g. boss bar titles). */
 	public static String legacyString(Component c) {
 		return c == null ? "" : LEGACY.serialize(c);
 	}
 
-	/** MiniMessage string of a component — to round-trip a Component (e.g. an item display name) back through the
+	/** MiniMessage string of a component to round-trip a Component (e.g. an item display name) back through the
 	 *  MiniMessage-based helpers such as {@link #changeName(LivingEntity, String)} while preserving its formatting. */
 	public static String mmString(Component c) {
 		return c == null ? "" : MM.serialize(c);
 	}
 
-	/** Plain text (no formatting) of a component — e.g. reading a custom name or item ID. */
+	/** Plain text (no formatting) of a component e.g. reading a custom name or item ID. */
 	public static String plain(Component c) {
 		return c == null ? "" : PLAIN.serialize(c);
 	}

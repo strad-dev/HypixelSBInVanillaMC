@@ -9,6 +9,7 @@ import mobs.withers.CustomWither;
 import net.kyori.adventure.title.Title;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.entity.CraftWither;
@@ -131,6 +132,21 @@ public class Storm implements CustomWither {
 		}
 	}
 
+	private static final double SKULL_SPEED = 0.4;
+
+	/**
+	 * Spawns a wither skull aimed along {@code dir}. The spawn location is faced toward the target so
+	 * the skull's inherited acceleration points the right way (a bare setDirection on a freshly spawned
+	 * skull is ignored, leaving it to fly along the wither's facing), and an initial velocity is added.
+	 */
+	private static void fireSkull(Wither wither, Location spawn, Vector dir) {
+		spawn.setDirection(dir);
+		WitherSkull skull = (WitherSkull) wither.getWorld().spawnEntity(spawn, EntityType.WITHER_SKULL);
+		skull.setShooter(wither);
+		skull.setDirection(dir);
+		skull.setVelocity(dir.clone().multiply(SKULL_SPEED));
+	}
+
 	private void spamSkulls(Wither wither, Player p, int i) {
 		Utils.scheduleTask(() -> {
 			if(!wither.isDead()) {
@@ -146,15 +162,9 @@ public class Storm implements CustomWither {
 					directionLeft = wither.getLocation().add(1, 0, 0).getDirection();
 					directionRight = wither.getLocation().add(-1, 0, 0).getDirection();
 				}
-				WitherSkull skullMain = (WitherSkull) wither.getWorld().spawnEntity(wither.getLocation().add(0, 1.5, 0), EntityType.WITHER_SKULL);
-				skullMain.setDirection(directionMain);
-				skullMain.setShooter(wither);
-				WitherSkull skullLeft = (WitherSkull) wither.getWorld().spawnEntity(wither.getLocation().add(1, 1.5, 0), EntityType.WITHER_SKULL);
-				skullLeft.setDirection(directionLeft);
-				skullLeft.setShooter(wither);
-				WitherSkull skullRight = (WitherSkull) wither.getWorld().spawnEntity(wither.getLocation().add(-1, 1.5, 0), EntityType.WITHER_SKULL);
-				skullRight.setDirection(directionRight);
-				skullRight.setShooter(wither);
+				fireSkull(wither, wither.getLocation().add(0, 1.5, 0), directionMain);
+				fireSkull(wither, wither.getLocation().add(1, 1.5, 0), directionLeft);
+				fireSkull(wither, wither.getLocation().add(-1, 1.5, 0), directionRight);
 				Utils.playGlobalSound(Sound.ENTITY_WITHER_SHOOT, 0.75f, 1.0f);
 			}
 		}, i);

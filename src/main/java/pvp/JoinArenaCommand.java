@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * /joinarena — teleport into the FFA arena spawn (remembering where the player was).
- * /leavearena — return to that original spot, or the player's respawn point if it's invalid, or
+ * /joinarena: teleport into the FFA arena spawn (remembering where the player was).
+ * /leavearena: return to that original spot, or the player's respawn point if it's invalid, or
  * world spawn if that's invalid too.
  */
 public class JoinArenaCommand implements CommandExecutor {
@@ -45,17 +45,17 @@ public class JoinArenaCommand implements CommandExecutor {
 			return true;
 		}
 		if (!cfg.ffaEnabled()) {
-			p.sendMessage(Utils.msg("<red>FFA is disabled on this server."));
+			p.sendMessage(Utils.msg("<red>Free-For-All is disabled on this server."));
 			return true;
 		}
 		Location spawn = cfg.ffaSpawn();
 		if (spawn == null) {
-			p.sendMessage(Utils.msg("<red>The FFA arena isn't configured yet."));
+			p.sendMessage(Utils.msg("<red>The Free-For-All arena isn't configured yet."));
 			return true;
 		}
 		origins.put(p.getUniqueId(), p.getLocation().clone()); // remember where they came from
 		p.teleport(spawn);
-		p.sendMessage(Utils.msg("<green>Welcome to the FFA arena — good luck!"));
+		p.sendMessage(Utils.msg("<green>Welcome to the Free-For-All arena.  Good luck!"));
 		return true;
 	}
 

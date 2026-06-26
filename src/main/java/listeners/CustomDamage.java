@@ -136,6 +136,12 @@ public class CustomDamage implements Listener {
 			doContinue = false;
 		}
 
+		// PvP layer (config-gated, inert off the pvp server): suppress damage in a Free-For-All
+		// safezone, during a duel countdown, or from an outsider interfering in a duel.
+		if(pvp.PvpHooks.shouldBlock(damagee, damager)) {
+			doContinue = false;
+		}
+
 		if(type == DamageType.LETHAL_ABSOLUTE || doContinue) {
 			calculateFinalDamage(damagee, damager, originalDamage, type, data);
 		}
@@ -266,6 +272,10 @@ public class CustomDamage implements Listener {
 
 			double absorption = damagee.getAbsorptionAmount();
 			double oldHealth = damagee.getHealth();
+
+			// PvP layer (config-gated, inert off the pvp server): record this hit for arena/duel combat stats.
+			pvp.PvpHooks.trackHit(damagee, damager, finalDamage,
+					type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL);
 
 			boolean isPhysicalHit = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL;
 			// handle particles and wind burst
@@ -459,12 +469,20 @@ public class CustomDamage implements Listener {
 					}
 
 					damagee.setHealth(1.0);
+					// Play the totem sound explicitly; the entity-event 35 animation doesn't reliably carry it here.
+					damagee.getWorld().playSound(damagee, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
 					damagee.getActivePotionEffects().forEach(effect -> damagee.removePotionEffect(effect.getType()));
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 900, 1));
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 800, 0));
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 				} else {
+					// PvP layer (config-gated, inert off the pvp server): with no totem to save them, a
+					// lethal blow ends the duel / scores the FFA kill and revives the player instead of
+					// killing them. Placed AFTER the totem branch so arena kills don't bypass totems.
+					if(pvp.PvpHooks.handleLethal(damagee, damager)) {
+						return;
+					}
 					if(damagee instanceof EnderDragon dragon && data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
 						if(damager == null) {
 							damager = Utils.getNearestPlayer(dragon, 16);
@@ -512,6 +530,22 @@ public class CustomDamage implements Listener {
 							Utils.playGlobalSound(Sound.ENTITY_ENDER_DRAGON_DEATH);
 							dragon.setSilent(true);
 							Utils.scheduleTask(() -> spawnDragonXP(dragon.getLocation(), dragon.getScoreboardTags().contains("HardMode") ? 640000 : 64000), 190);
+
+							// Pin the dragon at its kill spot for the death animation. The DYING phase otherwise
+							// paths it toward the exit portal first, so it visibly flies off before the death
+							// beams/ascent play. Cancel horizontal movement each tick; keep the upward death rise.
+							final double dragonPinX = dragon.getLocation().getX();
+							final double dragonPinZ = dragon.getLocation().getZ();
+							final int[] dragonPinTicks = {0};
+							Bukkit.getScheduler().runTaskTimer(Plugin.getInstance(), task -> {
+								if(nmsDragon.isRemoved() || ++dragonPinTicks[0] > 220) {
+									task.cancel();
+									return;
+								}
+								Vec3 m = nmsDragon.getDeltaMovement();
+								nmsDragon.setDeltaMovement(0.0, Math.max(0.0, m.y), 0.0);
+								nmsDragon.setPos(dragonPinX, nmsDragon.getY(), dragonPinZ);
+							}, 1L, 1L);
 						} else {
 							// build death message before setHealth(0) so the PlayerDeathEvent handler can use it
 							if(damagee instanceof Player p) {
@@ -1193,6 +1227,11 @@ public class CustomDamage implements Listener {
 	public void onEntityDamage(EntityDamageEvent e) {
 		if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
+			// Enderman bosses are immune to water: skip water/rain (drown) damage entirely. The teleport
+			// side is handled in StopBossesTeleporting.
+			if(entity instanceof Enderman && entity.getScoreboardTags().contains("SkyblockBoss") && e.getCause() == DamageCause.DROWNING) {
+				return;
+			}
 			DamageType type;
 			switch(e.getCause()) {
 				case BLOCK_EXPLOSION -> type = DamageType.MELEE;

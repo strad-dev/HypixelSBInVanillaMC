@@ -64,6 +64,7 @@ public class Necron implements CustomWither {
 			int finalI = i;
 			Utils.scheduleTask(() -> {
 				Utils.playGlobalSound(Sound.ENTITY_GENERIC_EXPLODE, 1.0F, 0.5F);
+				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT, 2.0f, 0.67f);
 				Utils.spawnTNT(wither, wither.getLocation(), 0, 8 + (finalI / 40), 32 + (finalI / 20) * 2, new ArrayList<>());
 			}, i);
 		}

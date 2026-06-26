@@ -131,6 +131,9 @@ public class CustomMobs implements Listener {
 			if(name.isEmpty()) {
 				name = "<aqua>" + entity.getName();
 			}
+			// SkyBlock names are MiniMessage; a foreign entity's legacy §-coded name (e.g. another
+			// plugin's "§bPig...") would make the stricter MiniMessage parser throw, so strip § codes.
+			name = name.replaceAll("(?i)§[0-9A-FK-OR]", "");
 			if(!name.contains("❤")) {
 				Utils.changeName(entity, name);
 			} else {

@@ -5,6 +5,7 @@ import items.CustomItem;
 import items.misc.AOTV;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
+import misc.Cooldowns;
 import misc.Plugin;
 import misc.Utils;
 import org.bukkit.*;
@@ -161,15 +162,16 @@ public class CustomItems implements Listener {
 				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
 					e.setCancelled(true);
 				}
-				if(!p.getScoreboardTags().contains("AbilityCooldown") || ((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && item instanceof Terminator)) {
+				if(!Cooldowns.onCooldown(p, "AbilityCooldown") || ((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && item instanceof Terminator)) {
 					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
 						if(!((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && !item.hasLeftClickAbility())) {
 							p.sendMessage(Utils.msg("<red>You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost()));
 							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 						}
-					} else if(p.getScoreboardTags().contains(item.cooldownTag()) && !(item.cooldownTag().equals("SalvationCooldown") && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))) {
+					} else if(Cooldowns.onCooldown(p, item.cooldownTag()) && !(item.cooldownTag().equals("SalvationCooldown") && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))) {
 						if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
-							p.sendMessage(Utils.msg("<red>This ability is on cooldown!"));
+							String secondsLeft = String.format("%.2f", Cooldowns.remaining(p, item.cooldownTag()) / 20.0);
+							p.sendMessage(Utils.msg("<red>This ability is on cooldown for " + secondsLeft + " seconds!"));
 							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 						}
 					} else {
@@ -185,10 +187,8 @@ public class CustomItems implements Listener {
 								Score score = CustomItems.currentScore();
 								score.setScore(score.getScore() - item.manaCost());
 							}
-							p.addScoreboardTag(item.cooldownTag());
-							Utils.scheduleTask(() -> p.removeScoreboardTag(item.cooldownTag()), item.cooldown());
-							p.addScoreboardTag("AbilityCooldown");
-							Utils.scheduleTask(() -> p.removeScoreboardTag("AbilityCooldown"), 3L);
+							Cooldowns.start(p, item.cooldownTag(), item.cooldown());
+							Cooldowns.start(p, "AbilityCooldown", 3);
 						}
 					}
 				} else {
