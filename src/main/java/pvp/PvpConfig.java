@@ -1,0 +1,127 @@
+package pvp;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Reads the PvP + chat config (config.yml). All values default to disabled/empty so SkyBlock is
+ * inert on non-pvp servers; admins fill these in on the pvp server.
+ */
+public class PvpConfig {
+	private final JavaPlugin plugin;
+
+	public PvpConfig(JavaPlugin plugin) {
+		this.plugin = plugin;
+		plugin.saveDefaultConfig();
+	}
+
+	private ConfigurationSection cfg() {
+		return plugin.getConfig();
+	}
+
+	// ===== chat =====
+	public boolean chatEnabled() {
+		return cfg().getBoolean("chat.enabled", true);
+	}
+
+	// ===== FFA =====
+	public boolean ffaEnabled() {
+		return cfg().getBoolean("pvp.ffa.enabled", false);
+	}
+
+	public String ffaWorld() {
+		return cfg().getString("pvp.ffa.world", defaultWorld());
+	}
+
+	public Location ffaSpawn() {
+		return loc("pvp.ffa.spawn", ffaWorld());
+	}
+
+	public Region ffaBounds() {
+		return region("pvp.ffa.bounds", ffaWorld());
+	}
+
+	public boolean safezoneEnabled() {
+		return cfg().getBoolean("pvp.ffa.safezone.enabled", false);
+	}
+
+	public Region safezone() {
+		return region("pvp.ffa.safezone", ffaWorld());
+	}
+
+	// ===== duel =====
+	public boolean duelEnabled() {
+		return cfg().getBoolean("pvp.duel.enabled", false);
+	}
+
+	public String duelWorld() {
+		return cfg().getString("pvp.duel.world", defaultWorld());
+	}
+
+	public Region duelArena() {
+		return region("pvp.duel.arena", duelWorld());
+	}
+
+	public int duelCountdown() {
+		return cfg().getInt("pvp.duel.countdown", 5);
+	}
+
+	/** Player corner i (0 or 1) for a duel, or null if not configured. */
+	public Location duelSpawn(int i) {
+		List<Map<?, ?>> spawns = cfg().getMapList("pvp.duel.spawns");
+		if (i < 0 || i >= spawns.size()) return null;
+		Map<?, ?> m = spawns.get(i);
+		World w = Bukkit.getWorld(duelWorld());
+		if (w == null) return null;
+		return new Location(w, num(m, "x"), num(m, "y"), num(m, "z"),
+				(float) num(m, "yaw"), (float) num(m, "pitch"));
+	}
+
+	// ===== stats =====
+	public boolean statsEnabled() {
+		return cfg().getBoolean("pvp.stats.enabled", false);
+	}
+
+	public Path statsFile() {
+		String f = cfg().getString("pvp.stats.file", "../data/pvp-stats.json");
+		Path p = Paths.get(f);
+		if (!p.isAbsolute()) p = plugin.getServer().getWorldContainer().toPath().resolve(f);
+		return p.normalize();
+	}
+
+	// ===== helpers =====
+	private String defaultWorld() {
+		return plugin.getServer().getWorlds().isEmpty() ? "world"
+				: plugin.getServer().getWorlds().get(0).getName();
+	}
+
+	private Location loc(String path, String worldName) {
+		ConfigurationSection s = cfg().getConfigurationSection(path);
+		World w = Bukkit.getWorld(worldName);
+		if (s == null || w == null) return null;
+		return new Location(w, s.getDouble("x"), s.getDouble("y"), s.getDouble("z"),
+				(float) s.getDouble("yaw"), (float) s.getDouble("pitch"));
+	}
+
+	private Region region(String path, String worldName) {
+		List<Double> min = cfg().getDoubleList(path + ".min");
+		List<Double> max = cfg().getDoubleList(path + ".max");
+		if (min.size() < 3 || max.size() < 3) return null;
+		return new Region(worldName,
+				new double[]{min.get(0), min.get(1), min.get(2)},
+				new double[]{max.get(0), max.get(1), max.get(2)});
+	}
+
+	private static double num(Map<?, ?> m, String key) {
+		Object v = m.get(key);
+		return v instanceof Number n ? n.doubleValue() : 0.0;
+	}
+}

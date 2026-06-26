@@ -276,18 +276,18 @@ public class CustomDamage implements Listener {
 
 				// Critical hit particles
 				if(isCrit) {
-					damagee.getWorld().spawnParticle(Particle.CRIT, particleLoc, 32);
+					damagee.getWorld().spawnParticle(Particle.CRIT, particleLoc, 24);
 					damagee.getWorld().playSound(damagee, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0F, 1.0F);
 				}
 
 				// Enchanted hit particles
 				if(!weapon.getEnchantments().isEmpty() && isPhysicalHit) {
-					damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, particleLoc, Math.min((int) (data.originalDamage * 8), 32));
+					damagee.getWorld().spawnParticle(Particle.ENCHANTED_HIT, particleLoc, Math.min((int) (data.originalDamage * 8), 24));
 				}
 
 				// Damage Indicator particles
 				if(data.originalDamage > 2 && isPhysicalHit) {
-					damagee.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, particleLoc, Math.min((int) (data.originalDamage / 2), 32));
+					damagee.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, particleLoc, Math.min((int) (data.originalDamage / 2), 24));
 				}
 
 				// Density enchantment - bonus smash damage on falling hits

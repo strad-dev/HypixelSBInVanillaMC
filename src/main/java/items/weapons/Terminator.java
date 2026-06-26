@@ -27,6 +27,8 @@ import static misc.Utils.shootBeam;
 public class Terminator implements AbilityItem {
 	private static final String COOLDOWN_TAG = "SalvationCooldown";
 	private static final int COOLDOWN = 20;
+	private static final String SHOT_COOLDOWN_TAG = "TerminatorShotCooldown";
+	private static final int SHOT_COOLDOWN = 3;
 
 	public static ItemStack getItem(int powerLevel) {
 		ItemStack term = new ItemStack(Material.BOW);
@@ -69,6 +71,14 @@ public class Terminator implements AbilityItem {
 
 	@Override
 	public boolean onRightClick(Player p) {
+		// Shortbow shot cooldown — cap firing at once per 3 ticks. Self-contained (not routed through the
+		// dispatcher's ability cooldown) so shooting never puts the Salvation beam on its 20-tick cooldown.
+		if(p.getScoreboardTags().contains(SHOT_COOLDOWN_TAG)) {
+			return false;
+		}
+		p.addScoreboardTag(SHOT_COOLDOWN_TAG);
+		Utils.scheduleTask(() -> p.removeScoreboardTag(SHOT_COOLDOWN_TAG), SHOT_COOLDOWN);
+
 		// you don't need arrows
 		p.getInventory().remove(Material.ARROW);
 		p.getInventory().remove(Material.TIPPED_ARROW);

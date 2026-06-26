@@ -95,8 +95,11 @@ public class Utils {
 				return;
 			}
 			// Swap the trailing "HP/maxHP" of the existing name in place, preserving all surrounding colors/formatting.
-			String serialized = MM.serialize(current).replaceFirst("\\d+/\\d+(\\s*)$", health + "/" + maxHealth + "$1");
-			entity.customName(MM.deserialize(serialized));
+			// Uses the legacy (§) serializer, NOT MiniMessage: this runs on EVERY hit to EVERY custom mob, and the
+			// MiniMessage serialize+parse round-trip here was a real per-hit hot-path cost. Legacy round-trips these
+			// simple color/bold names losslessly at a fraction of the cost.
+			String serialized = LEGACY.serialize(current).replaceFirst("\\d+/\\d+(\\s*)$", health + "/" + maxHealth + "$1");
+			entity.customName(LEGACY.deserialize(serialized));
 		}
 	}
 
@@ -252,7 +255,7 @@ public class Utils {
 					CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
 				}
 			}
-			spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), Math.min((int) Math.pow(radius, 3), 65536), radius, radius / 2.0, radius);
+			spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), Math.min((int) Math.pow(radius, 3), 16384), radius, radius / 2.0, radius);
 			spawner.getWorld().playSound(spawner.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 0.6F);
 		} else {
 			TNTPrimed tnt = (TNTPrimed) l.getWorld().spawnEntity(l, EntityType.TNT);
@@ -266,7 +269,7 @@ public class Utils {
 						CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
 					}
 				}
-				tnt.getWorld().spawnParticle(Particle.EXPLOSION, tnt.getLocation(), Math.min((int) Math.pow(radius, 3), 65536), radius, radius / 2.0, radius);
+				tnt.getWorld().spawnParticle(Particle.EXPLOSION, tnt.getLocation(), Math.min((int) Math.pow(radius, 3), 16384), radius, radius / 2.0, radius);
 				tnt.getWorld().playSound(tnt.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 2.0F, 0.6F);
 				tnt.remove();
 			}, fuse);

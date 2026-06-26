@@ -51,6 +51,7 @@ public class AtonedHorror implements CustomMob {
 		zombie.setHealth(200.0);
 		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(-6.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
+		zombie.getAttribute(Attribute.ARMOR).setBaseValue(0.0);
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		zombie.setTarget(p);
 		zombie.setCustomNameVisible(true);

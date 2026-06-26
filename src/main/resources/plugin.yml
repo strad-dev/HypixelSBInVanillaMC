@@ -31,6 +31,21 @@ commands:
   me:
     description: Send an action message
     usage: /me [action]
+  duel:
+    description: Challenge a player to a 1v1.
+    usage: /duel <player> | /duel accept
+  joinarena:
+    description: Teleport into the FFA arena.
+    usage: /joinarena
+  leavearena:
+    description: Leave the FFA arena.
+    usage: /leavearena
+  stats:
+    description: View PvP stats.
+    usage: /stats [player]
+  pvptop:
+    description: View the PvP leaderboard.
+    usage: /pvptop <ffa|1v1>
 
 softdepend:
   - DiscordSRV

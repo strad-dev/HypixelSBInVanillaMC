@@ -23,6 +23,10 @@ import java.util.*;
 
 public class VoidcrazedSeraph implements CustomMob {
 	private static final List<Block> beacons = new ArrayList<>();
+	// Danger-beam particle. DUST is far cheaper than FLAME (a billboarded dot — no animation, physics, or
+	// lighting), and red signifies danger like a guardian beam mid-fire. Hoisted to a constant so the
+	// ~960 beam particles/tick don't each allocate a new DustOptions.
+	private static final Particle.DustOptions DANGER_DUST = new Particle.DustOptions(Color.RED, 1.0F);
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -125,7 +129,7 @@ public class VoidcrazedSeraph implements CustomMob {
 			Utils.changeName(damagee);
 			damagee.setAI(false);
 
-			// Spinning flame beams
+			// Spinning danger beams
 			final int[] tickCounter = {0};
 			Location center = damagee.getLocation();
 			BukkitTask beamTask = Bukkit.getScheduler().runTaskTimer(Plugin.getInstance(), () -> {
@@ -145,17 +149,14 @@ public class VoidcrazedSeraph implements CustomMob {
 						double y = center.getY() + height + 0.5;
 
 						// Draw the beam with particles
-						for(double distance = 0; distance < 16; distance += 0.2) {
+						for(double distance = 0; distance < 24; distance += 0.25) {
 							double x = center.getX() + Math.cos(angle) * distance;
 							double z = center.getZ() + Math.sin(angle) * distance;
 
 							Location particleLocation = new Location(center.getWorld(), x, y, z);
 
-							// Spawn flame particle
-							center.getWorld().spawnParticle(Particle.FLAME, particleLocation, 1,  // count
-									0, 0, 0,  // offset
-									0  // speed
-							);
+							// Spawn danger beam particle
+							center.getWorld().spawnParticle(Particle.DUST, particleLocation, 1, DANGER_DUST);
 						}
 					}
 				}
@@ -166,6 +167,14 @@ public class VoidcrazedSeraph implements CustomMob {
 					for(Player player : Bukkit.getOnlinePlayers()) {
 						if(!player.getWorld().equals(center.getWorld())) continue;
 						Location playerLoc = player.getLocation();
+
+						// Beyond 24 blocks from the boss — punish with the same 4 damage/0.5s the beam deals,
+						// so players can't range-cheese the beam phase from outside the arena.
+						if(playerLoc.distanceSquared(center) > 24.0 * 24.0) {
+							CustomDamage.customMobs(player, damagee, 4, DamageType.ABSOLUTE);
+							damagedPlayers.add(player);
+							continue;
+						}
 
 						for(int direction = 0; direction < 4; direction++) {
 							double angle = (direction * Math.PI / 2) + rotationAngle;
