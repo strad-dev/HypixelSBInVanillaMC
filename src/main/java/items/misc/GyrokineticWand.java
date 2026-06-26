@@ -75,7 +75,7 @@ public class GyrokineticWand implements AbilityItem {
 			return false;
 		}
 		Location rift = location.getHitPosition().toLocation(p.getWorld());
-		p.getWorld().spawnParticle(Particle.PORTAL, rift, 1000);
+		p.getWorld().spawnParticle(Particle.PORTAL, rift, 128);
 		rift.setY(rift.getY() + 1);
 		rift.add(0, 0, 0);
 		new BukkitRunnable() {

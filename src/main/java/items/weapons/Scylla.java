@@ -158,7 +158,6 @@ public class Scylla implements AbilityItem {
 
 			l.setYaw(origin.getYaw());
 			l.setPitch(origin.getPitch());
-			p.teleport(l);
 		} else {
 			switch(result.getHitBlockFace()) {
 				case SELF -> {
@@ -168,13 +167,11 @@ public class Scylla implements AbilityItem {
 					l = result.getHitBlock().getLocation().add(0.5, 1, 0.5);
 					l.setYaw(origin.getYaw());
 					l.setPitch(origin.getPitch());
-					p.teleport(l);
 				}
 				case DOWN -> {
 					l = result.getHitBlock().getLocation().add(0.5, -2, 0.5);
 					l.setYaw(origin.getYaw());
 					l.setPitch(origin.getPitch());
-					p.teleport(l);
 				}
 				default -> {
 					// Hit a side face - backtrack until we find a safe spot
@@ -214,7 +211,6 @@ public class Scylla implements AbilityItem {
 								l = new Location(checkLoc.getWorld(), Math.floor(checkLoc.getX()) + 0.5, Math.floor(checkLoc.getY()), Math.floor(checkLoc.getZ()) + 0.5);
 								l.setYaw(origin.getYaw());
 								l.setPitch(origin.getPitch());
-								p.teleport(l);
 								break;
 							}
 						}
@@ -225,17 +221,24 @@ public class Scylla implements AbilityItem {
 						l = new Location(lastSafe.getWorld(), Math.floor(lastSafe.getX()) + 0.5, Math.floor(lastSafe.getY()), Math.floor(lastSafe.getZ()) + 0.5);
 						l.setYaw(origin.getYaw());
 						l.setPitch(origin.getPitch());
-						p.teleport(l);
 					}
 				}
 			}
+		}
+		// Defer the teleport one tick so it does NOT fire inside the interaction packet. Teleporting
+		// mid-interaction desyncs the client (a 26.x client behavior change) and makes vanilla flash a
+		// spurious "build.tooHigh" action bar. The implosion below is centered on the destination since
+		// the player only arrives there next tick.
+		if(l != null) {
+			Location dest = l;
+			Utils.scheduleTask(() -> p.teleport(dest), 1L);
 		}
 		p.setFallDistance(0);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
 		// implosion
 		p.getWorld().spawnParticle(Particle.EXPLOSION, l, 20);
-		List<Entity> entities = p.getNearbyEntities(10, 10, 10);
+		List<Entity> entities = new ArrayList<>(l.getWorld().getNearbyEntities(l, 10, 10, 10));
 		List<EntityType> doNotKill = CustomItems.createList();
 		double targetDamage = Objects.requireNonNull(p.getAttribute(Attribute.ATTACK_DAMAGE)).getValue();
 		int damaged = 0;

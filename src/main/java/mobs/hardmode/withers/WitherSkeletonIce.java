@@ -52,7 +52,7 @@ public class WitherSkeletonIce implements CustomMob {
 			damagee.addScoreboardTag("IceSprayed");
 			Utils.scheduleTask(() -> damagee.removeScoreboardTag("IceSprayed"), 201);
 			damagee.getWorld().playSound(damagee, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.0F);
-			damagee.getWorld().spawnParticle(Particle.SNOWFLAKE, damagee.getLocation(), 1000);
+			damagee.getWorld().spawnParticle(Particle.SNOWFLAKE, damagee.getLocation(), 256);
 			if(damagee instanceof Player p) {
 				p.showTitle(Title.title(Utils.msg("<aqua><bold>❄ ❅ ❆"), Utils.msg("<blue>Brrrr..."), Title.Times.times(Duration.ZERO, Duration.ofMillis(201L * 50L), Duration.ZERO)));
 				p.sendMessage(Utils.msg("<aqua><bold>The Henchman of Ice Ice Sprayed you for 10 seconds!"));

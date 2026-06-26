@@ -61,7 +61,7 @@ public class HolyIce implements AbilityItem {
 	public boolean onRightClick(Player p) {
 		p.addScoreboardTag("HolyIce");
 		Utils.scheduleTask(() -> p.removeScoreboardTag("HolyIce"), 20);
-		p.getWorld().spawnParticle(Particle.DRIPPING_WATER, p.getEyeLocation(), 1000);
+		p.getWorld().spawnParticle(Particle.DRIPPING_WATER, p.getEyeLocation(), 256);
 		p.playSound(p, Sound.ENTITY_PLAYER_SPLASH_HIGH_SPEED, 0.5F, 1.0F);
 		return true;
 	}

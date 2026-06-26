@@ -52,15 +52,25 @@ public class Plugin extends JavaPlugin implements Listener {
 	@Override
 	public void onEnable() {
 		instance = this;
+
+		// PvP + chat config. When chat is disabled (e.g. on the strad.dev network), the hub plugin
+		// owns chat, so SkyBlock skips registering its own chat commands/listeners below.
+		pvp.PvpConfig pvpCfg = new pvp.PvpConfig(this);
+		boolean chatEnabled = pvpCfg.chatEnabled();
+
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
 		Objects.requireNonNull(this.getCommand("locateplayer")).setExecutor(new LocatePlayer());
-		Objects.requireNonNull(this.getCommand("w")).setExecutor(new Tell());
-		Objects.requireNonNull(this.getCommand("tell")).setExecutor(new Tell());
-		Objects.requireNonNull(this.getCommand("msg")).setExecutor(new Tell());
+		if(chatEnabled) {
+			Objects.requireNonNull(this.getCommand("w")).setExecutor(new Tell());
+			Objects.requireNonNull(this.getCommand("tell")).setExecutor(new Tell());
+			Objects.requireNonNull(this.getCommand("msg")).setExecutor(new Tell());
+		}
 		Objects.requireNonNull(this.getCommand("resetwitherfight")).setExecutor(new ResetWitherFight());
 		Objects.requireNonNull(this.getCommand("m7tasactivatewitherfight")).setExecutor(new ActivateWitherFight());
-		Objects.requireNonNull(this.getCommand("say")).setExecutor(new Say());
-		Objects.requireNonNull(this.getCommand("me")).setExecutor(new Me());
+		if(chatEnabled) {
+			Objects.requireNonNull(this.getCommand("say")).setExecutor(new Say());
+			Objects.requireNonNull(this.getCommand("me")).setExecutor(new Me());
+		}
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
 		getServer().getPluginManager().registerEvents(new BetterAnvil(), this);
@@ -73,7 +83,7 @@ public class Plugin extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new EditSkull(), this);
 		getServer().getPluginManager().registerEvents(new CustomDamage(), this);
 		getServer().getPluginManager().registerEvents(new OldRegen(), this);
-		getServer().getPluginManager().registerEvents(new ChatListener(), this);
+		if(chatEnabled) getServer().getPluginManager().registerEvents(new ChatListener(), this);
 		getServer().getPluginManager().registerEvents(new CustomItemUses(), this);
 		getServer().getPluginManager().registerEvents(new StopBossesTeleporting(), this);
 		getServer().getPluginManager().registerEvents(new StopBossesEnteringVehicles(), this);
@@ -83,7 +93,7 @@ public class Plugin extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new CustomMining(), this);
 		getServer().getPluginManager().registerEvents(new CreativeMenu(), this);
 		getServer().getPluginManager().registerEvents(new ItemReloader(), this);
-		getServer().getPluginManager().registerEvents(new CommandInterceptor(), this);
+		if(chatEnabled) getServer().getPluginManager().registerEvents(new CommandInterceptor(), this);
 		getServer().getPluginManager().registerEvents(this, this);
 
 		getServer().addRecipe(AddRecipes.addScyllaRecipe(this));
@@ -121,6 +131,9 @@ public class Plugin extends JavaPlugin implements Listener {
 		}
 
 		Utils.scheduleTask(() -> passiveIntel(0), 20L);
+
+		// Config-gated PvP feature (FFA, 1v1 duels, stats, arena commands). Inert unless enabled.
+		pvp.PvpModule.enable(this, pvpCfg);
 	}
 
 	private static void setupAdvancements() {
