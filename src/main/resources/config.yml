@@ -24,6 +24,9 @@ pvp:
     # Set the duel world, the two player spawn locations, and the arena bounds.  For best results, use an enclosed space with bedrock walls at least 2 blocks thick separate from the Free-For-All Arena.
     world: world
     countdown: 5
+    # Each player is set to these for the duration of a duel (hunger is always full); originals are restored after.
+    intelligence: 50
+    saturation: 5
     arena:
       min: [ 100.0, 0.0, 100.0 ]
       max: [ 150.0, 256.0, 150.0 ]

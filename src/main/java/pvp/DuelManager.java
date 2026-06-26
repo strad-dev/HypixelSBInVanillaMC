@@ -1,23 +1,36 @@
 package pvp;
 
+import misc.Plugin;
 import misc.Utils;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.title.Title;
+
+import java.time.Duration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scoreboard.Score;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 /**
- * 1v1 duel lifecycle (SkyBlock-owned, standalone). Handles invites, the network-facing
- * force-pair, arena placement + countdown, win-on-death, stats, and returning players to the FFA
- * spawn (or their pre-duel location if no FFA spawn is configured).
+ * 1v1 duel lifecycle, layered on top of SkyBlock's CustomDamage system (it never registers its own
+ * damage listener; CustomDamage drives it through {@link PvpHooks}). Handles invites, the
+ * network-facing force-pair, arena placement + countdown, win-on-(would-be-)death without a death
+ * screen, intelligence swapping, stats, and returning both players to their pre-duel location.
  */
 public class DuelManager {
+	// Resistance V makes a player fully immune under CustomDamage (it reduces damage by 20% per level).
+	private static final int MAX_RESISTANCE = 4;
+	private static final int RETURN_DELAY_TICKS = 100;  // 5s
+
 	private final JavaPlugin plugin;
 	private final PvpConfig cfg;
 	private final PvpStats stats;
@@ -53,7 +66,7 @@ public class DuelManager {
 			return;
 		}
 		invites.put(to.getUniqueId(), from.getUniqueId());
-		to.sendMessage(Utils.msg("<gold><s></gold> <yellow>challenged you to a 1v1! <white>/duel accept</white>.",
+		to.sendMessage(Utils.msg("<yellow><gold><s></gold> is challenging you!  Click <click:run_command:'/duel accept'><gold><u>here</u></gold></click> to accept",
 				Placeholder.unparsed("s", from.getName())));
 		from.sendMessage(Utils.msg("<green>Challenge sent to <white><t></white>.", Placeholder.unparsed("t", to.getName())));
 	}
@@ -82,10 +95,19 @@ public class DuelManager {
 			return;
 		}
 		Duel d = new Duel(a.getUniqueId(), b.getUniqueId(), a.getLocation().clone(), b.getLocation().clone());
+		// Stash each player's real intelligence, hunger and saturation so the duel can run everyone at
+		// fixed values and restore the originals when it ends.
+		d.intelA = readIntelligence(a);
+		d.intelB = readIntelligence(b);
+		d.foodA = a.getFoodLevel();
+		d.foodB = b.getFoodLevel();
+		d.satA = a.getSaturation();
+		d.satB = b.getSaturation();
 		byPlayer.put(a.getUniqueId(), d);
 		byPlayer.put(b.getUniqueId(), d);
 		prepare(a, sa);
 		prepare(b, sb);
+		// Intelligence, saturation, and the corner snap all happen when the countdown ends (see snapToCorner).
 		runCountdown(d, a.getUniqueId(), b.getUniqueId());
 	}
 
@@ -93,7 +115,8 @@ public class DuelManager {
 		p.teleport(spawn);
 		healFull(p);
 		p.setFoodLevel(20);
-		p.setWalkSpeed(0f); // frozen during countdown
+		// Players may walk around during the countdown; max Resistance keeps them invulnerable until FIGHT.
+		p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, (cfg.duelCountdown() + 2) * 20, MAX_RESISTANCE, false, false));
 	}
 
 	private void runCountdown(Duel d, UUID aId, UUID bId) {
@@ -106,21 +129,49 @@ public class DuelManager {
 				return;
 			}
 			if (left[0] > 0) {
-				a.sendActionBar(Utils.msg("<yellow>Duel starts in <white><n></white>...", Placeholder.unparsed("n", String.valueOf(left[0]))));
-				b.sendActionBar(Utils.msg("<yellow>Duel starts in <white><n></white>...", Placeholder.unparsed("n", String.valueOf(left[0]))));
+				String n = String.valueOf(left[0]);
+				Component chat = Utils.msg("<yellow>Duel starts in <white><n></white>...", Placeholder.unparsed("n", n));
+				Title title = Title.title(
+						Utils.msg("<yellow><bold><n></bold>", Placeholder.unparsed("n", n)),
+						Utils.msg("<gray>Get ready..."),
+						Title.Times.times(Duration.ZERO, Duration.ofMillis(900), Duration.ofMillis(100)));
+				for (Player pl : new Player[]{a, b}) {
+					pl.showTitle(title);
+					pl.sendActionBar(chat);
+					pl.sendMessage(chat);
+				}
 				left[0]--;
 			} else {
+				// Movement was free during the countdown, so snap both back to their corners, drop the
+				// immunity, top them off, and start.
 				d.armed = true;
-				a.setWalkSpeed(0.2f);
-				b.setWalkSpeed(0.2f);
-				a.sendActionBar(Utils.msg("<green><bold>FIGHT!"));
-				b.sendActionBar(Utils.msg("<green><bold>FIGHT!"));
+				snapToCorner(a, cfg.duelSpawn(0));
+				snapToCorner(b, cfg.duelSpawn(1));
+				Component fight = Utils.msg("<green><bold>FIGHT!");
+				Title fightTitle = Title.title(fight, Component.empty(),
+						Title.Times.times(Duration.ZERO, Duration.ofMillis(800), Duration.ofMillis(200)));
+				for (Player pl : new Player[]{a, b}) {
+					pl.showTitle(fightTitle);
+					pl.sendActionBar(fight);
+					pl.sendMessage(fight);
+				}
 				task.cancel();
 			}
 		}, 0L, 20L);
 	}
 
-	/** The loser would have died — end the duel in the opponent's favour. */
+	private void snapToCorner(Player p, Location corner) {
+		if (corner != null) p.teleport(corner);
+		p.removePotionEffect(PotionEffectType.RESISTANCE);
+		healFull(p);
+		// Fixed combat state, applied when the countdown ends: hunger always full, configurable
+		// saturation and intelligence.
+		p.setFoodLevel(20);
+		p.setSaturation((float) cfg.duelSaturation());
+		setIntelligence(p, cfg.duelIntelligence());
+	}
+
+	/** A lethal blow landed on the loser; CustomDamage skips the kill and we end the duel here. */
 	public void handleDeath(Player loser) {
 		Duel d = byPlayer.get(loser.getUniqueId());
 		if (d == null) return;
@@ -139,22 +190,126 @@ public class DuelManager {
 
 		if (winner != null && loser != null && stats != null) stats.recordDuel(winner, loser);
 
-		// Return to the FFA spawn if one exists, else each player's pre-duel location.
-		Location ffa = (cfg.ffaEnabled() ? cfg.ffaSpawn() : null);
-		restoreAndSend(winner, ffa, winner != null ? d.prevFor(winner.getUniqueId()) : null);
-		restoreAndSend(loser, ffa, loser != null ? d.prevFor(loser.getUniqueId()) : null);
+		// Heal both immediately (the loser never sees a death screen) and restore their real
+		// intelligence. They stay invulnerable for the grace period before being sent home.
+		finishPlayer(winner, d);
+		finishPlayer(loser, d);
 
-		if (winner != null) winner.sendMessage(Utils.msg("<green>You won the duel!"));
-		if (loser != null) loser.sendMessage(Utils.msg("<red>You lost the duel."));
+		if (winner != null) {
+			winner.sendMessage(Utils.msg("<green>You won the duel!"));
+			winner.showTitle(Title.title(
+					Utils.msg("<green><bold>VICTORY"),
+					Utils.msg("<gray>You defeated <white><o></white>",
+							Placeholder.unparsed("o", loser != null ? loser.getName() : "your opponent"))));
+		}
+		if (loser != null) {
+			loser.sendMessage(Utils.msg("<red>You lost the duel."));
+			loser.showTitle(Title.title(
+					Utils.msg("<red><bold>DEFEAT"),
+					Utils.msg("<gray>You were defeated by <white><o></white>",
+							Placeholder.unparsed("o", winner != null ? winner.getName() : "your opponent"))));
+		}
+
+		printMatchStats(d, winner, loser);
+
+		// Return both to their pre-duel location 5s after the match ends.
+		final UUID aId = d.a, bId = d.b;
+		final Location prevA = d.prevA, prevB = d.prevB;
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			returnHome(Bukkit.getPlayer(aId), prevA);
+			returnHome(Bukkit.getPlayer(bId), prevB);
+		}, RETURN_DELAY_TICKS);
 	}
 
-	private void restoreAndSend(Player p, Location ffa, Location prev) {
+	private void finishPlayer(Player p, Duel d) {
 		if (p == null) return;
-		p.setWalkSpeed(0.2f);
 		healFull(p);
-		p.setFoodLevel(20);
-		Location dest = ffa != null ? ffa : prev;
-		if (dest != null) p.teleport(dest);
+		p.setFireTicks(0);
+		restoreIntelligence(p, d);
+		restoreFood(p, d);
+		// Invulnerable during the 5s grace so neither player can be re-hit before returning home.
+		p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, RETURN_DELAY_TICKS + 20, MAX_RESISTANCE, false, false));
+	}
+
+	private void restoreFood(Player p, Duel d) {
+		if (d.a.equals(p.getUniqueId())) {
+			p.setFoodLevel(d.foodA);
+			p.setSaturation(d.satA);
+		} else {
+			p.setFoodLevel(d.foodB);
+			p.setSaturation(d.satB);
+		}
+	}
+
+	/** Accumulates a landed hit's damage for the end-of-match summary. */
+	public void recordHit(Player attacker, Player victim, double damage) {
+		Duel d = byPlayer.get(attacker.getUniqueId());
+		if (d == null) return;
+		if (d.a.equals(attacker.getUniqueId())) {
+			d.dmgA += damage;
+			d.hitsA++;
+		} else if (d.b.equals(attacker.getUniqueId())) {
+			d.dmgB += damage;
+			d.hitsB++;
+		}
+	}
+
+	private void returnHome(Player p, Location prev) {
+		if (p == null) return;
+		p.removePotionEffect(PotionEffectType.RESISTANCE);
+		if (prev != null) p.teleport(prev);
+	}
+
+	/** Sends both players a summary of the match they just fought (damage dealt + hits landed). */
+	private void printMatchStats(Duel d, Player winner, Player loser) {
+		Component summary = Utils.msg("""
+				<gray><st>                                        </st>
+				<yellow><bold>1v1 Summary</bold>
+				<white><na></white><gray>:</gray> <red><da></red> <gray>dmg,</gray> <aqua><ha></aqua> <gray>hits</gray>
+				<white><nb></white><gray>:</gray> <red><db></red> <gray>dmg,</gray> <aqua><hb></aqua> <gray>hits</gray>
+				<gray><st>                                        </st>""",
+				Placeholder.unparsed("na", nameOf(d.a)),
+				Placeholder.unparsed("da", fmt(d.dmgA)),
+				Placeholder.unparsed("ha", String.valueOf(d.hitsA)),
+				Placeholder.unparsed("nb", nameOf(d.b)),
+				Placeholder.unparsed("db", fmt(d.dmgB)),
+				Placeholder.unparsed("hb", String.valueOf(d.hitsB)));
+		if (winner != null) winner.sendMessage(summary);
+		if (loser != null) loser.sendMessage(summary);
+	}
+
+	private static String nameOf(UUID id) {
+		Player p = Bukkit.getPlayer(id);
+		if (p != null) return p.getName();
+		String n = Bukkit.getOfflinePlayer(id).getName();
+		return n != null ? n : "Unknown";
+	}
+
+	private static String fmt(double d) {
+		return String.format("%.1f", d);
+	}
+
+	// ===== intelligence swap =====
+	private int readIntelligence(Player p) {
+		try {
+			return Plugin.getIntelligence(p).getScore();
+		} catch (Exception e) {
+			return -1;  // objective missing; nothing to restore
+		}
+	}
+
+	private void setIntelligence(Player p, int value) {
+		try {
+			Score s = Plugin.getIntelligence(p);
+			s.setScore(value);
+			Plugin.sendIntelligenceBar(p, s);
+		} catch (Exception ignored) {
+		}
+	}
+
+	private void restoreIntelligence(Player p, Duel d) {
+		int v = d.a.equals(p.getUniqueId()) ? d.intelA : d.intelB;
+		if (v >= 0) setIntelligence(p, v);
 	}
 
 	private boolean notEnabled(Player p) {
@@ -173,6 +328,11 @@ public class DuelManager {
 	private static final class Duel {
 		final UUID a, b;
 		final Location prevA, prevB;
+		int intelA = -1, intelB = -1;
+		int foodA = 20, foodB = 20;
+		float satA, satB;
+		double dmgA, dmgB;   // damage dealt by each player this match
+		int hitsA, hitsB;    // hits landed by each player this match
 		boolean armed;
 
 		Duel(UUID a, UUID b, Location prevA, Location prevB) {
@@ -188,10 +348,6 @@ public class DuelManager {
 
 		UUID other(UUID id) {
 			return a.equals(id) ? b : a;
-		}
-
-		Location prevFor(UUID id) {
-			return a.equals(id) ? prevA : prevB;
 		}
 	}
 }

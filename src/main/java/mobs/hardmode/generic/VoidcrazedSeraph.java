@@ -23,7 +23,7 @@ import java.util.*;
 
 public class VoidcrazedSeraph implements CustomMob {
 	private static final List<Block> beacons = new ArrayList<>();
-	// Danger-beam particle. DUST is far cheaper than FLAME (a billboarded dot — no animation, physics, or
+	// Danger-beam particle. DUST is far cheaper than FLAME (a billboarded dot no animation, physics, or
 	// lighting), and red signifies danger like a guardian beam mid-fire. Hoisted to a constant so the
 	// ~960 beam particles/tick don't each allocate a new DustOptions.
 	private static final Particle.DustOptions DANGER_DUST = new Particle.DustOptions(Color.RED, 1.0F);
@@ -87,7 +87,7 @@ public class VoidcrazedSeraph implements CustomMob {
 					Block block = Utils.randomLocation(voidgloom.getLocation(), 16, false).getBlock();
 					block.setType(Material.BEACON);
 					beacons.add(block);
-					for(int i = 0; i < 180; i += 20) {
+					for(int i = 0; i < 200; i += 20) {
 						int finalI = i;
 						Utils.scheduleTask(() -> {
 							if(block.getType() == Material.BEACON) {

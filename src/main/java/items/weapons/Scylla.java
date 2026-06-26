@@ -53,7 +53,7 @@ public class Scylla implements AbilityItem {
 		lore.add(Utils.mm("<gray>Damage: <red>+" + loreDamage));
 		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
 			lore.add(Utils.mm(""));
-			loreDamage = String.valueOf(enchLevel * 2.5);
+			loreDamage = String.valueOf(enchLevel * 2);
 			if(ench.equals(Enchantment.SMITE)) {
 				lore.add(Utils.mm("<gray>Bonus Undead Damage: <red>+" + loreDamage));
 			} else {
@@ -228,9 +228,12 @@ public class Scylla implements AbilityItem {
 		// Teleport on the same tick. The 1-tick defer was meant to suppress the spurious "build.tooHigh"
 		// action bar, but it still shows regardless — so the defer only added latency (badly noticeable
 		// during server lag spikes). The implosion below is centered on the destination location either way.
-		if(l != null) {
-			p.teleport(l);
+		// No valid etherwarp destination (e.g. the ray hit the SELF block face) — don't fire the
+		// ability so no mana is charged, and avoid imploding on a null location.
+		if(l == null) {
+			return false;
 		}
+		p.teleport(l);
 		p.setFallDistance(0);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
@@ -255,11 +258,11 @@ public class Scylla implements AbilityItem {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
 				double tempDamage = targetDamage;
 				if(entity1 instanceof Wither) {
-					tempDamage += 4 + smite * 2.5;
+					tempDamage += 4 + smite * 2;
 				} else if(entity1 instanceof Zombie || entity1 instanceof AbstractSkeleton || entity1 instanceof SkeletonHorse || entity1 instanceof ZombieHorse || entity1 instanceof Phantom || entity1 instanceof Zoglin) {
-					tempDamage += smite * 2.5;
+					tempDamage += smite * 2;
 				} else if(entity1 instanceof Spider || entity1 instanceof Bee || entity1 instanceof Silverfish || entity1 instanceof Endermite) {
-					tempDamage += bane * 2.5;
+					tempDamage += bane * 2;
 				}
 				tempDamage = Math.ceil(tempDamage * 0.51);
 				CustomDamage.customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC);

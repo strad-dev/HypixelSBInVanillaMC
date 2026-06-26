@@ -16,7 +16,11 @@ public final class PvpModule {
 		stats.start(plugin);
 
 		DuelManager duels = new DuelManager(plugin, cfg, stats);
-		plugin.getServer().getPluginManager().registerEvents(new PvpListener(cfg, stats, duels), plugin);
+		PvpListener listener = new PvpListener(cfg, stats, duels);
+		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
+		listener.start(plugin);
+		// Layer the duel/FFA combat handling on top of SkyBlock's CustomDamage flow.
+		PvpHooks.install(listener);
 
 		JoinArenaCommand arena = new JoinArenaCommand(cfg, duels);
 		bind(plugin, "joinarena", arena);

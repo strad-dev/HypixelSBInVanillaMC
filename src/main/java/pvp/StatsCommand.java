@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * /stats [player] — view a player's PvP stats (self if omitted). /pvptop <ffa|1v1> — leaderboard.
+ * /stats [player] view a player's PvP stats (self if omitted). /pvptop <ffa|1v1> leaderboard.
  * Reads the shared stats file fresh each call, so it works on any SkyBlock server.
  */
 public class StatsCommand implements CommandExecutor {
@@ -43,8 +43,8 @@ public class StatsCommand implements CommandExecutor {
 			sender.sendMessage(Utils.msg("<red>No stats for <p>.", Placeholder.unparsed("p", target)));
 			return true;
 		}
-		sender.sendMessage(Utils.msg("<gold><bold><p></bold></gold> <gray>— PvP stats", Placeholder.unparsed("p", e.name)));
-		sender.sendMessage(Utils.msg("<yellow>FFA:</yellow> <white><k></white> K / <white><d></white> D (<aqua><kd></aqua> K/D), streak <white><cs></white> (best <white><bs></white>)",
+		sender.sendMessage(Utils.msg("<gold><bold><p></bold></gold> <gray>'s PvP stats", Placeholder.unparsed("p", e.name)));
+		sender.sendMessage(Utils.msg("<yellow>Free-For-All:</yellow> <white><k></white> K / <white><d></white> D (<aqua><kd></aqua> K/D), streak <white><cs></white> (best <white><bs></white>)",
 				Placeholder.unparsed("k", String.valueOf(e.kills)),
 				Placeholder.unparsed("d", String.valueOf(e.deaths)),
 				Placeholder.unparsed("kd", fmt(e.kd())),
@@ -74,7 +74,7 @@ public class StatsCommand implements CommandExecutor {
 				: Comparator.comparingInt((PvpStats.Entry e) -> e.kills).reversed());
 
 		sender.sendMessage(Utils.msg("<gold><bold>Top <mode></bold></gold>",
-				Placeholder.unparsed("mode", oneVone ? "1v1 (wins)" : "FFA (kills)")));
+				Placeholder.unparsed("mode", oneVone ? "1v1 (wins)" : "Free-For-All (kills)")));
 		int n = Math.min(10, entries.size());
 		for (int i = 0; i < n; i++) {
 			PvpStats.Entry e = entries.get(i);

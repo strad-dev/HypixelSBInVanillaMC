@@ -14,7 +14,7 @@ public class StopBossesTeleporting implements Listener {
 		if(e.getEntity() instanceof Enderman enderman) {
 			String name = Utils.plain(enderman.customName());
 			try {
-				if(enderman.getFireTicks() > 0 || enderman.getScoreboardTags().contains("IceSprayed") || Objects.requireNonNull(name).contains("Voidgloom Seraph") || name.contains("Mutant Enderman")) {
+				if(enderman.getScoreboardTags().contains("SkyblockBoss") || enderman.getFireTicks() > 0 || enderman.getScoreboardTags().contains("IceSprayed") || Objects.requireNonNull(name).contains("Voidgloom Seraph") || name.contains("Mutant Enderman")) {
 					e.setCancelled(true);
 				}
 			} catch(Exception exception) {

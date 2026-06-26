@@ -44,7 +44,7 @@ public class Claymore implements CustomItem {
 		lore.add(Utils.mm("<gray>Swing Range: <red>+2"));
 		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
 			lore.add(Utils.mm(""));
-			loreDamage = String.valueOf(enchLevel * 2.5);
+			loreDamage = String.valueOf(enchLevel * 2);
 			if(ench.equals(Enchantment.SMITE)) {
 				lore.add(Utils.mm("<gray>Bonus Undead Damage: <red>+" + loreDamage));
 			} else {

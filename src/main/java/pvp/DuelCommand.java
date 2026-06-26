@@ -10,9 +10,9 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * /duel <player>   — challenge an online player here.
- * /duel accept     — accept the latest challenge.
- * /duel start <a> <b> — force-pair two players (used by the network plugin / admins).
+ * /duel <player>   challenge an online player here.
+ * /duel accept     accept the latest challenge.
+ * /duel start <a> <b> force-pair two players (used by the network plugin / admins).
  */
 public class DuelCommand implements CommandExecutor {
 	private final DuelManager duels;
@@ -47,7 +47,7 @@ public class DuelCommand implements CommandExecutor {
 		return true;
 	}
 
-	/** /duel start <a> <b> — console/op only (network plugin pairing). */
+	/** /duel start <a> <b> console/op only (network plugin pairing). */
 	private boolean start(CommandSender sender, String[] args) {
 		boolean privileged = !(sender instanceof Player p) || p.isOp();
 		if (!privileged) {

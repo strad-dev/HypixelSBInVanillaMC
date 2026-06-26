@@ -4,8 +4,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -21,6 +26,28 @@ public class PvpConfig {
 	public PvpConfig(JavaPlugin plugin) {
 		this.plugin = plugin;
 		plugin.saveDefaultConfig();
+		mergeMissingDefaults();
+	}
+
+	/**
+	 * Adds any keys present in the jar's bundled config.yml but missing from the on-disk file, with
+	 * their default values. Existing values (and, on modern Paper, comments) are left untouched, so a
+	 * config written before new options were added gets them filled in automatically on startup.
+	 */
+	private void mergeMissingDefaults() {
+		InputStream in = plugin.getResource("config.yml");
+		if (in == null) return;
+		YamlConfiguration bundled = YamlConfiguration.loadConfiguration(new InputStreamReader(in, StandardCharsets.UTF_8));
+		FileConfiguration live = plugin.getConfig();
+		boolean changed = false;
+		for (String key : bundled.getKeys(true)) {
+			// Only copy leaf values; sections are created implicitly by their children.
+			if (!bundled.isConfigurationSection(key) && !live.contains(key)) {
+				live.set(key, bundled.get(key));
+				changed = true;
+			}
+		}
+		if (changed) plugin.saveConfig();
 	}
 
 	private ConfigurationSection cfg() {
@@ -72,6 +99,16 @@ public class PvpConfig {
 
 	public int duelCountdown() {
 		return cfg().getInt("pvp.duel.countdown", 5);
+	}
+
+	/** Intelligence every player is set to for the duration of a duel (hunger is always full). */
+	public int duelIntelligence() {
+		return cfg().getInt("pvp.duel.intelligence", 50);
+	}
+
+	/** Saturation every player is set to for the duration of a duel. */
+	public double duelSaturation() {
+		return cfg().getDouble("pvp.duel.saturation", 5);
 	}
 
 	/** Player corner i (0 or 1) for a duel, or null if not configured. */
