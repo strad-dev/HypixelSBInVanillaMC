@@ -225,13 +225,11 @@ public class Scylla implements AbilityItem {
 				}
 			}
 		}
-		// Defer the teleport one tick so it does NOT fire inside the interaction packet. Teleporting
-		// mid-interaction desyncs the client (a 26.x client behavior change) and makes vanilla flash a
-		// spurious "build.tooHigh" action bar. The implosion below is centered on the destination since
-		// the player only arrives there next tick.
+		// Teleport on the same tick. The 1-tick defer was meant to suppress the spurious "build.tooHigh"
+		// action bar, but it still shows regardless — so the defer only added latency (badly noticeable
+		// during server lag spikes). The implosion below is centered on the destination location either way.
 		if(l != null) {
-			Location dest = l;
-			Utils.scheduleTask(() -> p.teleport(dest), 1L);
+			p.teleport(l);
 		}
 		p.setFallDistance(0);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);

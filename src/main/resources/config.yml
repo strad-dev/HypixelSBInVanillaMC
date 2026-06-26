@@ -1,15 +1,14 @@
-# SkyBlock-in-Vanilla config.
-# PvP is OFF by default so this plugin stays inert/standalone on non-pvp servers; enable + fill in
-# the coordinates on the pvp server only.
+# SkyBlock-in-Vanilla config.  There are a few options you can tweak here.
 
 chat:
-  # Set false on the strad.dev network so the hub (StradNetworkPlugin) owns chat instead.
+  # Enables a lightweight custom chat that bypasses Mojang chat reporting
   enabled: true
 
 pvp:
   ffa:
+    # Enables the Free-For-All PvP arena.
     enabled: false
-    # TODO(user): set the FFA world + spawn + arena bounds + (optional) safe zone.
+    # Set the FFA world, spawnpoint, arena bounds, and (optional) safe zone.
     world: world
     spawn: { x: 0.5, y: 100.0, z: 0.5, yaw: 0.0, pitch: 0.0 }
     bounds:
@@ -20,8 +19,9 @@ pvp:
       min: [ -5.0, 0.0, -5.0 ]
       max: [ 5.0, 256.0, 5.0 ]
   duel:
+    # Enables direct 1v1 duels.  Players can send duel requests to each other.
     enabled: false
-    # TODO(user): set the duel world, the two player spawn corners, and the arena bounds.
+    # Set the duel world, the two player spawn locations, and the arena bounds.  For best results, use an enclosed space with bedrock walls at least 2 blocks thick separate from the Free-For-All Arena.
     world: world
     countdown: 5
     arena:
@@ -31,6 +31,6 @@ pvp:
       - { x: 105.5, y: 100.0, z: 125.5, yaw: -90.0, pitch: 0.0 }
       - { x: 145.5, y: 100.0, z: 125.5, yaw: 90.0, pitch: 0.0 }
   stats:
+    # Enables stats tracking for duels (recommended).
     enabled: false
-    # Shared network-wide stats file. "../data/..." resolves to ~/data on the strad.dev box.
-    file: "../data/pvp-stats.json"
+    file: "pvp-stats.json"
