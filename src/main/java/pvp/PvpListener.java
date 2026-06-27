@@ -8,6 +8,11 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -126,13 +131,15 @@ public class PvpListener implements Listener {
 		if (duelHit) duels.recordHit(attacker, victim, finalDamage);
 	}
 
-	public boolean handleLethal(Player victim, Player attacker) {
+	public boolean handleLethal(Player victim, Player attacker, boolean absolute) {
 		if (duels.inDuel(victim.getUniqueId())) {
-			duels.handleDeath(victim); // heals both, restores intelligence, returns them home after 5s
+			if (absolute) duels.draw(victim);   // /kill (and void/border) end a 1v1 as a draw
+			else duels.handleDeath(victim);      // heals both, restores intelligence, returns home after 5s
 			return true;
 		}
 		if (cfg.ffaEnabled() && inFfa(victim)) {
-			ffaDeath(victim, attacker);
+			if (absolute) ffaRespawn(victim);    // /kill etc. - respawn but don't count a death
+			else ffaDeath(victim, attacker);
 			return true;
 		}
 		return false;
@@ -146,7 +153,11 @@ public class PvpListener implements Listener {
 		} else {
 			stats.recordDeath(victim);
 		}
-		// Heal to full and send them back to the FFA spawn instead of dying.
+		ffaRespawn(victim);
+	}
+
+	/** Heal to full and send the player back to the FFA spawn instead of dying (no stat change). */
+	private void ffaRespawn(Player victim) {
 		healFull(victim);
 		victim.setFoodLevel(20);
 		victim.setFireTicks(0);
@@ -161,6 +172,46 @@ public class PvpListener implements Listener {
 		inArena.remove(e.getPlayer().getUniqueId());
 		inSafezone.remove(e.getPlayer().getUniqueId());
 		combos.remove(e.getPlayer().getUniqueId());
+	}
+
+	// ===== per-match duel stats (no-op outside a duel) =====
+	@EventHandler(ignoreCancelled = true)
+	public void onRegainHealth(EntityRegainHealthEvent e) {
+		if (e.getEntity() instanceof Player p) duels.recordHeal(p, e.getAmount());
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onConsume(PlayerItemConsumeEvent e) {
+		duels.recordFood(e.getPlayer());
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onSwing(PlayerAnimationEvent e) {
+		duels.recordAttempt(e.getPlayer()); // arm swing = a melee attempt
+	}
+
+	@EventHandler(ignoreCancelled = true)
+	public void onShootBow(EntityShootBowEvent e) {
+		if (e.getEntity() instanceof Player p) duels.recordAttempt(p); // bow shot = a ranged attempt
+	}
+
+	// ===== arena protection =====
+	@EventHandler(ignoreCancelled = true)
+	public void onBlockBreak(BlockBreakEvent e) {
+		if (inArenaRegion(e.getBlock().getLocation())) e.setCancelled(true);
+	}
+
+	/** True if the location is inside the FFA bounds or the duel arena bounds. */
+	private boolean inArenaRegion(Location loc) {
+		if (cfg.ffaEnabled()) {
+			Region b = cfg.ffaBounds();
+			if (b != null && b.contains(loc)) return true;
+		}
+		if (cfg.duelEnabled()) {
+			Region a = cfg.duelArena();
+			if (a != null && a.contains(loc)) return true;
+		}
+		return false;
 	}
 
 	// ===== Free-For-All arena enter/exit detection =====
