@@ -36,9 +36,9 @@ public final class PvpHooks {
 	 * the kill (ended the duel, or scored the FFA kill) and revived the player, so CustomDamage must
 	 * NOT kill them (no death screen).
 	 */
-	public static boolean handleLethal(LivingEntity victim, Entity attacker) {
+	public static boolean handleLethal(LivingEntity victim, Entity attacker, boolean absolute) {
 		return listener != null && victim instanceof Player v
-				&& listener.handleLethal(v, attacker instanceof Player ? (Player) attacker : null);
+				&& listener.handleLethal(v, attacker instanceof Player ? (Player) attacker : null, absolute);
 	}
 
 	/**

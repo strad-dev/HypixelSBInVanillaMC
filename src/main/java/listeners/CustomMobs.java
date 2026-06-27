@@ -129,11 +129,16 @@ public class CustomMobs implements Listener {
 			}
 			// add health to the entity name if it doesn't exist already
 			if(name.isEmpty()) {
+				// Already named on a previous pass (e.g. a CustomPig that copied its name across the swap,
+				// or another plugin)? Leave it. Rebuilding from the legacy-serialized getName() loses the
+				// colors - the red ❤ would turn <aqua> - and MiniMessage can't parse the § codes. HP stays
+				// current via Utils.changeName(entity) on hits.
+				if(entity.customName() != null) {
+					entity.setCustomNameVisible(true);
+					return;
+				}
 				name = "<aqua>" + entity.getName();
 			}
-			// SkyBlock names are MiniMessage; a foreign entity's legacy §-coded name (e.g. another
-			// plugin's "§bPig...") would make the stricter MiniMessage parser throw, so strip § codes.
-			name = name.replaceAll("(?i)§[0-9A-FK-OR]", "");
 			if(!name.contains("❤")) {
 				Utils.changeName(entity, name);
 			} else {

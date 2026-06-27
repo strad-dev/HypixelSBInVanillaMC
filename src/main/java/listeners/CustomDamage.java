@@ -469,8 +469,13 @@ public class CustomDamage implements Listener {
 					}
 
 					damagee.setHealth(1.0);
-					// Play the totem sound explicitly; the entity-event 35 animation doesn't reliably carry it here.
-					damagee.getWorld().playSound(damagee, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
+					// Play the totem sound. Send it straight to the player (and to nearby players via the
+					// world location) since the entity-event 35 animation doesn't reliably carry the sound here.
+					Location totemLoc = damagee.getLocation();
+					damagee.getWorld().playSound(totemLoc, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
+					if(damagee instanceof Player totemUser) {
+						totemUser.playSound(totemLoc, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
+					}
 					damagee.getActivePotionEffects().forEach(effect -> damagee.removePotionEffect(effect.getType()));
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, 900, 1));
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 800, 0));
@@ -480,7 +485,8 @@ public class CustomDamage implements Listener {
 					// PvP layer (config-gated, inert off the pvp server): with no totem to save them, a
 					// lethal blow ends the duel / scores the FFA kill and revives the player instead of
 					// killing them. Placed AFTER the totem branch so arena kills don't bypass totems.
-					if(pvp.PvpHooks.handleLethal(damagee, damager)) {
+					// LETHAL_ABSOLUTE (e.g. /kill, void) is a draw in 1v1 and doesn't count a death in FFA.
+					if(pvp.PvpHooks.handleLethal(damagee, damager, type == DamageType.LETHAL_ABSOLUTE)) {
 						return;
 					}
 					if(damagee instanceof EnderDragon dragon && data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
