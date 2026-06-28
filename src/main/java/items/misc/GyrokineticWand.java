@@ -249,6 +249,10 @@ public class GyrokineticWand implements AbilityItem {
 
 		for(Entity e : rift.getWorld().getNearbyEntities(rift, 10, 10, 10)) {
 			if(e instanceof LivingEntity entity && !(e.equals(p))) {
+				// Don't gyro players in creative or spectator mode.
+				if(entity instanceof Player pl && (pl.getGameMode() == GameMode.CREATIVE || pl.getGameMode() == GameMode.SPECTATOR)) {
+					continue;
+				}
 				new BukkitRunnable() {
 					int tick = 0;
 
@@ -265,8 +269,11 @@ public class GyrokineticWand implements AbilityItem {
 							double y = (rift.getY() - entityLoc.getY()) / 5;
 							double z = (rift.getZ() - entityLoc.getZ()) / 5;
 							entity.setVelocity(new Vector(x, y, z));
-						} else { // Next 2.5 seconds - keep at rift
-							entity.teleport(rift);
+						} else { // Next 2.5 seconds - keep at rift, preserving the mob's own facing (don't snap yaw/pitch)
+							Location dest = rift.clone();
+							dest.setYaw(entity.getLocation().getYaw());
+							dest.setPitch(entity.getLocation().getPitch());
+							entity.teleport(dest);
 						}
 
 						tick++;

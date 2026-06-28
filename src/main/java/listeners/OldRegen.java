@@ -56,6 +56,7 @@ public class OldRegen implements Listener {
 
 		if(playerHealth < maxHealth) {
 			p.setHealth(clamp(playerHealth + 1, 0.0, maxHealth));
+			pvp.PvpHooks.trackHeal(p, 1);
 			healTimes.put(playerId, currentTime);
 		}
 

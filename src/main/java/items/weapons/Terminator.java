@@ -26,7 +26,7 @@ import static misc.Utils.shootBeam;
 
 public class Terminator implements AbilityItem {
 	private static final String COOLDOWN_TAG = "SalvationCooldown";
-	private static final int COOLDOWN = 20;
+	private static final int COOLDOWN = 16;
 	private static final String SHOT_COOLDOWN_TAG = "TerminatorShotCooldown";
 	private static final int SHOT_COOLDOWN = 3;
 
@@ -54,7 +54,7 @@ public class Terminator implements AbilityItem {
 		lore.add(Utils.mm("<gray>Shoot a beam, penetrating up to"));
 		lore.add(Utils.mm("<yellow>5<gray> foes and dealing <red>" + salvationDamage));
 		lore.add(Utils.mm("<gray>damage to each enemy."));
-		lore.add(Utils.mm("<gray>Cooldown: <green>1s"));
+		lore.add(Utils.mm("<gray>Cooldown: <green>0.8s"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC BOW <obfuscated>a</obfuscated>"));
 

@@ -45,9 +45,19 @@ public final class PvpHooks {
 	 * Reports a landed player-vs-player hit so the PvP layer can update damage/accuracy/combo stats.
 	 * Called for every applied hit; the listener decides whether it counts (arena or armed duel).
 	 */
-	public static void trackHit(LivingEntity victim, Entity attacker, double finalDamage, boolean arrow) {
+	public static void trackHit(LivingEntity victim, Entity attacker, double finalDamage, boolean arrow, boolean crit, boolean iframe) {
 		if (listener != null && victim instanceof Player v && attacker instanceof Player a) {
-			listener.trackHit(v, a, finalDamage, arrow);
+			listener.trackHit(v, a, finalDamage, arrow, crit, iframe);
 		}
+	}
+
+	/** Reports intelligence (mana) spent on an ability; counted only while the player is in PvP combat. */
+	public static void trackMana(Player p, int amount) {
+		if (listener != null) listener.trackMana(p, amount);
+	}
+
+	/** Reports HP restored; counted only while the player is in PvP combat. */
+	public static void trackHeal(Player p, int amount) {
+		if (listener != null) listener.trackHeal(p, amount);
 	}
 }

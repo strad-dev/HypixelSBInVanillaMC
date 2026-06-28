@@ -15,7 +15,8 @@ public final class PvpModule {
 		PvpStats stats = new PvpStats(cfg);
 		stats.start(plugin);
 
-		DuelManager duels = new DuelManager(plugin, cfg, stats);
+		PvpLoadouts loadouts = new PvpLoadouts();
+		DuelManager duels = new DuelManager(plugin, cfg, stats, loadouts);
 		PvpListener listener = new PvpListener(cfg, stats, duels);
 		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
 		listener.start(plugin);
@@ -31,6 +32,13 @@ public final class PvpModule {
 		bind(plugin, "pvptop", statsCmd);
 
 		bind(plugin, "duel", new DuelCommand(duels));
+
+		// PvP loadout editor (/pvploadout): declared in plugin.yml so it shows in /help and tab-completes.
+		// The command itself refuses unless 1v1 duels are enabled (checked in PvpLoadoutMenu), and the
+		// menu only opens then. Loadouts live in this plugin's own data folder, i.e. stored per-server.
+		PvpLoadoutMenu menu = new PvpLoadoutMenu(cfg, loadouts);
+		plugin.getServer().getPluginManager().registerEvents(menu, plugin);
+		bind(plugin, "pvploadout", menu);
 
 		plugin.getLogger().info("[PvP] ffa=" + cfg.ffaEnabled() + " duel=" + cfg.duelEnabled()
 				+ " stats=" + cfg.statsEnabled() + " chat=" + cfg.chatEnabled());

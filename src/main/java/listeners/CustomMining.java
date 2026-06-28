@@ -11,14 +11,70 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDamageAbortEvent;
+import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
+import misc.Plugin;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import static misc.Utils.sendRareDropMessage;
 
 public class CustomMining implements Listener {
+	// Players actively breaking a Voidgloom yang-glyph beacon: their target block + the scheduled defuse.
+	private final Map<UUID, Block> beaconTarget = new HashMap<>();
+	private final Map<UUID, BukkitTask> beaconTask = new HashMap<>();
+
+	/**
+	 * Voidgloom yang-glyph beacon: break (defuse) it on a fixed timer - 3s with a fist, 2s with the
+	 * Divan's Pickaxe (33% faster) - instead of the slow vanilla beacon dig (a beacon isn't
+	 * pickaxe-mineable, so vanilla tool tier doesn't speed it up). Defusing it removes the beacon so
+	 * the boss never detonates it.
+	 */
+	@EventHandler(ignoreCancelled = true)
+	public void onBeaconDamage(BlockDamageEvent e) {
+		Block b = e.getBlock();
+		if(!VoidcrazedSeraph.isVoidgloomBeacon(b) || b.getType() != Material.BEACON) return;
+		Player p = e.getPlayer();
+		UUID id = p.getUniqueId();
+		if(b.equals(beaconTarget.get(id))) return; // already breaking this beacon
+		cancelBeacon(id);
+		boolean divan = isDivanPickaxe(p.getInventory().getItemInMainHand());
+		long ticks = divan ? 40L : 60L; // 2s with Divan's Pickaxe (33% faster), 3s otherwise
+		beaconTarget.put(id, b);
+		beaconTask.put(id, Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
+			beaconTarget.remove(id);
+			beaconTask.remove(id);
+			if(VoidcrazedSeraph.isVoidgloomBeacon(b) && b.getType() == Material.BEACON) {
+				b.setType(Material.AIR); // defused before the boss can detonate it
+				b.getWorld().playSound(b.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1.0f, 1.0f);
+			}
+		}, ticks));
+	}
+
+	@EventHandler
+	public void onBeaconAbort(BlockDamageAbortEvent e) {
+		cancelBeacon(e.getPlayer().getUniqueId());
+	}
+
+	private void cancelBeacon(UUID id) {
+		BukkitTask t = beaconTask.remove(id);
+		if(t != null) t.cancel();
+		beaconTarget.remove(id);
+	}
+
+	private static boolean isDivanPickaxe(ItemStack item) {
+		return item != null && item.hasItemMeta() && item.getItemMeta().hasLore()
+				&& Utils.firstLorePlain(item.getItemMeta()).equals("skyblock/combat/divan_pickaxe");
+	}
+
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent e) {
 		Player p = e.getPlayer();

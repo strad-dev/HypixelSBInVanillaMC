@@ -36,16 +36,18 @@ public class DuelManager {
 	private final JavaPlugin plugin;
 	private final PvpConfig cfg;
 	private final PvpStats stats;
+	private final PvpLoadouts loadouts;
 
 	private final Map<UUID, Duel> byPlayer = new HashMap<>();
 	private final Map<UUID, UUID> invites = new HashMap<>();         // target -> inviter
 	private final Map<UUID, Integer> inviteTokens = new HashMap<>(); // target -> token, so a stale timeout can't cancel a newer request
 	private int inviteCounter = 0;
 
-	public DuelManager(JavaPlugin plugin, PvpConfig cfg, PvpStats stats) {
+	public DuelManager(JavaPlugin plugin, PvpConfig cfg, PvpStats stats, PvpLoadouts loadouts) {
 		this.plugin = plugin;
 		this.cfg = cfg;
 		this.stats = stats;
+		this.loadouts = loadouts;
 	}
 
 	public boolean inDuel(UUID id) {
@@ -174,7 +176,11 @@ public class DuelManager {
 		p.teleport(spawn);
 		healFull(p);
 		p.setFoodLevel(20);
-		DuelKit.apply(p); // swap to the standardized 1v1 loadout (the real inventory was saved in start())
+		// Use the player's saved PvP loadout if they have one; otherwise the standardized kit. (Their real
+		// inventory was saved in start() and is restored when the duel ends.)
+		ItemStack[] saved = loadouts == null ? null : loadouts.get(p.getUniqueId());
+		if (saved != null) PvpLoadouts.apply(p, saved);
+		else DuelKit.apply(p);
 		// Players may walk around during the countdown; max Resistance keeps them invulnerable until FIGHT.
 		p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, (cfg.duelCountdown() + 2) * 20, MAX_RESISTANCE, false, false));
 	}
@@ -365,17 +371,34 @@ public class DuelManager {
 		}
 	}
 
-	/** Accumulates a landed hit's damage for the end-of-match summary. */
-	public void recordHit(Player attacker, Player victim, double damage) {
+	/**
+	 * Accumulates a landed hit's damage for the end-of-match summary. {@code hits} counts every
+	 * connect (including those negated by the victim's i-frames); {@code iframes} counts only the
+	 * negated ones, so effective landed hits = hits - iframes. Crits only count when the hit actually
+	 * landed (not negated by i-frames).
+	 */
+	public void recordHit(Player attacker, Player victim, double damage, boolean crit, boolean iframe) {
 		Duel d = byPlayer.get(attacker.getUniqueId());
 		if (d == null) return;
 		if (d.a.equals(attacker.getUniqueId())) {
 			d.dmgA += damage;
 			d.hitsA++;
+			if (iframe) d.iframesA++;
+			else if (crit) d.critsA++;
 		} else if (d.b.equals(attacker.getUniqueId())) {
 			d.dmgB += damage;
 			d.hitsB++;
+			if (iframe) d.iframesB++;
+			else if (crit) d.critsB++;
 		}
+	}
+
+	/** Accumulates intelligence (mana) spent on an ability for the end-of-match summary. */
+	public void recordMana(Player p, int amount) {
+		Duel d = byPlayer.get(p.getUniqueId());
+		if (d == null) return;
+		if (d.a.equals(p.getUniqueId())) d.manaUsedA += amount;
+		else if (d.b.equals(p.getUniqueId())) d.manaUsedB += amount;
 	}
 
 	/** A swing/shot - counts toward hit-accuracy (landed hits / attempts). */
@@ -410,22 +433,28 @@ public class DuelManager {
 	private void printMatchStats(Duel d, Player one, Player two) {
 		Component summary = Utils.msg("""
 				<gray><st>                                                  </st>
-				<yellow><bold>1v1 Summary
-				<white><na></white><gray>:</gray> <red><da> dmg</red> <dark_gray>|</dark_gray> <aqua><ha>/<ta> hits (<acca>%)</aqua> <dark_gray>|</dark_gray> <green><hea> healed</green> <dark_gray>|</dark_gray> <gold><foa> food</gold>
-				<white><nb></white><gray>:</gray> <red><db> dmg</red> <dark_gray>|</dark_gray> <aqua><hb>/<tb> hits (<accb>%)</aqua> <dark_gray>|</dark_gray> <green><heb> healed</green> <dark_gray>|</dark_gray> <gold><fob> food</gold>
+				<yellow><bold>1v1 Summary</bold></yellow>
+				<white><na></white><gray>:</gray> <red><da> dmg</red> <dark_gray>|</dark_gray> <aqua><lna>/<ha>/<ta> hits (<acca>%)</aqua> <dark_gray>|</dark_gray> <yellow><cra> crits</yellow> <dark_gray>|</dark_gray> <light_purple><maa> mana</light_purple> <dark_gray>|</dark_gray> <green><hea> healed</green> <dark_gray>|</dark_gray> <gold><foa> food</gold>
+				<white><nb></white><gray>:</gray> <red><db> dmg</red> <dark_gray>|</dark_gray> <aqua><lnb>/<hb>/<tb> hits (<accb>%)</aqua> <dark_gray>|</dark_gray> <yellow><crb> crits</yellow> <dark_gray>|</dark_gray> <light_purple><mab> mana</light_purple> <dark_gray>|</dark_gray> <green><heb> healed</green> <dark_gray>|</dark_gray> <gold><fob> food</gold>
 				<gray><st>                                                  </st>""",
 				Placeholder.unparsed("na", nameOf(d.a)),
 				Placeholder.unparsed("da", fmt(d.dmgA)),
+				Placeholder.unparsed("lna", String.valueOf(d.hitsA - d.iframesA)),
 				Placeholder.unparsed("ha", String.valueOf(d.hitsA)),
 				Placeholder.unparsed("ta", String.valueOf(d.attemptsA)),
 				Placeholder.unparsed("acca", accuracy(d.hitsA, d.attemptsA)),
+				Placeholder.unparsed("cra", String.valueOf(d.critsA)),
+				Placeholder.unparsed("maa", String.valueOf(d.manaUsedA)),
 				Placeholder.unparsed("hea", fmt(d.healedA)),
 				Placeholder.unparsed("foa", String.valueOf(d.foodEatenA)),
 				Placeholder.unparsed("nb", nameOf(d.b)),
 				Placeholder.unparsed("db", fmt(d.dmgB)),
+				Placeholder.unparsed("lnb", String.valueOf(d.hitsB - d.iframesB)),
 				Placeholder.unparsed("hb", String.valueOf(d.hitsB)),
 				Placeholder.unparsed("tb", String.valueOf(d.attemptsB)),
 				Placeholder.unparsed("accb", accuracy(d.hitsB, d.attemptsB)),
+				Placeholder.unparsed("crb", String.valueOf(d.critsB)),
+				Placeholder.unparsed("mab", String.valueOf(d.manaUsedB)),
 				Placeholder.unparsed("heb", fmt(d.healedB)),
 				Placeholder.unparsed("fob", String.valueOf(d.foodEatenB)));
 		if (one != null) one.sendMessage(summary);
@@ -495,6 +524,9 @@ public class DuelManager {
 		int attemptsA, attemptsB;   // hit attempts (melee swings + bow shots)
 		double healedA, healedB;    // health regained this match
 		int foodEatenA, foodEatenB; // food items consumed this match
+		int critsA, critsB;         // critical hits landed this match
+		int iframesA, iframesB;     // hits landed during the victim's invulnerability frames this match
+		int manaUsedA, manaUsedB;   // intelligence (mana) spent on abilities this match
 		boolean armed;
 
 		Duel(UUID a, UUID b, Location prevA, Location prevB) {

@@ -60,6 +60,9 @@ public class Plugin extends JavaPlugin implements Listener {
 
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
 		Objects.requireNonNull(this.getCommand("locateplayer")).setExecutor(new LocatePlayer());
+		Eq eq = new Eq();
+		Objects.requireNonNull(this.getCommand("eq")).setExecutor(eq);
+		getServer().getPluginManager().registerEvents(eq, this);
 		if(chatEnabled) {
 			Objects.requireNonNull(this.getCommand("w")).setExecutor(new Tell());
 			Objects.requireNonNull(this.getCommand("tell")).setExecutor(new Tell());
@@ -247,7 +250,7 @@ public class Plugin extends JavaPlugin implements Listener {
 		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
 			try {
 				Score score = Plugin.getIntelligence(p);
-				if(score.getScore() < 2500 && second == 5) {
+				if(score.getScore() < 2500 && second == 4) {
 					score.setScore(score.getScore() + 1);
 				}
 				Plugin.sendIntelligenceBar(p, score);
@@ -258,7 +261,7 @@ public class Plugin extends JavaPlugin implements Listener {
 			}
 		}
 
-		if(second == 5) {
+		if(second == 4) {
 			second = 0;
 		} else {
 			second ++;

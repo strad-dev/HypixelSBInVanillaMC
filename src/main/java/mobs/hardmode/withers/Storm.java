@@ -140,11 +140,16 @@ public class Storm implements CustomWither {
 	 * skull is ignored, leaving it to fly along the wither's facing), and an initial velocity is added.
 	 */
 	private static void fireSkull(Wither wither, Location spawn, Vector dir) {
-		spawn.setDirection(dir);
-		WitherSkull skull = (WitherSkull) wither.getWorld().spawnEntity(spawn, EntityType.WITHER_SKULL);
-		skull.setShooter(wither);
-		skull.setDirection(dir);
-		skull.setVelocity(dir.clone().multiply(SKULL_SPEED));
+		Vector d = dir.clone().normalize();
+		// A fireball follows its ACCELERATION, not its velocity - setVelocity alone is overridden each
+		// tick, so the skull curved back along the wither's facing. Set the acceleration in the spawn
+		// consumer (before the entity ticks) so it actually flies at the target. Magnitude is tuned so
+		// its terminal speed stays ~SKULL_SPEED (fireball drag is ~0.95/tick).
+		WitherSkull skull = wither.getWorld().spawn(spawn, WitherSkull.class, s -> {
+			s.setShooter(wither);
+			s.setAcceleration(d.clone().multiply(SKULL_SPEED * 0.05));
+		});
+		skull.setVelocity(d.clone().multiply(SKULL_SPEED));
 	}
 
 	private void spamSkulls(Wither wither, Player p, int i) {

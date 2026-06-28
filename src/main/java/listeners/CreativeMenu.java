@@ -131,6 +131,14 @@ public class CreativeMenu implements Listener {
 		));
 	}
 
+	/** The "Items" catalog (weapons/armor/tools), cloned - reused as the PvP loadout editor palette. */
+	public static List<ItemStack> loadoutPalette() {
+		List<ItemStack> out = new ArrayList<>();
+		List<ItemStack> items = ITEMS.get("items");
+		if (items != null) for (ItemStack it : items) if (it != null) out.add(it.clone());
+		return out;
+	}
+
 	private static ItemStack getEnchantedBook(Enchantment enchantment, int level) {
 		ItemStack book = new ItemStack(Material.ENCHANTED_BOOK);
 		EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();

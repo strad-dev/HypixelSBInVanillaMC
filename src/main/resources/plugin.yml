@@ -19,6 +19,9 @@ commands:
   locateplayer:
     description: Locate a player on the server!
     usage: /locateplayer [player]
+  eq:
+    description: View your equipment and current speed.
+    usage: /eq
   resetwitherfight:
     description: Resets the status of the Wither Lords boss fight.  Useful if the boss was /kill'ed or otherwise dead in an unintended way.
     usage: /resetwitherfight
@@ -46,6 +49,9 @@ commands:
   pvptop:
     description: View the PvP leaderboard.
     usage: /pvptop <ffa|1v1>
+  pvploadout:
+    description: Edit your PvP duel loadout.
+    usage: /pvploadout [reset]
 
 softdepend:
   - DiscordSRV

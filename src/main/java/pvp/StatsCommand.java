@@ -44,7 +44,7 @@ public class StatsCommand implements CommandExecutor {
 			return true;
 		}
 		sender.sendMessage(Utils.msg("<gold><bold><p></bold></gold> <gray>'s PvP stats", Placeholder.unparsed("p", e.name)));
-		sender.sendMessage(Utils.msg("<yellow>Free-For-All:</yellow> <white><k></white> K / <white><d></white> D (<aqua><kd></aqua> K/D), streak <white><cs></white> (best <white><bs></white>)",
+		sender.sendMessage(Utils.msg("<yellow>Overall:</yellow> <white><k></white> K / <white><d></white> D (<aqua><kd></aqua> K/D), streak <white><cs></white> (best <white><bs></white>)",
 				Placeholder.unparsed("k", String.valueOf(e.kills)),
 				Placeholder.unparsed("d", String.valueOf(e.deaths)),
 				Placeholder.unparsed("kd", fmt(e.kd())),
@@ -57,12 +57,21 @@ public class StatsCommand implements CommandExecutor {
 				Placeholder.unparsed("m", String.valueOf(e.matches)),
 				Placeholder.unparsed("ws", String.valueOf(e.winStreak)),
 				Placeholder.unparsed("bws", String.valueOf(e.bestWinStreak))));
-		sender.sendMessage(Utils.msg("<yellow>Combat:</yellow> dealt <white><dd></white>, taken <white><dt></white>, hits <white><h></white> (<white><ar></white> arrows), best combo <white><c></white>",
-				Placeholder.unparsed("dd", fmt(e.damageDealt)),
-				Placeholder.unparsed("dt", fmt(e.damageTaken)),
+		int acc = e.hitAttempts > 0 ? (int) Math.round(e.hitsLanded * 100.0 / e.hitAttempts) : 0;
+		int critPct = e.hitsLanded > 0 ? (int) Math.round(e.criticalHits * 100.0 / e.hitsLanded) : 0;
+		int iframePct = e.hitsLanded > 0 ? (int) Math.round(e.iframeHits * 100.0 / e.hitsLanded) : 0;
+		sender.sendMessage(Utils.msg("<yellow>Combat:</yellow> <red><dmg></red> dmg <dark_gray>|</dark_gray> <aqua><h>/<ha> hits (<acc>%)</aqua> <dark_gray>|</dark_gray> <gold><cr>/<h> crit (<cp>%)</gold> <dark_gray>|</dark_gray> <blue><ifc>/<h> i-frame (<ip>%)</blue> <dark_gray>|</dark_gray> <dark_aqua><intel></dark_aqua> intelligence used <dark_gray>|</dark_gray> <green><heal></green> HP healed <dark_gray>|</dark_gray> <yellow><food></yellow> food eaten",
+				Placeholder.unparsed("dmg", fmt(e.damageDealt)),
 				Placeholder.unparsed("h", String.valueOf(e.hitsLanded)),
-				Placeholder.unparsed("ar", String.valueOf(e.arrowsLanded)),
-				Placeholder.unparsed("c", String.valueOf(e.longestCombo))));
+				Placeholder.unparsed("ha", String.valueOf(e.hitAttempts)),
+				Placeholder.unparsed("acc", String.valueOf(acc)),
+				Placeholder.unparsed("cr", String.valueOf(e.criticalHits)),
+				Placeholder.unparsed("cp", String.valueOf(critPct)),
+				Placeholder.unparsed("ifc", String.valueOf(e.iframeHits)),
+				Placeholder.unparsed("ip", String.valueOf(iframePct)),
+				Placeholder.unparsed("intel", String.valueOf(e.intelligenceUsed)),
+				Placeholder.unparsed("heal", String.valueOf(e.hpHealed)),
+				Placeholder.unparsed("food", String.valueOf(e.foodEaten))));
 		return true;
 	}
 

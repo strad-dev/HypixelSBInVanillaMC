@@ -63,7 +63,13 @@ public class WandOfRestoration implements AbilityItem {
 	public boolean onRightClick(Player p) {
 		double maxHealth = p.getAttribute(Attribute.MAX_HEALTH).getValue();
 		for(int i = 0; i < 51; i += 25) {
-			Utils.scheduleTask(() -> p.setHealth(Math.min(p.getHealth() + 1, maxHealth)), i);
+			Utils.scheduleTask(() -> {
+				double cur = p.getHealth();
+				if(cur < maxHealth) {
+					p.setHealth(Math.min(cur + 1, maxHealth));
+					pvp.PvpHooks.trackHeal(p, 1);
+				}
+			}, i);
 		}
 		p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CONVERTED, 1.0F, 1.0F);
 		return true;
