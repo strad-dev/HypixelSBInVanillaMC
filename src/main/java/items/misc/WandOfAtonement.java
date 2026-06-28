@@ -41,7 +41,7 @@ public class WandOfAtonement implements AbilityItem {
 		lore.add(Utils.mm("<gray>Damage: <red>0"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Big Heal <green><bold>RIGHT CLICK"));
-		lore.add(Utils.mm("<gray>Gain +<red>0.5❤<gray> every <green>0.75"));
+		lore.add(Utils.mm("<gray>Gain +<red>0.5❤<gray> every <green>0.6"));
 		lore.add(Utils.mm("<gray>seconds for <green>3<gray> seconds!"));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
 		lore.add(Utils.mm("<dark_gray>Cooldown: <green>" + COOLDOWN / 20 + "s"));
@@ -62,7 +62,7 @@ public class WandOfAtonement implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		double maxHealth = p.getAttribute(Attribute.MAX_HEALTH).getValue();
-		for(int i = 0; i < 61; i += 15) {
+		for(int i = 0; i < 61; i += 12) {
 			Utils.scheduleTask(() -> {
 				double cur = p.getHealth();
 				if(cur < maxHealth) {

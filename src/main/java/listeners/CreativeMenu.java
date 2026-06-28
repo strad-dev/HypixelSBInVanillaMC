@@ -8,6 +8,7 @@ import items.misc.*;
 import items.summonItems.*;
 import items.weapons.Claymore;
 import items.weapons.Scylla;
+import items.weapons.SwordOfBadHealth;
 import items.weapons.Terminator;
 import misc.Utils;
 import org.bukkit.Bukkit;
@@ -64,7 +65,8 @@ public class CreativeMenu implements Listener {
 				HolyIce.getItem(),
 				BonzoStaff.getItem(),
 				TacticalInsertion.getItem(),
-				GyrokineticWand.getItem()
+				GyrokineticWand.getItem(),
+				SwordOfBadHealth.getItem(Enchantment.SHARPNESS, 0)
 		));
 
 		// Initialize ingredients
