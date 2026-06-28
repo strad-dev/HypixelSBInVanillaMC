@@ -77,16 +77,17 @@ public class SwordOfBadHealth implements AbilityItem {
 
 	@Override
 	public boolean onRightClick(Player p) {
-		if(p.getHealth() > 1) {
-			CustomDamage.calculateFinalDamage(p, p, 1, DamageType.ABSOLUTE);
+		if(p.getHealth() > 2) {
+			CustomDamage.calculateFinalDamage(p, p, 2, DamageType.ABSOLUTE);
 			p.addScoreboardTag("BadHealthBuffed");
 			Utils.scheduleTask(() -> p.removeScoreboardTag("BadHealthBuffed"), 100);
 			p.playSound(p, Sound.ENTITY_GENERIC_EAT, 2.0F, 1.0F);
 			p.sendMessage(Utils.msg("<red>Ouch!  That hurt!  But you have buffed your damage by 10% for 5 seconds!"));
+			return true;
 		} else {
 			p.sendMessage(Utils.msg("<red>You do not have enough Health to use this ability!"));
+			return false;
 		}
-		return true;
 	}
 
 	@Override
