@@ -15,6 +15,7 @@ import items.misc.IceSpray;
 import items.misc.WandOfAtonement;
 import items.weapons.Claymore;
 import items.weapons.Scylla;
+import items.weapons.SwordOfBadHealth;
 import items.weapons.Terminator;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -47,13 +48,14 @@ public final class DuelKit {
 		a[3] = k(Claymore.getItem(Enchantment.SHARPNESS, 7));      // "sharpness dark claymore"
 		a[4] = k(Terminator.getItem(7));
 		a[5] = k(WandOfAtonement.getItem());
-		a[6] = k(GyrokineticWand.getItem());
+		a[6] = k(SwordOfBadHealth.getItem(Enchantment.SHARPNESS, 7));
 		a[7] = k(HolyIce.getItem());
 		a[8] = new ItemStack(Material.GOLDEN_CARROT, 64);
 		a[9] = k(WardenHelmet.getItem());
 		a[10] = k(NecronElytra.getItem());
 		a[11] = k(GoldorLeggings.getItem());
 		a[28] = k(BonzoStaff.getItem());
+		a[33] = k(GyrokineticWand.getItem());
 		a[34] = new ItemStack(Material.WATER_BUCKET);
 		a[36] = k(WitherKingCrown.getItem());
 		a[37] = k(PrimalDragonChestplate.getItem());
