@@ -25,7 +25,7 @@ public class WardenHelmet implements Armor {
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetArmor"), 5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
-		AttributeModifier speed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetSpeed"), -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.HEAD);
+		AttributeModifier speed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetSpeed"), -0.33333, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.HEAD);
 		data.addAttributeModifier(Attribute.MOVEMENT_SPEED, speed);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);
@@ -38,7 +38,7 @@ public class WardenHelmet implements Armor {
 		lore.add(Utils.mm("<gray>Damage: <red>+1"));
 		lore.add(Utils.mm("<gray>Armor: <red>+5"));
 		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+20%"));
-		lore.add(Utils.mm("<gray>Speed: <red>x0.5"));
+		lore.add(Utils.mm("<gray>Speed: <red>-33%"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>The brute force of the Warden"));
 		lore.add(Utils.mm("<gray><italic>packed into a single helmet."));

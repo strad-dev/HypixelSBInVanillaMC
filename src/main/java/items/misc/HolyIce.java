@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HolyIce implements AbilityItem {
-	private static final int MANA_COST = 25;
+	private static final int MANA_COST = 20;
 	private static final String COOLDOWN_TAG = "IceCooldown";
 	private static final int COOLDOWN = 60;
 

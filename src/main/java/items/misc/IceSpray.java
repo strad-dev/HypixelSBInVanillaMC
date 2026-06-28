@@ -55,7 +55,8 @@ public class IceSpray implements AbilityItem {
 		lore.add(Utils.mm("<red>1<gray> damage to enemies and"));
 		lore.add(Utils.mm("<gray>slows them down for <green>5"));
 		lore.add(Utils.mm("<gray>seconds!  Frozen enemies take"));
-		lore.add(Utils.mm("<red>+10%<gray> increased damage!"));
+		lore.add(Utils.mm("<red>+10%<gray> increased damage"));
+		lore.add(Utils.mm("<gray>and deal <red>-15%<gray> damage!"));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
 		lore.add(Utils.mm("<dark_gray>Cooldown: <green>" + COOLDOWN / 20 + "s"));
 		lore.add(Utils.mm(""));

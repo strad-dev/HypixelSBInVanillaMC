@@ -28,7 +28,7 @@ public class WitherShield implements Ingredients {
 		lore.add(Utils.mm("<gray>with the power of Goldor."));
 		lore.add(Utils.mm("<gray>Grants the ability to summon"));
 		lore.add(Utils.mm("<gray>6 hearts of absorption and"));
-		lore.add(Utils.mm("<gray>take 10% less damage for 5 seconds."));
+		lore.add(Utils.mm("<gray>take 15% less damage for 5 seconds."));
 		lore.add(Utils.mm("<gray>Extra absorption is converted to"));
 		lore.add(Utils.mm("<gray>healing after 5 seconds."));
 		lore.add(Utils.mm(""));

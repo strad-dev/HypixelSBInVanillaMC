@@ -25,7 +25,7 @@ public class MaxorBoots implements Armor {
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsArmor"), 4.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
-		AttributeModifier speed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsSpeed"), 3, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.FEET);
+		AttributeModifier speed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsSpeed"), 1.4, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.FEET);
 		AttributeModifier antiFall = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "maxorBootsAntiFall"), -0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.FEET);
 		data.addAttributeModifier(Attribute.MOVEMENT_SPEED, speed);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
@@ -40,7 +40,7 @@ public class MaxorBoots implements Armor {
 		lore.add(Utils.mm("<gray>Damage: <red>+1"));
 		lore.add(Utils.mm("<gray>Armor: <red>+4.5"));
 		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+10%"));
-		lore.add(Utils.mm("<gray>Speed: <red>x4"));
+		lore.add(Utils.mm("<gray>Speed: <red>x2.4"));
 		lore.add(Utils.mm("<gray>Fall Damage: <red>-10%"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>Zoooooooooooooooooooooooooooooom"));

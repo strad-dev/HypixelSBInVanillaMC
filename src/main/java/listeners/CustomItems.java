@@ -186,6 +186,7 @@ public class CustomItems implements Listener {
 							if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 								Score score = CustomItems.currentScore();
 								score.setScore(score.getScore() - item.manaCost());
+								pvp.PvpHooks.trackMana(p, item.manaCost());
 							}
 							Cooldowns.start(p, item.cooldownTag(), item.cooldown());
 							Cooldowns.start(p, "AbilityCooldown", 3);

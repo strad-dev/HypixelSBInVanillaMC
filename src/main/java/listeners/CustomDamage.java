@@ -53,7 +53,7 @@ import java.util.logging.Logger;
 
 public class CustomDamage implements Listener {
 
-	static String nextDeathMessage = null;
+	static net.kyori.adventure.text.Component nextDeathMessage = null;
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		customMobs(damagee, damager, originalDamage, type, new DamageData(damagee, damager, originalDamage));
@@ -164,7 +164,7 @@ public class CustomDamage implements Listener {
 			}
 
 			if(damagee.getScoreboardTags().contains("WitherShield")) {
-				finalDamage *= 0.9;
+				finalDamage *= 0.85;
 			}
 
 			if(damagee.getScoreboardTags().contains("HolyIce")) {
@@ -173,7 +173,7 @@ public class CustomDamage implements Listener {
 
 			if(damager instanceof LivingEntity entity1) {
 				if(entity1.getScoreboardTags().contains("IceSprayed")) {
-					finalDamage *= 0.8;
+					finalDamage *= 0.85;
 				}
 			}
 
@@ -275,7 +275,9 @@ public class CustomDamage implements Listener {
 
 			// PvP layer (config-gated, inert off the pvp server): record this hit for arena/duel combat stats.
 			pvp.PvpHooks.trackHit(damagee, damager, finalDamage,
-					type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL);
+					type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL,
+					damager instanceof Player critP && critP.getFallDistance() > 0 && type == DamageType.MELEE, // critical
+					damagee.getNoDamageTicks() > 0); // landed during the victim's i-frames
 
 			boolean isPhysicalHit = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL;
 			// handle particles and wind burst
@@ -555,12 +557,12 @@ public class CustomDamage implements Listener {
 						} else {
 							// build death message before setHealth(0) so the PlayerDeathEvent handler can use it
 							if(damagee instanceof Player p) {
-								String deathMessage;
+								String deathMessage = null;
 								if(data.e != null) {
 									DamageSource damageSource = convertBukkitDamageSource(data.e.getDamageSource(), p);
 									ServerPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
 									Component message = damageSource.getLocalizedDeathMessage(nmsPlayer);
-									deathMessage = message.getString();
+									nextDeathMessage = io.papermc.paper.adventure.PaperAdventure.asAdventure(message);
 								} else {
 									String damagerName;
 									if(damager != null) {
@@ -586,7 +588,7 @@ public class CustomDamage implements Listener {
 										deathMessage = p.getName() + " died";
 									}
 								}
-								nextDeathMessage = deathMessage;
+								if(deathMessage != null) nextDeathMessage = net.kyori.adventure.text.Component.text(deathMessage);
 							}
 							damagee.setHealth(0.0);
 						}
@@ -654,7 +656,7 @@ public class CustomDamage implements Listener {
 					}
 
 					if(data.isTermArrow) {
-						factor *= 0.25;
+						factor *= 0.33333;
 					}
 
 					if(data.isBlocking) {
@@ -1222,6 +1224,11 @@ public class CustomDamage implements Listener {
 					}
 
 					customMobs(entity, damager, e.getDamage(), type, new DamageData(e));
+				} else if(type == DamageType.MELEE && e.getDamager() instanceof Player) {
+					// Melee blow connected but the victim's i-frames negate it: it deals no damage and
+					// never reaches dealDamage, yet must still count toward PvP "total hits" as an
+					// i-frame hit (never a crit). Inert off the pvp server / outside a duel (PvpHooks gates it).
+					pvp.PvpHooks.trackHit(entity, e.getDamager(), 0.0, false, false, true);
 				}
 			}
 		}
@@ -1281,7 +1288,7 @@ public class CustomDamage implements Listener {
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		if(nextDeathMessage != null) {
-			e.deathMessage(net.kyori.adventure.text.Component.text(nextDeathMessage));
+			e.deathMessage(nextDeathMessage);
 			nextDeathMessage = null;
 		} else {
 			e.deathMessage(null);

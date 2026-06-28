@@ -83,10 +83,12 @@ public class PvpStats {
 		w.matches++;
 		w.winStreak++;
 		w.bestWinStreak = Math.max(w.bestWinStreak, w.winStreak);
+		w.kills++;   // 1v1 results carry into the overall kills/deaths totals
 		Entry l = entry(loser.getUniqueId(), loser.getName());
 		l.losses++;
 		l.matches++;
 		l.winStreak = 0;
+		l.deaths++;
 		dirty = true;
 		flush();
 	}
@@ -116,6 +118,40 @@ public class PvpStats {
 		}
 	}
 
+	/** Count an attack attempt (a swing/shot), landed or not - the denominator for hit accuracy. */
+	public void addHitAttempt(Player p) {
+		if (!enabled) return;
+		entry(p.getUniqueId(), p.getName()).hitAttempts++;
+		dirty = true;
+	}
+
+	/** Flag a landed hit as a critical and/or one that struck the target during its i-frames. */
+	public void addHitFlags(Player p, boolean critical, boolean iframe) {
+		if (!enabled) return;
+		Entry e = entry(p.getUniqueId(), p.getName());
+		if (critical) e.criticalHits++;
+		if (iframe) e.iframeHits++;
+		dirty = true;
+	}
+
+	public void addIntelligenceUsed(Player p, int amount) {
+		if (!enabled || amount <= 0) return;
+		entry(p.getUniqueId(), p.getName()).intelligenceUsed += amount;
+		dirty = true;
+	}
+
+	public void addHealed(Player p, int amount) {
+		if (!enabled || amount <= 0) return;
+		entry(p.getUniqueId(), p.getName()).hpHealed += amount;
+		dirty = true;
+	}
+
+	public void addFoodEaten(Player p) {
+		if (!enabled) return;
+		entry(p.getUniqueId(), p.getName()).foodEaten++;
+		dirty = true;
+	}
+
 	// ===== on-disk shapes (also read by StatsCommand) =====
 	public static class Data {
 		public Map<String, Entry> players = new LinkedHashMap<>();
@@ -130,6 +166,8 @@ public class PvpStats {
 		// combat
 		public double damageDealt, damageTaken;
 		public int hitsLanded, arrowsLanded, longestCombo;
+		public int hitAttempts, criticalHits, iframeHits;
+		public int intelligenceUsed, hpHealed, foodEaten;
 
 		public double kd() {
 			return deaths == 0 ? kills : (double) kills / deaths;

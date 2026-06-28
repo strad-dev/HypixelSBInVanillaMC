@@ -31,31 +31,36 @@ public final class DuelKit {
 	private DuelKit() {}
 
 	public static void apply(Player p) {
-		PlayerInventory inv = p.getInventory();
-		inv.clear();
+		PvpLoadouts.apply(p, defaultLoadout());
+	}
 
-		inv.setItem(0, k(Scylla.getItem(Enchantment.SHARPNESS, 7)));        // "sharpness hyperion"
-		inv.setItem(1, k(AOTV.getItem()));
-		inv.setItem(2, k(IceSpray.getItem()));
-		inv.setItem(3, k(Claymore.getItem(Enchantment.SHARPNESS, 7)));      // "sharpness dark claymore"
-		inv.setItem(4, k(Terminator.getItem(7)));
-		inv.setItem(5, k(WandOfAtonement.getItem()));
-		inv.setItem(6, k(GyrokineticWand.getItem()));
-		inv.setItem(7, k(HolyIce.getItem()));
-		inv.setItem(8, new ItemStack(Material.GOLDEN_CARROT, 64));
-		inv.setItem(9, k(WardenHelmet.getItem()));
-		inv.setItem(10, k(NecronElytra.getItem()));
-		inv.setItem(11, k(GoldorLeggings.getItem()));
-		inv.setItem(28, k(BonzoStaff.getItem()));
-		inv.setItem(34, new ItemStack(Material.WATER_BUCKET));
-
-		inv.setHelmet(k(WitherKingCrown.getItem()));
-		inv.setChestplate(k(PrimalDragonChestplate.getItem()));
-		inv.setLeggings(k(NecromancerLordLeggings.getItem()));
-		inv.setBoots(k(MaxorBoots.getItem()));
-		inv.setItemInOffHand(new ItemStack(Material.TOTEM_OF_UNDYING));
-
-		p.updateInventory();
+	/**
+	 * The standard kit as a 41-slot loadout array (0-35 main, 36 helmet, 37 chest, 38 legs, 39 boots,
+	 * 40 off-hand) - the default a PvP loadout starts from and resets to (same items/enchants the kit
+	 * used before custom loadouts existed).
+	 */
+	public static ItemStack[] defaultLoadout() {
+		ItemStack[] a = new ItemStack[41];
+		a[0] = k(Scylla.getItem(Enchantment.SHARPNESS, 7));        // "sharpness hyperion"
+		a[1] = k(AOTV.getItem());
+		a[2] = k(IceSpray.getItem());
+		a[3] = k(Claymore.getItem(Enchantment.SHARPNESS, 7));      // "sharpness dark claymore"
+		a[4] = k(Terminator.getItem(7));
+		a[5] = k(WandOfAtonement.getItem());
+		a[6] = k(GyrokineticWand.getItem());
+		a[7] = k(HolyIce.getItem());
+		a[8] = new ItemStack(Material.GOLDEN_CARROT, 64);
+		a[9] = k(WardenHelmet.getItem());
+		a[10] = k(NecronElytra.getItem());
+		a[11] = k(GoldorLeggings.getItem());
+		a[28] = k(BonzoStaff.getItem());
+		a[34] = new ItemStack(Material.WATER_BUCKET);
+		a[36] = k(WitherKingCrown.getItem());
+		a[37] = k(PrimalDragonChestplate.getItem());
+		a[38] = k(NecromancerLordLeggings.getItem());
+		a[39] = k(MaxorBoots.getItem());
+		a[40] = new ItemStack(Material.TOTEM_OF_UNDYING);
+		return a;
 	}
 
 	/** Applies the kit's standardized enchants to an item by material type, then returns it. */

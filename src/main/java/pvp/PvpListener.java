@@ -106,7 +106,7 @@ public class PvpListener implements Listener {
 	 * Records a landed player-vs-player hit for combat stats, but only when it's real PvP combat: an
 	 * armed duel between the two opponents, or both players inside the FFA arena.
 	 */
-	public void trackHit(Player victim, Player attacker, double finalDamage, boolean arrow) {
+	public void trackHit(Player victim, Player attacker, double finalDamage, boolean arrow, boolean crit, boolean iframe) {
 		if (attacker.equals(victim)) return;
 		boolean duelHit = duels.inDuel(victim.getUniqueId()) && duels.armed(victim.getUniqueId())
 				&& duels.areOpponents(victim.getUniqueId(), attacker.getUniqueId());
@@ -115,6 +115,7 @@ public class PvpListener implements Listener {
 
 		stats.addDamage(attacker, victim, finalDamage);
 		stats.addHit(attacker, arrow);
+		stats.addHitFlags(attacker, crit, iframe);
 
 		// Combo = consecutive hits on the same victim within the window; taking a hit breaks yours.
 		combos.remove(victim.getUniqueId());
@@ -128,7 +129,25 @@ public class PvpListener implements Listener {
 		c.last = now;
 		stats.reportCombo(attacker, c.count);
 
-		if (duelHit) duels.recordHit(attacker, victim, finalDamage);
+		if (duelHit) duels.recordHit(attacker, victim, finalDamage, crit, iframe);
+	}
+
+	/** True while a player is in live PvP combat: an armed duel, or inside the FFA arena. */
+	private boolean inPvpContext(Player p) {
+		if (duels.inDuel(p.getUniqueId())) return duels.armed(p.getUniqueId());
+		return cfg.ffaEnabled() && inFfa(p);
+	}
+
+	/** Intelligence spent on an ability (PvP-context only). Called via PvpHooks from CustomItems. */
+	public void trackMana(Player p, int amount) {
+		duels.recordMana(p, amount);                            // per-match 1v1 summary (no-op outside a duel)
+		if (inPvpContext(p)) stats.addIntelligenceUsed(p, amount);
+	}
+
+	/** HP restored (PvP-context only). Called via PvpHooks from the heal sources (regen + wands). */
+	public void trackHeal(Player p, int amount) {
+		duels.recordHeal(p, amount);                      // per-match 1v1 summary (no-op outside a duel)
+		if (inPvpContext(p)) stats.addHealed(p, amount);  // lifetime /stats
 	}
 
 	public boolean handleLethal(Player victim, Player attacker, boolean absolute) {
@@ -183,16 +202,21 @@ public class PvpListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	public void onConsume(PlayerItemConsumeEvent e) {
 		duels.recordFood(e.getPlayer());
+		if (e.getItem().getType().isEdible() && inPvpContext(e.getPlayer())) stats.addFoodEaten(e.getPlayer());
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void onSwing(PlayerAnimationEvent e) {
 		duels.recordAttempt(e.getPlayer()); // arm swing = a melee attempt
+		if (inPvpContext(e.getPlayer())) stats.addHitAttempt(e.getPlayer());
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void onShootBow(EntityShootBowEvent e) {
-		if (e.getEntity() instanceof Player p) duels.recordAttempt(p); // bow shot = a ranged attempt
+		if (e.getEntity() instanceof Player p) {
+			duels.recordAttempt(p); // bow shot = a ranged attempt
+			if (inPvpContext(p)) stats.addHitAttempt(p);
+		}
 	}
 
 	// ===== arena protection =====
