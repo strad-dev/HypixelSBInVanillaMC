@@ -159,10 +159,15 @@ public class CustomItems implements Listener {
 				item = null;
 			}
 			if(item != null) {
+				// A left click on an item whose ability isn't bound to left-click does nothing - and must
+				// never spam ability messages (not enough intelligence / on cooldown / "too fast").
+				boolean leftClickNoAbility = (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) && !item.hasLeftClickAbility();
 				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
 					e.setCancelled(true);
 				}
-				if(!Cooldowns.onCooldown(p, "AbilityCooldown") || ((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && item instanceof Terminator)) {
+				if(leftClickNoAbility) {
+					// no-op: no left-click ability, so skip all ability handling for this click
+				} else if(!Cooldowns.onCooldown(p, "AbilityCooldown") || ((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && item instanceof Terminator)) {
 					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
 						if(!((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && !item.hasLeftClickAbility())) {
 							p.sendMessage(Utils.msg("<red>You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost()));

@@ -8,7 +8,6 @@ import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
@@ -44,7 +43,7 @@ public class SwordOfBadHealth implements AbilityItem {
 		}
 
 		List<Component> lore = new ArrayList<>();
-		lore.add(Utils.mm("skyblock/combat/dark_claymore"));
+		lore.add(Utils.mm("skyblock/combat/sword_of_bad_health"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray>Damage: <red>+" + loreDamage));
 		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
@@ -58,9 +57,9 @@ public class SwordOfBadHealth implements AbilityItem {
 		}
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Bad Health <green><bold>RIGHT CLICK"));
-		lore.add(Utils.mm("<gray>Use <red>5%<gray> of your max health"));
+		lore.add(Utils.mm("<gray>Use <red>10%<gray> of your max health"));
 		lore.add(Utils.mm("<gray>to gain <red>+10% Damage<gray> for <green>5s<gray>."));
-		lore.add(Utils.mm("<dark_gray>Health Cost: <red>1"));
+		lore.add(Utils.mm("<dark_gray>Health Cost: <red>2"));
 		lore.add(Utils.mm("<dark_gray>Cooldown: <green>" + COOLDOWN / 20 + "s"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<blue><bold><obfuscated>a</obfuscated> RARE SWORD <obfuscated>a</obfuscated>"));
@@ -83,9 +82,9 @@ public class SwordOfBadHealth implements AbilityItem {
 			p.addScoreboardTag("BadHealthBuffed");
 			Utils.scheduleTask(() -> p.removeScoreboardTag("BadHealthBuffed"), 100);
 			p.playSound(p, Sound.ENTITY_GENERIC_EAT, 2.0F, 1.0F);
-			p.sendMessage("<red>Ouch!  That hurt!  But you have buffed your damage by 10% for 5 seconds!");
+			p.sendMessage(Utils.msg("<red>Ouch!  That hurt!  But you have buffed your damage by 10% for 5 seconds!"));
 		} else {
-			p.sendMessage("<red>You do not have enough Health to use this ability!");
+			p.sendMessage(Utils.msg("<red>You do not have enough Health to use this ability!"));
 		}
 		return true;
 	}

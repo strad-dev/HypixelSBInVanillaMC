@@ -3,6 +3,7 @@ package items;
 import items.misc.*;
 import items.summonItems.HighlyInfuriatedWitherSkeletonSpawnEgg;
 import items.weapons.Scylla;
+import items.weapons.SwordOfBadHealth;
 import items.weapons.Terminator;
 import misc.Utils;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +31,7 @@ public interface CustomItem {
 			ITEMS.put("skyblock/combat/bonzo_staff", new BonzoStaff());
 			ITEMS.put("skyblock/combat/tactical_insertion", new TacticalInsertion());
 			ITEMS.put("skyblock/combat/gyro", new GyrokineticWand());
+			ITEMS.put("skyblock/combat/sword_of_bad_health", new SwordOfBadHealth());
 			ITEMS.put("skyblock/summon/wither_skeleton_spawn_egg", new HighlyInfuriatedWitherSkeletonSpawnEgg());
 		}
 
