@@ -250,7 +250,7 @@ public class Plugin extends JavaPlugin implements Listener {
 		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
 			try {
 				Score score = Plugin.getIntelligence(p);
-				if(score.getScore() < 2500 && second == 4) {
+				if(score.getScore() < 2500 && second == 3) {
 					score.setScore(score.getScore() + 1);
 				}
 				Plugin.sendIntelligenceBar(p, score);
@@ -261,7 +261,7 @@ public class Plugin extends JavaPlugin implements Listener {
 			}
 		}
 
-		if(second == 4) {
+		if(second == 3) {
 			second = 0;
 		} else {
 			second ++;

@@ -175,6 +175,10 @@ public class CustomDamage implements Listener {
 				if(entity1.getScoreboardTags().contains("IceSprayed")) {
 					finalDamage *= 0.85;
 				}
+
+				if(entity1.getScoreboardTags().contains("BadHealthBuffed")) {
+					finalDamage *= 1.1;
+				}
 			}
 
 			// shield logic (for weirdos)
