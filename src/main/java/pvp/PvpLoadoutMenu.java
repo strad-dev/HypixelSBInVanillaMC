@@ -211,8 +211,9 @@ public final class PvpLoadoutMenu implements CommandExecutor, Listener {
 	}
 
 	// ===== helpers =====
-	/** Palette = the SkyBlock "Items" catalog (weapons/armor/tools) plus a few vanilla PvP essentials. */
-	private static List<ItemStack> palette() {
+	/** Palette = the SkyBlock "Items" catalog (weapons/armor/tools) plus a few vanilla PvP essentials.
+	 *  Public so {@link PvpModule} can export it to the shared data folder for network-side editors. */
+	public static List<ItemStack> palette() {
 		List<ItemStack> out = new ArrayList<>(CreativeMenu.loadoutPalette());
 		out.add(new ItemStack(Material.GOLDEN_CARROT, 64));
 		out.add(new ItemStack(Material.WATER_BUCKET));

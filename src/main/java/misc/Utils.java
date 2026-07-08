@@ -451,11 +451,13 @@ public class Utils {
 	 * Applies the setup shared by every SkyBlock boss and boss-spawned subentity: no item pickup,
 	 * infinite fire resistance, name always visible, persistence across chunk unloads, the
 	 * "SkyblockBoss" tag plus any {@code extraTags} (e.g. the mob's registry key), and a target.
-	 * Pass {@code target == null} to leave targeting alone. The shared water-movement attribute is
-	 * handled separately by the SkyblockBoss sweep in {@link listeners.CustomMobs}.
+	 * Pass {@code target == null} to leave targeting alone. Full water-movement efficiency is applied
+	 * here too: the SkyblockBoss sweep in {@link listeners.CustomMobs} only fires on EntitySpawnEvent,
+	 * so summon-item bosses that convert an existing mob (e.g. Atoned Horror) would otherwise miss it.
 	 */
 	public static void setupBoss(Mob e, @Nullable Player target, String... extraTags) {
 		e.setCanPickupItems(false);
+		applyDepthStrider(e);
 		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
 		if(target != null) {
 			e.setTarget(target);

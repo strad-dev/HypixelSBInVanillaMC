@@ -121,6 +121,32 @@ public class PvpConfig {
 		return cfg().getDouble("pvp.duel.saturation", 5);
 	}
 
+	/**
+	 * Where PvP duel loadouts are stored. Default is this plugin's own folder
+	 * ({@code plugins/SkyBlock/pvp-loadouts.json}), so SkyBlock stays self-contained. Relative paths
+	 * resolve against that folder; set an ABSOLUTE path (the network's shared {@code ~/data}) so a
+	 * player's duel loadout is shared across servers and editable from any of them.
+	 */
+	public Path loadoutsFile() {
+		String f = cfg().getString("pvp.duel.loadouts-file", "pvp-loadouts.json");
+		Path p = Paths.get(f);
+		if (!p.isAbsolute()) p = plugin.getDataFolder().toPath().resolve(f);
+		return p.normalize();
+	}
+
+	/**
+	 * Absolute path to export the duel item palette + default kit to (the network's shared
+	 * {@code ~/data/pvp-item-catalog.json}), so servers without SkyBlock can offer the same items in
+	 * their loadout editor. {@code null} when unset - standalone servers do not export.
+	 */
+	public Path catalogFile() {
+		String f = cfg().getString("pvp.duel.catalog-file", "");
+		if (f == null || f.isBlank()) return null;
+		Path p = Paths.get(f);
+		if (!p.isAbsolute()) p = plugin.getDataFolder().toPath().resolve(f);
+		return p.normalize();
+	}
+
 	/** Player corner i (0 or 1) for a duel, or null if not configured. */
 	public Location duelSpawn(int i) {
 		List<Map<?, ?>> spawns = cfg().getMapList("pvp.duel.spawns");

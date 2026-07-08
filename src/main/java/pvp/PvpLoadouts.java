@@ -1,6 +1,5 @@
 package pvp;
 
-import misc.Plugin;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -14,9 +13,14 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Per-player PvP loadout storage for THIS server. One saved loadout per player, persisted to
- * {@code plugins/SkyBlock/pvp-loadouts.json} - the plugin's own data folder, so loadouts are
- * inherently per-server (each server has its own folder).
+ * Per-player PvP loadout storage. One saved loadout per player. The file location is configurable
+ * ({@code pvp.duel.loadouts-file}): by default it is this plugin's own folder
+ * ({@code plugins/SkyBlock/pvp-loadouts.json}, per-server, standalone), but on the network it can point
+ * at the shared {@code ~/data/pvp-loadouts.json} so a loadout follows the player across servers.
+ *
+ * Reads/writes go straight to disk (no in-memory cache) so an edit made on another server - e.g. via
+ * the network's own {@code /pvploadout} editor writing the shared file - is seen here the next time a
+ * duel starts. Writes are read-modify-write (load, change one player, atomic save).
  *
  * 41-slot layout (the convention the editor GUI maps to): [0..35] main inventory, [36] helmet,
  * [37] chestplate, [38] leggings, [39] boots, [40] off-hand.
@@ -25,31 +29,35 @@ public final class PvpLoadouts {
 	public static final int SLOTS = 41;
 
 	private final Path file;
-	private final Data data;
 
-	public PvpLoadouts() {
-		this.file = Plugin.getInstance().getDataFolder().toPath().resolve("pvp-loadouts.json");
+	public PvpLoadouts(Path file) {
+		this.file = file;
+	}
+
+	private Data load() {
 		Data d = PvpJson.load(file, Data.class, new Data());
 		if (d.players == null) d.players = new HashMap<>();
-		this.data = d;
+		return d;
 	}
 
 	public boolean has(UUID uuid) {
-		return data.players.containsKey(uuid.toString());
+		return load().players.containsKey(uuid.toString());
 	}
 
 	/** This player's saved 41-slot loadout, or null if they've never saved one. */
 	public ItemStack[] get(UUID uuid) {
-		List<String> ser = data.players.get(uuid.toString());
+		List<String> ser = load().players.get(uuid.toString());
 		return ser == null ? null : fromSer(ser);
 	}
 
 	public void set(UUID uuid, ItemStack[] arr) {
+		Data data = load();
 		data.players.put(uuid.toString(), toSer(arr));
 		PvpJson.save(file, data);
 	}
 
 	public void clear(UUID uuid) {
+		Data data = load();
 		if (data.players.remove(uuid.toString()) != null) PvpJson.save(file, data);
 	}
 

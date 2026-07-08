@@ -8,7 +8,7 @@ pvp:
   ffa:
     # Enables the Free-For-All PvP arena.
     enabled: false
-    # Set the FFA world, spawnpoint, arena bounds, and (optional) safe zone.  For best results, use an enclosed space with bedrock walls at least 2 blocks thick.
+    # Set the FFA world, spawnpoint, arena bounds, and (optional) safe zone.  For best results, use an enclosed space with barrier walls at least 2 blocks thick.
     world: world
     spawn: { x: 0.5, y: 100.0, z: 0.5, yaw: 0.0, pitch: 0.0 }
     bounds:
@@ -21,12 +21,21 @@ pvp:
   duel:
     # Enables direct 1v1 duels.  Players can send duel requests to each other.
     enabled: false
-    # Set the duel world, the two player spawn locations, and the arena bounds.  For best results, use an enclosed space with bedrock walls at least 2 blocks thick separate from the Free-For-All Arena.
+    # Set the duel world, the two player spawn locations, and the arena bounds.  For best results, use an enclosed space with barrier walls at least 2 blocks thick separate from the Free-For-All Arena.
     world: world
     countdown: 5
     # Each player is set to these for the duration of a duel (hunger is always full); originals are restored after.
     intelligence: 50
     saturation: 5
+    # Where PvP duel loadouts are stored.  Relative = this plugin's own folder (per-server; fine for a
+    # standalone server).  Set an ABSOLUTE path to the network's shared data folder
+    # (e.g. C:/.../network test/data/pvp-loadouts.json) so players can edit their duel loadout from ANY
+    # server on the network and it applies here at duel start.
+    loadouts-file: "pvp-loadouts.json"
+    # If set to an ABSOLUTE path (the network's shared .../data/pvp-item-catalog.json), the duel item
+    # palette + default kit are exported there on startup, so servers WITHOUT SkyBlock can offer the same
+    # items in their /pvploadout editor.  Leave empty to disable (standalone).
+    catalog-file: ""
     arena:
       min: [ 100.0, 0.0, 100.0 ]
       max: [ 150.0, 256.0, 150.0 ]
@@ -35,5 +44,5 @@ pvp:
       - { x: 145.5, y: 100.0, z: 125.5, yaw: 90.0, pitch: 0.0 }
   stats:
     # Enables stats tracking for duels and/or free-for-alls (recommended).
-    enabled: false
+    enabled: true
     file: "pvp-stats.json"

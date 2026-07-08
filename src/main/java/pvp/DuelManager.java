@@ -18,8 +18,13 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -48,6 +53,11 @@ public class DuelManager {
 	// Players who disconnected mid-duel: the return-home teleport (5s later) skips them while offline, so
 	// move them out of the arena to a safe spot on their next join instead.
 	private final Set<UUID> strandedInArena = new HashSet<>();
+	// Single arena: at most one duel runs at a time. Pairs that accept while it's busy wait here (FIFO)
+	// and start automatically when it frees. arenaOccupied stays true through the post-match grace period
+	// (until both fighters have been returned home), so the next pair never spawns on top of them.
+	private final Deque<Queued> queue = new ArrayDeque<>();
+	private boolean arenaOccupied = false;
 
 	public DuelManager(JavaPlugin plugin, PvpConfig cfg, PvpStats stats, PvpLoadouts loadouts) {
 		this.plugin = plugin;
@@ -73,6 +83,10 @@ public class DuelManager {
 	// ===== invite flow (local) =====
 	public void invite(Player from, Player to) {
 		if (notEnabled(from)) return;
+		if (inDuel(from.getUniqueId()) || isQueued(from.getUniqueId())) {
+			from.sendMessage(Utils.msg("<red>You're already in a duel or waiting in the queue"));
+			return;
+		}
 		if (from.equals(to)) {
 			from.sendMessage(Utils.msg("<red>You can't duel yourself"));
 			return;
@@ -152,12 +166,36 @@ public class DuelManager {
 			a.sendMessage(Utils.msg("<red>One of you is already in a duel"));
 			return;
 		}
+		if (isQueued(a.getUniqueId()) || isQueued(b.getUniqueId())) {
+			a.sendMessage(Utils.msg("<red>One of you is already waiting in the duel queue"));
+			return;
+		}
+		if (cfg.duelSpawn(0) == null || cfg.duelSpawn(1) == null) {
+			a.sendMessage(Utils.msg("<red>The duel arena isn't configured yet"));
+			return;
+		}
+		// Single arena: if a duel is in progress (or still clearing out), queue this pair instead of
+		// spawning them on top of the current fight. They start automatically when the arena frees.
+		if (arenaOccupied) {
+			queue.addLast(new Queued(a.getUniqueId(), b.getUniqueId()));
+			Component msg = Utils.msg("<yellow>The duel arena is busy - you're <white>#<n></white> in the queue. You'll be sent in automatically when it's free.  <gray><click:run_command:'/duel leave'>(<red><u>leave queue</u></red>)</click>",
+					Placeholder.unparsed("n", String.valueOf(queue.size())));
+			a.sendMessage(msg);
+			b.sendMessage(msg);
+			return;
+		}
+		begin(a, b);
+	}
+
+	/** Place a pair into the (now free) arena and run the countdown. */
+	private void begin(Player a, Player b) {
 		Location sa = cfg.duelSpawn(0);
 		Location sb = cfg.duelSpawn(1);
 		if (sa == null || sb == null) {
 			a.sendMessage(Utils.msg("<red>The duel arena isn't configured yet"));
 			return;
 		}
+		arenaOccupied = true;
 		Duel d = new Duel(a.getUniqueId(), b.getUniqueId(), a.getLocation().clone(), b.getLocation().clone());
 		// Stash each player's real intelligence, hunger and saturation so the duel can run everyone at
 		// fixed values and restore the originals when it ends.
@@ -170,6 +208,9 @@ public class DuelManager {
 		// Save the real inventories so the standardized kit can replace them and be restored at the end.
 		d.invA = cloneContents(a.getInventory().getContents());
 		d.invB = cloneContents(b.getInventory().getContents());
+		// Save each player's real potion effects; they're wiped at FIGHT and restored when the duel ends.
+		d.effA = new ArrayList<>(a.getActivePotionEffects());
+		d.effB = new ArrayList<>(b.getActivePotionEffects());
 		// Save game modes; both players fight in Adventure and are restored to their originals at the end.
 		d.gmA = a.getGameMode();
 		d.gmB = b.getGameMode();
@@ -238,13 +279,74 @@ public class DuelManager {
 
 	private void snapToCorner(Player p, Location corner) {
 		if (corner != null) p.teleport(corner);
-		p.removePotionEffect(PotionEffectType.RESISTANCE);
+		// Battle start: wipe every effect (the countdown Resistance + anything the player walked in with) so
+		// both fight on a clean slate. Their pre-duel effects are restored when the duel ends.
+		for (PotionEffect eff : new ArrayList<>(p.getActivePotionEffects())) p.removePotionEffect(eff.getType());
 		healFull(p);
 		// Fixed combat state, applied when the countdown ends: hunger always full, configurable
 		// saturation and intelligence.
 		p.setFoodLevel(20);
 		p.setSaturation((float) cfg.duelSaturation());
 		setIntelligence(p, cfg.duelIntelligence());
+	}
+
+	// ===== queue (single arena, FIFO) =====
+	private boolean isQueued(UUID id) {
+		for (Queued q : queue) if (q.a.equals(id) || q.b.equals(id)) return true;
+		return false;
+	}
+
+	/**
+	 * Remove a waiting pair containing {@code id} (they quit or left the queue) and tell their partner.
+	 * Returns true if an entry was removed. A player who is actually dueling is left untouched.
+	 */
+	private boolean removeFromQueue(UUID id) {
+		Iterator<Queued> it = queue.iterator();
+		while (it.hasNext()) {
+			Queued q = it.next();
+			if (q.a.equals(id) || q.b.equals(id)) {
+				it.remove();
+				Player partner = Bukkit.getPlayer(q.a.equals(id) ? q.b : q.a);
+				if (partner != null) partner.sendMessage(Utils.msg("<gray>Your queued duel was cancelled - your opponent left the queue."));
+				announcePositions();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Arena just cleared: start the next still-valid queued pair, skipping any who went offline. */
+	private void pumpQueue() {
+		while (!queue.isEmpty()) {
+			Queued q = queue.pollFirst();
+			Player a = Bukkit.getPlayer(q.a);
+			Player b = Bukkit.getPlayer(q.b);
+			if (a == null || b == null || inDuel(q.a) || inDuel(q.b)) {
+				Component gone = Utils.msg("<gray>Your queued duel was cancelled - your opponent is no longer available.");
+				if (a != null && !inDuel(q.a)) a.sendMessage(gone);
+				if (b != null && !inDuel(q.b)) b.sendMessage(gone);
+				continue;
+			}
+			Component go = Utils.msg("<green>The arena is free - your duel is starting!");
+			a.sendMessage(go);
+			b.sendMessage(go);
+			begin(a, b);
+			announcePositions();
+			return;
+		}
+	}
+
+	/** Re-tell each still-waiting pair their current position (positions shift as duels start / people leave). */
+	private void announcePositions() {
+		int pos = 0;
+		for (Queued q : queue) {
+			pos++;
+			Component msg = Utils.msg("<gray>You're now <white>#<n></white> in the duel queue.", Placeholder.unparsed("n", String.valueOf(pos)));
+			Player a = Bukkit.getPlayer(q.a);
+			Player b = Bukkit.getPlayer(q.b);
+			if (a != null) a.sendMessage(msg);
+			if (b != null) b.sendMessage(msg);
+		}
 	}
 
 	/** A lethal blow landed on the loser; CustomDamage skips the kill and we end the duel here. */
@@ -255,6 +357,7 @@ public class DuelManager {
 	}
 
 	public void handleQuit(Player p) {
+		if (removeFromQueue(p.getUniqueId())) return; // was only waiting in the queue, not fighting
 		Duel d = byPlayer.get(p.getUniqueId());
 		if (d == null) return;
 		// Disconnecting forfeits: the opponent wins, and we restore the quitter's inventory/intel/food
@@ -278,6 +381,10 @@ public class DuelManager {
 
 	/** A player leaves their duel via /duel leave - they forfeit and the opponent wins. */
 	public boolean leave(Player p) {
+		if (removeFromQueue(p.getUniqueId())) {
+			p.sendMessage(Utils.msg("<yellow>You left the duel queue"));
+			return true;
+		}
 		Duel d = byPlayer.get(p.getUniqueId());
 		if (d == null) {
 			p.sendMessage(Utils.msg("<red>You're not in a duel"));
@@ -367,6 +474,9 @@ public class DuelManager {
 			// server back home (it transfers them off pvp; the local returnHome above is then a harmless
 			// no-op for them). Gated by config so a standalone server never logs an unknown command.
 			notifyNetworkDuelEnd(a, b);
+			// Arena is now empty - free it and pull in the next queued pair, if any.
+			arenaOccupied = false;
+			pumpQueue();
 		}, RETURN_DELAY_TICKS);
 	}
 
@@ -384,6 +494,7 @@ public class DuelManager {
 		restoreFood(p, d);
 		restoreInventory(p, d);
 		restoreGameMode(p, d);
+		restoreEffects(p, d);
 		// Invulnerable during the 5s grace so neither player can be re-hit before returning home.
 		p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, RETURN_DELAY_TICKS + 20, MAX_RESISTANCE, false, false));
 	}
@@ -415,6 +526,13 @@ public class DuelManager {
 	private void restoreGameMode(Player p, Duel d) {
 		GameMode gm = d.a.equals(p.getUniqueId()) ? d.gmA : d.gmB;
 		if (gm != null) p.setGameMode(gm);
+	}
+
+	/** Wipe any effects gained during the duel, then re-apply the player's saved pre-duel potion effects. */
+	private void restoreEffects(Player p, Duel d) {
+		Collection<PotionEffect> saved = d.a.equals(p.getUniqueId()) ? d.effA : d.effB;
+		for (PotionEffect e : new ArrayList<>(p.getActivePotionEffects())) p.removePotionEffect(e.getType());
+		if (saved != null) for (PotionEffect e : saved) p.addPotionEffect(e);
 	}
 
 	/**
@@ -558,6 +676,15 @@ public class DuelManager {
 		if (attr != null) p.setHealth(attr.getValue());
 	}
 
+	/** A pair waiting for the arena to free up. */
+	private static final class Queued {
+		final UUID a, b;
+		Queued(UUID a, UUID b) {
+			this.a = a;
+			this.b = b;
+		}
+	}
+
 	private static final class Duel {
 		final UUID a, b;
 		final Location prevA, prevB;
@@ -566,6 +693,7 @@ public class DuelManager {
 		float satA, satB;
 		GameMode gmA, gmB;          // saved real game mode (restored when the duel ends)
 		ItemStack[] invA, invB;     // saved real inventory (restored when the duel ends)
+		Collection<PotionEffect> effA, effB; // saved real potion effects (wiped at FIGHT, restored at end)
 		double dmgA, dmgB;          // damage dealt by each player this match
 		int hitsA, hitsB;           // hits landed by each player this match
 		int attemptsA, attemptsB;   // hit attempts (melee swings + bow shots)

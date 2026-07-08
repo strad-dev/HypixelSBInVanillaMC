@@ -15,7 +15,7 @@ public final class PvpModule {
 		PvpStats stats = new PvpStats(cfg);
 		stats.start(plugin);
 
-		PvpLoadouts loadouts = new PvpLoadouts();
+		PvpLoadouts loadouts = new PvpLoadouts(cfg.loadoutsFile());
 		DuelManager duels = new DuelManager(plugin, cfg, stats, loadouts);
 		PvpListener listener = new PvpListener(cfg, stats, duels);
 		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
@@ -38,10 +38,20 @@ public final class PvpModule {
 
 		// PvP loadout editor (/pvploadout): declared in plugin.yml so it shows in /help and tab-completes.
 		// The command itself refuses unless 1v1 duels are enabled (checked in PvpLoadoutMenu), and the
-		// menu only opens then. Loadouts live in this plugin's own data folder, i.e. stored per-server.
+		// menu only opens then. Loadouts live wherever pvp.duel.loadouts-file points (own folder by
+		// default; the network's shared ~/data on a network pvp server).
 		PvpLoadoutMenu menu = new PvpLoadoutMenu(cfg, loadouts);
 		plugin.getServer().getPluginManager().registerEvents(menu, plugin);
 		bind(plugin, "pvploadout", menu);
+
+		// On the network's pvp server (pvp.duel.catalog-file set), export the duel item palette + default
+		// kit to the shared data folder so servers WITHOUT SkyBlock can offer the same items in their own
+		// /pvploadout editor. Skipped when unset, so a standalone server exports nothing.
+		java.nio.file.Path catalogFile = cfg.catalogFile();
+		if (catalogFile != null) {
+			PvpCatalogExport.write(catalogFile, PvpLoadoutMenu.palette(), DuelKit.defaultLoadout());
+			plugin.getLogger().info("[PvP] exported duel item catalog to " + catalogFile);
+		}
 
 		plugin.getLogger().info("[PvP] ffa=" + cfg.ffaEnabled() + " duel=" + cfg.duelEnabled()
 				+ " stats=" + cfg.statsEnabled() + " chat=" + cfg.chatEnabled());
