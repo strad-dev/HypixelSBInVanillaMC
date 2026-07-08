@@ -155,7 +155,7 @@ public class PvpListener implements Listener {
 	/** HP restored (PvP-context only). Called via PvpHooks from the heal sources (regen + wands). */
 	public void trackHeal(Player p, int amount) {
 		duels.recordHeal(p, amount);                      // per-match 1v1 summary (no-op outside a duel)
-		if (inPvpContext(p)) stats.addHealed(p, amount);  // lifetime /stats
+		if (inPvpContext(p)) stats.addHealed(p, amount);  // lifetime /pvpstats
 	}
 
 	public boolean handleLethal(Player victim, Player attacker, boolean absolute) {

@@ -58,17 +58,11 @@ public class Sadan implements CustomMob {
 		zombie.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		zombie.getAttribute(Attribute.SCALE).setBaseValue(6.0);
-		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		zombie.setTarget(p);
-		zombie.setCustomNameVisible(true);
-		zombie.addScoreboardTag("SkyblockBoss");
-		zombie.addScoreboardTag("Sadan");
+		Utils.setupBoss(zombie, p, "Sadan");
 		p.sendMessage(Utils.msg("<red><bold>Sadan has arrived from the bowels of The Catacombs to destroy you!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned Sadan.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		zombie.setAdult();
-		zombie.setPersistent(true);
-		zombie.setRemoveWhenFarAway(false);
 		BossBarManager.createBossBar(zombie, BarColor.RED, BarStyle.SOLID);
 		return newName;
 	}

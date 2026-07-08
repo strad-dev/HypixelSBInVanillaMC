@@ -30,16 +30,10 @@ public class VoidgloomSeraph implements CustomMob {
 		enderman.setHealth(250.0);
 		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
-		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		enderman.setTarget(p);
-		enderman.setCustomNameVisible(true);
-		enderman.addScoreboardTag("SkyblockBoss");
-		enderman.addScoreboardTag("VoidgloomSeraph");
+		Utils.setupBoss(enderman, p, "VoidgloomSeraph");
 		p.sendMessage(Utils.msg("<red><bold>From the ashes of the Superior Dragon rises the terrifying Voidgloom Seraph!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Voidgloom Seraph.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
-		enderman.setPersistent(true);
-		enderman.setRemoveWhenFarAway(false);
 
 		Utils.scheduleTask(() -> dissonance(enderman), 20);
 

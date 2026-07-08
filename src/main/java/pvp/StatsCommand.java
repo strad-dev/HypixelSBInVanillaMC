@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * /stats [player] view a player's PvP stats (self if omitted). /pvptop <ffa|1v1> leaderboard.
+ * /pvpstats [player] view a player's PvP stats (self if omitted). /pvptop <ffa|1v1> leaderboard.
  * Reads the shared stats file fresh each call, so it works on any SkyBlock server.
  */
 public class StatsCommand implements CommandExecutor {
@@ -35,7 +35,7 @@ public class StatsCommand implements CommandExecutor {
 		String target = args.length >= 1 ? args[0]
 				: (sender instanceof Player p ? p.getName() : null);
 		if (target == null) {
-			sender.sendMessage(Utils.msg("<red>Usage: /stats <player>"));
+			sender.sendMessage(Utils.msg("<red>Usage: /pvpstats <player>"));
 			return true;
 		}
 		PvpStats.Entry e = findByName(data, target);

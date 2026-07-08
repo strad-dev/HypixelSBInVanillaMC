@@ -30,16 +30,10 @@ public class TarantulaBroodfather implements CustomMob {
 		spider.setHealth(100.0);
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(10.0);
-		spider.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		spider.setTarget(p);
-		spider.setCustomNameVisible(true);
-		spider.addScoreboardTag("SkyblockBoss");
-		spider.addScoreboardTag("TarantulaBroodfather");
+		Utils.setupBoss(spider, p, "TarantulaBroodfather");
 		p.sendMessage(Utils.msg("<red><bold>The Spider Relic draws the attention of the Tarantula Broodfather!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Tarantula Broodfather.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
-		spider.setPersistent(true);
-		spider.setRemoveWhenFarAway(false);
 		return newName;
 	}
 

@@ -56,6 +56,14 @@ public class CustomMobs implements Listener {
 	@EventHandler
 	public void onEntitySpawn(EntitySpawnEvent e) {
 		if(e.getEntity() instanceof LivingEntity entity) {
+			// Blanket every boss + subentity (all tagged "SkyblockBoss") with Depth Strider 3 so they
+			// don't crawl through water. Delayed a tick because the tag is added during/after this event.
+			Utils.scheduleTask(() -> {
+				if(entity.isValid() && entity.getScoreboardTags().contains("SkyblockBoss")) {
+					Utils.applyDepthStrider(entity);
+				}
+			}, 1);
+
 			String name = "";
 
 			// MAXOR, STORM, GOLDOR, NECRON
@@ -93,12 +101,7 @@ public class CustomMobs implements Listener {
 								Bukkit.getLogger().info("A player has initiated the Wither Lords fight!");
 							} else {
 								name = CustomWither.spawnRandom().onSpawn(p, wither);
-								wither.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-								wither.setTarget(p);
-								wither.setCustomNameVisible(true);
-								wither.setPersistent(true);
-								wither.setRemoveWhenFarAway(false);
-								wither.addScoreboardTag("SkyblockBoss");
+								Utils.setupBoss(wither, p);
 							}
 						} else {
 							return;
@@ -113,12 +116,7 @@ public class CustomMobs implements Listener {
 						} else {
 							name = CustomDragon.spawnRandom().onSpawn(p, dragon);
 							dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
-							dragon.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-							dragon.setTarget(p);
-							dragon.setCustomNameVisible(true);
-							dragon.setPersistent(true);
-							dragon.setRemoveWhenFarAway(false);
-							dragon.addScoreboardTag("SkyblockBoss");
+							Utils.setupBoss(dragon, p);
 						}
 					}
 					default -> {

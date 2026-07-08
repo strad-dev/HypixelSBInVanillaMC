@@ -1070,6 +1070,12 @@ public class CustomDrops implements Listener {
 		} else if(p == null) {
 			e.setDroppedExp(0);
 		}
+
+		// The Voidcrazed Seraph may die mid yang-glyph; drop the beacon it placed and halt the
+		// pending "mine it or die" countdown titles that guard on that beacon.
+		if(died.getScoreboardTags().contains("VoidcrazedSeraph")) {
+			mobs.hardmode.generic.VoidcrazedSeraph.cleanup();
+		}
 	}
 
 

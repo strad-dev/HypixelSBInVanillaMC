@@ -26,15 +26,8 @@ public class ConjoinedBrood implements CustomMob {
 		spider.setHealth(500.0);
 		spider.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.67);
 		spider.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(35.0);
-		spider.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		spider.setTarget(p);
-		spider.setCustomNameVisible(true);
-		spider.addScoreboardTag("SkyblockBoss");
-		spider.addScoreboardTag("ConjoinedBrood");
-		spider.addScoreboardTag("HardMode");
+		Utils.setupBoss(spider, p, "ConjoinedBrood", "HardMode");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
-		spider.setPersistent(true);
-		spider.setRemoveWhenFarAway(false);
 		Utils.changeName(spider, newName);
 
 		return newName;

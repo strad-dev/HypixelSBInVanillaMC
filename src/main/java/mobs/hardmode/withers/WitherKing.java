@@ -27,10 +27,10 @@ import static misc.Utils.sendRareDropMessage;
 import static misc.Utils.teleport;
 
 public class WitherKing implements CustomWither {
-	// Entity custom-name: obfuscated shimmer is fine on the floating name above the boss.
+	// Native <obfuscated> shimmer, used for both the nameplate and chat dialogue. On 26.2 this jitters and
+	// thrashes the font atlas (MC-277733) — accepted until Mojang patches it.
 	private static final String name = "<gold><bold>﴾ <red><bold><obfuscated>Wither-King</obfuscated><gold><bold> ﴿";
-	// Chat/title/broadcast dialogue: rendered STATIC (no obfuscated) so it doesn't visibly spasm in the chat box.
-	private static final String chatName = "<gold><bold>﴾ <red><bold>Wither-King<gold><bold> ﴿";
+	private static final String chatName = name;
 	private static Mob witherKing;
 	private static final List<WitherSkeleton> henchmen = new ArrayList<>();
 
@@ -139,15 +139,8 @@ public class WitherKing implements CustomWither {
 		//noinspection DuplicatedCode
 		witherSkeleton.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 		witherSkeleton.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
-		witherSkeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		witherSkeleton.setTarget(Utils.getNearestPlayer(witherSkeleton));
+		Utils.setupBoss(witherSkeleton, Utils.getNearestPlayer(witherSkeleton), "GuardSkeleton", "HardMode");
 		witherSkeleton.teleport(wither);
-		witherSkeleton.setCustomNameVisible(true);
-		witherSkeleton.addScoreboardTag("SkyblockBoss");
-		witherSkeleton.addScoreboardTag("GuardSkeleton");
-		witherSkeleton.addScoreboardTag("HardMode");
-		witherSkeleton.setPersistent(true);
-		witherSkeleton.setRemoveWhenFarAway(false);
 		CustomMob.getMob(which, false).onSpawn(Utils.getNearestPlayer(witherSkeleton), witherSkeleton);
 		witherSkeleton.addScoreboardTag(which);
 		henchmen.add(witherSkeleton);
@@ -221,14 +214,7 @@ public class WitherKing implements CustomWither {
 				//noinspection DuplicatedCode
 				witherSkeleton.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 				witherSkeleton.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
-				witherSkeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-				witherSkeleton.setTarget(Utils.getNearestPlayer(witherSkeleton));
-				witherSkeleton.setCustomNameVisible(true);
-				witherSkeleton.addScoreboardTag("SkyblockBoss");
-				witherSkeleton.addScoreboardTag("GuardSkeleton");
-				witherSkeleton.addScoreboardTag("HardMode");
-				witherSkeleton.setPersistent(true);
-				witherSkeleton.setRemoveWhenFarAway(false);
+				Utils.setupBoss(witherSkeleton, Utils.getNearestPlayer(witherSkeleton), "GuardSkeleton", "HardMode");
 			}
 			Utils.playGlobalSound(Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
 

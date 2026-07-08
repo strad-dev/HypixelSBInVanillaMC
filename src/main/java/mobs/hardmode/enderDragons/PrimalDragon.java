@@ -441,12 +441,7 @@ public class PrimalDragon implements CustomDragon {
 			enderman.setHealth(66.0);
 			enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(15.0);
 			enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
-			enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-			enderman.setTarget(p);
-			enderman.setCustomNameVisible(true);
-			enderman.addScoreboardTag("SkyblockBoss");
-			enderman.setPersistent(true);
-			enderman.setRemoveWhenFarAway(false);
+			Utils.setupBoss(enderman, p);
 			Utils.changeName(enderman, "<gold><bold>﴾ <red><bold>Zealot<gold><bold> ﴿");
 		}
 		if(spawnBruiser) {
@@ -456,12 +451,7 @@ public class PrimalDragon implements CustomDragon {
 			enderman.setHealth(133.0);
 			enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
 			enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
-			enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-			enderman.setTarget(p);
-			enderman.setCustomNameVisible(true);
-			enderman.addScoreboardTag("SkyblockBoss");
-			enderman.setPersistent(true);
-			enderman.setRemoveWhenFarAway(false);
+			Utils.setupBoss(enderman, p);
 			Utils.changeName(enderman, "<gold><bold>﴾ <red><bold>Zealot Bruiser<gold><bold> ﴿");
 		}
 	}

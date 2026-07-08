@@ -50,17 +50,11 @@ public class RevenantHorror implements CustomMob {
 		zombie.setHealth(100.0);
 		zombie.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(15.0);
 		zombie.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.4);
-		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		zombie.setTarget(p);
-		zombie.setCustomNameVisible(true);
-		zombie.addScoreboardTag("SkyblockBoss");
-		zombie.addScoreboardTag("RevenantHorror");
+		Utils.setupBoss(zombie, p, "RevenantHorror");
 		p.sendMessage(Utils.msg("<red><bold>The Revenant Horror has risen from the depths!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Revenant Horror.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
 		zombie.setAdult();
-		zombie.setPersistent(true);
-		zombie.setRemoveWhenFarAway(false);
 		Utils.scheduleTask(() -> aoe(zombie), 20);
 		return newName;
 	}

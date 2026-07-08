@@ -22,6 +22,7 @@ commands:
   eq:
     description: View your equipment and current speed.
     usage: /eq
+    aliases: [stats]
   resetwitherfight:
     description: Resets the status of the Wither Lords boss fight.  Useful if the boss was /kill'ed or otherwise dead in an unintended way.
     usage: /resetwitherfight
@@ -43,9 +44,9 @@ commands:
   leavearena:
     description: Leave the FFA arena.
     usage: /leavearena
-  stats:
+  pvpstats:
     description: View PvP stats.
-    usage: /stats [player]
+    usage: /pvpstats [player]
   pvptop:
     description: View the PvP leaderboard.
     usage: /pvptop <ffa|1v1>

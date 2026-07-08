@@ -44,17 +44,9 @@ public class Sadan implements CustomMob {
 		zombie.setHealth(2000.0);
 		zombie.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 		zombie.getAttribute(Attribute.SCALE).setBaseValue(0.625);
-		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
+		Utils.setupBoss(zombie, p, "DummySadan", "HardMode", "Invulnerable");
 		zombie.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, -1, 255));
-		zombie.setTarget(p);
-		zombie.setCustomNameVisible(true);
-		zombie.addScoreboardTag("SkyblockBoss");
-		zombie.addScoreboardTag("DummySadan");
-		zombie.addScoreboardTag("HardMode");
-		zombie.addScoreboardTag("Invulnerable");
 		Bukkit.getLogger().info(p.getName() + " has initiated the M6 boss fight!");
-		zombie.setPersistent(true);
-		zombie.setRemoveWhenFarAway(false);
 		zombie.setAI(false);
 		zombie.setSilent(true);
 		BossBarManager.createBossBar(zombie, BarColor.RED, BarStyle.SOLID);
@@ -143,14 +135,7 @@ public class Sadan implements CustomMob {
 		Utils.changeName(terracotta, "<gold><bold>﴾ <red><bold>Terracotta<gold><bold> ﴿");
 		terracotta.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(40.0);
 		terracotta.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.6);
-		terracotta.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		terracotta.setTarget(Utils.getNearestPlayer(terracotta));
-		terracotta.setCustomNameVisible(true);
-		terracotta.addScoreboardTag("SkyblockBoss");
-		terracotta.addScoreboardTag("Terracotta");
-		terracotta.addScoreboardTag("HardMode");
-		terracotta.setPersistent(true);
-		terracotta.setRemoveWhenFarAway(false);
+		Utils.setupBoss(terracotta, Utils.getNearestPlayer(terracotta), "Terracotta", "HardMode");
 
 		return terracotta;
 	}
@@ -167,14 +152,7 @@ public class Sadan implements CustomMob {
 		Utils.changeName(ironGolem, "<gold><bold>﴾ <red><bold>Woke Golem<gold><bold> ﴿");
 		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(60.0);
 		ironGolem.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.6);
-		ironGolem.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		ironGolem.setTarget(Utils.getNearestPlayer(ironGolem));
-		ironGolem.setCustomNameVisible(true);
-		ironGolem.addScoreboardTag("SkyblockBoss");
-		ironGolem.addScoreboardTag("WokeGolem");
-		ironGolem.addScoreboardTag("HardMode");
-		ironGolem.setPersistent(true);
-		ironGolem.setRemoveWhenFarAway(false);
+		Utils.setupBoss(ironGolem, Utils.getNearestPlayer(ironGolem), "WokeGolem", "HardMode");
 
 		return ironGolem;
 	}
@@ -195,6 +173,7 @@ public class Sadan implements CustomMob {
 					dead++;
 				} else {
 					currentHP += terracotta.getHealth();
+					leashToSadan(terracotta, sadan);
 				}
 			}
 			for(IronGolem golem : golems) {
@@ -202,6 +181,7 @@ public class Sadan implements CustomMob {
 					dead++;
 				} else {
 					currentHP += golem.getHealth();
+					leashToSadan(golem, sadan);
 				}
 			}
 			sadan.setHealth(Math.max(1, currentHP * 100 / maxHealth));
@@ -253,14 +233,7 @@ public class Sadan implements CustomMob {
 		zombie.getAttribute(Attribute.ARMOR).setBaseValue(-7.0);
 		zombie.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 		zombie.getAttribute(Attribute.SCALE).setBaseValue(6.0);
-		zombie.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		zombie.setTarget(Utils.getNearestPlayer(zombie));
-		zombie.setCustomNameVisible(true);
-		zombie.addScoreboardTag("SkyblockBoss");
-		zombie.addScoreboardTag("MutantGiant");
-		zombie.addScoreboardTag("HardMode");
-		zombie.setPersistent(true);
-		zombie.setRemoveWhenFarAway(false);
+		Utils.setupBoss(zombie, Utils.getNearestPlayer(zombie), "MutantGiant", "HardMode");
 
 		return zombie;
 	}
@@ -400,6 +373,7 @@ public class Sadan implements CustomMob {
 					dead++;
 				} else {
 					currentHP += zombie.getHealth();
+					leashToSadan(zombie, sadan);
 				}
 			}
 			sadan.setHealth(Math.max(1, currentHP * 100 / 3200));
@@ -414,6 +388,14 @@ public class Sadan implements CustomMob {
 		helmetMeta.setColor(Color.BLACK);
 		helmet.setItemMeta(helmetMeta);
 		return helmet;
+	}
+
+	// Keep the summoned add-ons tethered to the fight: if a submob strays more than 96 blocks from
+	// Sadan (e.g. chasing a player who bolted), yank it back. Piggybacks on the per-tick health loops.
+	private static void leashToSadan(LivingEntity submob, Zombie sadan) {
+		if(submob.getWorld().equals(sadan.getWorld()) && submob.getLocation().distanceSquared(sadan.getLocation()) > 96.0 * 96.0) {
+			submob.teleport(sadan.getLocation());
+		}
 	}
 
 	private static void sendChatMessage(String message) {

@@ -30,21 +30,15 @@ public class ObfuscatedmeloGnorI implements CustomMob {
 
 		String newName = "<gold><bold>﴾ <red><bold><obfuscated>meloG-norI</obfuscated><gold><bold> ﴿";
 		e.getAttribute(Attribute.MAX_HEALTH).setBaseValue(250.0);
-		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		e.setTarget(p);
+		Utils.setupBoss(e, p, "ObfuscatedmeloGnorI", "HardMode");
 		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(50.0);
 		e.setHealth(250.0);
-		e.setCustomNameVisible(true);
-		e.addScoreboardTag("SkyblockBoss");
-		e.addScoreboardTag("ObfuscatedmeloGnorI");
-		e.addScoreboardTag("HardMode");
 		p.sendMessage(Utils.msg("<red><bold>The Antimatter has done strange things to this Iron Golem..."));
 		Bukkit.getLogger().info(p.getName() + " has summoned the meloG norI!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
-		e.setPersistent(true);
-		e.setRemoveWhenFarAway(false);
 
 		Utils.scheduleTask(() -> launch(ironGolem), 100);
+		Utils.changeName(ironGolem, newName);
 
 		return newName;
 	}

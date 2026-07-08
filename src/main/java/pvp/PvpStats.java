@@ -13,7 +13,7 @@ import java.util.UUID;
  * PvP stats writer for the pvp server. Held in memory and flushed to the shared
  * {@code pvp-stats.json} periodically (so frequent per-hit damage updates don't thrash the disk)
  * plus immediately on milestones (kills, deaths, duel results). The pvp server is the only writer;
- * other servers read the file directly for /stats.
+ * other servers read the file directly for /pvpstats.
  */
 public class PvpStats {
 	private final Path file;

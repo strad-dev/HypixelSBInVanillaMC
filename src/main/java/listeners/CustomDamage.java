@@ -7,6 +7,7 @@ import mobs.CustomMob;
 import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
@@ -54,6 +55,10 @@ import java.util.logging.Logger;
 public class CustomDamage implements Listener {
 
 	static net.kyori.adventure.text.Component nextDeathMessage = null;
+
+	// Last server tick each entity took Terminator-arrow knockback, so a same-tick volley of the 3
+	// arrows accumulates horizontally instead of each setVelocity overwriting the last.
+	private static final Map<Entity, Integer> lastTermKnockbackTick = new WeakHashMap<>();
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		customMobs(damagee, damager, originalDamage, type, new DamageData(damagee, damager, originalDamage));
@@ -561,38 +566,27 @@ public class CustomDamage implements Listener {
 						} else {
 							// build death message before setHealth(0) so the PlayerDeathEvent handler can use it
 							if(damagee instanceof Player p) {
-								String deathMessage = null;
 								if(data.e != null) {
 									DamageSource damageSource = convertBukkitDamageSource(data.e.getDamageSource(), p);
 									ServerPlayer nmsPlayer = ((CraftPlayer) p).getHandle();
 									Component message = damageSource.getLocalizedDeathMessage(nmsPlayer);
 									nextDeathMessage = io.papermc.paper.adventure.PaperAdventure.asAdventure(message);
 								} else {
-									String damagerName;
-									if(damager != null) {
-										damagerName = damager.getName();
-									} else {
-										damagerName = "absolutely no one";
-									}
-									if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) {
-										deathMessage = p.getName() + " was slain by " + damagerName;
-									} else if(type == DamageType.RANGED) {
-										deathMessage = p.getName() + " was shot by " + damagerName;
-									} else if(type == DamageType.RANGED_SPECIAL) {
-										deathMessage = p.getName() + " was killed by " + damagerName + "'s lasers";
-									} else if(type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC) {
-										deathMessage = p.getName() + " was killed by " + damagerName + "'s magic";
-									} else if(type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL) {
-										deathMessage = p.getName() + " was killed by the world";
-									} else if(type == DamageType.FALL) {
-										deathMessage = p.getName() + " fell to their death";
-									} else if(type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE) {
-										deathMessage = p.getName() + " fell out of the world";
-									} else {
-										deathMessage = p.getName() + " died";
-									}
+									// Build a Component from the killer's formatted display name (its live magic shimmer)
+									// rather than the plain getName(), so a boss keeps its colours/shimmer in the death message.
+									net.kyori.adventure.text.Component killer = damager instanceof LivingEntity dle && dle.customName() != null ? dle.customName() : net.kyori.adventure.text.Component.text(damager != null ? damager.getName() : "absolutely no one");
+									net.kyori.adventure.text.Component who = net.kyori.adventure.text.Component.text(p.getName());
+									nextDeathMessage = switch(type) {
+										case MELEE, MELEE_SWEEP -> who.append(net.kyori.adventure.text.Component.text(" was slain by ")).append(killer);
+										case RANGED -> who.append(net.kyori.adventure.text.Component.text(" was shot by ")).append(killer);
+										case RANGED_SPECIAL -> who.append(net.kyori.adventure.text.Component.text(" was killed by ")).append(killer).append(net.kyori.adventure.text.Component.text("'s lasers"));
+										case MAGIC, PLAYER_MAGIC -> who.append(net.kyori.adventure.text.Component.text(" was killed by ")).append(killer).append(net.kyori.adventure.text.Component.text("'s magic"));
+										case ENVIRONMENTAL, IFRAME_ENVIRONMENTAL -> who.append(net.kyori.adventure.text.Component.text(" was killed by the world"));
+										case FALL -> who.append(net.kyori.adventure.text.Component.text(" fell to their death"));
+										case ABSOLUTE, LETHAL_ABSOLUTE -> who.append(net.kyori.adventure.text.Component.text(" fell out of the world"));
+										default -> who.append(net.kyori.adventure.text.Component.text(" died"));
+									};
 								}
-								if(deathMessage != null) nextDeathMessage = net.kyori.adventure.text.Component.text(deathMessage);
 							}
 							damagee.setHealth(0.0);
 						}
@@ -642,46 +636,75 @@ public class CustomDamage implements Listener {
 				} else if(isPhysicalHit && damager != null) {
 					// apply knockback
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
-					double enchantments = 1;
+					// Skip everything for a fully knockback-resistant target (antiKB <= 0): its motion is
+					// left untouched (vanilla behavior) and we avoid a sqrt of a non-positive amount.
+					if(antiKB > 0) {
+						double enchantments = 1;
 
-					if(damager instanceof LivingEntity livingEntity) {
-						if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK) && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
-							enchantments += 0.3 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
-						} else if(data.punchArrow > 0) {
-							enchantments += 0.3 * data.punchArrow;
+						if(damager instanceof LivingEntity livingEntity) {
+							if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK) && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
+								enchantments += 0.33333 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
+							} else if(data.punchArrow > 0) {
+								enchantments += 0.33333 * data.punchArrow;
+							}
+						}
+
+						// All non-resistance knockback modifiers (enchant, sprint, fall, block, term).
+						double modifiers = enchantments;
+
+						if(type == DamageType.MELEE) {
+							if(damager.getFallDistance() > 0) {
+								modifiers *= 1.2;
+							}
+
+							if(damager instanceof Player p && p.isSprinting()) {
+								modifiers *= 1.2;
+							}
+						}
+
+						if(data.isTermArrow) {
+							modifiers *= 0.33333;
+						}
+
+						if(data.isBlocking) {
+							modifiers *= 0.5;
+						}
+
+						// Vertical knockback is a sqrt function of knockback resistance ONLY (enchant/
+						// sprint/blocking never change the pop height). Horizontal uses antiKB^0.75 to
+						// compensate for the longer air-time of that higher pop, keeping distance ~linear
+						// in resistance (full netherite still lands ~60%) and exactly linear in the modifiers.
+						double vertical = 0.4 * Math.sqrt(Math.min(antiKB, 1.0));
+						double horizontal = 0.4 * (antiKB <= 1 ? Math.pow(antiKB, 0.75) : antiKB) * modifiers;
+
+						// Calculate knockback direction from damager to damagee
+						Vector knockbackDir = damagee.getLocation().toVector().subtract(damager.getLocation().toVector());
+
+						// Normalize horizontal direction only (preserve Y=0 for horizontal KB)
+						double horizontalDist = Math.sqrt(knockbackDir.getX() * knockbackDir.getX() + knockbackDir.getZ() * knockbackDir.getZ());
+						if(horizontalDist > 0) {
+							knockbackDir.setX(knockbackDir.getX() / horizontalDist);
+							knockbackDir.setZ(knockbackDir.getZ() / horizontalDist);
+						}
+
+						// Apply knockback
+						Vector oldVelocity = damagee.getVelocity();
+						Vector newVelocity;
+						if(data.isTermArrow && Integer.valueOf(MinecraftServer.currentTick).equals(lastTermKnockbackTick.get(damagee))) {
+							// Same-tick Terminator volley: stack horizontally onto the prior arrow(s) so the
+							// three 1/3-strength hits add up, keeping the single-hit pop (don't launch 3x high).
+							newVelocity = new Vector(oldVelocity.getX() + knockbackDir.getX() * horizontal, (damagee.isOnGround() ? Math.max(oldVelocity.getY(), vertical) : oldVelocity.getY()), oldVelocity.getZ() + knockbackDir.getZ() * horizontal);
+						} else {
+							// First hit this tick: damp the target's own momentum (retain 10%) as usual.
+							newVelocity = new Vector(oldVelocity.getX() * 0.1 + knockbackDir.getX() * horizontal, (damagee.isOnGround() ? vertical : 0), oldVelocity.getZ() * 0.1 + knockbackDir.getZ() * horizontal);
+						}
+
+						damagee.setVelocity(newVelocity);
+
+						if(data.isTermArrow) {
+							lastTermKnockbackTick.put(damagee, MinecraftServer.currentTick);
 						}
 					}
-
-					double factor = 0.5 * antiKB * enchantments;
-
-					// Apply type-specific modifiers
-					if(damager.getFallDistance() > 0) {
-						factor *= 1.2;
-					}
-
-					if(data.isTermArrow) {
-						factor *= 0.33333;
-					}
-
-					if(data.isBlocking) {
-						factor *= 0.5;
-					}
-
-					// Calculate knockback direction from damager to damagee
-					Vector knockbackDir = damagee.getLocation().toVector().subtract(damager.getLocation().toVector());
-
-					// Normalize horizontal direction only (preserve Y=0 for horizontal KB)
-					double horizontalDist = Math.sqrt(knockbackDir.getX() * knockbackDir.getX() + knockbackDir.getZ() * knockbackDir.getZ());
-					if(horizontalDist > 0) {
-						knockbackDir.setX(knockbackDir.getX() / horizontalDist);
-						knockbackDir.setZ(knockbackDir.getZ() / horizontalDist);
-					}
-
-					// Apply knockback
-					Vector oldVelocity = damagee.getVelocity();
-					Vector newVelocity = new Vector(oldVelocity.getX() * 0.1 + knockbackDir.getX() * factor + factor * damager.getVelocity().getX(), (damagee.isOnGround() ? 0.4 * antiKB * (data.isBlocking ? 0.5 : 1) * (data.isTermArrow ? 0.5 : 1) : 0), oldVelocity.getZ() * 0.1 + knockbackDir.getZ() * factor + factor * damager.getVelocity().getZ());
-
-					damagee.setVelocity(newVelocity);
 				}
 
 				// change nametag health
@@ -706,7 +729,7 @@ public class CustomDamage implements Listener {
 	}
 
 	private static void triggerAllRelevantAdvancements(LivingEntity victim, Entity attacker, DamageType type,
-													   double originalDamage, double finalDamage, boolean wasBlocked, boolean wasKilled, DamageData data) {
+	                                                   double originalDamage, double finalDamage, boolean wasBlocked, boolean wasKilled, DamageData data) {
 		DamageSource nmsSource;
 		Entity causingEntity;
 		if(data.e != null) {
@@ -1165,6 +1188,12 @@ public class CustomDamage implements Listener {
 
 		} else if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
+			// Wither skulls are hurting projectiles: cancelling their damage event makes vanilla DEFLECT
+			// them (they visibly bounce off) instead of consuming them. Remove the skull on any entity
+			// hit so it disappears like a normal impact; the custom damage below still lands.
+			if(e.getDamager() instanceof org.bukkit.entity.WitherSkull skull) {
+				skull.remove();
+			}
 			if(!entity.isDead()) {
 				// Prevent boss-on-boss friendly fire (e.g. Sadan golems vs terracottas, giants vs giants)
 				if(e.getDamager() instanceof Mob damagerMob && entity instanceof Mob entityMob
@@ -1254,7 +1283,7 @@ public class CustomDamage implements Listener {
 				case BLOCK_EXPLOSION -> type = DamageType.MELEE;
 				case POISON, WITHER -> type = DamageType.MAGIC;
 				case CAMPFIRE, CONTACT, CRAMMING, DROWNING, DRYOUT, FIRE, FIRE_TICK, FREEZE, HOT_FLOOR, LAVA,
-					 MELTING, STARVATION, SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
+				     MELTING, STARVATION, SUFFOCATION -> type = DamageType.ENVIRONMENTAL;
 				case CUSTOM -> type = DamageType.IFRAME_ENVIRONMENTAL;
 				case FALL, FLY_INTO_WALL -> type = DamageType.FALL;
 				case KILL, SUICIDE, VOID, WORLD_BORDER -> type = DamageType.LETHAL_ABSOLUTE;

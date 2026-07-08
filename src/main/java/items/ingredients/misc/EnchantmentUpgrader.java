@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnchantmentUpgrader implements Ingredients {
+	// HIDE_ADDITIONAL_TOOLTIP is deprecated on 26.2 (tooltip control moved to the tooltip_display data
+	// component), but there's no direct component equivalent for hiding a smithing template's built-in
+	// "Applies to / Ingredients" lines, so we keep the still-functional flag and suppress the warning.
+	@SuppressWarnings("deprecation")
 	public static ItemStack getItem() {
 		ItemStack upgrader = new ItemStack(Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE);
 

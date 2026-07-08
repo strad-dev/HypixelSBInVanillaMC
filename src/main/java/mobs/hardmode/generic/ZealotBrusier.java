@@ -30,17 +30,10 @@ public class ZealotBrusier implements CustomMob {
 		enderman.setHealth(999.0);
 		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(45.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
-		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		enderman.setTarget(p);
-		enderman.setCustomNameVisible(true);
-		enderman.addScoreboardTag("SkyblockBoss");
-		enderman.addScoreboardTag("ZealotBrusier");
-		enderman.addScoreboardTag("HardMode");
+		Utils.setupBoss(enderman, p, "ZealotBrusier", "HardMode");
 		p.sendMessage(Utils.msg("<red><bold>The Pearl corrupts the Enderman.  It has become a Zealot Brusier!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Zealot Brusier!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
-		enderman.setPersistent(true);
-		enderman.setRemoveWhenFarAway(false);
 		return newName;
 	}
 

@@ -370,13 +370,7 @@ public class Utils {
 			Utils.changeName(e, "<gold><bold>﴾ <red><bold>Wither Guard<gold><bold> ﴿");
 			e.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
 			e.getAttribute(Attribute.FALL_DAMAGE_MULTIPLIER).setBaseValue(0.0);
-			e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-			e.setTarget(Utils.getNearestPlayer(entity));
-			e.setCustomNameVisible(true);
-			e.addScoreboardTag("SkyblockBoss");
-			e.addScoreboardTag("GuardSkeleton");
-			e.setPersistent(true);
-			e.setRemoveWhenFarAway(false);
+			Utils.setupBoss(e, Utils.getNearestPlayer(entity), "GuardSkeleton");
 		}
 		entity.getWorld().playSound(entity, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 2.0F);
 	}
@@ -439,6 +433,40 @@ public class Utils {
 
 	public static void scheduleTask(Runnable task, long delay) {
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), task, delay);
+	}
+
+	/**
+	 * Gives the entity full water-movement efficiency (equivalent to Depth Strider 3) so bosses and
+	 * their subentities don't wade slowly through water. No-op if the entity lacks the attribute
+	 * (e.g. flying withers/dragons that never had it registered).
+	 */
+	public static void applyDepthStrider(LivingEntity entity) {
+		var attr = entity.getAttribute(Attribute.WATER_MOVEMENT_EFFICIENCY);
+		if(attr != null) {
+			attr.setBaseValue(1.0);
+		}
+	}
+
+	/**
+	 * Applies the setup shared by every SkyBlock boss and boss-spawned subentity: no item pickup,
+	 * infinite fire resistance, name always visible, persistence across chunk unloads, the
+	 * "SkyblockBoss" tag plus any {@code extraTags} (e.g. the mob's registry key), and a target.
+	 * Pass {@code target == null} to leave targeting alone. The shared water-movement attribute is
+	 * handled separately by the SkyblockBoss sweep in {@link listeners.CustomMobs}.
+	 */
+	public static void setupBoss(Mob e, @Nullable Player target, String... extraTags) {
+		e.setCanPickupItems(false);
+		e.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
+		if(target != null) {
+			e.setTarget(target);
+		}
+		e.setCustomNameVisible(true);
+		e.addScoreboardTag("SkyblockBoss");
+		for(String tag : extraTags) {
+			e.addScoreboardTag(tag);
+		}
+		e.setPersistent(true);
+		e.setRemoveWhenFarAway(false);
 	}
 
 	/**

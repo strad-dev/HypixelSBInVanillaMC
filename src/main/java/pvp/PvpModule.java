@@ -5,7 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * Wires the (config-gated) PvP feature into SkyBlock: stats writer, duel manager, the damage/FFA
- * listener, and the /joinarena /leavearena /stats /pvptop /duel commands. Everything no-ops unless
+ * listener, and the /joinarena /leavearena /pvpstats /pvptop /duel commands. Everything no-ops unless
  * enabled in config.yml, so SkyBlock stays standalone and inert on non-pvp servers.
  */
 public final class PvpModule {
@@ -28,7 +28,7 @@ public final class PvpModule {
 		bind(plugin, "leavearena", arena);
 
 		StatsCommand statsCmd = new StatsCommand(cfg);
-		bind(plugin, "stats", statsCmd);
+		bind(plugin, "pvpstats", statsCmd);
 		bind(plugin, "pvptop", statsCmd);
 
 		DuelCommand duelCmd = new DuelCommand(duels);

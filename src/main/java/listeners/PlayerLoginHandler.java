@@ -19,9 +19,7 @@ public class PlayerLoginHandler implements Listener {
 		BossBarManager.addPlayerToActiveBars(p);
 		p.discoverRecipes(AddRecipes.returnRecipes(Plugin.getInstance()));
 		// MiniMessage output isn't auto-linked by the client the way legacy chat URLs were, so the
-		// links are wrapped in explicit <click:open_url>. The leading/trailing "magic" uses a single
-		// fixed-width ASCII char (E) in the default font so obfuscation keeps a constant width and
-		// doesn't shove the title around. (If it still jitters, the client has Force Unicode Font ON.)
+		// links are wrapped in explicit <click:open_url>.
 		p.sendMessage(Utils.msg("""
 				 <blue><bold><obfuscated>E</obfuscated> Hypixel SkyBlock in Vanilla Minecraft Plugin <obfuscated>E</obfuscated><reset>
 				<black>---<dark_blue>---<dark_green>---<dark_aqua>---<dark_red>---<dark_purple>---<gold>---<gray>---\

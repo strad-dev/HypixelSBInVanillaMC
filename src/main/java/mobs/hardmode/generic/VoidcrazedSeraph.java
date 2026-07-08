@@ -43,18 +43,10 @@ public class VoidcrazedSeraph implements CustomMob {
 		enderman.setHealth(1666.0);
 		enderman.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(55.0);
 		enderman.getAttribute(Attribute.MOVEMENT_SPEED).setBaseValue(0.5);
-		enderman.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		enderman.setTarget(p);
-		enderman.setCustomNameVisible(true);
-		enderman.addScoreboardTag("SkyblockBoss");
-		enderman.addScoreboardTag("VoidcrazedSeraph");
-		enderman.addScoreboardTag("HardMode");
-		enderman.addScoreboardTag("833Trigger");
+		Utils.setupBoss(enderman, p, "VoidcrazedSeraph", "HardMode", "833Trigger");
 		p.sendMessage(Utils.msg("<red><bold>From the ashes of the Superior Dragon rises the terrifying Voidcrazed Seraph!"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Voidcrazed Seraph!");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
-		enderman.setPersistent(true);
-		enderman.setRemoveWhenFarAway(false);
 		enderman.setAware(true);
 		Utils.scheduleTask(() -> dissonance(enderman), 20);
 		Utils.scheduleTask(() -> yangGlyph(enderman), 600);
@@ -112,6 +104,20 @@ public class VoidcrazedSeraph implements CustomMob {
 
 	public static boolean isVoidgloomBeacon(Block b) {
 		return beacons.contains(b);
+	}
+
+	/**
+	 * Clears any yang-glyph beacons still in the world — called when the Seraph dies so a beacon left
+	 * mid-phase doesn't linger. Reverting the blocks to AIR also stops the pending "YANG GLYPH"
+	 * countdown titles, which each guard on the block still being a beacon before showing.
+	 */
+	public static void cleanup() {
+		for(Block b : beacons) {
+			if(b.getType() == Material.BEACON) {
+				b.setType(Material.AIR);
+			}
+		}
+		beacons.clear();
 	}
 
 	@Override
@@ -208,6 +214,7 @@ public class VoidcrazedSeraph implements CustomMob {
 				damagee.setAI(true);
 				damagee.removeScoreboardTag("Invulnerable");
 			}, 240);
+			return false;
 		}
 		Random random = new Random();
 		if(random.nextDouble() < 0.2) {

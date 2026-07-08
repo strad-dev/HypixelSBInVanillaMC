@@ -29,18 +29,12 @@ public class meloGnorI implements CustomMob {
 
 		String newName = "<gold><bold>﴾ <red><bold>meloG norI<gold><bold> ﴿";
 		ironGolem.getAttribute(Attribute.MAX_HEALTH).setBaseValue(50.0);
-		ironGolem.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		ironGolem.setTarget(p);
+		Utils.setupBoss(ironGolem, p, "meloGnorI");
 		ironGolem.setHealth(50.0);
 		ironGolem.getAttribute(Attribute.ATTACK_DAMAGE).setBaseValue(25.0);
-		ironGolem.setCustomNameVisible(true);
-		ironGolem.addScoreboardTag("SkyblockBoss");
-		ironGolem.addScoreboardTag("meloGnorI");
 		p.sendMessage(Utils.msg("<red><bold>The Antimatter has done strange things to this Iron Golem..."));
 		Bukkit.getLogger().info(p.getName() + " has summoned the meloG norI.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
-		ironGolem.setPersistent(true);
-		ironGolem.setRemoveWhenFarAway(false);
 		return newName;
 	}
 

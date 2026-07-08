@@ -40,17 +40,11 @@ public class InfuriatedWitherSkeleton implements CustomMob {
 
 		witherSkeleton.getAttribute(Attribute.MAX_HEALTH).setBaseValue(100.0);
 		witherSkeleton.setHealth(100.0);
-		witherSkeleton.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, -1, 255));
-		witherSkeleton.setTarget(p);
+		Utils.setupBoss(witherSkeleton, p, "InfuriatedSkeleton");
 		witherSkeleton.teleport(p);
-		witherSkeleton.setCustomNameVisible(true);
-		witherSkeleton.addScoreboardTag("SkyblockBoss");
-		witherSkeleton.addScoreboardTag("InfuriatedSkeleton");
 		p.sendMessage(Utils.msg("<red><bold>From the ashes of the Wither Skeleton rises its reincarnation: a HIGHLY INFURIATED Wither Skeleton"));
 		Bukkit.getLogger().info(p.getName() + " has summoned the Highly Infuriated Wither Skeleton!.");
 		p.playSound(p.getLocation(), Sound.ENTITY_WITHER_SPAWN, 1.0F, 1.0F);
-		witherSkeleton.setPersistent(true);
-		witherSkeleton.setRemoveWhenFarAway(false);
 		return newName;
 	}
 
