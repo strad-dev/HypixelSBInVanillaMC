@@ -148,7 +148,7 @@ public class Utils {
 			}
 		}
 		playersInWorld.sort(Comparator.comparingDouble(o -> o.getLocation().distanceSquared(location)));
-		if(e.getLocation().distanceSquared(playersInWorld.getFirst().getLocation()) > blocks * blocks) {
+		if(e.getLocation().distanceSquared(playersInWorld.getFirst().getLocation()) > (double) blocks * blocks) {
 			return null;
 		}
 		return playersInWorld.getFirst();

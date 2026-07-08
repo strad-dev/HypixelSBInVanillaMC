@@ -12,6 +12,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -138,6 +139,13 @@ public class PvpListener implements Listener {
 		return cfg.ffaEnabled() && inFfa(p);
 	}
 
+	/** No dropping items while in a duel (the whole duel, incl. countdown) or inside the FFA arena. */
+	@EventHandler(ignoreCancelled = true)
+	public void onDropItem(PlayerDropItemEvent e) {
+		Player p = e.getPlayer();
+		if (duels.inDuel(p.getUniqueId()) || (cfg.ffaEnabled() && inFfa(p))) e.setCancelled(true);
+	}
+
 	/** Intelligence spent on an ability (PvP-context only). Called via PvpHooks from CustomItems. */
 	public void trackMana(Player p, int amount) {
 		duels.recordMana(p, amount);                            // per-match 1v1 summary (no-op outside a duel)
@@ -251,6 +259,8 @@ public class PvpListener implements Listener {
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
+		// If they disconnected mid-duel, get them out of the arena to a safe spot first.
+		duels.restoreOnJoin(e.getPlayer());
 		// Seed membership silently so relogging inside the arena doesn't fire a spurious "entered".
 		if (cfg.ffaEnabled()) {
 			Region b = cfg.ffaBounds();

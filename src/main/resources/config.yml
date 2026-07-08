@@ -8,7 +8,7 @@ pvp:
   ffa:
     # Enables the Free-For-All PvP arena.
     enabled: false
-    # Set the FFA world, spawnpoint, arena bounds, and (optional) safe zone.
+    # Set the FFA world, spawnpoint, arena bounds, and (optional) safe zone.  For best results, use an enclosed space with bedrock walls at least 2 blocks thick.
     world: world
     spawn: { x: 0.5, y: 100.0, z: 0.5, yaw: 0.0, pitch: 0.0 }
     bounds:
@@ -34,6 +34,6 @@ pvp:
       - { x: 105.5, y: 100.0, z: 125.5, yaw: -90.0, pitch: 0.0 }
       - { x: 145.5, y: 100.0, z: 125.5, yaw: 90.0, pitch: 0.0 }
   stats:
-    # Enables stats tracking for duels (recommended).
+    # Enables stats tracking for duels and/or free-for-alls (recommended).
     enabled: false
     file: "pvp-stats.json"

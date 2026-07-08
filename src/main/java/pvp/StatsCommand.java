@@ -57,18 +57,18 @@ public class StatsCommand implements CommandExecutor {
 				Placeholder.unparsed("m", String.valueOf(e.matches)),
 				Placeholder.unparsed("ws", String.valueOf(e.winStreak)),
 				Placeholder.unparsed("bws", String.valueOf(e.bestWinStreak))));
+		int landed = e.hitsLanded - e.iframeHits; // hits that actually dealt damage (not negated by i-frames)
 		int acc = e.hitAttempts > 0 ? (int) Math.round(e.hitsLanded * 100.0 / e.hitAttempts) : 0;
 		int critPct = e.hitsLanded > 0 ? (int) Math.round(e.criticalHits * 100.0 / e.hitsLanded) : 0;
-		int iframePct = e.hitsLanded > 0 ? (int) Math.round(e.iframeHits * 100.0 / e.hitsLanded) : 0;
-		sender.sendMessage(Utils.msg("<yellow>Combat:</yellow> <red><dmg></red> dmg <dark_gray>|</dark_gray> <aqua><h>/<ha> hits (<acc>%)</aqua> <dark_gray>|</dark_gray> <gold><cr>/<h> crit (<cp>%)</gold> <dark_gray>|</dark_gray> <blue><ifc>/<h> i-frame (<ip>%)</blue> <dark_gray>|</dark_gray> <dark_aqua><intel></dark_aqua> intelligence used <dark_gray>|</dark_gray> <green><heal></green> HP healed <dark_gray>|</dark_gray> <yellow><food></yellow> food eaten",
+		// hits = landed (dealt damage) / total connects (incl. i-frame-blocked) / left clicks; acc = connects/clicks.
+		sender.sendMessage(Utils.msg("<yellow>Combat:</yellow> <red><dmg></red> dmg <dark_gray>|</dark_gray> <aqua><ln>/<h>/<ha> hits (<acc>%)</aqua> <dark_gray>|</dark_gray> <gold><cr>/<h> crit (<cp>%)</gold> <dark_gray>|</dark_gray> <dark_aqua><intel></dark_aqua> intelligence used <dark_gray>|</dark_gray> <green><heal></green> HP healed <dark_gray>|</dark_gray> <yellow><food></yellow> food eaten",
 				Placeholder.unparsed("dmg", fmt(e.damageDealt)),
+				Placeholder.unparsed("ln", String.valueOf(landed)),
 				Placeholder.unparsed("h", String.valueOf(e.hitsLanded)),
 				Placeholder.unparsed("ha", String.valueOf(e.hitAttempts)),
 				Placeholder.unparsed("acc", String.valueOf(acc)),
 				Placeholder.unparsed("cr", String.valueOf(e.criticalHits)),
 				Placeholder.unparsed("cp", String.valueOf(critPct)),
-				Placeholder.unparsed("ifc", String.valueOf(e.iframeHits)),
-				Placeholder.unparsed("ip", String.valueOf(iframePct)),
 				Placeholder.unparsed("intel", String.valueOf(e.intelligenceUsed)),
 				Placeholder.unparsed("heal", String.valueOf(e.hpHealed)),
 				Placeholder.unparsed("food", String.valueOf(e.foodEaten))));

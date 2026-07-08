@@ -6,18 +6,25 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * /duel <player>   challenge an online player here.
- * /duel accept     accept the latest challenge.
- * /duel decline    decline a pending challenge (receiver).
- * /duel cancel     cancel your outgoing challenge (sender).
- * /duel leave      forfeit the duel you're currently in.
+ * /duel <player>     challenge an online player here.
+ * /duel accept       accept the latest challenge.
+ * /duel decline      decline a pending challenge (receiver).
+ * /duel cancel       cancel your outgoing challenge (sender).
+ * /duel leave (ff)   forfeit the duel you're currently in.
  * /duel start <a> <b> force-pair two players (used by the network plugin / admins).
  */
-public class DuelCommand implements CommandExecutor {
+public class DuelCommand implements CommandExecutor, TabCompleter {
+	private static final List<String> SUBCOMMANDS = List.of("accept", "decline", "cancel", "leave", "ff");
+
 	private final DuelManager duels;
 
 	public DuelCommand(DuelManager duels) {
@@ -45,12 +52,12 @@ public class DuelCommand implements CommandExecutor {
 			duels.cancel(p);
 			return true;
 		}
-		if (args.length >= 1 && args[0].equalsIgnoreCase("leave")) {
+		if (args.length >= 1 && (args[0].equalsIgnoreCase("leave") || args[0].equalsIgnoreCase("ff"))) {
 			duels.leave(p);
 			return true;
 		}
 		if (args.length < 1) {
-			p.sendMessage(Utils.msg("<red>Usage: /duel <player> | /duel accept | /duel decline | /duel cancel | /duel leave"));
+			p.sendMessage(Utils.msg("<red>Usage: /duel <player> | /duel accept | /duel decline | /duel cancel | /duel leave (ff)"));
 			return true;
 		}
 		Player target = Bukkit.getPlayerExact(args[0]);
@@ -82,5 +89,17 @@ public class DuelCommand implements CommandExecutor {
 		}
 		duels.start(a, b);
 		return true;
+	}
+
+	@Override
+	public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+		if (args.length != 1) return List.of();
+		String prefix = args[0].toLowerCase();
+		List<String> out = new ArrayList<>();
+		for (String s : SUBCOMMANDS) if (s.startsWith(prefix)) out.add(s);
+		for (Player pl : Bukkit.getOnlinePlayers()) {
+			if (pl.getName().toLowerCase().startsWith(prefix)) out.add(pl.getName());
+		}
+		return out;
 	}
 }

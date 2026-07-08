@@ -31,7 +31,10 @@ public final class PvpModule {
 		bind(plugin, "stats", statsCmd);
 		bind(plugin, "pvptop", statsCmd);
 
-		bind(plugin, "duel", new DuelCommand(duels));
+		DuelCommand duelCmd = new DuelCommand(duels);
+		bind(plugin, "duel", duelCmd);
+		var duelCommand = plugin.getCommand("duel");
+		if (duelCommand != null) duelCommand.setTabCompleter(duelCmd);
 
 		// PvP loadout editor (/pvploadout): declared in plugin.yml so it shows in /help and tab-completes.
 		// The command itself refuses unless 1v1 duels are enabled (checked in PvpLoadoutMenu), and the

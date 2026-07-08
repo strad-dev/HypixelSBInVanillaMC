@@ -8,6 +8,7 @@ import net.kyori.adventure.title.Title;
 
 import java.time.Duration;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -18,7 +19,9 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Score;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -42,6 +45,9 @@ public class DuelManager {
 	private final Map<UUID, UUID> invites = new HashMap<>();         // target -> inviter
 	private final Map<UUID, Integer> inviteTokens = new HashMap<>(); // target -> token, so a stale timeout can't cancel a newer request
 	private int inviteCounter = 0;
+	// Players who disconnected mid-duel: the return-home teleport (5s later) skips them while offline, so
+	// move them out of the arena to a safe spot on their next join instead.
+	private final Set<UUID> strandedInArena = new HashSet<>();
 
 	public DuelManager(JavaPlugin plugin, PvpConfig cfg, PvpStats stats, PvpLoadouts loadouts) {
 		this.plugin = plugin;
@@ -164,6 +170,9 @@ public class DuelManager {
 		// Save the real inventories so the standardized kit can replace them and be restored at the end.
 		d.invA = cloneContents(a.getInventory().getContents());
 		d.invB = cloneContents(b.getInventory().getContents());
+		// Save game modes; both players fight in Adventure and are restored to their originals at the end.
+		d.gmA = a.getGameMode();
+		d.gmB = b.getGameMode();
 		byPlayer.put(a.getUniqueId(), d);
 		byPlayer.put(b.getUniqueId(), d);
 		prepare(a, sa);
@@ -174,6 +183,7 @@ public class DuelManager {
 
 	private void prepare(Player p, Location spawn) {
 		p.teleport(spawn);
+		p.setGameMode(GameMode.ADVENTURE); // duels are fought in Adventure; restored in finishPlayer
 		healFull(p);
 		p.setFoodLevel(20);
 		// Use the player's saved PvP loadout if they have one; otherwise the standardized kit. (Their real
@@ -241,7 +251,7 @@ public class DuelManager {
 	public void handleDeath(Player loser) {
 		Duel d = byPlayer.get(loser.getUniqueId());
 		if (d == null) return;
-		end(d, Bukkit.getPlayer(d.other(loser.getUniqueId())), loser);
+		end(d, Bukkit.getPlayer(d.other(loser.getUniqueId())), loser, false);
 	}
 
 	public void handleQuit(Player p) {
@@ -249,7 +259,21 @@ public class DuelManager {
 		if (d == null) return;
 		// Disconnecting forfeits: the opponent wins, and we restore the quitter's inventory/intel/food
 		// (via finishPlayer in end()) before they fully leave so their real state is saved.
-		end(d, Bukkit.getPlayer(d.other(p.getUniqueId())), p);
+		end(d, Bukkit.getPlayer(d.other(p.getUniqueId())), p, true);
+		strandedInArena.add(p.getUniqueId()); // move them out of the arena on their next join
+	}
+
+	/**
+	 * If this player disconnected mid-duel, move them out of the arena to a safe spot on rejoin (the FFA
+	 * safezone, else the world spawn). Their duel was already ended/forfeited and their inventory restored
+	 * when they quit; this just gets them out of the (otherwise sealed) arena. Network servers send the
+	 * player to the lobby on reconnect anyway, so this only matters for a standalone / direct pvp relog.
+	 */
+	public void restoreOnJoin(Player p) {
+		if (!strandedInArena.remove(p.getUniqueId())) return;
+		Location safe = cfg.ffaSpawn();
+		if (safe == null) safe = p.getWorld().getSpawnLocation();
+		p.teleport(safe);
 	}
 
 	/** A player leaves their duel via /duel leave - they forfeit and the opponent wins. */
@@ -259,7 +283,7 @@ public class DuelManager {
 			p.sendMessage(Utils.msg("<red>You're not in a duel"));
 			return true;
 		}
-		end(d, Bukkit.getPlayer(d.other(p.getUniqueId())), p);
+		end(d, Bukkit.getPlayer(d.other(p.getUniqueId())), p, true);
 		return true;
 	}
 
@@ -270,7 +294,7 @@ public class DuelManager {
 		drawEnd(d);
 	}
 
-	private void end(Duel d, Player winner, Player loser) {
+	private void end(Duel d, Player winner, Player loser, boolean forfeit) {
 		byPlayer.remove(d.a);
 		byPlayer.remove(d.b);
 
@@ -285,7 +309,7 @@ public class DuelManager {
 		finishPlayer(loser, d);
 
 		if (winner != null) {
-			winner.sendMessage(Utils.msg("<green>You won the duel!"));
+			winner.sendMessage(Utils.msg(forfeit ? "<green>You won (by forfeit)" : "<green>You won the duel!"));
 			winner.showTitle(Title.title(
 					Utils.msg("<green><bold>VICTORY"),
 					Utils.msg("<gray>You defeated <white><o></white>",
@@ -293,9 +317,13 @@ public class DuelManager {
 		}
 		if (loser != null) {
 			String winnerName = winner != null ? winner.getName() : "your opponent";
-			loser.sendMessage(Utils.msg("<red>You lost the duel <dark_gray>-</dark_gray> <white><o></white> <gray>had</gray> <red><h>❤</red> <gray>left",
-					Placeholder.unparsed("o", winnerName),
-					Placeholder.unparsed("h", fmt(winnerHealth))));
+			if (forfeit) {
+				loser.sendMessage(Utils.msg("<red>You lost (by forfeit)"));
+			} else {
+				loser.sendMessage(Utils.msg("<red>You lost the duel <dark_gray>-</dark_gray> <white><o></white> <gray>had</gray> <red><h>❤</red> <gray>left",
+						Placeholder.unparsed("o", winnerName),
+						Placeholder.unparsed("h", fmt(winnerHealth))));
+			}
 			loser.showTitle(Title.title(
 					Utils.msg("<red><bold>DEFEAT"),
 					Utils.msg("<gray>Defeated by <white><o></white> <gray>(<red><h>❤</red><gray>)",
@@ -331,9 +359,21 @@ public class DuelManager {
 		final UUID aId = d.a, bId = d.b;
 		final Location prevA = d.prevA, prevB = d.prevB;
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			returnHome(Bukkit.getPlayer(aId), prevA);
-			returnHome(Bukkit.getPlayer(bId), prevB);
+			Player a = Bukkit.getPlayer(aId);
+			Player b = Bukkit.getPlayer(bId);
+			returnHome(a, prevA);
+			returnHome(b, prevB);
+			// On the network, hand off to the network plugin so it can send players who came from another
+			// server back home (it transfers them off pvp; the local returnHome above is then a harmless
+			// no-op for them). Gated by config so a standalone server never logs an unknown command.
+			notifyNetworkDuelEnd(a, b);
 		}, RETURN_DELAY_TICKS);
+	}
+
+	private void notifyNetworkDuelEnd(Player a, Player b) {
+		if (!cfg.duelNetwork() || (a == null && b == null)) return;
+		String cmd = "networkduelend " + (a != null ? a.getName() : "-") + " " + (b != null ? b.getName() : "-");
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 	}
 
 	private void finishPlayer(Player p, Duel d) {
@@ -343,6 +383,7 @@ public class DuelManager {
 		restoreIntelligence(p, d);
 		restoreFood(p, d);
 		restoreInventory(p, d);
+		restoreGameMode(p, d);
 		// Invulnerable during the 5s grace so neither player can be re-hit before returning home.
 		p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, RETURN_DELAY_TICKS + 20, MAX_RESISTANCE, false, false));
 	}
@@ -369,6 +410,11 @@ public class DuelManager {
 			p.setFoodLevel(d.foodB);
 			p.setSaturation(d.satB);
 		}
+	}
+
+	private void restoreGameMode(Player p, Duel d) {
+		GameMode gm = d.a.equals(p.getUniqueId()) ? d.gmA : d.gmB;
+		if (gm != null) p.setGameMode(gm);
 	}
 
 	/**
@@ -518,6 +564,7 @@ public class DuelManager {
 		int intelA = -1, intelB = -1;
 		int foodA = 20, foodB = 20;
 		float satA, satB;
+		GameMode gmA, gmB;          // saved real game mode (restored when the duel ends)
 		ItemStack[] invA, invB;     // saved real inventory (restored when the duel ends)
 		double dmgA, dmgB;          // damage dealt by each player this match
 		int hitsA, hitsB;           // hits landed by each player this match
