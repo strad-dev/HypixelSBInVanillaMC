@@ -158,6 +158,7 @@ public class Scylla implements AbilityItem {
 
 			l.setYaw(origin.getYaw());
 			l.setPitch(origin.getPitch());
+			p.teleport(l);
 		} else {
 			switch(result.getHitBlockFace()) {
 				case SELF -> {
@@ -167,11 +168,13 @@ public class Scylla implements AbilityItem {
 					l = result.getHitBlock().getLocation().add(0.5, 1, 0.5);
 					l.setYaw(origin.getYaw());
 					l.setPitch(origin.getPitch());
+					p.teleport(l);
 				}
 				case DOWN -> {
 					l = result.getHitBlock().getLocation().add(0.5, -2, 0.5);
 					l.setYaw(origin.getYaw());
 					l.setPitch(origin.getPitch());
+					p.teleport(l);
 				}
 				default -> {
 					// Hit a side face - backtrack until we find a safe spot
@@ -211,6 +214,7 @@ public class Scylla implements AbilityItem {
 								l = new Location(checkLoc.getWorld(), Math.floor(checkLoc.getX()) + 0.5, Math.floor(checkLoc.getY()), Math.floor(checkLoc.getZ()) + 0.5);
 								l.setYaw(origin.getYaw());
 								l.setPitch(origin.getPitch());
+								p.teleport(l);
 								break;
 							}
 						}
@@ -221,19 +225,11 @@ public class Scylla implements AbilityItem {
 						l = new Location(lastSafe.getWorld(), Math.floor(lastSafe.getX()) + 0.5, Math.floor(lastSafe.getY()), Math.floor(lastSafe.getZ()) + 0.5);
 						l.setYaw(origin.getYaw());
 						l.setPitch(origin.getPitch());
+						p.teleport(l);
 					}
 				}
 			}
 		}
-		// Teleport on the same tick. The 1-tick defer was meant to suppress the spurious "build.tooHigh"
-		// action bar, but it still shows regardless — so the defer only added latency (badly noticeable
-		// during server lag spikes). The implosion below is centered on the destination location either way.
-		// No valid etherwarp destination (e.g. the ray hit the SELF block face) — don't fire the
-		// ability so no mana is charged, and avoid imploding on a null location.
-		if(l == null) {
-			return false;
-		}
-		p.teleport(l);
 		p.setFallDistance(0);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 

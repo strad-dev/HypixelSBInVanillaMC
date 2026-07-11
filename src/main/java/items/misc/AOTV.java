@@ -74,11 +74,7 @@ public class AOTV implements AbilityItem {
 				l.setPitch(p.getEyeLocation().getPitch());
 				p.setFallDistance(0);
 				p.playSound(p, Sound.ENTITY_ENDER_DRAGON_HURT, 1, 0.50F);
-				// Teleport on the same tick. The 1-tick defer was meant to suppress the spurious
-				// "build.tooHigh" action bar, but it still shows regardless — so the defer only added
-				// latency (badly noticeable during server lag spikes). Reverted to an immediate teleport.
-				Location dest = l;
-				p.teleport(dest);
+				p.teleport(l);
 				return true;
 			}
 			return false;
@@ -158,8 +154,7 @@ public class AOTV implements AbilityItem {
 
 				targetLoc.setYaw(origin.getYaw());
 				targetLoc.setPitch(origin.getPitch());
-				Location dest = targetLoc;
-				p.teleport(dest);
+				p.teleport(targetLoc);
 			} else {
 				switch(result.getHitBlockFace()) {
 					case SELF -> {
@@ -169,15 +164,13 @@ public class AOTV implements AbilityItem {
 						Location l = result.getHitBlock().getLocation().add(0.5, 1, 0.5);
 						l.setYaw(origin.getYaw());
 						l.setPitch(origin.getPitch());
-						Location dest = l;
-						p.teleport(dest);
+						p.teleport(l);
 					}
 					case DOWN -> {
 						Location l = result.getHitBlock().getLocation().add(0.5, -2, 0.5);
 						l.setYaw(origin.getYaw());
 						l.setPitch(origin.getPitch());
-						Location dest = l;
-						p.teleport(dest);
+						p.teleport(l);
 					}
 					default -> {
 						// Hit a side face - backtrack until we find a safe spot
@@ -217,8 +210,7 @@ public class AOTV implements AbilityItem {
 									Location l = new Location(checkLoc.getWorld(), Math.floor(checkLoc.getX()) + 0.5, Math.floor(checkLoc.getY()), Math.floor(checkLoc.getZ()) + 0.5);
 									l.setYaw(origin.getYaw());
 									l.setPitch(origin.getPitch());
-									Location dest = l;
-									p.teleport(dest);
+									p.teleport(l);
 									break;
 								}
 							}
@@ -229,8 +221,7 @@ public class AOTV implements AbilityItem {
 							Location l = new Location(lastSafe.getWorld(), Math.floor(lastSafe.getX()) + 0.5, Math.floor(lastSafe.getY()), Math.floor(lastSafe.getZ()) + 0.5);
 							l.setYaw(origin.getYaw());
 							l.setPitch(origin.getPitch());
-							Location dest = l;
-							p.teleport(dest);
+							p.teleport(l);
 						}
 					}
 				}
