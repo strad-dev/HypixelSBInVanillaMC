@@ -3,6 +3,7 @@ package pvp;
 import misc.Utils;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
@@ -36,9 +37,11 @@ import java.util.UUID;
  */
 public class PvpListener implements Listener {
 
-	// TODO(user): final wording for the two Free-For-All arena enter/exit messages below.
+	// TODO(user): final wording for the four Free-For-All enter/exit messages below.
 	private static final String ARENA_ENTER_MSG = "<green>You entered the Free-For-All arena.";
 	private static final String ARENA_EXIT_MSG = "<gray>You left the Free-For-All arena.";
+	private static final String SAFEZONE_ENTER_MSG = "<green>You entered the safe zone.";
+	private static final String SAFEZONE_EXIT_MSG = "<red>You left the safe zone.";
 
 	// Resistance V = full immunity under CustomDamage (it reduces damage by 20% per level).
 	private static final int MAX_RESISTANCE = 4;
@@ -71,11 +74,12 @@ public class PvpListener implements Listener {
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			boolean immune = sz.contains(p.getLocation()) && !duels.inDuel(p.getUniqueId());
 			if (immune) {
-				inSafezone.add(p.getUniqueId());
+				if (inSafezone.add(p.getUniqueId())) p.sendMessage(Utils.msg(SAFEZONE_ENTER_MSG));
 				// Short duration, refreshed each second, so it drops on its own shortly after they leave.
 				p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 40, MAX_RESISTANCE, false, false));
 			} else if (inSafezone.remove(p.getUniqueId())) {
 				p.removePotionEffect(PotionEffectType.RESISTANCE);
+				p.sendMessage(Utils.msg(SAFEZONE_EXIT_MSG));
 			}
 		}
 	}
@@ -230,6 +234,8 @@ public class PvpListener implements Listener {
 	// ===== arena protection =====
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent e) {
+		// Creative-mode players (builders/admins) are exempt so they can edit the arena.
+		if (e.getPlayer().getGameMode() == GameMode.CREATIVE) return;
 		if (inArenaRegion(e.getBlock().getLocation())) e.setCancelled(true);
 	}
 
@@ -261,10 +267,14 @@ public class PvpListener implements Listener {
 	public void onJoin(PlayerJoinEvent e) {
 		// If they disconnected mid-duel, get them out of the arena to a safe spot first.
 		duels.restoreOnJoin(e.getPlayer());
-		// Seed membership silently so relogging inside the arena doesn't fire a spurious "entered".
+		// Seed membership silently so relogging inside the arena/safe zone doesn't fire a spurious "entered".
 		if (cfg.ffaEnabled()) {
 			Region b = cfg.ffaBounds();
 			if (b != null && b.contains(e.getPlayer().getLocation())) inArena.add(e.getPlayer().getUniqueId());
+			if (cfg.safezoneEnabled() && !duels.inDuel(e.getPlayer().getUniqueId())) {
+				Region sz = cfg.safezone();
+				if (sz != null && sz.contains(e.getPlayer().getLocation())) inSafezone.add(e.getPlayer().getUniqueId());
+			}
 		}
 	}
 

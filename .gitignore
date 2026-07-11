@@ -6,3 +6,7 @@ wiki/site/
 wiki/venv/
 MIGRATION_PLAYBOOK.md
 .paper-nms/
+
+# Claude
+.claude/
+CLAUDE.md

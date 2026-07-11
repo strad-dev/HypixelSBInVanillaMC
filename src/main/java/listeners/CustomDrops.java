@@ -737,6 +737,17 @@ public class CustomDrops implements Listener {
 					world.dropItemNaturally(l, new ItemStack(Material.SADDLE));
 				}
 			}
+			case SulfurCube cube -> {
+				// Sulfur cubes carry the block they absorbed in the BODY slot; a large cube drops
+				// it on death, while small (split) cubes never hold one. Same idea as HappyGhast.
+				EntityEquipment cubeGear = cube.getEquipment();
+				if(cubeGear != null) {
+					ItemStack absorbed = cubeGear.getItem(EquipmentSlot.BODY);
+					if(absorbed != null && !absorbed.getType().isAir()) {
+						world.dropItemNaturally(l, absorbed);
+					}
+				}
+			}
 			// no drops
 			case TropicalFish ignored -> {
 				if(random.nextDouble() < 0.05 * rngLootingBonus) {
@@ -1098,6 +1109,7 @@ public class CustomDrops implements Listener {
 			case GHAST -> 5;
 			case MAGMA_CUBE -> mob instanceof MagmaCube m ? m.getSize() : 4;
 			case SLIME -> mob instanceof Slime s ? s.getSize() : 4;
+			case SULFUR_CUBE -> mob instanceof AbstractCubeMob c && c.getSize() > 1 ? 2 : 0; // large drops 1-2 XP, small none
 			case ZOMBIFIED_PIGLIN, PIGLIN, PIGLIN_BRUTE -> 5;
 			case HOGLIN, ZOGLIN -> 5;
 			case STRIDER -> 5;
