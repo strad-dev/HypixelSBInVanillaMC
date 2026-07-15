@@ -73,6 +73,11 @@ public class Plugin extends JavaPlugin implements Listener {
 		if(chatEnabled) {
 			Objects.requireNonNull(this.getCommand("say")).setExecutor(new Say());
 			Objects.requireNonNull(this.getCommand("me")).setExecutor(new Me());
+		} else {
+			// Chat is disabled (network hub owns whisper/chat). Our plugin.yml still REGISTERS these commands
+			// even though we set no executor, which shadows the hub's /w, /tell, /msg, /say, /me. Unregister
+			// ours so the hub's versions are reachable.
+			releaseChatCommands("w", "tell", "msg", "say", "me");
 		}
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
@@ -137,6 +142,30 @@ public class Plugin extends JavaPlugin implements Listener {
 
 		// Config-gated PvP feature (FFA, 1v1 duels, stats, arena commands). Inert unless enabled.
 		pvp.PvpModule.enable(this, pvpCfg);
+	}
+
+	/**
+	 * Remove our own copies of the given commands from the command map. plugin.yml registers every declared
+	 * command whether or not we set an executor, so with chat disabled (on the network) our /w, /tell, /msg,
+	 * /say, /me would otherwise shadow the hub's. This releases them so the hub's versions are reachable.
+	 */
+	private void releaseChatCommands(String... names) {
+		try {
+			org.bukkit.command.SimpleCommandMap map =
+					(org.bukkit.command.SimpleCommandMap) ((org.bukkit.craftbukkit.CraftServer) getServer()).getCommandMap();
+			java.util.Map<String, org.bukkit.command.Command> known = map.getKnownCommands();
+			String prefix = getName().toLowerCase(java.util.Locale.ROOT) + ":";
+			for(String name : names) {
+				org.bukkit.command.PluginCommand ours = getCommand(name);
+				if(ours == null) continue;
+				ours.unregister(map);
+				known.values().removeIf(c -> c == ours);
+				known.remove(name);
+				known.remove(prefix + name);
+			}
+		} catch(Exception e) {
+			getLogger().warning("Could not release chat commands to the hub: " + e.getMessage());
+		}
 	}
 
 	private static void setupAdvancements() {

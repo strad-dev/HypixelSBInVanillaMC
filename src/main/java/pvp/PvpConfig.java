@@ -89,16 +89,6 @@ public class PvpConfig {
 		return cfg().getBoolean("pvp.duel.enabled", false);
 	}
 
-	/**
-	 * When true (set only on the network's pvp server), the duel manager dispatches a
-	 * {@code networkduelend <a> <b>} console command when a duel ends, so the network plugin can send
-	 * players who came from another server back home. Off by default so a standalone SkyBlock server
-	 * never logs an unknown-command warning.
-	 */
-	public boolean duelNetwork() {
-		return cfg().getBoolean("pvp.duel.network", false);
-	}
-
 	public String duelWorld() {
 		return cfg().getString("pvp.duel.world", defaultWorld());
 	}

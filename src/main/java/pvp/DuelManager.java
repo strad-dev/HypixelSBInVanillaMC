@@ -470,20 +470,15 @@ public class DuelManager {
 			Player b = Bukkit.getPlayer(bId);
 			returnHome(a, prevA);
 			returnHome(b, prevB);
-			// On the network, hand off to the network plugin so it can send players who came from another
-			// server back home (it transfers them off pvp; the local returnHome above is then a harmless
-			// no-op for them). Gated by config so a standalone server never logs an unknown command.
-			notifyNetworkDuelEnd(a, b);
+			// Announce the duel end as a plain Bukkit event. SkyBlock depends on nothing external — this
+			// fires into the void when nothing listens (so it stays standalone), and an optional glue plugin
+			// may listen to send players who came from another server back home (its transfer makes the local
+			// returnHome above a harmless no-op for them).
+			Bukkit.getPluginManager().callEvent(new DuelEndEvent(a, b));
 			// Arena is now empty - free it and pull in the next queued pair, if any.
 			arenaOccupied = false;
 			pumpQueue();
 		}, RETURN_DELAY_TICKS);
-	}
-
-	private void notifyNetworkDuelEnd(Player a, Player b) {
-		if (!cfg.duelNetwork() || (a == null && b == null)) return;
-		String cmd = "networkduelend " + (a != null ? a.getName() : "-") + " " + (b != null ? b.getName() : "-");
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
 	}
 
 	private void finishPlayer(Player p, Duel d) {
