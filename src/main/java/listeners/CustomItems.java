@@ -112,6 +112,7 @@ public class CustomItems implements Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
+		if(p.getGameMode() == GameMode.SPECTATOR) return; // spectators never fire item abilities (e.g. a right-click on a block)
 		ItemStack itemInUse = e.getItem();
 		if(itemInUse != null && itemInUse.hasItemMeta()) {
 			ItemMeta meta = itemInUse.getItemMeta();
