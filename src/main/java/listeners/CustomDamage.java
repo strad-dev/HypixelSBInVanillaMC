@@ -1256,6 +1256,14 @@ public class CustomDamage implements Listener {
 						}
 					}
 
+					// Golden-sword piglins hit disproportionately hard for how commonly they spawn holding one.
+					// Shave 25% off the whole melee hit (multiplicative, so the sword's +3 and any vanilla
+					// difficulty scaling already baked into e.getDamage() are both scaled proportionally).
+					if(type == DamageType.MELEE && damager instanceof org.bukkit.entity.Piglin piglin
+							&& piglin.getEquipment().getItemInMainHand().getType() == org.bukkit.Material.GOLDEN_SWORD) {
+						e.setDamage(e.getDamage() * 0.75);
+					}
+
 					customMobs(entity, damager, e.getDamage(), type, new DamageData(e));
 				} else if(type == DamageType.MELEE && e.getDamager() instanceof Player) {
 					// Melee blow connected but the victim's i-frames negate it: it deals no damage and
