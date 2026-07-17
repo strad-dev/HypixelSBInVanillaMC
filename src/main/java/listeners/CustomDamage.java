@@ -617,7 +617,10 @@ public class CustomDamage implements Listener {
 				}
 
 				if(damagee instanceof Mob && damager instanceof LivingEntity) {
-					if(!(damagee instanceof Wolf wolf && damager instanceof Player player && wolf.getOwner().getUniqueId().equals(player.getUniqueId()))) {
+					// Endermen shouldn't swarm the dragon just for standing in its breath/fireball AoE around
+					// the fountain — only a direct flying hit (MELEE) should pull their aggro onto it.
+					boolean dragonAoeOnEnderman = damagee instanceof Enderman && damager instanceof EnderDragon && type != DamageType.MELEE;
+					if(!(damagee instanceof Wolf wolf && damager instanceof Player player && wolf.getOwner().getUniqueId().equals(player.getUniqueId())) && !dragonAoeOnEnderman) {
 						((Mob) damagee).setTarget((LivingEntity) damager);
 					}
 				}
@@ -1300,6 +1303,11 @@ public class CustomDamage implements Listener {
 				}
 			}
 
+			double damage = e.getDamage();
+			if(type == DamageType.FALL) {
+				damage--;
+			}
+
 			long currentTime = System.currentTimeMillis();
 			if(!noDamageTimes.containsKey(entity)) {
 				noDamageTimes.put(entity, 0L);
@@ -1307,7 +1315,7 @@ public class CustomDamage implements Listener {
 			long lastDamageTime = noDamageTimes.get(entity);
 
 			if(currentTime - lastDamageTime > 490 || e.getCause().equals(DamageCause.KILL)) {
-				customMobs(entity, null, e.getDamage(), type, new DamageData(e));
+				customMobs(entity, null, damage, type, new DamageData(e));
 				noDamageTimes.put(entity, currentTime);
 			}
 
