@@ -186,6 +186,14 @@ public class CustomDamage implements Listener {
 				}
 			}
 
+			// Golden-sword piglins hit disproportionately hard for how commonly they spawn holding one;
+			// shave 25% off. Multiplicative here, so the sword's +3 and any vanilla difficulty scaling
+			// baked into the incoming damage are both scaled proportionally.
+			if(type == DamageType.MELEE && damager instanceof org.bukkit.entity.Piglin piglin
+					&& piglin.getEquipment().getItemInMainHand().getType() == Material.GOLDEN_SWORD) {
+				finalDamage *= 0.75;
+			}
+
 			// shield logic (for weirdos)
 			if(data.isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL)) {
 				finalDamage *= 0.4;
@@ -1254,14 +1262,6 @@ public class CustomDamage implements Listener {
 						if(sharpness > 1) {
 							e.setDamage(e.getDamage() + (sharpness - 1) * 0.5);
 						}
-					}
-
-					// Golden-sword piglins hit disproportionately hard for how commonly they spawn holding one.
-					// Shave 25% off the whole melee hit (multiplicative, so the sword's +3 and any vanilla
-					// difficulty scaling already baked into e.getDamage() are both scaled proportionally).
-					if(type == DamageType.MELEE && damager instanceof org.bukkit.entity.Piglin piglin
-							&& piglin.getEquipment().getItemInMainHand().getType() == org.bukkit.Material.GOLDEN_SWORD) {
-						e.setDamage(e.getDamage() * 0.75);
 					}
 
 					customMobs(entity, damager, e.getDamage(), type, new DamageData(e));
