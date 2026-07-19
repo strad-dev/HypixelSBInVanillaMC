@@ -5,6 +5,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,9 +16,11 @@ import java.util.Locale;
 
 /**
  * /pvpstats [player] view a player's PvP stats (self if omitted). /pvptop <ffa|1v1> leaderboard.
- * Reads the shared stats file fresh each call, so it works on any SkyBlock server.
+ * Reads the shared stats file fresh each call, so it works on any SkyBlock server. Each /pvptop board is
+ * gated on whether that mode is enabled (FFA kills / 1v1 wins); PvpModule only registers /pvptop at all
+ * when at least one is on.
  */
-public class StatsCommand implements CommandExecutor {
+public class StatsCommand implements CommandExecutor, TabCompleter {
 	private final PvpConfig cfg;
 
 	public StatsCommand(PvpConfig cfg) {
@@ -76,7 +79,24 @@ public class StatsCommand implements CommandExecutor {
 	}
 
 	private boolean top(CommandSender sender, String[] args, PvpStats.Data data) {
-		boolean oneVone = args.length >= 1 && (args[0].equalsIgnoreCase("1v1") || args[0].equalsIgnoreCase("duel"));
+		boolean ffaOn = cfg.ffaEnabled();
+		boolean duelOn = cfg.duelEnabled();
+		if (!ffaOn && !duelOn) { // pvptop is unregistered when both are off; guard for safety
+			sender.sendMessage(Utils.msg("<red>PvP leaderboards are disabled."));
+			return true;
+		}
+		boolean explicit1v1 = args.length >= 1 && (args[0].equalsIgnoreCase("1v1") || args[0].equalsIgnoreCase("duel"));
+		boolean explicitFfa = args.length >= 1 && args[0].equalsIgnoreCase("ffa");
+		if (explicit1v1 && !duelOn) {
+			sender.sendMessage(Utils.msg("<red>The 1v1 leaderboard is disabled."));
+			return true;
+		}
+		if (explicitFfa && !ffaOn) {
+			sender.sendMessage(Utils.msg("<red>The FFA leaderboard is disabled."));
+			return true;
+		}
+		// No arg (or unrecognised): default to FFA, falling back to 1v1 if only duels are enabled.
+		boolean oneVone = explicit1v1 || (!explicitFfa && !ffaOn);
 		List<PvpStats.Entry> entries = new ArrayList<>(data.players.values());
 		entries.sort(oneVone
 				? Comparator.comparingInt((PvpStats.Entry e) -> e.wins).reversed()
@@ -95,6 +115,19 @@ public class StatsCommand implements CommandExecutor {
 		}
 		if (n == 0) sender.sendMessage(Utils.msg("<gray>No stats yet."));
 		return true;
+	}
+
+	@Override
+	public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+		if (command.getName().equalsIgnoreCase("pvptop") && args.length == 1) {
+			String prefix = args[0].toLowerCase(Locale.ROOT);
+			List<String> modes = new ArrayList<>();
+			if (cfg.ffaEnabled()) modes.add("ffa");
+			if (cfg.duelEnabled()) modes.add("1v1");
+			modes.removeIf(m -> !m.startsWith(prefix));
+			return modes;
+		}
+		return List.of();
 	}
 
 	private static PvpStats.Entry findByName(PvpStats.Data data, String name) {
