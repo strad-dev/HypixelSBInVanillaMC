@@ -69,7 +69,7 @@ public class PvpConfig {
 	 * the higher value, so a respawn never costs mana. -1 leaves whatever mana they had.
 	 */
 	public int ffaRespawnIntelligence() {
-		return cfg().getInt("pvp.ffa.respawn-intelligence", 100);
+		return cfg().getInt("pvp.ffa.respawn-intelligence", 50);
 	}
 
 	public String ffaWorld() {
