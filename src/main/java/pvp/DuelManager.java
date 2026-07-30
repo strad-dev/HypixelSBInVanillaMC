@@ -228,8 +228,10 @@ public class DuelManager {
 		healFull(p);
 		p.setFoodLevel(20);
 		// Use the player's saved PvP loadout if they have one; otherwise the standardized kit. (Their real
-		// inventory was saved in start() and is restored when the duel ends.)
-		ItemStack[] saved = loadouts == null ? null : loadouts.get(p.getUniqueId());
+		// inventory was saved in start() and is restored when the duel ends.) The saved copy is refreshed
+		// against the current item definitions first, so a loadout saved before an item change doesn't
+		// bring stale items into the duel.
+		ItemStack[] saved = PvpItemRefresh.refreshSaved(loadouts, p.getUniqueId()).arr();
 		if (saved != null) PvpLoadouts.apply(p, saved);
 		else DuelKit.apply(p);
 		// Players may walk around during the countdown; max Resistance keeps them invulnerable until FIGHT.

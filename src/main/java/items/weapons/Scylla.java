@@ -18,8 +18,6 @@ import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -28,7 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Scylla implements AbilityItem {
-	private static final int MANA_COST = 12;
+	private static final int MANA_COST = 15;
 
 	public static ItemStack getItem(Enchantment ench, int enchLevel) {
 		ItemStack scylla = new ItemStack(Material.NETHERITE_SWORD);
@@ -66,7 +64,7 @@ public class Scylla implements AbilityItem {
 		lore.add(Utils.mm("<gold>Ability: Wither Impact <green><bold>RIGHT CLICK"));
 		lore.add(Utils.mm("<gray>Teleport <green>10 blocks<gray> ahead of"));
 		lore.add(Utils.mm("<gray>you.  Then implode, dealing"));
-		lore.add(Utils.mm("<red>51%<gray> of your Melee Damage to"));
+		lore.add(Utils.mm("<red>61%<gray> of your Melee Damage to"));
 		lore.add(Utils.mm("<gray>nearby enemies.  Also applies"));
 		lore.add(Utils.mm("<gray>the Wither Shield Scroll Ability,"));
 		lore.add(Utils.mm("<gray>reducing damage taken and"));
@@ -260,7 +258,7 @@ public class Scylla implements AbilityItem {
 				} else if(entity1 instanceof Spider || entity1 instanceof Bee || entity1 instanceof Silverfish || entity1 instanceof Endermite) {
 					tempDamage += bane * 2;
 				}
-				tempDamage = Math.ceil(tempDamage * 0.51);
+				tempDamage = Math.ceil(tempDamage * 0.61);
 				CustomDamage.customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC);
 				damaged += 1;
 				damage += tempDamage;
@@ -273,11 +271,19 @@ public class Scylla implements AbilityItem {
 
 		// wither shield
 		if(!p.getScoreboardTags().contains("WitherShield")) { // reduced damage
-			p.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 101, 2));
+			double absorptionBefore = p.getAbsorptionAmount();
+			double witherShieldBonus = 10.0;
+			AttributeModifier temp = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "witherShield"), 10, AttributeModifier.Operation.ADD_NUMBER);
+			p.getAttribute(Attribute.MAX_ABSORPTION).addModifier(temp);
+			p.setAbsorptionAmount(absorptionBefore + witherShieldBonus);
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 0.66666F);
 			Location finalL = l;
 			Utils.scheduleTask(() -> { // convert to healing after 5 seconds
-				p.setHealth(Math.min(p.getHealth() + (p.getAbsorptionAmount() / 2), p.getAttribute(Attribute.MAX_HEALTH).getValue()));
+				p.setHealth(Math.min(p.getHealth() + (Math.max(0, (p.getAbsorptionAmount() - absorptionBefore)) / 2), p.getAttribute(Attribute.MAX_HEALTH).getValue()));
+				p.getAttribute(Attribute.MAX_ABSORPTION).removeModifier(temp);
+				if(p.getAbsorptionAmount() > absorptionBefore) {
+					p.setAbsorptionAmount(absorptionBefore);
+				}
 				p.playSound(finalL, Sound.ENTITY_PLAYER_LEVELUP, 2.0F, 2.0F);
 			}, 101L);
 			p.addScoreboardTag("WitherShield");

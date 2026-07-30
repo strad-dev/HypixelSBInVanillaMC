@@ -10,17 +10,17 @@ import net.kyori.adventure.title.Title;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftWither;
 import org.bukkit.entity.*;
 
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Maxor implements CustomWither {
 	private static final String name = "<gold><bold>﴾ <red><bold>Maxor<gold><bold> ﴿";
+	/** An end crystal's hitbox is 2 blocks tall and we hover it 1 block off the floor, so 3 must be clear above it. */
+	private static final double CRYSTAL_CLEARANCE = 3.0;
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -62,38 +62,38 @@ public class Maxor implements CustomWither {
 	}
 
 	private void spawnCrystal(Wither wither, int which) {
-		Location l = wither.getLocation();
-		Random random = new Random();
-		l.add(random.nextInt(32) - 16, 0, random.nextInt(32) - 16);
-		for(int i = 319; i > -64; i--) {
-			Block b = l.getWorld().getBlockAt((int) l.getX(), i, (int) l.getZ());
-			if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
-				l.setY(i + 2);
-				EnderCrystal crystal = (EnderCrystal) wither.getWorld().spawnEntity(l, EntityType.END_CRYSTAL);
-				crystal.customName(Utils.msg("<red><bold>Energy Crystal"));
-				crystal.addScoreboardTag("SkyblockBoss");
-				if(which == 600) {
-					wither.removeScoreboardTag("600Crystal");
-					Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-					Bukkit.broadcast(Utils.msg(name + "<red><bold>: HAHAHA!  GOOD LUCK GETTING AROUND MY TRICKS!"));
-					Utils.scheduleTask(() -> {
-						if(wither.getScoreboardTags().contains("Invulnerable") && wither.getScoreboardTags().contains("300Crystal")) {
-							Bukkit.broadcast(Utils.msg(name + "<red><bold>: ARE YOU REALLY THIS BAD?!  CAN YOU NOT SEE EXPLOSIVES AROUND YOU?!"));
-						}
-					}, 600L);
-					wither.setHealth(600.0);
-				} else {
-					wither.removeScoreboardTag("300Crystal");
-					Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
-					Bukkit.broadcast(Utils.msg(name + "<red><bold>: IF YOU FAIL ONCE, YOU SHOULD SIMPLY TRY AGAIN!"));
-					wither.setHealth(300.0);
-				}
-				wither.addScoreboardTag("Invulnerable");
-				Utils.scheduleTask(() -> wither.addScoreboardTag("InvulnerableReminder"), 60L);
-				Bukkit.broadcast(Utils.msg("<yellow>An Energy Crystal has spawned!  Maybe it is useful?"));
-				return;
+		// Scatter the crystal around Maxor and drop it on the NEAREST valid floor, hovering a block above it. The old
+		// top-down scan from y=319 found the *highest* block in the column instead, which parked the crystal on the roof
+		// of an enclosed arena - unreachable, so the fight could never leave its invulnerable phase.
+		Location l = Utils.randomLocation(wither.getLocation(), 16, CRYSTAL_CLEARANCE);
+		if(l.clone().subtract(0, 1, 0).getBlock().getType().isSolid()) {
+			l.add(0, 1, 0);
+			EnderCrystal crystal = (EnderCrystal) wither.getWorld().spawnEntity(l, EntityType.END_CRYSTAL);
+			crystal.customName(Utils.msg("<red><bold>Energy Crystal"));
+			crystal.addScoreboardTag("SkyblockBoss");
+			if(which == 600) {
+				wither.removeScoreboardTag("600Crystal");
+				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+				Bukkit.broadcast(Utils.msg(name + "<red><bold>: HAHAHA!  GOOD LUCK GETTING AROUND MY TRICKS!"));
+				Utils.scheduleTask(() -> {
+					if(wither.getScoreboardTags().contains("Invulnerable") && wither.getScoreboardTags().contains("300Crystal")) {
+						Bukkit.broadcast(Utils.msg(name + "<red><bold>: ARE YOU REALLY THIS BAD?!  CAN YOU NOT SEE EXPLOSIVES AROUND YOU?!"));
+					}
+				}, 600L);
+				wither.setHealth(600.0);
+			} else {
+				wither.removeScoreboardTag("300Crystal");
+				Utils.playGlobalSound(Sound.ENTITY_WITHER_AMBIENT);
+				Bukkit.broadcast(Utils.msg(name + "<red><bold>: IF YOU FAIL ONCE, YOU SHOULD SIMPLY TRY AGAIN!"));
+				wither.setHealth(300.0);
 			}
+			wither.addScoreboardTag("Invulnerable");
+			Utils.scheduleTask(() -> wither.addScoreboardTag("InvulnerableReminder"), 60L);
+			Bukkit.broadcast(Utils.msg("<yellow>An Energy Crystal has spawned!  Maybe it is useful?"));
+			return;
 		}
+		// Nothing in that column has a floor to stand a crystal on (open void) - randomLocation falls back to a bare
+		// surface Y, so don't strand the crystal in mid-air; hand out the phase for free instead.
 		WitherBoss nmsWither = ((CraftWither) wither).getHandle();
 		nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 800);
 		Bukkit.broadcast(Utils.msg("<red>Oops!  Unable to summon a crystal!  Take it for free."));
@@ -123,7 +123,7 @@ public class Maxor implements CustomWither {
 				Utils.changeName(damagee);
 			} else {
 				if(!damagee.getScoreboardTags().contains("Dead")) {
-					if(damagee instanceof Player p) {
+					if(damager instanceof Player p) { // damagee is Maxor himself - the title goes to whoever hit him
 						p.showTitle(Title.title(Utils.msg("<red><bold>IMMUNE"), Utils.msg("<yellow>You cannot damage Maxor!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 					}
 					damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);

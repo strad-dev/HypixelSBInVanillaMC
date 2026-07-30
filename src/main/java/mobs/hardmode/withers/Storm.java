@@ -187,8 +187,8 @@ public class Storm implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			Utils.changeName(damagee);
-			if(damagee.getScoreboardTags().contains("Dead")) {
-				if(damager instanceof Player p) {
+			if(!damagee.getScoreboardTags().contains("Dead")) { // tell the player why their hits do nothing DURING a
+				if(damager instanceof Player p) {              // survival phase, not while the corpse plays out
 					p.showTitle(Title.title(Utils.msg("<red><bold>IMMUNE"), Utils.msg("<yellow>You cannot damage Storm!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 				}
 				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);

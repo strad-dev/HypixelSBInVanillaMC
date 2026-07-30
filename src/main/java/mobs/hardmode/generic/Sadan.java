@@ -256,14 +256,9 @@ public class Sadan implements CustomMob {
 				for(int i = x; i < x + (finalPhase ? 7 : 5); i++) {
 					for(int j = z; j < z + (finalPhase ? 7 : 5); j++) {
 						Block temp = p.getWorld().getBlockAt(i, y, j);
-						if(temp.getType().equals(Material.AIR)) {
-							temp.setType(Material.DAMAGED_ANVIL);
-						}
+						Utils.spawnAnvil(temp.getLocation());
 						if(finalPhase) {
-							temp = temp.getRelative(0, 21, 0);
-							if(temp.getType().equals(Material.AIR)) {
-								temp.setType(Material.DAMAGED_ANVIL);
-							}
+							Utils.spawnAnvil(temp.getRelative(0, 21, 0).getLocation());
 						}
 					}
 				}

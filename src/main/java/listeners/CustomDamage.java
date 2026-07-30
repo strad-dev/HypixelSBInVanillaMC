@@ -1230,9 +1230,15 @@ public class CustomDamage implements Listener {
 					}
 				}
 
+				// A blow the PvP layer suppresses (Free-For-All safezone, duel countdown, an outsider
+				// interfering in a duel) never lands - customMobs stops at the same shouldBlock check
+				// below - so it must not pay out either: no intelligence for the attacker, no hit against
+				// the victim's stats. Always false off the pvp server / with PvP disabled.
+				boolean pvpBlocked = pvp.PvpHooks.shouldBlock(entity, e.getDamager());
+
 				if(entity.getNoDamageTicks() == 0 || e.getDamager() instanceof AbstractArrow) {
 					// apply intelligence to players
-					if(e.getDamager() instanceof Player p) {
+					if(!pvpBlocked && e.getDamager() instanceof Player p) {
 						if(type.equals(DamageType.MELEE) && (e.getEntity() instanceof Monster || e.getEntity().getScoreboardTags().contains("SkyblockBoss") || e.getEntity() instanceof Player)) {
 							try {
 								Score score = Plugin.getIntelligence(p);
@@ -1272,7 +1278,7 @@ public class CustomDamage implements Listener {
 					}
 
 					customMobs(entity, damager, e.getDamage(), type, new DamageData(e));
-				} else if(type == DamageType.MELEE && e.getDamager() instanceof Player) {
+				} else if(!pvpBlocked && type == DamageType.MELEE && e.getDamager() instanceof Player) {
 					// Melee blow connected but the victim's i-frames negate it: it deals no damage and
 					// never reaches dealDamage, yet must still count toward PvP "total hits" as an
 					// i-frame hit (never a crit). Inert off the pvp server / outside a duel (PvpHooks gates it).

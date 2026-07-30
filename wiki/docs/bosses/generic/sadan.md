@@ -16,7 +16,7 @@ Use [Giant Zombie Flesh](../../items/summon-items/index.md) on a Zombie.
     - **Stomp** -- deals 25 damage.
     - **Laser Beam** -- deals 25 damage.
     - **Sword Attack** -- deals 25 damage.
-    - **Anvil Rain** -- rains anvils on the player.
+    - **Anvil Rain** -- rains anvils on the player. The anvils shatter on impact, so they never pile up in the arena.
 
 ## Drops
 

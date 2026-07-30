@@ -8,7 +8,6 @@ import misc.Utils;
 import mobs.CustomMob;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Block;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.enchantments.Enchantment;
@@ -91,10 +90,7 @@ public class Sadan implements CustomMob {
 						damager.getWorld().playSound(damager.getLocation(), Sound.ENTITY_PLAYER_ATTACK_SWEEP, 1.0F, 1.0F);
 					}
 					case 5, 6 -> {
-						Block b = damager.getLocation().add(0, 20, 0).getBlock();
-						if(b.getType().equals(Material.AIR)) {
-							b.setType(Material.DAMAGED_ANVIL);
-						}
+						Utils.spawnAnvil(damager.getLocation().add(0, 20, 0));
 						damager.sendMessage(Utils.msg("<red><bold>Sadan rains boulders on top of your head!!"));
 						damager.getWorld().playSound(damager.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1.0F, 1.0F);
 					}

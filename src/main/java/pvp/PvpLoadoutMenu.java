@@ -90,9 +90,13 @@ public final class PvpLoadoutMenu implements CommandExecutor, Listener {
 		Inventory gui = Bukkit.createInventory(holder, 54, Utils.msg("<dark_gray>PvP Loadout"));
 		holder.inv = gui;
 
-		// First open (no saved loadout yet) starts from the default kit.
-		ItemStack[] arr = loadouts.get(p.getUniqueId());
-		if (arr == null) arr = DuelKit.defaultLoadout();
+		// Row 1 (the palette) is inherently current - it's rebuilt on every open; the SAVED slots are
+		// frozen copies, so re-sync them against the current item definitions too, or an item change
+		// never reaches a loadout that already holds that item. refreshSaved also re-saves, so the
+		// fresh items reach duel start even if this editor is closed untouched.
+		// First open (nothing saved yet) starts from the default kit.
+		PvpItemRefresh.Result saved = PvpItemRefresh.refreshSaved(loadouts, p.getUniqueId());
+		ItemStack[] arr = saved.arr() != null ? saved.arr() : DuelKit.defaultLoadout();
 		for (int g = 0; g < 54; g++) {
 			int idx = arrIndex(g);
 			if (idx >= 0 && arr[idx] != null) gui.setItem(g, arr[idx]);
@@ -102,6 +106,10 @@ public final class PvpLoadoutMenu implements CommandExecutor, Listener {
 
 		p.openInventory(gui);
 		p.sendMessage(Utils.msg("<gray>Editing your PvP loadout. Row 1 = palette (click to copy); row 2 = armor + off-hand + trash + page/reset; rows 3-5 = inventory; bottom = hotbar. Close to save."));
+		if (saved.updated() > 0) {
+			p.sendMessage(Utils.msg("<gray>Updated <yellow>" + saved.updated()
+					+ "<gray> item" + (saved.updated() == 1 ? "" : "s") + " in your loadout to the latest version"));
+		}
 	}
 
 	/** (Re)draw the palette items + page/clear buttons for the holder's current page. */

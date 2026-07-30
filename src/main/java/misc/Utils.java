@@ -293,6 +293,32 @@ public class Utils {
 	}
 
 	/**
+	 * Drops an anvil on a location.<br>The anvil is a falling block that deletes itself on impact instead of landing as
+	 * a real block, so an anvil barrage doesn't litter the arena with anvils (or anvil drops) to clean up afterwards.
+	 *
+	 * @param l the location the anvil should fall from; nothing is spawned if that space isn't air
+	 * @return whether an anvil was spawned
+	 */
+	public static boolean spawnAnvil(Location l) {
+		Block b = l.getBlock();
+		if(!b.getType().equals(Material.AIR)) {
+			return false;
+		}
+		// Vanilla only arms anvil fall damage in AnvilBlock.falling(), which runs when a *placed* block turns itself into
+		// an entity - a directly spawned falling block starts at hurtEntities = false with 0 damage per block, so both
+		// have to be set here to match a real anvil (2 per block, capped at 40).
+		l.getWorld().spawn(b.getLocation().add(0.5, 0, 0.5), FallingBlock.class, fb -> {
+			fb.setBlockData(Material.DAMAGED_ANVIL.createBlockData());
+			fb.setHurtEntities(true);
+			fb.setDamagePerBlock(2.0F);
+			fb.setMaxDamage(40);
+			fb.setCancelDrop(true); // on landing: discard the entity, place no block, drop nothing
+			fb.setDropItem(false); // ...and drop nothing either if it never lands and times out over a void
+		});
+		return true;
+	}
+
+	/**
 	 * Teleports the entity to a random position in a given radius from its current location.<br>The entity lands on
 	 * the nearest ground it actually fits on (see {@link #getNearestValidBlockYAt}).
 	 *
@@ -300,7 +326,20 @@ public class Utils {
 	 * @param radius The radius of the randomness
 	 */
 	public static void teleport(Entity e, int radius) {
-		teleport(e, e.getLocation(), radius);
+		teleport(e, e.getLocation(), radius, true);
+	}
+
+	/**
+	 * Teleports the entity to a random position in a given radius from its current location, optionally silently.<br>
+	 * Bosses repositioning themselves mid-phase pass {@code false} - they have their own audio cue and the enderman
+	 * warp on top of it reads as a different mechanic.
+	 *
+	 * @param e      The entity to be teleported
+	 * @param radius The radius of the randomness
+	 * @param sound  Whether to play the enderman teleport sound
+	 */
+	public static void teleport(Entity e, int radius, boolean sound) {
+		teleport(e, e.getLocation(), radius, sound);
 	}
 
 	/**
@@ -312,8 +351,24 @@ public class Utils {
 	 * @param radius The radius of the randomness
 	 */
 	public static void teleport(Entity e, Location center, int radius) {
+		teleport(e, center, radius, true);
+	}
+
+	/**
+	 * Teleports the entity to a random position in a given radius from the given location, optionally silently.<br>
+	 * A {@code radius} of 0 is legal and means "stay put, but snap to a spot that actually fits" - several bosses use
+	 * it to unstick themselves when entering a phase.
+	 *
+	 * @param e      The entity to be teleported
+	 * @param center The center of the radius to teleport from
+	 * @param radius The radius of the randomness
+	 * @param sound  Whether to play the enderman teleport sound
+	 */
+	public static void teleport(Entity e, Location center, int radius, boolean sound) {
 		e.teleport(randomLocation(center, radius, e.getHeight()));
-		e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
+		if(sound) {
+			e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
+		}
 	}
 
 	/**
