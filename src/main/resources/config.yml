@@ -8,6 +8,8 @@ pvp:
   ffa:
     # Enables the Free-For-All PvP arena.
     enabled: false
+    # Minimum Intelligence (mana) a player respawns with in the arena.  Players who die with more than this keep what they had - respawning never lowers your mana.  Set to -1 to leave mana untouched on respawn.
+    respawn-intelligence: 100
     # Set the FFA world, spawnpoint, arena bounds, and (optional) safe zone.  For best results, use an enclosed space with barrier walls at least 2 blocks thick.
     world: world
     spawn: { x: 0.5, y: 100.0, z: 0.5, yaw: 0.0, pitch: 0.0 }

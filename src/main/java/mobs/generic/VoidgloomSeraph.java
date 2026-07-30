@@ -51,7 +51,7 @@ public class VoidgloomSeraph implements CustomMob {
 	public boolean whenDamaged(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		Random random = new Random();
 		if(random.nextDouble() < 0.1) {
-			damagee.teleport(Utils.randomLocation(damager.getLocation(), 3, false));
+			damagee.teleport(Utils.randomLocation(damager.getLocation(), 3, damagee.getHeight()));
 		}
 		return true;
 	}

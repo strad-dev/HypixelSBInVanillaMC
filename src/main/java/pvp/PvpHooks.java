@@ -32,6 +32,15 @@ public final class PvpHooks {
 	}
 
 	/**
+	 * True if this lethal blow must skip the Totem of Undying entirely (not consumed, no revive): totems
+	 * are ignored inside the Free-For-All arena, where a kill is scored and respawns the victim anyway.
+	 * Duel loadouts may still carry a totem, so duels are unaffected.
+	 */
+	public static boolean ignoresTotem(LivingEntity victim) {
+		return listener != null && victim instanceof Player v && listener.ignoresTotem(v);
+	}
+
+	/**
 	 * Called when a blow would be lethal to {@code victim}. Returns true if the PvP system consumed
 	 * the kill (ended the duel, or scored the FFA kill) and revived the player, so CustomDamage must
 	 * NOT kill them (no death screen).

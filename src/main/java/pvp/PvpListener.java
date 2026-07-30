@@ -162,6 +162,15 @@ public class PvpListener implements Listener {
 		if (inPvpContext(p)) stats.addHealed(p, amount);  // lifetime /pvpstats
 	}
 
+	/**
+	 * True if a Totem of Undying must not save this player: inside the FFA arena a lethal blow is scored
+	 * and respawns them anyway, so a totem would only deny the kill (and burn the holder's totem). Duels
+	 * keep theirs - a totem is a legal loadout item there.
+	 */
+	public boolean ignoresTotem(Player victim) {
+		return !duels.inDuel(victim.getUniqueId()) && cfg.ffaEnabled() && inFfa(victim);
+	}
+
 	public boolean handleLethal(Player victim, Player attacker, boolean absolute) {
 		if (duels.inDuel(victim.getUniqueId())) {
 			if (absolute) duels.draw(victim);   // /kill (and void/border) end a 1v1 as a draw
@@ -192,6 +201,13 @@ public class PvpListener implements Listener {
 		healFull(victim);
 		victim.setFoodLevel(20);
 		victim.setFireTicks(0);
+		// Mana is topped up TO the configured floor, never down to it: dying with more than that keeps
+		// what you had, so respawning can't cost you mana. -1 leaves it alone entirely.
+		int intel = cfg.ffaRespawnIntelligence();
+		if (intel >= 0) {
+			int current = DuelManager.readIntelligence(victim);  // -1 = no Intelligence objective
+			if (current >= 0 && current < intel) DuelManager.setIntelligence(victim, intel);
+		}
 		Location spawn = cfg.ffaSpawn();
 		if (spawn != null) victim.teleport(spawn);
 	}

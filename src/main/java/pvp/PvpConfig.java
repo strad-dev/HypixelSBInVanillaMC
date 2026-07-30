@@ -64,6 +64,14 @@ public class PvpConfig {
 		return cfg().getBoolean("pvp.ffa.enabled", false);
 	}
 
+	/**
+	 * Minimum intelligence a player respawns with in the FFA arena - dying with more than this keeps
+	 * the higher value, so a respawn never costs mana. -1 leaves whatever mana they had.
+	 */
+	public int ffaRespawnIntelligence() {
+		return cfg().getInt("pvp.ffa.respawn-intelligence", 100);
+	}
+
 	public String ffaWorld() {
 		return cfg().getString("pvp.ffa.world", defaultWorld());
 	}

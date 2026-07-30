@@ -636,7 +636,8 @@ public class DuelManager {
 	}
 
 	// ===== intelligence swap =====
-	private int readIntelligence(Player p) {
+	/** Package-visible so the FFA respawn in {@link PvpListener} can reuse it. */
+	static int readIntelligence(Player p) {
 		try {
 			return Plugin.getIntelligence(p).getScore();
 		} catch (Exception e) {
@@ -644,7 +645,8 @@ public class DuelManager {
 		}
 	}
 
-	private void setIntelligence(Player p, int value) {
+	/** Package-visible so the FFA respawn in {@link PvpListener} can reuse it. */
+	static void setIntelligence(Player p, int value) {
 		try {
 			Score s = Plugin.getIntelligence(p);
 			s.setScore(value);

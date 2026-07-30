@@ -7,10 +7,12 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.entity.EnderDragon;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Wither;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -249,6 +251,10 @@ public class GyrokineticWand implements AbilityItem {
 
 		for(Entity e : rift.getWorld().getNearbyEntities(rift, 10, 10, 10)) {
 			if(e instanceof LivingEntity entity && !(e.equals(p))) {
+				// Boss entities (withers, ender dragons) are immune to the Gyrokinetic Wand.
+				if(entity instanceof Wither || entity instanceof EnderDragon) {
+					continue;
+				}
 				// Don't gyro players in creative or spectator mode.
 				if(entity instanceof Player pl && (pl.getGameMode() == GameMode.CREATIVE || pl.getGameMode() == GameMode.SPECTATOR)) {
 					continue;

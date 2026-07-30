@@ -34,6 +34,7 @@ public class PrimalDragon implements CustomDragon {
 	private static final Random random = new Random();
 	private static final int PERCH_MAX_DAMAGE = 50;
 	private static final int SEARCH_RADIUS_SQUARED = 16384; // 128^2
+	private static final double ZEALOT_HEIGHT = 2.9;        // enderman hitbox - fed to Utils.getNearestValidBlockYAt
 	private static double perchedDamageAccumulated = 0;
 
 	@Override
@@ -366,9 +367,9 @@ public class PrimalDragon implements CustomDragon {
 			if(!phase.equals(currentPhase) && !currentPhase.equals("final")) return; // Phase changed
 
 			if(notPerching(dragon)) {
-				// Flying TNT rain
+				// Flying TNT rain - drop it on the ground under the dragon
 				Location l = dragon.getLocation();
-				l.setY(Utils.highestBlockY(l));
+				l.setY(Utils.getNearestValidBlockYAt(l, 1.0));
 				Utils.spawnTNT(dragon, l, fuse, 8, damage, new ArrayList<>());
 			} else if(currentPhase.equals("final")) {
 				// Perched TNT only in final phase
@@ -429,10 +430,10 @@ public class PrimalDragon implements CustomDragon {
 		Player p = Utils.getNearestPlayer(dragon, 128);
 		Location spawnLoc;
 		if(p != null && p.getLocation().distanceSquared(dragon.getLocation()) < SEARCH_RADIUS_SQUARED) {
-			spawnLoc = Utils.randomLocation(p.getLocation(), 16, false);
+			spawnLoc = Utils.randomLocation(p.getLocation(), 16, ZEALOT_HEIGHT);
 		} else {
 			spawnLoc = dragon.getLocation().clone();
-			spawnLoc.setY(Utils.highestBlockY(spawnLoc));
+			spawnLoc.setY(Utils.getNearestValidBlockYAt(spawnLoc, ZEALOT_HEIGHT));
 		}
 		for(int i = 0; i < 2; i++) {
 			Enderman enderman = (Enderman) dragon.getWorld().spawnEntity(spawnLoc, EntityType.ENDERMAN);
@@ -458,8 +459,9 @@ public class PrimalDragon implements CustomDragon {
 
 	private static void theFinalTrick(EnderDragon dragon) {
 		if(!dragon.getScoreboardTags().contains("Invulnerable") && !dragon.isDead()) {
-			Location spawnLoc = Utils.randomLocation(new Location(dragon.getWorld(), 0, 64, 0), 24, true);
-			spawnLoc.setY(Utils.highestBlockY(spawnLoc) + 10 + random.nextInt(6));
+			// Crystals hover 10-15 above the ground, so snap to the surface first and then lift off it.
+			Location spawnLoc = Utils.randomLocation(new Location(dragon.getWorld(), 0, 64, 0), 24);
+			spawnLoc.setY(spawnLoc.getY() + 10 + random.nextInt(6));
 			dragon.getWorld().spawnEntity(spawnLoc, EntityType.END_CRYSTAL);
 			dragon.setHealth(dragon.getHealth() + 10);
 			Bukkit.getOnlinePlayers().forEach(p2 -> p2.showTitle(Title.title(Utils.msg("<yellow><bold>IT'S A TRICK!"), Utils.msg("<red>?<gold>?<blue>?"), Title.Times.times(Duration.ZERO, Duration.ofMillis(40L * 50L), Duration.ZERO))));

@@ -26,6 +26,11 @@ import java.util.List;
 
 public class Sadan implements CustomMob {
 	private static final String name = "<gold><bold>﴾ <red><bold>Sadan<gold><bold> ﴿";
+	// Hitbox heights fed to Utils.getNearestValidBlockYAt so spawns can't land somewhere the mob doesn't fit.
+	// Scaled mobs are taller than their vanilla type, and SCALE is applied after the spawn, so state it here.
+	private static final double TERRACOTTA_HEIGHT = 1.95;    // husk
+	private static final double GOLEM_HEIGHT = 2.7;
+	private static final double GIANT_HEIGHT = 1.95 * 6.0;   // zombie at SCALE 6
 
 	@Override
 	public String onSpawn(Player p, Mob e) {
@@ -80,8 +85,9 @@ public class Sadan implements CustomMob {
 		int golemCount = players.size() + 5;
 
 		if(players.isEmpty()) {
+			// Everything piles onto one spot, so make room for the tallest of them (the golems).
 			Location l = sadan.getLocation();
-			l.setY(l.getWorld().getHighestBlockYAt(l));
+			l.setY(Utils.getNearestValidBlockYAt(l, GOLEM_HEIGHT));
 			for(int i = 0; i < 20; i++) {
 				terracottas.add(spawnTerracotta(l));
 			}
@@ -92,7 +98,7 @@ public class Sadan implements CustomMob {
 		} else {
 			int index = 0;
 			for(int i = 0; i < terracottaCount; i++) {
-				Location l = Utils.randomLocation(players.get(index).getLocation(), 8, false);
+				Location l = Utils.randomLocation(players.get(index).getLocation(), 8, TERRACOTTA_HEIGHT);
 				terracottas.add(spawnTerracotta(l));
 				if(index + 1 == players.size()) {
 					index = 0;
@@ -102,7 +108,7 @@ public class Sadan implements CustomMob {
 			}
 			index = 0;
 			for(int i = 0; i < golemCount; i++) {
-				Location l = Utils.randomLocation(players.get(index).getLocation(), 8, false);
+				Location l = Utils.randomLocation(players.get(index).getLocation(), 8, GOLEM_HEIGHT);
 				golems.add(spawnGolem(l));
 				if(index + 1 == players.size()) {
 					index = 0;
@@ -209,7 +215,7 @@ public class Sadan implements CustomMob {
 	}
 
 	private static Zombie spawnGiant(Zombie sadan) {
-		Zombie zombie = (Zombie) sadan.getWorld().spawnEntity(Utils.randomLocation(sadan.getLocation(), 12, false), EntityType.ZOMBIE);
+		Zombie zombie = (Zombie) sadan.getWorld().spawnEntity(Utils.randomLocation(sadan.getLocation(), 12, GIANT_HEIGHT), EntityType.ZOMBIE);
 		zombie.setCanPickupItems(false);
 		zombie.setAdult();
 		zombie.eject();
@@ -334,9 +340,9 @@ public class Sadan implements CustomMob {
 
 			Utils.changeName(sadan);
 
+			// Sink him 12 blocks under the floor he's standing on, then float him back up (see the loop below).
 			Location l = sadan.getLocation();
-			int y = sadan.getWorld().getHighestBlockYAt(l);
-			l.setY(y - 12);
+			l.setY(Utils.getNearestBlockYAt(l) - 12);
 			sadan.teleport(l);
 			Utils.playGlobalSound(Sound.ENTITY_HORSE_ARMOR, 2.0F, 0.5F);
 			for(int i = 10; i < 280; i += 10) {

@@ -34,6 +34,12 @@ import static listeners.CustomDamage.customMobs;
 
 public class Utils {
 	private static final Random random = new Random();
+	/** How far (in blocks) a beam may miss a mob's hitbox and still connect — the aim tolerance around the beam line.
+	 *  Hypixel never publishes an exact figure; empirically its beams are hitscan that forgive being off the mob by
+	 *  roughly a block, so we grow each candidate's hitbox by this much and test true distance from the beam line to
+	 *  the hitbox faces (0.5 blocks in any direction), rather than the old axis-aligned box that leaked to ~1.7 blocks
+	 *  at its corners. */
+	private static final double BEAM_LENIENCY = 0.5;
 	private static final MiniMessage MM = MiniMessage.miniMessage();
 	private static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.plainText();
 	private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
@@ -223,9 +229,19 @@ public class Utils {
 			if(l.getBlock().getType().isSolid()) {
 				break;
 			}
-			ArrayList<Entity> entities = (ArrayList<Entity>) world.getNearbyEntities(l, 1, 1, 1);
+			// Broad phase: getNearbyEntities' box already accounts for each mob's own hitbox, so a box of half-width
+			// BEAM_LENIENCY returns every mob within the leniency; the distance test below narrows that to a uniform
+			// cylinder around the beam line so a mob is hit iff its hitbox is within BEAM_LENIENCY of this sample point.
+			Collection<Entity> entities = world.getNearbyEntities(l, BEAM_LENIENCY, BEAM_LENIENCY, BEAM_LENIENCY);
 			for(Entity entity : entities) {
 				if(entity instanceof LivingEntity temp && !damagedEntities.contains(entity)) {
+					var box = temp.getBoundingBox();
+					double dx = Math.max(0, Math.max(box.getMinX() - l.getX(), l.getX() - box.getMaxX()));
+					double dy = Math.max(0, Math.max(box.getMinY() - l.getY(), l.getY() - box.getMaxY()));
+					double dz = Math.max(0, Math.max(box.getMinZ() - l.getZ(), l.getZ() - box.getMaxZ()));
+					if(dx * dx + dy * dy + dz * dz > BEAM_LENIENCY * BEAM_LENIENCY) {
+						continue;
+					}
 					damagedEntities.add(entity);
 					customMobs(temp, origin, damage, DamageType.RANGED_SPECIAL);
 					pierce--;
@@ -277,59 +293,78 @@ public class Utils {
 	}
 
 	/**
-	 * Teleports the entity to a random position in a given radius from its current location.<br>The entity will always be teleported to the highest block.
+	 * Teleports the entity to a random position in a given radius from its current location.<br>The entity lands on
+	 * the nearest ground it actually fits on (see {@link #getNearestValidBlockYAt}).
 	 *
-	 * @param e       The entity to be teleported
-	 * @param radius  The radius of the randomness
-	 * @param highest Whether to look for the highest block or the closest block, with respect to Y
+	 * @param e      The entity to be teleported
+	 * @param radius The radius of the randomness
 	 */
-	public static void teleport(Entity e, int radius, boolean highest) {
-		teleport(e, e.getLocation(), radius, highest);
+	public static void teleport(Entity e, int radius) {
+		teleport(e, e.getLocation(), radius);
 	}
 
 	/**
-	 * Teleports the entity to a random position in a given radius from the given location.<br>The entity will always be teleported to the highest block.
+	 * Teleports the entity to a random position in a given radius from the given location.<br>The entity lands on
+	 * the nearest ground its own hitbox fits on, so it can't be stuffed into a gap that's too short for it.
 	 *
-	 * @param e       The entity to be teleported
-	 * @param center  The center of the radius to teleport from
-	 * @param radius  The radius of the randomness
-	 * @param highest Whether to look for the highest block or the closest block, with respect to Y
+	 * @param e      The entity to be teleported
+	 * @param center The center of the radius to teleport from
+	 * @param radius The radius of the randomness
 	 */
-	public static void teleport(Entity e, Location center, int radius, boolean highest) {
-		e.teleport(randomLocation(center, radius, highest));
+	public static void teleport(Entity e, Location center, int radius) {
+		e.teleport(randomLocation(center, radius, e.getHeight()));
 		e.getWorld().playSound(e.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 1.0F);
 	}
 
 	/**
-	 * Finds a random location given a center and a radius.<br>The Location will always be the highest block.
+	 * Finds a random location given a center and a radius, snapped to the nearest ground (by Y).<br>Use the
+	 * {@code height} overload for anything that has a hitbox to fit.
 	 *
-	 * @param center  The center
-	 * @param radius  How far away at most
-	 * @param highest Whether to look for the highest block or the closest block, with respect to Y
+	 * @param center The center
+	 * @param radius How far away at most
 	 * @return The randomized Location
 	 */
-	public static Location randomLocation(Location center, int radius, boolean highest) {
+	public static Location randomLocation(Location center, int radius) {
+		Location l = scatter(center, radius);
+		l.setY(getNearestBlockYAt(l));
+		return l;
+	}
+
+	/**
+	 * Finds a random location given a center and a radius, snapped to the nearest ground that a body of the given
+	 * height fits on.
+	 *
+	 * @param center The center
+	 * @param radius How far away at most
+	 * @param height The height (in blocks) that must fit above the ground - e.g. {@code entity.getHeight()}
+	 * @return The randomized Location
+	 */
+	public static Location randomLocation(Location center, int radius, double height) {
+		Location l = scatter(center, radius);
+		l.setY(getNearestValidBlockYAt(l, height));
+		return l;
+	}
+
+	/** Randomizes X/Z within the radius, leaving Y alone. Never mutates the caller's Location. */
+	private static Location scatter(Location center, int radius) {
 		Vector added = new Vector(random.nextInt(radius * 2 + 1) - radius, 0, random.nextInt(radius * 2 + 1) - radius);
-		center.add(added);
-		if(highest) {
-			center.setY(highestBlockY(center));
-		} else {
-			center.setY(nearestBlockY(center));
-		}
-		return center;
+		return center.clone().add(added);
 	}
 
-	public static int highestBlockY(Location l) {
-		Block b = l.getWorld().getBlockAt((int) l.getX(), l.getWorld().getHighestBlockYAt(l), (int) l.getZ());
-		return b.getY();
-	}
-
-	public static int nearestBlockY(Location l) {
+	/**
+	 * The Y of the first surface found searching outward (down first, then up) from the location's own Y: the block
+	 * above the nearest non-air block in that column. Ignores hitboxes entirely - prefer
+	 * {@link #getNearestValidBlockYAt} when placing something that can get stuck.
+	 */
+	public static int getNearestBlockYAt(Location l) {
+		World w = l.getWorld();
+		int min = w.getMinHeight();
+		int max = w.getMaxHeight();
 		int yUp = (int) l.getY();
 		int yDown = yUp;
-		while(yUp < 320 || yDown > -64) {
+		while(yUp < max || yDown > min) {
 			Location temp = l.clone();
-			if(yDown > -64) {
+			if(yDown > min) {
 				temp.setY(yDown);
 				Block b = temp.getBlock();
 				if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
@@ -338,7 +373,7 @@ public class Utils {
 				}
 				yDown--;
 			}
-			if(yUp < 320) {
+			if(yUp < max) {
 				temp.setY(yUp);
 				Block b = temp.getBlock();
 				if(b.getType() != Material.AIR && b.getType() != Material.VOID_AIR) {
@@ -348,7 +383,53 @@ public class Utils {
 				yUp++;
 			}
 		}
-		return 320;
+		return max;
+	}
+
+	/**
+	 * The Y a body of the given height can actually stand at, searching outward (down first, then up) from the
+	 * location's own Y for the closest spot in that column with solid ground underfoot AND enough clear headroom
+	 * for the whole hitbox. This is what stops a tall mob being teleported/spawned into a gap it doesn't fit in -
+	 * a 2.9-block Enderman won't be dropped into a 1-block pocket or suffocated in a ceiling.
+	 *
+	 * <p>Falls back to {@link #getNearestBlockYAt} when nothing in the column fits, so a mob too tall for anywhere
+	 * in its column still lands on a surface rather than mid-air.
+	 *
+	 * @param l      The column to search (its Y is the starting point)
+	 * @param height Hitbox height in blocks - {@code entity.getHeight()} for a live entity, otherwise the mob's
+	 *               natural height (scaled entities are taller than their vanilla type)
+	 */
+	public static int getNearestValidBlockYAt(Location l, double height) {
+		World w = l.getWorld();
+		int needed = Math.max(1, (int) Math.ceil(height));
+		int min = w.getMinHeight() + 1;         // needs a block underneath to stand on
+		int max = w.getMaxHeight() - needed;    // needs the whole hitbox under the build limit
+		if(min > max) return getNearestBlockYAt(l);
+		int start = Math.min(Math.max(l.getBlockY(), min), max);
+		for(int offset = 0; offset <= max - min; offset++) {
+			int down = start - offset;
+			if(down >= min && fits(l, down, needed)) return down;
+			int up = start + offset;
+			if(offset > 0 && up <= max && fits(l, up, needed)) return up;
+		}
+		return getNearestBlockYAt(l);
+	}
+
+	/** True if {@code needed} blocks of headroom starting at y are clear and the block below y is solid ground. */
+	private static boolean fits(Location column, int y, int needed) {
+		World w = column.getWorld();
+		int x = column.getBlockX();
+		int z = column.getBlockZ();
+		if(!w.getBlockAt(x, y - 1, z).getType().isSolid()) return false;
+		for(int i = 0; i < needed; i++) {
+			if(!w.getBlockAt(x, y + i, z).isPassable()) return false;
+		}
+		return true;
+	}
+
+	/** True if nothing is between this location and the sky - the vanilla "can rain/lightning reach you" test. */
+	public static boolean underOpenSky(Location l) {
+		return l.getWorld().getHighestBlockYAt(l) <= l.getBlockY();
 	}
 
 	public static void spawnGuards(LivingEntity entity, int num) {

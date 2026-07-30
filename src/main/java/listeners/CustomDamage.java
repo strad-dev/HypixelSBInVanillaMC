@@ -470,7 +470,9 @@ public class CustomDamage implements Listener {
 				}
 			}
 			if(finalDamage >= oldHealth + absorption) {
-				if(type != DamageType.LETHAL_ABSOLUTE && (damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING))) {
+				// PvP layer: totems are ignored (kept, not consumed) inside the FFA arena, where the kill is
+				// scored and the victim respawns anyway. Always false off the pvp server / outside the arena.
+				if(type != DamageType.LETHAL_ABSOLUTE && !pvp.PvpHooks.ignoresTotem(damagee) && (damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING))) {
 					if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
 						damagee.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
 					} else if(damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
@@ -706,8 +708,10 @@ public class CustomDamage implements Listener {
 							// three 1/3-strength hits add up, keeping the single-hit pop (don't launch 3x high).
 							newVelocity = new Vector(oldVelocity.getX() + knockbackDir.getX() * horizontal, (damagee.isOnGround() ? Math.max(oldVelocity.getY(), vertical) : oldVelocity.getY()), oldVelocity.getZ() + knockbackDir.getZ() * horizontal);
 						} else {
-							// First hit this tick: damp the target's own momentum (retain 10%) as usual.
-							newVelocity = new Vector(oldVelocity.getX() * 0.1 + knockbackDir.getX() * horizontal, (damagee.isOnGround() ? vertical : 0), oldVelocity.getZ() * 0.1 + knockbackDir.getZ() * horizontal);
+							// First hit this tick: damp the target's own momentum (retain 10%) as usual. Only apply the
+							// vertical pop when grounded; an airborne target keeps its current Y (like vanilla) so hits
+							// mid-air don't cancel its fall/jump arc.
+							newVelocity = new Vector(oldVelocity.getX() * 0.1 + knockbackDir.getX() * horizontal, (damagee.isOnGround() ? vertical : oldVelocity.getY()), oldVelocity.getZ() * 0.1 + knockbackDir.getZ() * horizontal);
 						}
 
 						damagee.setVelocity(newVelocity);
