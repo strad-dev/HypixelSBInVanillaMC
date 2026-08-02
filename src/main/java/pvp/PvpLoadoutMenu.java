@@ -139,9 +139,12 @@ public final class PvpLoadoutMenu implements CommandExecutor, Listener {
 			return;
 		}
 		if (arrIndex(raw) >= 0) {
-			// Editable slot: allow rearranging WITHIN the editor, but never let an item move out to the player.
+			// Editable slot: allow rearranging WITHIN the editor, but never let an item move out to the player
+			// (MOVE_TO_OTHER_INVENTORY/HOTBAR_*/COLLECT_TO_CURSOR) or into the world (Q / ctrl-Q = DROP_*_SLOT).
+			// These are palette copies, not real items - anything that escapes the editor is a free item spawn.
 			switch (e.getAction()) {
-				case MOVE_TO_OTHER_INVENTORY, HOTBAR_SWAP, HOTBAR_MOVE_AND_READD, COLLECT_TO_CURSOR -> { e.setCancelled(true); return; }
+				case MOVE_TO_OTHER_INVENTORY, HOTBAR_SWAP, HOTBAR_MOVE_AND_READD, COLLECT_TO_CURSOR,
+						DROP_ONE_SLOT, DROP_ALL_SLOT -> { e.setCancelled(true); return; }
 				default -> { }
 			}
 			// One-totem limit: reject placing a totem when the loadout already holds one in another slot.
