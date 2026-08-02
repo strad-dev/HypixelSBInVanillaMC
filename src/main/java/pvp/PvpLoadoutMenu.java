@@ -14,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -139,13 +140,16 @@ public final class PvpLoadoutMenu implements CommandExecutor, Listener {
 			return;
 		}
 		if (arrIndex(raw) >= 0) {
-			// Editable slot: allow rearranging WITHIN the editor, but never let an item move out to the player
-			// (MOVE_TO_OTHER_INVENTORY/HOTBAR_*/COLLECT_TO_CURSOR) or into the world (Q / ctrl-Q = DROP_*_SLOT).
-			// These are palette copies, not real items - anything that escapes the editor is a free item spawn.
+			// Editable slot: allowlist, not a blocklist. Only cursor<->slot moves are permitted; shift-click,
+			// hotbar keys, Q, creative clone and anything Bukkit couldn't classify are denied, so an action we
+			// don't recognise fails closed instead of handing out a free copy of a palette item.
 			switch (e.getAction()) {
-				case MOVE_TO_OTHER_INVENTORY, HOTBAR_SWAP, HOTBAR_MOVE_AND_READD, COLLECT_TO_CURSOR,
-						DROP_ONE_SLOT, DROP_ALL_SLOT -> { e.setCancelled(true); return; }
-				default -> { }
+				case NOTHING, PICKUP_ALL, PICKUP_SOME, PICKUP_HALF, PICKUP_ONE,
+						PLACE_ALL, PLACE_SOME, PLACE_ONE, SWAP_WITH_CURSOR,
+						// Bundle ops are cursor<->slot too, so they can't move anything out either.
+						PICKUP_FROM_BUNDLE, PICKUP_ALL_INTO_BUNDLE, PICKUP_SOME_INTO_BUNDLE,
+						PLACE_FROM_BUNDLE, PLACE_ALL_INTO_BUNDLE, PLACE_SOME_INTO_BUNDLE -> { }
+				default -> { e.setCancelled(true); return; }
 			}
 			// One-totem limit: reject placing a totem when the loadout already holds one in another slot.
 			ItemStack cur = e.getCursor();
@@ -198,6 +202,13 @@ public final class PvpLoadoutMenu implements CommandExecutor, Listener {
 			e.setCancelled(true);
 			if (e.getWhoClicked() instanceof Player pl) pl.sendMessage(Utils.msg("<red>You are limited to only one totem"));
 		}
+	}
+
+	// Backstop for every drop path, whatever the click was classified as: nothing leaves an open menu as a
+	// world drop. Keeps the guarantee even if the click allowlist above misses an action.
+	@EventHandler(ignoreCancelled = true)
+	public void onDropItem(PlayerDropItemEvent e) {
+		if (e.getPlayer().getOpenInventory().getTopInventory().getHolder() instanceof EditorHolder) e.setCancelled(true);
 	}
 
 	@EventHandler
