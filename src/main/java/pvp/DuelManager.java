@@ -472,7 +472,7 @@ public class DuelManager {
 			Player b = Bukkit.getPlayer(bId);
 			returnHome(a, prevA);
 			returnHome(b, prevB);
-			// Announce the duel end as a plain Bukkit event. SkyBlock depends on nothing external — this
+			// Announce the duel end as a plain Bukkit event.  SkyBlock depends on nothing external, so this
 			// fires into the void when nothing listens (so it stays standalone), and an optional glue plugin
 			// may listen to send players who came from another server back home (its transfer makes the local
 			// returnHome above a harmless no-op for them).

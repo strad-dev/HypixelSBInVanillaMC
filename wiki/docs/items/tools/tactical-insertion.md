@@ -11,7 +11,7 @@
 
 ## Ability
 
-!!! note "Ability: Gorilla Tactics — RIGHT CLICK"
+!!! note "Ability: Gorilla Tactics - RIGHT CLICK"
     Marks your current location and **teleports you back** to it after **3 seconds**.
 
     <span class="mana-cost">Intelligence Cost: 10</span> · <span class="cooldown">Cooldown: 20s</span>

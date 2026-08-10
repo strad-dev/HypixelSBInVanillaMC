@@ -18,7 +18,7 @@
 
 ## Mechanics
 
-**Shortbow** — Instantly shoots without charging. Fires **3 arrows** at once with a 5-degree spread. All arrows have **Pierce 4**.
+**Shortbow** - Instantly shoots without charging. Fires **3 arrows** at once with a 5-degree spread. All arrows have **Pierce 4**.
 
 Does not require arrows in your inventory (arrows are removed if present).
 
@@ -35,7 +35,7 @@ The **Strength** potion effect adds bonus damage to arrows.
 
 ## Ability
 
-!!! note "Ability: Salvation — LEFT CLICK"
+!!! note "Ability: Salvation - LEFT CLICK"
     Shoot a **red beam** that penetrates up to **5 foes**, dealing **4 damage** (up to 8 with Power 7).
 
     <span class="cooldown">Cooldown: 1s</span>

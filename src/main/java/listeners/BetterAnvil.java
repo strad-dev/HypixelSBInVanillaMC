@@ -77,7 +77,7 @@ public class BetterAnvil implements Listener {
 
 		e.setResult(result);
 
-		// Fix XP cost — vanilla may not compute a valid cost for custom results
+		// Fix XP cost, since vanilla may not compute a valid cost for custom results
 		int fallbackCost = computeCost(first, second, result);
 		if(e.getView().getPlayer() instanceof Player player) {
 			Utils.scheduleTask(() -> {
@@ -115,7 +115,7 @@ public class BetterAnvil implements Listener {
 			int firstLevel = firstEnchants.getOrDefault(ench, 0);
 
 			if(resultLevel > firstLevel) {
-				// Enchant was added or upgraded — cost is the new level
+				// Enchant was added or upgraded, so the cost is the new level
 				cost += resultLevel;
 			}
 		}
@@ -135,7 +135,7 @@ public class BetterAnvil implements Listener {
 		if(e.getInventory().getType() != InventoryType.ANVIL) return;
 		if(!(e.getWhoClicked() instanceof Player player)) return;
 
-		// Handle clicking the result slot (slot 2) — vanilla may block custom results
+		// Handle clicking the result slot (slot 2), since vanilla may block custom results
 		if(e.getRawSlot() == 2) {
 			ItemStack result = e.getInventory().getItem(2);
 			if(result != null && result.getType() != Material.AIR) {
@@ -192,11 +192,11 @@ public class BetterAnvil implements Listener {
 			int itemLevel = result.getEnchantmentLevel(enchantment);
 
 			if(itemLevel == 0) {
-				// Item doesn't have this enchant — apply it
+				// Item doesn't have this enchant, so apply it
 				result.addUnsafeEnchantment(enchantment, bookLevel);
 				anyApplied = true;
 			} else if(bookLevel > itemLevel) {
-				// Book level is higher — upgrade
+				// Book level is higher, so upgrade
 				result.addUnsafeEnchantment(enchantment, bookLevel);
 				anyApplied = true;
 			} else if(bookLevel == itemLevel) {
@@ -205,9 +205,9 @@ public class BetterAnvil implements Listener {
 					result.addUnsafeEnchantment(enchantment, combined);
 					anyApplied = true;
 				}
-				// else: would create overleveled — skip this enchant
+				// else: would create overleveled, so skip this enchant
 			}
-			// bookLevel < itemLevel — skip (no downgrade)
+			// bookLevel < itemLevel, so skip; no downgrade
 		}
 
 		if(!anyApplied) return null;
@@ -248,9 +248,9 @@ public class BetterAnvil implements Listener {
 					enchants1.put(enchantment, combined);
 					anyChanged = true;
 				}
-				// else: would create overleveled — skip
+				// else: would create overleveled, so skip
 			}
-			// level2 < level1 — skip
+			// level2 < level1, so skip
 		}
 
 		if(!anyChanged) return null;

@@ -15,7 +15,7 @@
 
 ## Ability
 
-!!! note "Ability: Splash Yo Face — RIGHT CLICK"
+!!! note "Ability: Splash Yo Face - RIGHT CLICK"
     Take **75% less damage** for **1 second**.
 
     <span class="mana-cost">Intelligence Cost: 25</span> · <span class="cooldown">Cooldown: 3s</span>

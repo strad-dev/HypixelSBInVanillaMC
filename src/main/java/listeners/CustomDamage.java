@@ -620,7 +620,7 @@ public class CustomDamage implements Listener {
 
 				if(damagee instanceof Mob && damager instanceof LivingEntity) {
 					// Endermen shouldn't swarm the dragon just for standing in its breath/fireball AoE around
-					// the fountain — only a direct flying hit (MELEE) should pull their aggro onto it.
+					// the fountain; only a direct flying hit (MELEE) should pull their aggro onto it.
 					boolean dragonAoeOnEnderman = damagee instanceof Enderman && damager instanceof EnderDragon && type != DamageType.MELEE;
 					if(!(damagee instanceof Wolf wolf && damager instanceof Player player && wolf.getOwner().getUniqueId().equals(player.getUniqueId())) && !dragonAoeOnEnderman) {
 						((Mob) damagee).setTarget((LivingEntity) damager);

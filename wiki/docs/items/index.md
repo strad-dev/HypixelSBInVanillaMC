@@ -5,7 +5,7 @@ SkyBlock in Vanilla adds a wide variety of custom items across several categorie
 ## Categories
 
 ### [Weapons](weapons/index.md)
-Three powerful weapons — the Hyperion, Dark Claymore, and Terminator — each with unique stats and enchantment scaling.
+Three powerful weapons, the Hyperion, Dark Claymore, and Terminator, each with unique stats and enchantment scaling.
 
 ### [Armor](armor/index.md)
 Seven mythic armor pieces crafted from boss drops. Mix and match pieces from Wither Lords, dragons, and slayer bosses.

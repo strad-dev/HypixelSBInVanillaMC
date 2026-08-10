@@ -30,7 +30,7 @@ public final class PvpModule {
 		boolean ffa = cfg.ffaEnabled();
 		boolean duel = cfg.duelEnabled();
 
-		// FFA arena — only with FFA on.
+		// FFA arena, only with FFA on.
 		if (ffa) {
 			JoinArenaCommand arena = new JoinArenaCommand(cfg, duels);
 			bind(plugin, "joinarena", arena);
@@ -39,7 +39,7 @@ public final class PvpModule {
 			unregister(plugin, "joinarena", "leavearena");
 		}
 
-		// Stats + leaderboard — only when at least one tracked mode is on (FFA kills or 1v1 wins). /pvptop
+		// Stats and leaderboard, only when at least one tracked mode is on (FFA kills or 1v1 wins).  /pvptop
 		// tab-completes just the enabled board(s) via StatsCommand's TabCompleter.
 		if (ffa || duel) {
 			StatsCommand statsCmd = new StatsCommand(cfg);
@@ -51,7 +51,8 @@ public final class PvpModule {
 			unregister(plugin, "pvpstats", "pvptop");
 		}
 
-		// Duels + loadout editor — only with 1v1 duels on. Loadouts live wherever pvp.duel.loadouts-file
+		// Duels and loadout editor, only with 1v1 duels on.  Loadouts live wherever pvp.duel.loadouts-file
+
 		// points (own folder by default; the network's shared ~/data on a network pvp server).
 		if (duel) {
 			DuelCommand duelCmd = new DuelCommand(duels);

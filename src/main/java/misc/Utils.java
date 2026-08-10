@@ -34,12 +34,6 @@ import static listeners.CustomDamage.customMobs;
 
 public class Utils {
 	private static final Random random = new Random();
-	/** How far (in blocks) a beam may miss a mob's hitbox and still connect — the aim tolerance around the beam line.
-	 *  Hypixel never publishes an exact figure; empirically its beams are hitscan that forgive being off the mob by
-	 *  roughly a block, so we grow each candidate's hitbox by this much and test true distance from the beam line to
-	 *  the hitbox faces (0.5 blocks in any direction), rather than the old axis-aligned box that leaked to ~1.7 blocks
-	 *  at its corners. */
-	private static final double BEAM_LENIENCY = 0.5;
 	private static final MiniMessage MM = MiniMessage.miniMessage();
 	private static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.plainText();
 	private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
@@ -77,7 +71,7 @@ public class Utils {
 		return c == null ? "" : PLAIN.serialize(c);
 	}
 
-	/** Plain text of an item's first lore line — used to read the custom-item ID. */
+	/** Plain text of an item's first lore line, used to read the custom-item ID. */
 	public static String firstLorePlain(ItemMeta meta) {
 		if(meta == null) {
 			return "";
@@ -229,19 +223,9 @@ public class Utils {
 			if(l.getBlock().getType().isSolid()) {
 				break;
 			}
-			// Broad phase: getNearbyEntities' box already accounts for each mob's own hitbox, so a box of half-width
-			// BEAM_LENIENCY returns every mob within the leniency; the distance test below narrows that to a uniform
-			// cylinder around the beam line so a mob is hit iff its hitbox is within BEAM_LENIENCY of this sample point.
-			Collection<Entity> entities = world.getNearbyEntities(l, BEAM_LENIENCY, BEAM_LENIENCY, BEAM_LENIENCY);
+			Collection<Entity> entities = world.getNearbyEntities(l, 1, 1, 1);
 			for(Entity entity : entities) {
 				if(entity instanceof LivingEntity temp && !damagedEntities.contains(entity)) {
-					var box = temp.getBoundingBox();
-					double dx = Math.max(0, Math.max(box.getMinX() - l.getX(), l.getX() - box.getMaxX()));
-					double dy = Math.max(0, Math.max(box.getMinY() - l.getY(), l.getY() - box.getMaxY()));
-					double dz = Math.max(0, Math.max(box.getMinZ() - l.getZ(), l.getZ() - box.getMaxZ()));
-					if(dx * dx + dy * dy + dz * dz > BEAM_LENIENCY * BEAM_LENIENCY) {
-						continue;
-					}
 					damagedEntities.add(entity);
 					customMobs(temp, origin, damage, DamageType.RANGED_SPECIAL);
 					pierce--;

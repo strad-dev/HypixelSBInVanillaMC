@@ -107,7 +107,7 @@ public class VoidcrazedSeraph implements CustomMob {
 	}
 
 	/**
-	 * Clears any yang-glyph beacons still in the world — called when the Seraph dies so a beacon left
+	 * Clears any yang-glyph beacons still in the world.  Called when the Seraph dies so a beacon left
 	 * mid-phase doesn't linger. Reverting the blocks to AIR also stops the pending "YANG GLYPH"
 	 * countdown titles, which each guard on the block still being a beacon before showing.
 	 */
@@ -174,7 +174,7 @@ public class VoidcrazedSeraph implements CustomMob {
 						if(!player.getWorld().equals(center.getWorld())) continue;
 						Location playerLoc = player.getLocation();
 
-						// Beyond 24 blocks from the boss — punish with the same 4 damage/0.5s the beam deals,
+						// Beyond 24 blocks from the boss, so punish with the same 4 damage per 0.5s the beam deals,
 						// so players can't range-cheese the beam phase from outside the arena.
 						if(playerLoc.distanceSquared(center) > 24.0 * 24.0) {
 							CustomDamage.customMobs(player, damagee, 4, DamageType.ABSOLUTE);

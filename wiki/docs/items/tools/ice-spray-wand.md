@@ -15,7 +15,7 @@
 
 ## Ability
 
-!!! note "Ability: Ice Spray — RIGHT CLICK"
+!!! note "Ability: Ice Spray - RIGHT CLICK"
     Deals **1 damage** to enemies in a **6-block radius** and applies **Slowness IV** for **5 seconds**.
 
     Frozen enemies take **+10% increased damage** from all sources.

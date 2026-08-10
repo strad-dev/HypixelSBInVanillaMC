@@ -15,14 +15,14 @@
 
 ## Abilities
 
-!!! note "Ability: Instant Transmission — RIGHT CLICK"
+!!! note "Ability: Instant Transmission - RIGHT CLICK"
     Teleport **12 blocks** ahead in the direction you are looking.
 
     Smart teleportation finds safe landing spots and avoids suffocation.
 
     <span class="mana-cost">Intelligence Cost: 1</span> · <span class="cooldown">Cooldown: None</span>
 
-!!! note "Ability: Ether Transmission — SNEAK RIGHT CLICK"
+!!! note "Ability: Ether Transmission - SNEAK RIGHT CLICK"
     Teleport to the **targeted block** up to **61 blocks** away.
 
     Smart teleportation finds safe landing spots and avoids suffocation.

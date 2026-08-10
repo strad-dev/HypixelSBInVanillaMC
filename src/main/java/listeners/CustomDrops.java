@@ -372,7 +372,7 @@ public class CustomDrops implements Listener {
 				world.dropItemNaturally(l, item);
 			}
 			case Fox fox -> {
-				// Foxes carry an item in their mouth (main-hand equipment) — drop it on death.
+				// Foxes carry an item in their mouth (main-hand equipment), so drop it on death.
 				if(fox.getEquipment() != null) {
 					ItemStack held = fox.getEquipment().getItemInMainHand();
 					if(!held.getType().isAir()) {

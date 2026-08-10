@@ -11,7 +11,7 @@
 
 ## Ability
 
-!!! note "Ability: Showtime — RIGHT CLICK"
+!!! note "Ability: Showtime - RIGHT CLICK"
     Shoots **Wind Charges** that create an explosion propelling the player forward.
 
     <span class="mana-cost">Intelligence Cost: 1</span> · <span class="cooldown">Cooldown: None</span>

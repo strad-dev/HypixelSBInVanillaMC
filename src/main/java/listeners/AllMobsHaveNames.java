@@ -14,7 +14,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class AllMobsHaveNames implements Listener {
-	// Entities waiting to be named. EntitiesLoadEvent fires per chunk as its stored entities load — which
+	// Entities waiting to be named.  EntitiesLoadEvent fires per chunk as its stored entities load, which
 	// happens in a big burst when a player teleports (especially at high render distance). Naming every mob
 	// inline ran a MiniMessage parse per entity, so a teleport into a mob-dense area meant hundreds of parses
 	// in one tick → a lag spike. Instead we queue them here and drain a few per tick.

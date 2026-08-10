@@ -26,7 +26,7 @@
 
 ## Ability
 
-!!! note "Ability: Wither Impact — RIGHT CLICK"
+!!! note "Ability: Wither Impact - RIGHT CLICK"
     Teleport **10 blocks** ahead and deal **51% of melee damage** to all nearby enemies in a **10-block radius**.
 
     Applies **Wither Shield**: grants Absorption 3 for 5 seconds, then converts any remaining absorption hearts into healing.
@@ -58,9 +58,9 @@
 
 ### Ingredients
 
-- <span class="mc-tooltip-wrapper"><a href="../ingredients/wither-lords/" class="mc-item"><img src="../../assets/textures/enchanted_book.png">Shadow Warp</a><div class="mc-tooltip"><div class="tt-name" style="color:#AA00AA">Shadow Warp</div><div class="tt-stat">Wither Lord ingredient</div><div class="tt-rarity rarity-epic">EPIC</div></div></span> — Teleport component
-- <span class="mc-tooltip-wrapper"><a href="../ingredients/wither-lords/" class="mc-item"><img src="../../assets/textures/enchanted_book.png">Implosion</a><div class="mc-tooltip"><div class="tt-name" style="color:#AA00AA">Implosion</div><div class="tt-stat">Wither Lord ingredient</div><div class="tt-rarity rarity-epic">EPIC</div></div></span> — AoE damage component
-- <span class="mc-tooltip-wrapper"><a href="../ingredients/wither-lords/" class="mc-item"><img src="../../assets/textures/enchanted_book.png">Wither Shield</a><div class="mc-tooltip"><div class="tt-name" style="color:#AA00AA">Wither Shield</div><div class="tt-stat">Wither Lord ingredient</div><div class="tt-rarity rarity-epic">EPIC</div></div></span> — Defensive component
+- <span class="mc-tooltip-wrapper"><a href="../ingredients/wither-lords/" class="mc-item"><img src="../../assets/textures/enchanted_book.png">Shadow Warp</a><div class="mc-tooltip"><div class="tt-name" style="color:#AA00AA">Shadow Warp</div><div class="tt-stat">Wither Lord ingredient</div><div class="tt-rarity rarity-epic">EPIC</div></div></span> - Teleport component
+- <span class="mc-tooltip-wrapper"><a href="../ingredients/wither-lords/" class="mc-item"><img src="../../assets/textures/enchanted_book.png">Implosion</a><div class="mc-tooltip"><div class="tt-name" style="color:#AA00AA">Implosion</div><div class="tt-stat">Wither Lord ingredient</div><div class="tt-rarity rarity-epic">EPIC</div></div></span> - AoE damage component
+- <span class="mc-tooltip-wrapper"><a href="../ingredients/wither-lords/" class="mc-item"><img src="../../assets/textures/enchanted_book.png">Wither Shield</a><div class="mc-tooltip"><div class="tt-name" style="color:#AA00AA">Wither Shield</div><div class="tt-stat">Wither Lord ingredient</div><div class="tt-rarity rarity-epic">EPIC</div></div></span> - Defensive component
 - <img src="../../assets/textures/nether_star.png" class="inline-icon"> Nether Star x4
 - <img src="../../assets/textures/netherite_sword.png" class="inline-icon"> Netherite Sword
 - <span class="mc-tooltip-wrapper"><a href="../ingredients/wither-lords/" class="mc-item"><img src="../../assets/textures/stick.png">Necron's Handle</a><div class="mc-tooltip"><div class="tt-name" style="color:#AA00AA">Necron's Handle</div><div class="tt-stat">Wither Lord ingredient</div><div class="tt-rarity rarity-epic">EPIC</div></div></span>

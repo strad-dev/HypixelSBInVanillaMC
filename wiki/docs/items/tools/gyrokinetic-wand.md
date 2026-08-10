@@ -15,7 +15,7 @@
 
 ## Ability
 
-!!! note "Ability: Gravity Storm — LEFT CLICK"
+!!! note "Ability: Gravity Storm - LEFT CLICK"
     Creates a gravitational rift at the aimed location, **pulling all mobs together** for **3 seconds**.
 
     <span class="mana-cost">Intelligence Cost: 50</span> · <span class="cooldown">Cooldown: 30s</span>

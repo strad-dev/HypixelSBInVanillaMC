@@ -15,7 +15,7 @@
 
 ## Ability
 
-!!! note "Ability: Big Heal — RIGHT CLICK"
+!!! note "Ability: Big Heal - RIGHT CLICK"
     Gain **+0.5 hearts** every **0.75 seconds** for **3 seconds**.
 
     <span class="mana-cost">Intelligence Cost: 10</span> · <span class="cooldown">Cooldown: 5s</span>

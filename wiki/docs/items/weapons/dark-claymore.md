@@ -18,7 +18,7 @@
   <span class="stat"><span class="stat-label">Swing Range:</span> <span class="stat-value">+2</span></span>
 </div>
 
-This weapon has no active ability — it is a passive item that relies on raw damage and extended reach.
+This weapon has no active ability; it is a passive item that relies on raw damage and extended reach.
 
 ## Crafting
 

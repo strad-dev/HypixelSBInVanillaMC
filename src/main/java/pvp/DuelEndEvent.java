@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Fired when a 1v1 duel ends (win, forfeit, or draw), after both players have been restored and are
  * about to be returned to their pre-duel spot. SkyBlock fires this unconditionally and depends on
- * nothing external — it is a plain notification that fires into the void when nothing is listening,
+ * nothing external: it is a plain notification that fires into the void when nothing is listening,
  * so SkyBlock stays fully standalone. An optional glue plugin may listen to it (e.g. to send
  * cross-server duelers back to their origin server). Either player may be null if they disconnected
  * mid-match.

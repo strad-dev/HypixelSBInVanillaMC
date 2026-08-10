@@ -24,8 +24,8 @@
 
 ### Ingredients
 
-- **Viscera** — Drops from [Revenant Horror](../../bosses/generic/revenant-horror.md) (5% chance) and [Atoned Horror](../../bosses/hard-mode/atoned-horror.md) (25% chance)
-- **Warden Heart** — Drops from Wardens (2% chance)
+- **Viscera** - Drops from [Revenant Horror](../../bosses/generic/revenant-horror.md) (5% chance) and [Atoned Horror](../../bosses/hard-mode/atoned-horror.md) (25% chance)
+- **Warden Heart** - Drops from Wardens (2% chance)
 
 ## Crafting
 

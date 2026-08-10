@@ -15,7 +15,7 @@
 
 ## Ability
 
-!!! note "Ability: Heal — RIGHT CLICK"
+!!! note "Ability: Heal - RIGHT CLICK"
     Gain **+0.5 hearts** every **1.25 seconds** for **2.5 seconds**.
 
     <span class="mana-cost">Intelligence Cost: 10</span> · <span class="cooldown">Cooldown: 5s</span>
