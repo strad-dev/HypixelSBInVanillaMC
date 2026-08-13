@@ -128,7 +128,12 @@ public class Plugin extends JavaPlugin implements Listener {
 
 		getLogger().info("Started SkyBlock in Vanilla!");
 
-		setupAdvancements();
+		// Advancements are cosmetic, so never let them stop the plugin from enabling
+		try {
+			setupAdvancements();
+		} catch(Exception exception) {
+			getLogger().warning("Could not set up advancements: " + exception);
+		}
 
 		try {
 			Objects.requireNonNull(getServer().getScoreboardManager()).getMainScoreboard().registerNewObjective("Intelligence", Criteria.DUMMY, net.kyori.adventure.text.Component.text("Intelligence"));
@@ -168,7 +173,11 @@ public class Plugin extends JavaPlugin implements Listener {
 		}
 	}
 
+	private static int keptAdvancements;
+
 	private static void setupAdvancements() {
+		keptAdvancements = 0;
+
 		// Root advancement
 		loadAdvancement("root", null, "minecraft:nether_star", "SkyBlock", "Can you beat all the bosses?", "task", false, false, 0, 3, "minecraft:block/light_blue_concrete");
 
@@ -199,15 +208,26 @@ public class Plugin extends JavaPlugin implements Listener {
 		loadAdvancement("defeat_voidgloom_seraph", "skyblock:defeat_zealot_brusier", "minecraft:end_crystal", "Ender of Ender", "Silence falls across the land.", "task", true, true, 3, 1.5f, null);
 		loadAdvancement("defeat_voidcrazed_seraph", "skyblock:defeat_voidgloom_seraph", "minecraft:beacon", "The Line Between Genius and Insanity", "??????????!!!!!!!!!!", "challenge", true, true, 4, 1.5f, null);
 		loadAdvancement("defeat_primal_dragon", "skyblock:defeat_zealot_brusier", "minecraft:dragon_egg", "The Beginning.", "The start of something new.", "challenge", true, true, 3, 0.5f, null);
+
+		if(keptAdvancements > 0) {
+			instance.getLogger().info("Reused " + keptAdvancements + " advancement(s) already in the server's registry. "
+				+ "To pick up edits to them, delete world/datapacks/bukkit/data/skyblock and restart.");
+		}
 	}
 
 	@SuppressWarnings("deprecation")
 	private static void loadAdvancement(String name, String parent, String icon, String title, String description, String frame, boolean showToast, boolean announceToChat, float x, float y, String background) {
 		NamespacedKey key = new NamespacedKey(instance, name);
 
-		// Remove if already registered (e.g. from a reload)
+		// loadAdvancement saves the json into world/datapacks/bukkit, and newer Paper builds load that
+		// datapack again at boot, so our advancements can already be in the registry before onEnable runs.
+		// removeAdvancement only deletes the json file, it never drops the live registry entry, so the old
+		// remove-then-reload made loadAdvancement throw "already exists" and took the whole plugin down.
+		// Keep whatever is already registered instead; the keys and the "requirement" criterion never change,
+		// so granting still works. Delete the datapack folder and restart to pick up edits made here.
 		if(Bukkit.getAdvancement(key) != null) {
-			Bukkit.getUnsafe().removeAdvancement(key);
+			keptAdvancements++;
+			return;
 		}
 
 		StringBuilder json = new StringBuilder();
@@ -235,7 +255,12 @@ public class Plugin extends JavaPlugin implements Listener {
 		json.append("\"criteria\":{\"requirement\":{\"trigger\":\"minecraft:impossible\"}}");
 		json.append("}");
 
-		Bukkit.getUnsafe().loadAdvancement(key, json.toString());
+		try {
+			Bukkit.getUnsafe().loadAdvancement(key, json.toString());
+		} catch(IllegalArgumentException exception) {
+			// Registered already, just not through anything getAdvancement can see. Never fatal.
+			keptAdvancements++;
+		}
 	}
 
 	@EventHandler
@@ -279,7 +304,9 @@ public class Plugin extends JavaPlugin implements Listener {
 		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
 			try {
 				Score score = Plugin.getIntelligence(p);
-				if(score.getScore() < 2500 && second == 3) {
+				// No passive regen in the Free-For-All safe zone: mana has to be earned in the arena.
+				// Always false off the pvp server / with PvP disabled.
+				if(score.getScore() < 2500 && second == 3 && !pvp.PvpHooks.inSafezone(p)) {
 					score.setScore(score.getScore() + 1);
 				}
 				Plugin.sendIntelligenceBar(p, score);

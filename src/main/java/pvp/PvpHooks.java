@@ -60,6 +60,14 @@ public final class PvpHooks {
 		}
 	}
 
+	/**
+	 * True if this player is standing in the Free-For-All safe zone (and isn't duelling), i.e. they
+	 * currently hold safezone immunity. Used to suppress passive mana regen while they're parked there.
+	 */
+	public static boolean inSafezone(Player p) {
+		return listener != null && listener.inSafezone(p);
+	}
+
 	/** Reports intelligence (mana) spent on an ability; counted only while the player is in PvP combat. */
 	public static void trackMana(Player p, int amount) {
 		if (listener != null) listener.trackMana(p, amount);

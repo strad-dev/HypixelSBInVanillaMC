@@ -8,8 +8,6 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -48,7 +46,7 @@ public class WitherSkeletonIce implements CustomMob {
 	@Override
 	public boolean whenDamaging(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
 		if(!damagee.getScoreboardTags().contains("IceSprayed")) {
-			damagee.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 201, 3));
+			Utils.iceSpraySlow(damagee, 201);
 			damagee.addScoreboardTag("IceSprayed");
 			Utils.scheduleTask(() -> damagee.removeScoreboardTag("IceSprayed"), 201);
 			damagee.getWorld().playSound(damagee, Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0F, 1.0F);

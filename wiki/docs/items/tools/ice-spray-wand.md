@@ -16,9 +16,11 @@
 ## Ability
 
 !!! note "Ability: Ice Spray - RIGHT CLICK"
-    Deals **1 damage** to enemies in a **6-block radius** and applies **Slowness IV** for **5 seconds**.
+    Deals **1 damage** to enemies in a **6-block radius** and **halves their movement speed** for **5 seconds**.
 
-    Frozen enemies take **+10% increased damage** from all sources.
+    Frozen enemies take **+10% increased damage** from all sources and deal **-15% damage**.
+
+    The slow is a movement speed attribute modifier (0.5x), not the Slowness potion effect, so milk won't clear it.
 
     <span class="mana-cost">Intelligence Cost: 8</span> · <span class="cooldown">Cooldown: 5s</span>
 

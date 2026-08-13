@@ -13,6 +13,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
@@ -564,6 +565,29 @@ public class Utils {
 		var attr = entity.getAttribute(Attribute.WATER_MOVEMENT_EFFICIENCY);
 		if(attr != null) {
 			attr.setBaseValue(1.0);
+		}
+	}
+
+	/**
+	 * The Ice Spray freeze: halves the target's movement speed for {@code ticks}, then restores it.
+	 * A MOVEMENT_SPEED modifier rather than the Slowness effect, so milk can't clear it and it doesn't
+	 * fight with other slowness sources; MULTIPLY_SCALAR_1 applies to the running total, so -0.5 is
+	 * exactly 0.5x whatever the target's speed already is. The modifier is transient, so it is never
+	 * written to the entity's NBT and a restart mid-freeze can't leave it stuck on. Callers pair this
+	 * with the "IceSprayed" tag (which carries the +10% damage taken / -15% damage dealt) on the same
+	 * timer. No-op if the entity lacks the attribute.
+	 */
+	public static void iceSpraySlow(LivingEntity entity, long ticks) {
+		var speed = entity.getAttribute(Attribute.MOVEMENT_SPEED);
+		if(speed != null) {
+			NamespacedKey key = new NamespacedKey(Plugin.getInstance(), "IceSpraySlow");
+			AttributeModifier stale = speed.getModifier(key); // a leftover would make addModifier throw
+			if(stale != null) {
+				speed.removeModifier(stale);
+			}
+			AttributeModifier slow = new AttributeModifier(key, -0.5, AttributeModifier.Operation.MULTIPLY_SCALAR_1);
+			speed.addTransientModifier(slow);
+			scheduleTask(() -> speed.removeModifier(slow), ticks);
 		}
 	}
 

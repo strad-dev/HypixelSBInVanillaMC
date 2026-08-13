@@ -10,7 +10,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,8 +30,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /*
@@ -44,6 +48,9 @@ public class Eq implements CommandExecutor, Listener {
 
 	private static final Component TITLE = Utils.msg("<dark_gray>Equipment");
 	private static final int SPEED_SLOT = 8;
+	/** Modifiers currentSpeed resolves the attribute WITHOUT - vanilla mechanics that aren't part of the speed
+	 *  stat. Add a key here and it stops counting; Speed/Soul Speed are deliberately absent, they do count. */
+	private static final Set<NamespacedKey> IGNORED_SPEED_MODIFIERS = Set.of(NamespacedKey.minecraft("sprinting"));
 	/** Last server tick a swap ran per player - collapses a double-click's burst of events into one swap. */
 	private static final Map<UUID, Integer> lastSwapTick = new HashMap<>();
 
@@ -102,11 +109,35 @@ public class Eq implements CommandExecutor, Listener {
 		return cane;
 	}
 
-	/** Player's current movement speed on the 100-based scale (100 = vanilla default), all modifiers included. */
+	/** Player's current movement speed on the 100-based scale (100 = vanilla default), sprinting excluded. */
 	private static int currentSpeed(Player p) {
 		var attr = p.getAttribute(Attribute.MOVEMENT_SPEED);
 		if(attr == null || attr.getBaseValue() == 0) return 100;
-		return (int) Math.round(attr.getValue() / attr.getBaseValue() * 100);
+		// Resolved here rather than via getValue() so IGNORED_SPEED_MODIFIERS can be skipped outright: sprinting
+		// is a transient +30% MULTIPLY_SCALAR_1 modifier vanilla puts on this same attribute, getValue() resolves
+		// it like any other, and that made a sprinting player read 30% high. The three passes mirror
+		// AttributeInstance.calculateValue (base + ADD_NUMBER, then ADD_SCALAR off that base, then each
+		// MULTIPLY_SCALAR_1); negatives are clamped like vanilla's sanitizeValue, whose floor here is 0.
+		double vanillaBase = attr.getBaseValue(); // the 100-point scale is relative to this, so keep it separate
+		Collection<AttributeModifier> mods = attr.getModifiers();
+
+		double base = vanillaBase;
+		for(AttributeModifier mod : mods) {
+			if(counts(mod, AttributeModifier.Operation.ADD_NUMBER)) base += mod.getAmount();
+		}
+		double value = base;
+		for(AttributeModifier mod : mods) {
+			if(counts(mod, AttributeModifier.Operation.ADD_SCALAR)) value += base * mod.getAmount();
+		}
+		for(AttributeModifier mod : mods) {
+			if(counts(mod, AttributeModifier.Operation.MULTIPLY_SCALAR_1)) value *= 1 + mod.getAmount();
+		}
+		return (int) Math.round(Math.max(0, value) / vanillaBase * 100);
+	}
+
+	/** Whether a modifier belongs in op's pass of currentSpeed's sum. */
+	private static boolean counts(AttributeModifier mod, AttributeModifier.Operation op) {
+		return mod.getOperation() == op && !IGNORED_SPEED_MODIFIERS.contains(mod.getKey());
 	}
 
 	// =================== Click handling: swap armor from the player's inventory ===================

@@ -18,8 +18,6 @@ import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -53,7 +51,7 @@ public class IceSpray implements AbilityItem {
 		lore.add(Utils.mm("<gray>Produces a cone of ice in front"));
 		lore.add(Utils.mm("<gray>of the caster that deals"));
 		lore.add(Utils.mm("<red>1<gray> damage to enemies and"));
-		lore.add(Utils.mm("<gray>slows them down for <green>5"));
+		lore.add(Utils.mm("<gray>halves their speed for <green>5"));
 		lore.add(Utils.mm("<gray>seconds!  Frozen enemies take"));
 		lore.add(Utils.mm("<red>+10%<gray> increased damage"));
 		lore.add(Utils.mm("<gray>and deal <red>-15%<gray> damage!"));
@@ -91,7 +89,7 @@ public class IceSpray implements AbilityItem {
 				} else {
 					damage += 1;
 					customMobs(entity1, p, 1, DamageType.PLAYER_MAGIC);
-					entity1.addPotionEffect(new PotionEffect(PotionEffectType.SLOWNESS, 101, 3));
+					Utils.iceSpraySlow(entity1, 101L);
 					entity1.addScoreboardTag("IceSprayed");
 					Utils.scheduleTask(() -> entity1.removeScoreboardTag("IceSprayed"), 101L);
 					if(entity1 instanceof Player enemy) {

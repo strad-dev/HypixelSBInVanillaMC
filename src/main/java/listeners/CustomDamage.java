@@ -296,6 +296,24 @@ public class CustomDamage implements Listener {
 					damager instanceof Player critP && critP.getFallDistance() > 0 && type == DamageType.MELEE, // critical
 					damagee.getNoDamageTicks() > 0); // landed during the victim's i-frames
 
+			// Intelligence for landing a melee blow. Granted here, at the end of the pipeline, rather than
+			// at the damage event, so a swing that ends up dealing nothing (armor/resistance soaking it to
+			// 0, a blocked hit, an i-framed target, or a blow the PvP layer suppressed) pays out nothing.
+			if(finalDamage > 0 && type == DamageType.MELEE && damager instanceof Player p
+					&& (damagee instanceof Monster || damagee.getScoreboardTags().contains("SkyblockBoss") || damagee instanceof Player)) {
+				try {
+					Score score = Plugin.getIntelligence(p);
+					if(score.getScore() < 2500) {
+						score.setScore(score.getScore() + 1);
+					}
+					Plugin.sendIntelligenceBar(p, score);
+				} catch(Exception exception) {
+					Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
+					Bukkit.broadcast(Utils.msg("<red>Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin"));
+					return;
+				}
+			}
+
 			boolean isPhysicalHit = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL;
 			// handle particles and wind burst
 			if(damager instanceof Player p) {
@@ -1232,28 +1250,11 @@ public class CustomDamage implements Listener {
 
 				// A blow the PvP layer suppresses (Free-For-All safezone, duel countdown, an outsider
 				// interfering in a duel) never lands - customMobs stops at the same shouldBlock check
-				// below - so it must not pay out either: no intelligence for the attacker, no hit against
-				// the victim's stats. Always false off the pvp server / with PvP disabled.
+				// below - so it must not pay out either: no hit against the victim's stats (and no
+				// intelligence, which dealDamage grants). Always false off the pvp server / with PvP disabled.
 				boolean pvpBlocked = pvp.PvpHooks.shouldBlock(entity, e.getDamager());
 
 				if(entity.getNoDamageTicks() == 0 || e.getDamager() instanceof AbstractArrow) {
-					// apply intelligence to players
-					if(!pvpBlocked && e.getDamager() instanceof Player p) {
-						if(type.equals(DamageType.MELEE) && (e.getEntity() instanceof Monster || e.getEntity().getScoreboardTags().contains("SkyblockBoss") || e.getEntity() instanceof Player)) {
-							try {
-								Score score = Plugin.getIntelligence(p);
-								if(score.getScore() < 2500) {
-									score.setScore(score.getScore() + 1);
-								}
-								Plugin.sendIntelligenceBar(p, score);
-							} catch(Exception exception) {
-								Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
-								Bukkit.broadcast(Utils.msg("<red>Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin"));
-								return;
-							}
-						}
-					}
-
 					Entity damager = e.getDamager();
 
 					// Normalize custom boss damage to remove vanilla difficulty scaling

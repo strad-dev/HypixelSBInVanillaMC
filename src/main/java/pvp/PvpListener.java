@@ -84,6 +84,14 @@ public class PvpListener implements Listener {
 		}
 	}
 
+	/**
+	 * True if this player currently holds safezone immunity, per the tick above (so it already accounts
+	 * for FFA/safezone being enabled and for duellists being excluded).
+	 */
+	public boolean inSafezone(Player p) {
+		return inSafezone.contains(p.getUniqueId());
+	}
+
 	// ===== CustomDamage hooks (called from PvpHooks) =====
 
 	/**

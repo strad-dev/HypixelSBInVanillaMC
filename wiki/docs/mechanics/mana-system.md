@@ -6,7 +6,8 @@ The mana system is internally called **Intelligence** and powers all [item abili
 
 <div class="stat-line"><strong>Maximum mana:</strong> 2500</div>
 <div class="stat-line"><strong>Minimum mana:</strong> 0</div>
-<div class="stat-line"><strong>Passive regen:</strong> +1 every 5 seconds</div>
+<div class="stat-line"><strong>Passive regen:</strong> +1 every 5 seconds (paused inside the PvP safe zone)</div>
+<div class="stat-line"><strong>On hit:</strong> +1 per melee blow that deals damage</div>
 <div class="stat-line"><strong>Tracked via:</strong> scoreboard objective <code>"Intelligence"</code></div>
 <div class="stat-line"><strong>Display:</strong> action bar via NMS packets</div>
 
@@ -22,3 +23,5 @@ The mana system is internally called **Intelligence** and powers all [item abili
 ## Mana Management
 
 Mana regenerates slowly at +1 every 5 seconds. There is no way to increase the regeneration rate or maximum beyond 2500. Spamming abilities like [Hyperion](../items/weapons/hyperion.md) or [AOTV](../items/tools/aspect-of-the-void.md) will drain your pool quickly -- manage it carefully during boss fights.
+
+Landing a melee hit on a monster, boss, or player also gives +1, but only if the hit actually deals damage: a swing fully soaked by armor or Resistance, blocked, absorbed by the target's invulnerability frames, or negated by a boss mechanic gives nothing. Standing in the PvP safe zone stops passive regen entirely, so mana there has to be earned in the arena.
