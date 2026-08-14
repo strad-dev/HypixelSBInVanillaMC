@@ -159,6 +159,58 @@ public class DuelManager {
 		if (target != null) target.sendMessage(Utils.msg("<gray><white><s></white> cancelled their duel request", Placeholder.unparsed("s", sender.getName())));
 	}
 
+	/**
+	 * Clear every duel state a player is in: an ACTIVE duel ends as a draw, a queued pair is dropped, and
+	 * any request they sent or received is cancelled. Returns true if there was anything to clear.
+	 *
+	 * <p>A draw and not a forfeit on purpose - neither fighter chose to stop, so neither should take a loss
+	 * for it. Reached by console/op through {@code /duel forceclear <player>}, which the network plugin uses
+	 * before force-pairing someone who's already busy; harmless standalone (it's just an admin tool).
+	 * The arena stays occupied for the usual grace period, so a pair force-started right after simply waits
+	 * in the queue and is pumped in when it frees.
+	 */
+	public boolean forceClear(Player p) {
+		UUID id = p.getUniqueId();
+		boolean cleared = clearInvites(id);
+		if (removeFromQueue(id)) {
+			p.sendMessage(Utils.msg("<yellow>An admin took you out of the duel queue"));
+			return true;
+		}
+		Duel d = byPlayer.get(id);
+		if (d == null) return cleared;
+		for (UUID side : new UUID[]{d.a, d.b}) {
+			Player pl = Bukkit.getPlayer(side);
+			if (pl != null) pl.sendMessage(Utils.msg("<yellow>An admin ended your duel"));
+		}
+		drawEnd(d);
+		return true;
+	}
+
+	/** Drop the request this player is waiting on and any they sent, telling the other side. */
+	private boolean clearInvites(UUID id) {
+		boolean any = false;
+		UUID inviter = invites.remove(id);
+		inviteTokens.remove(id);
+		if (inviter != null) {
+			any = true;
+			Player f = Bukkit.getPlayer(inviter);
+			Player t = Bukkit.getPlayer(id);
+			if (f != null && t != null) f.sendMessage(Utils.msg("<gray>Your duel request to <white><t></white> was cancelled",
+					Placeholder.unparsed("t", t.getName())));
+		}
+		Iterator<Map.Entry<UUID, UUID>> it = invites.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry<UUID, UUID> e = it.next();
+			if (!e.getValue().equals(id)) continue;
+			it.remove();
+			inviteTokens.remove(e.getKey());
+			any = true;
+			Player t = Bukkit.getPlayer(e.getKey());
+			if (t != null) t.sendMessage(Utils.msg("<gray>That duel request was cancelled"));
+		}
+		return any;
+	}
+
 	// ===== match =====
 	public void start(Player a, Player b) {
 		if (notEnabled(a)) return;

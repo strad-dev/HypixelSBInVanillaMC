@@ -36,6 +36,9 @@ public class DuelCommand implements CommandExecutor, TabCompleter {
 		if (args.length >= 1 && args[0].equalsIgnoreCase("start")) {
 			return start(sender, args);
 		}
+		if (args.length >= 1 && args[0].equalsIgnoreCase("forceclear")) {
+			return forceClear(sender, args);
+		}
 		if (!(sender instanceof Player p)) {
 			sender.sendMessage(Utils.msg("<red>Only players can duel"));
 			return true;
@@ -83,11 +86,36 @@ public class DuelCommand implements CommandExecutor, TabCompleter {
 		Player a = Bukkit.getPlayerExact(args[1]);
 		Player b = Bukkit.getPlayerExact(args[2]);
 		if (a == null || b == null) {
-			sender.sendMessage(Utils.msg("<red>Both players must be online here (<a>, <b>)",
-					Placeholder.unparsed("a", args[1]), Placeholder.unparsed("b", args[2])));
+			// Placeholders are <x>/<y>: <b> is MiniMessage's bold tag and would eat the second name.
+			sender.sendMessage(Utils.msg("<red>Both players must be online here (<x>, <y>)",
+					Placeholder.unparsed("x", args[1]), Placeholder.unparsed("y", args[2])));
 			return true;
 		}
 		duels.start(a, b);
+		return true;
+	}
+
+	/**
+	 * /duel forceclear <player> console/op only: end whatever duel state they're in - an active duel
+	 * becomes a draw, a queue slot is dropped, requests are cancelled. The network plugin runs this before
+	 * force-pairing someone who's already busy (its /forceduel).
+	 */
+	private boolean forceClear(CommandSender sender, String[] args) {
+		boolean privileged = !(sender instanceof Player p) || p.isOp();
+		if (!privileged) {
+			sender.sendMessage(Utils.msg("<red>You can't force-clear duels"));
+			return true;
+		}
+		if (args.length < 2) {
+			sender.sendMessage(Utils.msg("<red>Usage: /duel forceclear <player>"));
+			return true;
+		}
+		Player t = Bukkit.getPlayerExact(args[1]);
+		if (t == null) {
+			sender.sendMessage(Utils.msg("<red>That player isn't on this server"));
+			return true;
+		}
+		duels.forceClear(t);
 		return true;
 	}
 
