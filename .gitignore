@@ -2,8 +2,7 @@
 /shelf/
 .idea/
 target/
-wiki/site/
-wiki/venv/
+wiki/
 MIGRATION_PLAYBOOK.md
 .paper-nms/
 
