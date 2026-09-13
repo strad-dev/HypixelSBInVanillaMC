@@ -27,6 +27,3 @@ Add it to your server by dragging it into the `plugins` folder once downloaded.
 **REQUIRES SPIGOT OR PAPER**
 
 <sup>Older releases are available but **may contain unpatched bugs and exploits**.  This is your one and only warning.</sup>
-
-## Full Info About Items, Mobs, & Gameplay Changes
-Check out the Wiki [here](https://github.com/strad-dev/HypixelSBInVanillaMC/wiki) (work-in-progress, finishing up in 3-5 business days)
