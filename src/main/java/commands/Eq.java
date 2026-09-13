@@ -30,11 +30,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /*
  * Eq (/eq) - ported from the M7 TAS plugin. Opens a 1-row chest GUI showing the player's worn armor

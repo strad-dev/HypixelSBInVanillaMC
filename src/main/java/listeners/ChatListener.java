@@ -1,5 +1,6 @@
 package listeners;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
@@ -8,7 +9,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import io.papermc.paper.event.player.AsyncChatEvent;
 
 public class ChatListener implements Listener {
 	private static final boolean DISCORDSRV_PRESENT = Bukkit.getPluginManager().getPlugin("DiscordSRV") != null;

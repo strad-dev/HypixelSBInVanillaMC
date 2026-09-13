@@ -1,24 +1,20 @@
 package listeners;
 
 import items.ingredients.mining.*;
+import misc.Plugin;
 import misc.Utils;
 import mobs.hardmode.generic.VoidcrazedSeraph;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageAbortEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitTask;
-import misc.Plugin;
 
 import java.util.HashMap;
 import java.util.Map;
