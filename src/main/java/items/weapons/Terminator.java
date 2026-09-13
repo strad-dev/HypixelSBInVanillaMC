@@ -38,8 +38,9 @@ public class Terminator implements AbilityItem {
 
 	/**
 	 * One arrow's damage at this Power level, before the Strength bonus the shot adds on top.  <b>The lore and
-	 * {@link #onRightClick} both read this</b>, which is the whole point of it existing: the numbers were
-	 * written out twice and had already drifted apart on the Salvation line below.
+	 * {@link #onRightClick} both read this</b>, which is the whole point of it existing: the numbers used to be
+	 * written out twice, and the Salvation pair below had already drifted - the lore promised a base of 4 and
+	 * the beam fired 4.5.  The lore was the intended figure, so the beam came down to it.
 	 *
 	 * <p>Level 7 rounds up to a flat +2 rather than 1.75, the same way the melee enchantments round at 7.
 	 */
