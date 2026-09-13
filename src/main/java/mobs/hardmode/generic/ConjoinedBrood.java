@@ -7,8 +7,6 @@ import mobs.CustomMob;
 import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 
 public class ConjoinedBrood implements CustomMob {
 	@Override

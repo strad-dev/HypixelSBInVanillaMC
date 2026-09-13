@@ -1,18 +1,7 @@
 package pvp;
 
-import items.armor.GoldorLeggings;
-import items.armor.MaxorBoots;
-import items.armor.NecromancerLordLeggings;
-import items.armor.NecronElytra;
-import items.armor.PrimalDragonChestplate;
-import items.armor.WardenHelmet;
-import items.armor.WitherKingCrown;
-import items.misc.AOTV;
-import items.misc.BonzoStaff;
-import items.misc.GyrokineticWand;
-import items.misc.HolyIce;
-import items.misc.IceSpray;
-import items.misc.WandOfAtonement;
+import items.armor.*;
+import items.misc.*;
 import items.weapons.Claymore;
 import items.weapons.Scylla;
 import items.weapons.SwordOfBadHealth;
@@ -22,7 +11,6 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 /**
  * The fixed 1v1 loadout. {@link #apply(Player)} wipes the inventory and lays out the standardized kit
