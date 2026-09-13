@@ -47,8 +47,8 @@ public class CreativeMenu implements Listener {
 	static {
 		// Initialize items
 		ITEMS.put("items", Arrays.asList(
-				Scylla.getItem(Enchantment.SHARPNESS, 0),
-				Claymore.getItem(Enchantment.SHARPNESS, 0),
+				Scylla.getItem(),
+				Claymore.getItem(),
 				Terminator.getItem(0),
 				WardenHelmet.getItem(),
 				WitherKingCrown.getItem(),
@@ -66,7 +66,7 @@ public class CreativeMenu implements Listener {
 				BonzoStaff.getItem(),
 				TacticalInsertion.getItem(),
 				GyrokineticWand.getItem(),
-				SwordOfBadHealth.getItem(Enchantment.SHARPNESS, 0)
+				SwordOfBadHealth.getItem()
 		));
 
 		// Initialize ingredients

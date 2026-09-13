@@ -16,9 +16,22 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Claymore implements CustomItem {
-	public static ItemStack getItem(Enchantment ench, int enchLevel) {
+	/** This weapon's own attack damage, before any enchantment. Quoted on the lore line. */
+	private static final double BASE_DAMAGE = 9;
+
+	public static ItemStack getItem() {
+		return getItem(Map.of());
+	}
+
+	/**
+	 * The item, carrying {@code enchants} and with lore that says so. <b>The enchantments go on here rather
+	 * than being applied by the caller afterwards</b> - that was the desync: the caller built the item, got
+	 * lore for whatever it named, and then enchanted the stack by material type.
+	 */
+	public static ItemStack getItem(Map<Enchantment, Integer> enchants) {
 		ItemStack claymore = new ItemStack(Material.STONE_SWORD);
 
 		ItemMeta data = claymore.getItemMeta();
@@ -32,25 +45,12 @@ public class Claymore implements CustomItem {
 		data.addAttributeModifier(Attribute.ENTITY_INTERACTION_RANGE, attackRange);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
-		String loreDamage = "9";
-		if(ench.equals(Enchantment.SHARPNESS)) {
-			loreDamage = String.valueOf(9 + enchLevel);
-		}
-
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/dark_claymore"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>+" + loreDamage));
+		lore.add(Utils.damageLore(BASE_DAMAGE, enchants));
 		lore.add(Utils.mm("<gray>Swing Range: <red>+2"));
-		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
-			lore.add(Utils.mm(""));
-			loreDamage = String.valueOf(enchLevel * 2);
-			if(ench.equals(Enchantment.SMITE)) {
-				lore.add(Utils.mm("<gray>Bonus Undead Damage: <red>+" + loreDamage));
-			} else {
-				lore.add(Utils.mm("<gray>Bonus Arthropod Damage: <red>+" + loreDamage));
-			}
-		}
+		lore.addAll(Utils.bonusDamageLore(enchants));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>That thing was too big to be"));
 		lore.add(Utils.mm("<gray><italic>called a sword, it was more like"));
@@ -60,6 +60,7 @@ public class Claymore implements CustomItem {
 
 		data.lore(lore);
 		claymore.setItemMeta(data);
+		claymore.addUnsafeEnchantments(enchants);
 
 		return claymore;
 	}

@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
@@ -60,8 +61,145 @@ public class CustomDamage implements Listener {
 	// arrows accumulates horizontally instead of each setVelocity overwriting the last.
 	private static final Map<Entity, Integer> lastTermKnockbackTick = new WeakHashMap<>();
 
+	// Stamped on an Ender Dragon the moment its death branch runs, and the one way to tell a corpse from a live
+	// dragon: vanilla's own death animation runs at 1 HP (EnderDragon.handleKillingBlow pins it there and hands
+	// the phase to DYING), so isDead() and getHealth() both read as alive for the whole 200-tick animation.
+	public static final String DYING_DRAGON_TAG = "DyingDragon";
+
+	/** True while an Ender Dragon is playing its death animation, i.e. it is a corpse and must take no damage. */
+	public static boolean isDyingDragon(Entity e) {
+		return e instanceof EnderDragon && e.getScoreboardTags().contains(DYING_DRAGON_TAG);
+	}
+
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type) {
 		customMobs(damagee, damager, originalDamage, type, new DamageData(damagee, damager, originalDamage));
+	}
+
+	// ================================ melee crits and weapon enchantments ================================
+	//
+	// Vanilla's critical hit is worth very little here and is unavailable exactly when a player is fighting.
+	// Two things about it:
+	//
+	//   * it multiplies only the ATTRIBUTE damage.  The enchantment bonus is added afterwards, untouched
+	//     (Player.attack: `f *= 1.5f` and only then `f + g`), so a Sharpness VII Claymore's crit is worth
+	//     1.5x of 10 and a flat +7 on top rather than 1.5x of 17.
+	//   * Player.canCriticalAttack ends with `&& !isSprinting()`, so you cannot crit while sprinting, which
+	//     in practice means you cannot crit while chasing anyone.
+	//
+	// So the crit is decided and applied HERE instead: the same conditions minus the sprint clause, and a
+	// 1.5x over the WHOLE blow, enchantments included.  That is a large buff to enchanted weapons, so
+	// Sharpness and Smite/Bane are retuned downwards below to pay for it.  The whole exchange is meant to
+	// make the jump-crit worth doing rather than make gear hit harder.
+
+	/** Sharpness, per level, replacing vanilla's {@code 0.5 * level + 0.5}.  Level 7 is the one the duel kit
+	 *  and the palette hand out, so it gets a round 5.5 rather than 5.25. */
+	public static double sharpnessBonus(int level) {
+		if(level <= 0) return 0;
+		return level == 7 ? 5.5 : level * 0.75;
+	}
+
+	/** Smite / Bane of Arthropods against a target of the type they apply to, replacing vanilla's
+	 *  {@code 2.5 * level}.  Level 7 gets 11 rather than 10.5, for the same reason as Sharpness. */
+	public static double smiteBonus(int level) {
+		if(level <= 0) return 0;
+		return level == 7 ? 11 : level * 1.5;
+	}
+
+	/** What vanilla would have given, which is what has to come back off before ours goes on. */
+	private static double vanillaSharpnessBonus(int level) {
+		return level <= 0 ? 0 : level * 0.5 + 0.5;
+	}
+
+	/** @see #vanillaSharpnessBonus */
+	private static double vanillaSmiteBonus(int level) {
+		return level <= 0 ? 0 : level * 2.5;
+	}
+
+	/**
+	 * Can this player land a critical hit on that target?  {@code Player.canCriticalAttack} copied out of the
+	 * 26.2 jar with ONE clause dropped - {@code !isSprinting()} - plus the attack-cooldown gate that lives in
+	 * {@code Player.attack} beside the call rather than inside it ({@code getAttackStrengthScale > 0.9}).
+	 *
+	 * <p>The cooldown is read here rather than assumed, and it is still the value vanilla used: the ticker is
+	 * reset by the packet handler AFTER {@code attack()} returns, and the damage event this is called from
+	 * fires inside it.  With the plugin's own weapons it is always 1 anyway - they all carry ATTACK_SPEED +100.
+	 */
+	public static boolean canCrit(Player p, Entity target) {
+		if(!(target instanceof LivingEntity)) return false;
+		ServerPlayer sp = ((CraftPlayer) p).getHandle();
+		return sp.getAttackStrengthScale(0.5f) > 0.9f
+				&& p.getFallDistance() > 0
+				&& !sp.onGround()
+				&& !sp.onClimbable()
+				&& !sp.isInWater()
+				&& !sp.isMobilityRestricted()
+				&& !sp.isPassenger()
+				&& critsEnabled(p.getWorld());
+	}
+
+	/** Paper can switch player crits off per world.  If it ever is, vanilla did not crit either, so both the
+	 *  strip in {@link #rebuildMelee} and our own multiplier have to go quiet with it. */
+	private static boolean critsEnabled(World world) {
+		return !((CraftWorld) world).getHandle().paperConfig().entities.behavior.disablePlayerCrits;
+	}
+
+	/**
+	 * Rebuild one melee blow.  Takes vanilla's number back apart - its enchantment bonus off, its own crit
+	 * off - puts our enchantment values on instead, and then multiplies the WHOLE thing by the crit.
+	 *
+	 * <p>It unwinds rather than recomputing from the attribute, so everything else vanilla folded in stays
+	 * in: the mace's smash bonus, the attack-cooldown scaling, and the boss difficulty normalisation applied
+	 * to {@code e.getDamage()} a few lines above the call.
+	 *
+	 * <p>The enchantment bonus is asked of {@code EnchantmentHelper}, the same helper vanilla used, so an
+	 * enchantment we have not modelled (Impaling on a trident, anything a datapack adds) survives the strip
+	 * as itself instead of being silently dropped.  Only the three levels below are swapped out.
+	 *
+	 * <p><b>Mobs take the enchantment retune and nothing else.</b>  They cannot crit, and their damage does
+	 * not always come from a vanilla swing, so the delta is added the way the old Sharpness patch did rather
+	 * than the whole number being taken apart.
+	 */
+	private static double rebuildMelee(LivingEntity attacker, LivingEntity target, double vanillaDamage, boolean crit) {
+		ItemStack weapon = attacker.getEquipment() == null ? null : attacker.getEquipment().getItemInMainHand();
+		if(weapon == null) return vanillaDamage;
+
+		int sharpness = weapon.getEnchantmentLevel(Enchantment.SHARPNESS);
+		int smite = weapon.getEnchantmentLevel(Enchantment.SMITE);
+		int bane = weapon.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS);
+		net.minecraft.world.entity.Entity nmsTarget = ((CraftEntity) target).getHandle();
+		// Smite and Bane only ever applied if the target is of the type they are for, so the delta is zero
+		// otherwise - asked of the same tags the enchantments' own conditions use.
+		if(!nmsTarget.is(net.minecraft.tags.EntityTypeTags.SENSITIVE_TO_SMITE)) smite = 0;
+		if(!nmsTarget.is(net.minecraft.tags.EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)) bane = 0;
+
+		double delta = (sharpnessBonus(sharpness) - vanillaSharpnessBonus(sharpness))
+				+ (smiteBonus(smite) - vanillaSmiteBonus(smite))
+				+ (smiteBonus(bane) - vanillaSmiteBonus(bane));
+
+		if(!(attacker instanceof Player p)) {
+			return Math.max(0, vanillaDamage + delta);
+		}
+
+		ServerPlayer sp = ((CraftPlayer) p).getHandle();
+		ServerLevel level = ((CraftWorld) p.getWorld()).getHandle();
+		// The enchantment bonus is scaled by the swing's charge and the base damage by its square; the crit
+		// multiplies neither of the two, it multiplies what they add up to.
+		float scale = sp.getAttackStrengthScale(0.5f);
+		float attributeDamage = (float) sp.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
+		DamageSource source = level.damageSources().playerAttack(sp);
+		double vanillaEnchant = scale * (net.minecraft.world.item.enchantment.EnchantmentHelper.modifyDamage(
+				level, sp.getWeaponItem(), nmsTarget, source, attributeDamage) - attributeDamage);
+
+		// 1. the blow with no enchantments and no crit on it.  Vanilla's own crit is ours minus the sprint
+		// clause, so the caller's answer settles it and the conditions are only evaluated once.
+		double base = vanillaDamage - vanillaEnchant;
+		if(crit && !p.isSprinting()) {
+			base /= 1.5; // vanilla's crit, which it applied to this part alone
+		}
+
+		// 2. our enchantment bonus, then 3. the crit over both.
+		double enchant = vanillaEnchant + scale * delta;
+		return Math.max(0, (base + enchant) * (crit ? 1.5 : 1));
 	}
 
 	private static void handleTridentHit(Trident trident, DamageData data) {
@@ -76,6 +214,12 @@ public class CustomDamage implements Listener {
 	}
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
+		// A dragon mid-death animation is a corpse.  Hitting one used to re-run the whole death branch below - the
+		// phase flip, dragonDeathTime back to 1, another death sound, another XP drop, another pin ticker - so a
+		// party still swinging restarted the 200-tick animation every hit and the dragon simply never finished
+		// dying.  It also re-ran the boss's own whenDamaged (the Primal Dragon replayed its death dialogue and
+		// re-granted the advancement) and drew hit particles off a dead target.  Refuse at both entry points.
+		if(isDyingDragon(damagee)) return;
 		if(damager instanceof Projectile projectile) {
 			originalDamage = data.originalDamage;
 			// stop stupidly annoying arrows
@@ -157,6 +301,7 @@ public class CustomDamage implements Listener {
 	}
 
 	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
+		if(isDyingDragon(damagee)) return; // see customMobs; a boss's whenDamaged calls in here directly
 		if(!(DamageType.isAbsoluteDamage(type))) {
 			// bonus damage to withers from hyperion
 			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && p.getInventory().getItemInMainHand().hasItemMeta() && Utils.firstLorePlain(p.getInventory().getItemInMainHand().getItemMeta()).equals("skyblock/combat/scylla")) {
@@ -293,7 +438,7 @@ public class CustomDamage implements Listener {
 			// PvP layer (config-gated, inert off the pvp server): record this hit for arena/duel combat stats.
 			pvp.PvpHooks.trackHit(damagee, damager, finalDamage,
 					type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL,
-					damager instanceof Player critP && critP.getFallDistance() > 0 && type == DamageType.MELEE, // critical
+					data.isCrit, // critical - decided once, at the damage event, and already priced into finalDamage
 					damagee.getNoDamageTicks() > 0); // landed during the victim's i-frames
 
 			// Intelligence for landing a melee blow. Granted here, at the end of the pipeline, rather than
@@ -319,7 +464,7 @@ public class CustomDamage implements Listener {
 			if(damager instanceof Player p) {
 				Location particleLoc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
 				ItemStack weapon = p.getEquipment().getItemInMainHand();
-				boolean isCrit = p.getFallDistance() > 0 && type == DamageType.MELEE;
+				boolean isCrit = data.isCrit;
 
 				// Critical hit particles
 				if(isCrit) {
@@ -543,6 +688,7 @@ public class CustomDamage implements Listener {
 						// handle ender dragons specially
 						if(damagee instanceof EnderDragon dragon) {
 							if(!(dragon instanceof CraftEnderDragon)) return;
+							dragon.addScoreboardTag(DYING_DRAGON_TAG); // from here on it is a corpse - see isDyingDragon
 							net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon = ((CraftEnderDragon) dragon).getHandle();
 							nmsDragon.getPhaseManager().setPhase(EnderDragonPhase.DYING);
 							DragonPhaseInstance phase = nmsDragon.getPhaseManager().getCurrentPhase();
@@ -1271,14 +1417,23 @@ public class CustomDamage implements Listener {
 						}
 					}
 
-					if(damager instanceof LivingEntity livingEntity) {
-						int sharpness = livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SHARPNESS);
-						if(sharpness > 1) {
-							e.setDamage(e.getDamage() + (sharpness - 1) * 0.5);
-						}
+					// Melee blows are recomputed here rather than taken as vanilla left them: vanilla's crit
+					// multiplies only the attribute damage and refuses to happen while sprinting, and its
+					// Sharpness/Smite/Bane numbers are not the ones this plugin wants.  See rebuildMelee.
+					// ENTITY_ATTACK and not DamageType.MELEE, which also covers thorns and explosions - this
+					// is about a swing, and neither of those is one.
+					boolean crit = false;
+					if(e.getCause() == DamageCause.ENTITY_ATTACK && damager instanceof LivingEntity attacker) {
+						crit = damager instanceof Player p && canCrit(p, entity);
+						e.setDamage(rebuildMelee(attacker, entity, e.getDamage(), crit));
 					}
 
-					customMobs(entity, damager, e.getDamage(), type, new DamageData(e));
+					// The crit goes on the DamageData, not back through a second getFallDistance() test: it
+					// is already priced into the damage above, and the particles, the sound and the PvP hit
+					// stats must all name the same blow.
+					DamageData data = new DamageData(e);
+					data.isCrit = crit;
+					customMobs(entity, damager, e.getDamage(), type, data);
 				} else if(!pvpBlocked && type == DamageType.MELEE && e.getDamager() instanceof Player) {
 					// Melee blow connected but the victim's i-frames negate it: it deals no damage and
 					// never reaches dealDamage, yet must still count toward PvP "total hits" as an

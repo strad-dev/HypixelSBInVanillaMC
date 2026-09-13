@@ -22,6 +22,11 @@ public class DamageData {
 	public boolean isTridentAttack = false;
 	public boolean tridentChanneling = false;
 	public Trident trident = null;
+	// Was this melee blow a critical hit?  Decided ONCE, at the damage event, by CustomDamage.canCrit, and
+	// carried from there instead of being re-derived: the damage number in originalDamage already has the
+	// 1.5x in it, and the particles, the sound and the PvP hit stats all have to agree with it.  Re-asking
+	// later would not, either - the mace branch in dealDamage zeroes the fall distance the answer is built on.
+	public boolean isCrit = false;
 
 	public DamageData(EntityDamageByEntityEvent e) {
 		this.originalDamage = e.getDamage();

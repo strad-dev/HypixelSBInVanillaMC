@@ -17,6 +17,7 @@ import items.weapons.Claymore;
 import items.weapons.Scylla;
 import items.weapons.SwordOfBadHealth;
 import items.weapons.Terminator;
+import listeners.ItemReloader;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -42,13 +43,13 @@ public final class DuelKit {
 	 */
 	public static ItemStack[] defaultLoadout() {
 		ItemStack[] a = new ItemStack[41];
-		a[0] = k(Scylla.getItem(Enchantment.SHARPNESS, 7));        // "sharpness hyperion"
+		a[0] = k(Scylla.getItem());        // "sharpness hyperion"
 		a[1] = k(AOTV.getItem());
 		a[2] = k(IceSpray.getItem());
-		a[3] = k(Claymore.getItem(Enchantment.SHARPNESS, 7));      // "sharpness dark claymore"
+		a[3] = k(Claymore.getItem());      // "sharpness dark claymore"
 		a[4] = k(Terminator.getItem(7));
 		a[5] = k(WandOfAtonement.getItem());
-		a[6] = k(SwordOfBadHealth.getItem(Enchantment.SHARPNESS, 7));
+		a[6] = k(SwordOfBadHealth.getItem());
 		a[7] = k(HolyIce.getItem());
 		a[8] = new ItemStack(Material.GOLDEN_CARROT, 64);
 		a[9] = k(WardenHelmet.getItem());
@@ -108,6 +109,10 @@ public final class DuelKit {
 			item.addUnsafeEnchantment(Enchantment.FLAME, 1);
 			item.addUnsafeEnchantment(Enchantment.PUNCH, 2);
 		}
-		return item;
+		// Enchanting a custom item out here leaves its LORE describing the item before the enchants went on -
+		// which is how the kit's Claymore ended up reading "Damage: +9" while carrying Sharpness VII. Rebuild
+		// it through the canonical path, which regenerates the lore from the enchantments now on the stack.
+		ItemStack refreshed = ItemReloader.refreshItem(item);
+		return refreshed != null ? refreshed : item;
 	}
 }

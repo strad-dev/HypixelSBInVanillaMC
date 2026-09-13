@@ -82,6 +82,61 @@ public class Utils {
 	}
 
 	/**
+	 * A damage figure as it belongs on a lore line: no trailing {@code .0}, at most two decimals.  Sharpness
+	 * is 0.75 a level, so these are no longer whole numbers.
+	 */
+	public static String damageNumber(double d) {
+		if(d == Math.rint(d)) {
+			return String.valueOf((long) d);
+		}
+		return new java.math.BigDecimal(d).setScale(2, java.math.RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
+	}
+
+	/**
+	 * The {@code Damage: +N} line for a weapon, N being its own attack damage plus whatever Sharpness it is
+	 * actually carrying.
+	 *
+	 * <p><b>Built from the item's enchantments rather than from an argument someone remembered to pass.</b>
+	 * The bug this replaces: the palette and the duel kit both build a weapon with {@code getItem}, get a
+	 * lore line for the enchantment they named, and THEN enchant the stack by material type - so a Claymore
+	 * whose lore said {@code Damage: +9} was handed out carrying Sharpness VII.  It also read one
+	 * enchantment only, so Sharpness on a Smite weapon never showed, and quoted numbers
+	 * ({@code level * 2} for Smite) that no longer matched what the damage pipeline paid out.
+	 *
+	 * @see CustomDamage#sharpnessBonus
+	 */
+	public static Component damageLore(double baseDamage, Map<Enchantment, Integer> enchants) {
+		int sharpness = enchants == null ? 0 : enchants.getOrDefault(Enchantment.SHARPNESS, 0);
+		return mm("<gray>Damage: <red>+" + damageNumber(baseDamage + CustomDamage.sharpnessBonus(sharpness)));
+	}
+
+	/**
+	 * The {@code Bonus Undead/Arthropod Damage} lines for a weapon, blank separator included, or nothing at
+	 * all if it carries neither enchantment.  Both are listed when an item somehow has both.
+	 *
+	 * @see #damageLore
+	 */
+	public static List<Component> bonusDamageLore(Map<Enchantment, Integer> enchants) {
+		List<Component> out = new ArrayList<>();
+		if(enchants == null) {
+			return out;
+		}
+		int smite = enchants.getOrDefault(Enchantment.SMITE, 0);
+		int bane = enchants.getOrDefault(Enchantment.BANE_OF_ARTHROPODS, 0);
+		if(smite <= 0 && bane <= 0) {
+			return out;
+		}
+		out.add(mm(""));
+		if(smite > 0) {
+			out.add(mm("<gray>Bonus Undead Damage: <red>+" + damageNumber(CustomDamage.smiteBonus(smite))));
+		}
+		if(bane > 0) {
+			out.add(mm("<gray>Bonus Arthropod Damage: <red>+" + damageNumber(CustomDamage.smiteBonus(bane))));
+		}
+		return out;
+	}
+
+	/**
 	 * Updates the HP display of the given entity.
 	 *
 	 * @param entity The entity in question.

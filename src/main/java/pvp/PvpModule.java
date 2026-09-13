@@ -12,6 +12,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class PvpModule {
 	private PvpModule() {}
 
+	/** The live loadout editor, held only so {@link #disable} can shut it down. Null with duels off. */
+	private static PvpLoadoutMenu loadoutMenu;
+
+	/**
+	 * Hand back the real inventory of anyone still inside the loadout editor. While one is open the editor IS the
+	 * player's inventory, so a shutdown that skipped this would leave them holding palette copies - i.e. their own
+	 * items gone. Called from the plugin's onDisable, before players are dropped.
+	 */
+	public static void disable() {
+		if (loadoutMenu != null) loadoutMenu.restoreAll();
+	}
+
 	public static void enable(JavaPlugin plugin, PvpConfig cfg) {
 		PvpStats stats = new PvpStats(cfg);
 		stats.start(plugin);
@@ -63,6 +75,7 @@ public final class PvpModule {
 			PvpLoadoutMenu menu = new PvpLoadoutMenu(cfg, loadouts);
 			plugin.getServer().getPluginManager().registerEvents(menu, plugin);
 			bind(plugin, "pvploadout", menu);
+			loadoutMenu = menu;
 		} else {
 			unregister(plugin, "duel", "pvploadout");
 		}

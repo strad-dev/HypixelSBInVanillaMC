@@ -328,6 +328,7 @@ public class Plugin extends JavaPlugin implements Listener {
 
 	@Override
 	public void onDisable() {
+		pvp.PvpModule.disable(); // hands back the inventory of anyone inside the PvP loadout editor
 		getLogger().info("Stopped SkyBlock in Vanilla!");
 	}
 

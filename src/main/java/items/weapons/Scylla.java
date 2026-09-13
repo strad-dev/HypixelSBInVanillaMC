@@ -23,12 +23,25 @@ import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 public class Scylla implements AbilityItem {
 	private static final int MANA_COST = 15;
 
-	public static ItemStack getItem(Enchantment ench, int enchLevel) {
+	/** This weapon's own attack damage, before any enchantment. Quoted on the lore line. */
+	private static final double BASE_DAMAGE = 8;
+
+	public static ItemStack getItem() {
+		return getItem(Map.of());
+	}
+
+	/**
+	 * The item, carrying {@code enchants} and with lore that says so. <b>The enchantments go on here rather
+	 * than being applied by the caller afterwards</b> - that was the desync: the caller built the item, got
+	 * lore for whatever it named, and then enchanted the stack by material type.
+	 */
+	public static ItemStack getItem(Map<Enchantment, Integer> enchants) {
 		ItemStack scylla = new ItemStack(Material.NETHERITE_SWORD);
 
 		ItemMeta data = scylla.getItemMeta();
@@ -40,24 +53,11 @@ public class Scylla implements AbilityItem {
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeed);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
-		String loreDamage = "8";
-		if(ench.equals(Enchantment.SHARPNESS)) {
-			loreDamage = String.valueOf(8 + enchLevel);
-		}
-
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/scylla"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>+" + loreDamage));
-		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
-			lore.add(Utils.mm(""));
-			loreDamage = String.valueOf(enchLevel * 2);
-			if(ench.equals(Enchantment.SMITE)) {
-				lore.add(Utils.mm("<gray>Bonus Undead Damage: <red>+" + loreDamage));
-			} else {
-				lore.add(Utils.mm("<gray>Bonus Arthropod Damage: <red>+" + loreDamage));
-			}
-		}
+		lore.add(Utils.damageLore(BASE_DAMAGE, enchants));
+		lore.addAll(Utils.bonusDamageLore(enchants));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray>Deals <red>+4<gray> damage to Withers."));
 		lore.add(Utils.mm(""));
@@ -76,6 +76,7 @@ public class Scylla implements AbilityItem {
 
 		data.lore(lore);
 		scylla.setItemMeta(data);
+		scylla.addUnsafeEnchantments(enchants);
 
 		return scylla;
 	}
@@ -238,25 +239,22 @@ public class Scylla implements AbilityItem {
 		double targetDamage = Objects.requireNonNull(p.getAttribute(Attribute.ATTACK_DAMAGE)).getValue();
 		int damaged = 0;
 		double damage = 0;
-		int smite = 0;
-		int bane = 0;
-		if(p.getInventory().getItemInMainHand().containsEnchantment(Enchantment.SHARPNESS)) {
-			int sharpness = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.SHARPNESS);
-			targetDamage += sharpness;
-		} else if(p.getInventory().getItemInMainHand().containsEnchantment(Enchantment.SMITE)) {
-			smite = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.SMITE);
-		} else if(p.getInventory().getItemInMainHand().containsEnchantment(Enchantment.BANE_OF_ARTHROPODS)) {
-			bane = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS);
-		}
+		// The same figures the melee pipeline pays out, so "61% of your Melee Damage" stays true through the
+		// Sharpness/Smite retune - and all three are read, where the old else-if chain counted exactly one of
+		// them and quoted numbers (level, level * 2) that matched neither vanilla nor this plugin.
+		ItemStack held = p.getInventory().getItemInMainHand();
+		targetDamage += CustomDamage.sharpnessBonus(held.getEnchantmentLevel(Enchantment.SHARPNESS));
+		double smite = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.SMITE));
+		double bane = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS));
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
 				double tempDamage = targetDamage;
 				if(entity1 instanceof Wither) {
-					tempDamage += 4 + smite * 2;
+					tempDamage += 4 + smite;
 				} else if(entity1 instanceof Zombie || entity1 instanceof AbstractSkeleton || entity1 instanceof SkeletonHorse || entity1 instanceof ZombieHorse || entity1 instanceof Phantom || entity1 instanceof Zoglin) {
-					tempDamage += smite * 2;
+					tempDamage += smite;
 				} else if(entity1 instanceof Spider || entity1 instanceof Bee || entity1 instanceof Silverfish || entity1 instanceof Endermite) {
-					tempDamage += bane * 2;
+					tempDamage += bane;
 				}
 				tempDamage = Math.ceil(tempDamage * 0.61);
 				CustomDamage.customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC);

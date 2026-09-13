@@ -20,12 +20,25 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class SwordOfBadHealth implements AbilityItem {
 	private static final String COOLDOWN_TAG = "BadHealthCooldown";
 	private static final int COOLDOWN = 100;
 
-	public static ItemStack getItem(Enchantment ench, int enchLevel) {
+	/** This weapon's own attack damage, before any enchantment. Quoted on the lore line. */
+	private static final double BASE_DAMAGE = 1;
+
+	public static ItemStack getItem() {
+		return getItem(Map.of());
+	}
+
+	/**
+	 * The item, carrying {@code enchants} and with lore that says so. <b>The enchantments go on here rather
+	 * than being applied by the caller afterwards</b> - that was the desync: the caller built the item, got
+	 * lore for whatever it named, and then enchanted the stack by material type.
+	 */
+	public static ItemStack getItem(Map<Enchantment, Integer> enchants) {
 		ItemStack swordOfBadHealth = new ItemStack(Material.WOODEN_SWORD);
 
 		ItemMeta data = swordOfBadHealth.getItemMeta();
@@ -37,24 +50,11 @@ public class SwordOfBadHealth implements AbilityItem {
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeed);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 
-		String loreDamage = "1";
-		if(ench.equals(Enchantment.SHARPNESS)) {
-			loreDamage = String.valueOf(1 + enchLevel);
-		}
-
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/sword_of_bad_health"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>+" + loreDamage));
-		if(ench.equals(Enchantment.SMITE) || ench.equals(Enchantment.BANE_OF_ARTHROPODS)) {
-			lore.add(Utils.mm(""));
-			loreDamage = String.valueOf(enchLevel * 2);
-			if(ench.equals(Enchantment.SMITE)) {
-				lore.add(Utils.mm("<gray>Bonus Undead Damage: <red>+" + loreDamage));
-			} else {
-				lore.add(Utils.mm("<gray>Bonus Arthropod Damage: <red>+" + loreDamage));
-			}
-		}
+		lore.add(Utils.damageLore(BASE_DAMAGE, enchants));
+		lore.addAll(Utils.bonusDamageLore(enchants));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Bad Health <green><bold>RIGHT CLICK"));
 		lore.add(Utils.mm("<gray>Use <red>10%<gray> of your max health"));
@@ -66,6 +66,7 @@ public class SwordOfBadHealth implements AbilityItem {
 
 		data.lore(lore);
 		swordOfBadHealth.setItemMeta(data);
+		swordOfBadHealth.addUnsafeEnchantments(enchants);
 
 		return swordOfBadHealth;
 	}

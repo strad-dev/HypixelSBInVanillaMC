@@ -8,6 +8,7 @@ import items.misc.*;
 import items.summonItems.*;
 import items.weapons.Claymore;
 import items.weapons.Scylla;
+import items.weapons.SwordOfBadHealth;
 import items.weapons.Terminator;
 import misc.Utils;
 import org.bukkit.Material;
@@ -196,16 +197,12 @@ public class ItemReloader implements Listener {
 
 		String key = Utils.firstLorePlain(item.getItemMeta());
 
-		Enchantment ench = Enchantment.SHARPNESS;
-		if(item.getEnchantments().containsKey(Enchantment.SMITE)) {
-			ench = Enchantment.SMITE;
-		} else if(item.getEnchantments().containsKey(Enchantment.BANE_OF_ARTHROPODS)) {
-			ench = Enchantment.BANE_OF_ARTHROPODS;
-		}
-
+		// The weapons take the WHOLE enchantment map, not one enchantment picked out of it. This used to
+		// choose Smite over Bane over Sharpness and hand that single pair to getItem, so a sword carrying
+		// both showed one of them and the other silently vanished from the lore.
 		ItemStack newItem = switch(key) {
 			case "skyblock/combat/aspect_of_the_void" -> AOTV.getItem();
-			case "skyblock/combat/scylla" -> Scylla.getItem(ench, item.getEnchantmentLevel(ench));
+			case "skyblock/combat/scylla" -> Scylla.getItem(item.getEnchantments());
 			case "skyblock/combat/terminator" -> Terminator.getItem(item.getEnchantmentLevel(Enchantment.POWER));
 			case "skyblock/combat/ice_spray_wand" -> IceSpray.getItem();
 			case "skyblock/combat/wand_of_restoration" -> WandOfRestoration.getItem();
@@ -215,7 +212,10 @@ public class ItemReloader implements Listener {
 			case "skyblock/combat/bonzo_staff" -> BonzoStaff.getItem();
 			case "skyblock/combat/tactical_insertion" -> TacticalInsertion.getItem();
 			case "skyblock/combat/gyro" -> GyrokineticWand.getItem();
-			case "skyblock/combat/dark_claymore" -> Claymore.getItem(ench, item.getEnchantmentLevel(ench));
+			case "skyblock/combat/dark_claymore" -> Claymore.getItem(item.getEnchantments());
+			// Was missing from this list entirely, so a saved Sword of Bad Health was the one weapon whose
+			// lore never came back into step with the enchantments on it.
+			case "skyblock/combat/sword_of_bad_health" -> SwordOfBadHealth.getItem(item.getEnchantments());
 			case "skyblock/combat/warden_helmet" -> WardenHelmet.getItem();
 			case "skyblock/combat/wither_king_crown" -> WitherKingCrown.getItem();
 			case "skyblock/combat/necron_elytra" -> NecronElytra.getItem();
