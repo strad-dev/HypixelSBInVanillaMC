@@ -21,6 +21,7 @@ import org.bukkit.util.Vector;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import static misc.Utils.shootBeam;
 
@@ -30,7 +31,40 @@ public class Terminator implements AbilityItem {
 	private static final String SHOT_COOLDOWN_TAG = "TerminatorShotCooldown";
 	private static final int SHOT_COOLDOWN = 3;
 
-	public static ItemStack getItem(int powerLevel) {
+	/** An ordinary shot's own damage, before Power. */
+	private static final double ARROW_BASE = 2.5;
+	/** The Salvation beam's own damage, before Power. */
+	private static final double SALVATION_BASE = 4;
+
+	/**
+	 * One arrow's damage at this Power level, before the Strength bonus the shot adds on top.  <b>The lore and
+	 * {@link #onRightClick} both read this</b>, which is the whole point of it existing: the numbers were
+	 * written out twice and had already drifted apart on the Salvation line below.
+	 *
+	 * <p>Level 7 rounds up to a flat +2 rather than 1.75, the same way the melee enchantments round at 7.
+	 */
+	public static double arrowDamage(int power) {
+		if(power <= 0) return ARROW_BASE;
+		return ARROW_BASE + (power == 7 ? 2.0 : power * 0.25);
+	}
+
+	/** The Salvation beam's damage at this Power level, before Strength.  @see #arrowDamage */
+	public static double salvationDamage(int power) {
+		if(power <= 0) return SALVATION_BASE;
+		return SALVATION_BASE + (power == 7 ? 4.0 : power * 0.5);
+	}
+
+	public static ItemStack getItem() {
+		return getItem(Map.of());
+	}
+
+	/**
+	 * The item, carrying {@code enchants} and with lore that says so.  <b>The enchantments go on here rather
+	 * than being applied by the caller afterwards</b> - that was the desync: the caller built the item, got
+	 * lore for the Power level it named, and then enchanted the stack by material type.
+	 */
+	public static ItemStack getItem(Map<Enchantment, Integer> enchants) {
+		int powerLevel = enchants == null ? 0 : enchants.getOrDefault(Enchantment.POWER, 0);
 		ItemStack term = new ItemStack(Material.BOW);
 
 		ItemMeta data = term.getItemMeta();
@@ -38,8 +72,8 @@ public class Terminator implements AbilityItem {
 		data.displayName(Utils.mm("<light_purple>Terminator"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_UNBREAKABLE);
 
-		String loreDamage = powerLevel == 7 ? "4.5" : String.valueOf(2.5 + powerLevel * 0.25);
-		String salvationDamage = powerLevel == 7 ? "8" : String.valueOf(4 + powerLevel * 0.5);
+		String loreDamage = Utils.damageNumber(arrowDamage(powerLevel));
+		String salvationDamage = Utils.damageNumber(salvationDamage(powerLevel));
 
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/terminator"));
@@ -60,6 +94,7 @@ public class Terminator implements AbilityItem {
 
 		data.lore(lore);
 		term.setItemMeta(data);
+		term.addUnsafeEnchantments(enchants);
 
 		return term;
 	}
@@ -127,17 +162,8 @@ public class Terminator implements AbilityItem {
 		Arrow middle = (Arrow) nmsMiddle.getBukkitEntity();
 		Arrow right = (Arrow) nmsRight.getBukkitEntity();
 
-		// Calculate bonuses
-		double powerBonus;
-		try {
-			int power = p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.POWER);
-			powerBonus = power * 0.25;
-			if(power == 7) {
-				powerBonus += 0.25;
-			}
-		} catch(Exception exception) {
-			powerBonus = 0;
-		}
+		// The lore's figure, not a second copy of the arithmetic - see arrowDamage.
+		double damage = arrowDamage(p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.POWER));
 
 		double strengthBonus;
 		try {
@@ -146,11 +172,9 @@ public class Terminator implements AbilityItem {
 			strengthBonus = 0;
 		}
 
-		double add = powerBonus + strengthBonus;
-
 		// Set Bukkit properties
 		for(Arrow arrow : Arrays.asList(left, middle, right)) {
-			arrow.setDamage(2.5 + add);
+			arrow.setDamage(damage + strengthBonus);
 			arrow.setPierceLevel(4);
 			arrow.setShooter(p);
 			arrow.setWeapon(p.getInventory().getItemInMainHand());
@@ -164,16 +188,10 @@ public class Terminator implements AbilityItem {
 
 	@Override
 	public boolean onLeftClick(Player p) {
-		double powerBonus;
-		try {
-			int power = p.getInventory().getItem(p.getInventory().getHeldItemSlot()).getEnchantmentLevel(Enchantment.POWER);
-			powerBonus = power * 0.5;
-			if(power == 7) {
-				powerBonus += 0.5;
-			}
-		} catch(Exception exception) {
-			powerBonus = 0;
-		}
+		// Off the MAIN HAND, like the shot above and like the lore.  This used to read
+		// getItem(getHeldItemSlot()), which is the same item by a route that can return null - hence the
+		// try/catch that then swallowed the Power level and silently fired an unenchanted beam.
+		double damage = salvationDamage(p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.POWER));
 
 		double strengthBonus;
 		try {
@@ -182,9 +200,7 @@ public class Terminator implements AbilityItem {
 			strengthBonus = 0;
 		}
 
-		// shoot the three arrows
-		double add = powerBonus + strengthBonus;
-		shootBeam(p, p, Color.RED, 64, 5, 4.5 + add);
+		shootBeam(p, p, Color.RED, 64, 5, damage + strengthBonus);
 		p.playSound(p.getLocation(), Sound.ENTITY_GUARDIAN_DEATH, 1.0F, 2.0F);
 		return true;
 	}

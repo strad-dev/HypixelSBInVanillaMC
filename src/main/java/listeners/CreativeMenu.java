@@ -49,7 +49,7 @@ public class CreativeMenu implements Listener {
 		ITEMS.put("items", Arrays.asList(
 				Scylla.getItem(),
 				Claymore.getItem(),
-				Terminator.getItem(0),
+				Terminator.getItem(),
 				WardenHelmet.getItem(),
 				WitherKingCrown.getItem(),
 				NecronElytra.getItem(),

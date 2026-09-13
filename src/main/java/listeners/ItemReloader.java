@@ -203,7 +203,7 @@ public class ItemReloader implements Listener {
 		ItemStack newItem = switch(key) {
 			case "skyblock/combat/aspect_of_the_void" -> AOTV.getItem();
 			case "skyblock/combat/scylla" -> Scylla.getItem(item.getEnchantments());
-			case "skyblock/combat/terminator" -> Terminator.getItem(item.getEnchantmentLevel(Enchantment.POWER));
+			case "skyblock/combat/terminator" -> Terminator.getItem(item.getEnchantments());
 			case "skyblock/combat/ice_spray_wand" -> IceSpray.getItem();
 			case "skyblock/combat/wand_of_restoration" -> WandOfRestoration.getItem();
 			case "skyblock/combat/wand_of_atonement" -> WandOfAtonement.getItem();

@@ -47,7 +47,7 @@ public final class DuelKit {
 		a[1] = k(AOTV.getItem());
 		a[2] = k(IceSpray.getItem());
 		a[3] = k(Claymore.getItem());      // "sharpness dark claymore"
-		a[4] = k(Terminator.getItem(7));
+		a[4] = k(Terminator.getItem());
 		a[5] = k(WandOfAtonement.getItem());
 		a[6] = k(SwordOfBadHealth.getItem());
 		a[7] = k(HolyIce.getItem());

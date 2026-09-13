@@ -86,7 +86,7 @@ public class AddRecipes {
 	}
 
 	public static Recipe addTermRecipe(Plugin plugin) {
-		ItemStack term = Terminator.getItem(0);
+		ItemStack term = Terminator.getItem();
 		ItemStack core = Core.getItem();
 		ItemStack tessellated = TessellatedPearl.getItem();
 		ItemStack nullBlade = NullBlade.getItem();
