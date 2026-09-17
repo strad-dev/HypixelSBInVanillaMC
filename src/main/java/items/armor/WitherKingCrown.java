@@ -44,6 +44,7 @@ public class WitherKingCrown implements Armor {
 
 		data.lore(lore);
 		crown.setItemMeta(data);
+		Utils.setEnchantability(crown, Utils.SKYBLOCK_ENCHANTABILITY);
 
 		return crown;
 	}

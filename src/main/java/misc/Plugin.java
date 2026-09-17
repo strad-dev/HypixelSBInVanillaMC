@@ -143,10 +143,14 @@ public class Plugin extends JavaPlugin implements Listener {
 			getLogger().info("Deteced Intelligence.");
 		}
 
-		Utils.scheduleTask(() -> passiveIntel(0), 20L);
+		Utils.scheduleTask(Plugin::passiveIntel, 20L);
 
 		// Config-gated PvP feature (FFA, 1v1 duels, stats, arena commands). Inert unless enabled.
 		pvp.PvpModule.enable(this, pvpCfg);
+
+		// Config-gated Manhunt feature (/manhunt, the Manhunt Hyperion ladder). Inert unless enabled.
+		// PvpConfig above has already saved and loaded the config file.
+		manhunt.ManhuntModule.enable(this, getConfig().getBoolean("manhunt", false));
 	}
 
 	/**
@@ -272,6 +276,12 @@ public class Plugin extends JavaPlugin implements Listener {
 		}
 	}
 
+	@EventHandler
+	public void onPlayerQuit(org.bukkit.event.player.PlayerQuitEvent event) {
+		// Banked regen ticks are worth nothing once they are gone, and the map would only grow.
+		intelTicks.remove(event.getPlayer().getUniqueId());
+	}
+
 	public static void grantAdvancement(String key, Player player) {
 		// key format is "skyblock:advancement_name" - extract the name part
 		String name = key.contains(":") ? key.split(":")[1] : key;
@@ -288,11 +298,17 @@ public class Plugin extends JavaPlugin implements Listener {
 			.getScore(p.getName());
 	}
 
+	/** The ceiling on {@code p}'s intelligence: 2500, or their Manhunt Hyperion's rung during a Manhunt. */
+	public static int maxIntelligence(Player p) {
+		return manhunt.Manhunt.maxIntelligence(p);
+	}
+
 	public static void sendIntelligenceBar(Player p, Score score) {
-		MutableComponent message = Component.literal("Intelligence: " + score.getScore() + "/2500")
+		int max = maxIntelligence(p);
+		MutableComponent message = Component.literal("Intelligence: " + score.getScore() + "/" + max)
 			.withStyle(Style.EMPTY.withColor(ChatFormatting.AQUA));
 
-		if(score.getScore() >= 2500) {
+		if(score.getScore() >= max) {
 			message.append(Component.literal(" MAX INTELLIGENCE")
 				.withStyle(Style.EMPTY.withColor(ChatFormatting.RED).withBold(true)));
 		}
@@ -300,13 +316,36 @@ public class Plugin extends JavaPlugin implements Listener {
 		((CraftPlayer) p).getHandle().connection.send(new ClientboundSetActionBarTextPacket(message));
 	}
 
-	public static void passiveIntel(int second) {
+	/**
+	 * Ticks of regen each player has banked. Per-player because the rate is theirs: off a Manhunt it is one
+	 * point every 80 ticks for everybody, during one it is the Hyperion rung they have reached.
+	 */
+	private static final java.util.Map<java.util.UUID, Integer> intelTicks = new java.util.HashMap<>();
+
+	/**
+	 * Passive intelligence regen, run <b>every tick</b> - each player banks a tick and is paid a point once
+	 * they have banked their own rate's worth. It used to run every 20 ticks with a 0-3 counter, i.e. one
+	 * point every 4 seconds for everyone, which cannot express a Manhunt's per-rung rates.
+	 */
+	public static void passiveIntel() {
 		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
 			try {
+				// Picking a Hyperion up is what raises a Manhunt intelligence ceiling, and it can happen
+				// any tick - crafted, looted off a body, pulled out of a chest.
+				manhunt.Manhunt.observe(p);
+
 				Score score = Plugin.getIntelligence(p);
+				int max = maxIntelligence(p);
+				if(score.getScore() > max) {
+					score.setScore(max);
+				}
+
 				// No passive regen in the Free-For-All safe zone: mana has to be earned in the arena.
 				// Always false off the pvp server / with PvP disabled.
-				if(score.getScore() < 2500 && second == 3 && !pvp.PvpHooks.inSafezone(p)) {
+				if(score.getScore() >= max || pvp.PvpHooks.inSafezone(p)) {
+					intelTicks.put(p.getUniqueId(), 0);
+				} else if(intelTicks.merge(p.getUniqueId(), 1, Integer::sum) >= manhunt.Manhunt.ticksPerMana(p)) {
+					intelTicks.put(p.getUniqueId(), 0);
 					score.setScore(score.getScore() + 1);
 				}
 				Plugin.sendIntelligenceBar(p, score);
@@ -317,13 +356,7 @@ public class Plugin extends JavaPlugin implements Listener {
 			}
 		}
 
-		if(second == 3) {
-			second = 0;
-		} else {
-			second ++;
-		}
-		int finalSecond = second;
-		Utils.scheduleTask(() -> passiveIntel(finalSecond), 20L);
+		Utils.scheduleTask(Plugin::passiveIntel, 1L);
 	}
 
 	@Override

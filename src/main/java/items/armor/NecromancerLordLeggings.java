@@ -44,6 +44,7 @@ public class NecromancerLordLeggings implements Armor {
 
 		data.lore(lore);
 		necromancerLordLeggings.setItemMeta(data);
+		Utils.setEnchantability(necromancerLordLeggings, Utils.SKYBLOCK_ENCHANTABILITY);
 
 		return necromancerLordLeggings;
 	}

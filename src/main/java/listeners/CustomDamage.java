@@ -1,5 +1,6 @@
 package listeners;
 
+import items.weapons.Scylla;
 import misc.DamageData;
 import misc.Plugin;
 import misc.Utils;
@@ -104,6 +105,20 @@ public class CustomDamage implements Listener {
 		return level == 7 ? 11 : level * 1.5;
 	}
 
+	/**
+	 * What Strength has to give back. Vanilla's is <b>+3 melee damage per level</b> (an {@code effect.strength}
+	 * {@code ADD_VALUE 3.0} modifier on ATTACK_DAMAGE, read off the 26.2 jar); this plugin pays <b>+2</b>, so
+	 * one point per level comes off every melee blow.
+	 *
+	 * <p>It rides on the attribute, so it is already inside anything that reads ATTACK_DAMAGE - vanilla's own
+	 * damage number, and {@code Utils.meleeDamageWith}. Both take this off rather than trying to keep the
+	 * modifier itself out, which is not ours to change: vanilla applies it transiently when the effect lands.
+	 */
+	public static double strengthPenalty(LivingEntity attacker) {
+		PotionEffect strength = attacker.getPotionEffect(PotionEffectType.STRENGTH);
+		return strength == null ? 0 : strength.getAmplifier() + 1;
+	}
+
 	/** What vanilla would have given, which is what has to come back off before ours goes on. */
 	private static double vanillaSharpnessBonus(int level) {
 		return level <= 0 ? 0 : level * 0.5 + 0.5;
@@ -176,7 +191,8 @@ public class CustomDamage implements Listener {
 				+ (smiteBonus(bane) - vanillaSmiteBonus(bane));
 
 		if(!(attacker instanceof Player p)) {
-			return Math.max(0, vanillaDamage + delta);
+			// A mob's blow is not always a charged swing, so its Strength comes off unscaled.
+			return Math.max(0, vanillaDamage + delta - strengthPenalty(attacker));
 		}
 
 		ServerPlayer sp = ((CraftPlayer) p).getHandle();
@@ -195,6 +211,12 @@ public class CustomDamage implements Listener {
 		if(crit && !p.isSprinting()) {
 			base /= 1.5; // vanilla's crit, which it applied to this part alone
 		}
+
+		// Strength down from +3 to +2 per level.  It sits in the attribute, so it is inside `base` and was
+		// scaled by the charge the same way the rest of the attribute damage was (Player.attack does
+		// `attributeDamage * (0.2 + scale^2 * 0.8)`); the penalty is scaled to match, and the crit below
+		// then multiplies the nerfed blow rather than the vanilla one.
+		base -= strengthPenalty(p) * (0.2 + scale * scale * 0.8);
 
 		// 2. our enchantment bonus, then 3. the crit over both.
 		double enchant = vanillaEnchant + scale * delta;
@@ -312,8 +334,9 @@ public class CustomDamage implements Listener {
 				finalDamage *= 1.1;
 			}
 
+			// The share is the Hyperion's, not the tag's - a Manhunt Hyperion shields for as little as 5%.
 			if(damagee.getScoreboardTags().contains("WitherShield")) {
-				finalDamage *= 0.85;
+				finalDamage *= 1 - Scylla.witherShieldReduction(damagee);
 			}
 
 			if(damagee.getScoreboardTags().contains("HolyIce")) {
@@ -443,11 +466,12 @@ public class CustomDamage implements Listener {
 			// Intelligence for landing a melee blow. Granted here, at the end of the pipeline, rather than
 			// at the damage event, so a swing that ends up dealing nothing (armor/resistance soaking it to
 			// 0, a blocked hit, an i-framed target, or a blow the PvP layer suppressed) pays out nothing.
+			// Any living target pays out - except during a Manhunt, where only hitting another player does.
 			if(finalDamage > 0 && type == DamageType.MELEE && damager instanceof Player p
-					&& (damagee instanceof Monster || damagee.getScoreboardTags().contains("SkyblockBoss") || damagee instanceof Player)) {
+					&& (!manhunt.Manhunt.active() || damagee instanceof Player)) {
 				try {
 					Score score = Plugin.getIntelligence(p);
-					if(score.getScore() < 2500) {
+					if(score.getScore() < Plugin.maxIntelligence(p)) {
 						score.setScore(score.getScore() + 1);
 					}
 					Plugin.sendIntelligenceBar(p, score);

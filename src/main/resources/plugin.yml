@@ -53,6 +53,9 @@ commands:
   pvploadout:
     description: Edit your PvP duel loadout.
     usage: /pvploadout [reset]
+  manhunt:
+    description: Manage a game of Minecraft Manhunt
+    usage: /manhunt [speedrunner|teams|start|reset]
 
 softdepend:
   - DiscordSRV

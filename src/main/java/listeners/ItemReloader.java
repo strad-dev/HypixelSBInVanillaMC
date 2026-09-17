@@ -7,6 +7,7 @@ import items.ingredients.witherLords.*;
 import items.misc.*;
 import items.summonItems.*;
 import items.weapons.Claymore;
+import items.weapons.ManhuntHyperion;
 import items.weapons.Scylla;
 import items.weapons.SwordOfBadHealth;
 import items.weapons.Terminator;
@@ -21,6 +22,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
@@ -36,7 +38,7 @@ public class ItemReloader implements Listener {
 		if(!(e.getEntity() instanceof Player p)) return;
 
 		ItemStack item = e.getItem().getItemStack();
-		ItemStack refreshed = refreshItem(item);
+		ItemStack refreshed = refreshItem(item, p);
 		if(refreshed != null) {
 			e.getItem().setItemStack(refreshed);
 		} else {
@@ -52,12 +54,29 @@ public class ItemReloader implements Listener {
 		for(int i = 0; i < inventory.getSize(); i++) {
 			ItemStack item = inventory.getItem(i);
 			if(item == null) continue;
-			ItemStack refreshed = refreshItem(item);
+			ItemStack refreshed = refreshItem(item, p);
 			if(refreshed != null) {
 				inventory.setItem(i, refreshed);
 			} else {
 				modifyVanillaArmor(item);
 			}
+		}
+	}
+
+	/**
+	 * Rewrites the item the player just switched to. Weapons whose lore quotes a live figure - the Hyperion's
+	 * implosion damage - go stale when whatever it is read off changes, so the item is rebuilt on every slot
+	 * switch as well as on join and on pickup.
+	 */
+	@EventHandler
+	public void onItemHeld(PlayerItemHeldEvent e) {
+		Player p = e.getPlayer();
+		PlayerInventory inventory = p.getInventory();
+		ItemStack item = inventory.getItem(e.getNewSlot());
+		if(item == null) return;
+		ItemStack refreshed = refreshItem(item, p);
+		if(refreshed != null) {
+			inventory.setItem(e.getNewSlot(), refreshed);
 		}
 	}
 
@@ -68,7 +87,7 @@ public class ItemReloader implements Listener {
 		Utils.scheduleTask(() -> {
 			ItemStack cursor = p.getItemOnCursor();
 			if(!cursor.getType().isAir()) {
-				ItemStack refreshed = refreshItem(cursor);
+				ItemStack refreshed = refreshItem(cursor, p);
 				if(refreshed != null) {
 					p.setItemOnCursor(refreshed);
 				} else {
@@ -78,7 +97,7 @@ public class ItemReloader implements Listener {
 
 			ItemStack current = e.getCurrentItem();
 			if(current != null && !current.getType().isAir()) {
-				ItemStack refreshed = refreshItem(current);
+				ItemStack refreshed = refreshItem(current, p);
 				if(refreshed != null) {
 					e.setCurrentItem(refreshed);
 				} else {
@@ -192,6 +211,16 @@ public class ItemReloader implements Listener {
 	 * preserving enchantments and stack size. Returns null if the item is not a custom item.
 	 */
 	public static ItemStack refreshItem(ItemStack item) {
+		return refreshItem(item, null);
+	}
+
+	/**
+	 * As {@link #refreshItem(ItemStack)}, for an item that belongs to {@code p}. Only weapons whose lore
+	 * quotes a live figure care who the owner is - the Hyperion writes out the implosion damage it would
+	 * deal in <i>their</i> hands, so a rebuild without the player would reset that line to the figure for a
+	 * player with no other damage modifiers. Saved-loadout refreshes have no live player and pass null.
+	 */
+	public static ItemStack refreshItem(ItemStack item, Player p) {
 		if(item == null || item.getType().isAir()) return null;
 		if(!item.hasItemMeta() || !item.getItemMeta().hasLore()) return null;
 
@@ -202,7 +231,15 @@ public class ItemReloader implements Listener {
 		// both showed one of them and the other silently vanished from the lore.
 		ItemStack newItem = switch(key) {
 			case "skyblock/combat/aspect_of_the_void" -> AOTV.getItem();
-			case "skyblock/combat/scylla" -> Scylla.getItem(item.getEnchantments());
+			case "skyblock/combat/scylla" -> Scylla.getItem(item.getEnchantments(), p);
+			// Both Manhunt items carry state a plain getItem() would lose: the Hyperion its rung
+			// (its material), the compass its target and the needle's last known position.
+			case "skyblock/manhunt/hyperion" -> {
+				// No rung means the ID was pasted onto something that is not one of the eight materials.
+				manhunt.ManhuntTier tier = manhunt.ManhuntTier.of(item);
+				yield tier == null ? null : ManhuntHyperion.getItem(tier, item.getEnchantments(), p);
+			}
+			case "skyblock/manhunt/compass" -> ManhuntCompass.refresh(item);
 			case "skyblock/combat/terminator" -> Terminator.getItem(item.getEnchantments());
 			case "skyblock/combat/ice_spray_wand" -> IceSpray.getItem();
 			case "skyblock/combat/wand_of_restoration" -> WandOfRestoration.getItem();

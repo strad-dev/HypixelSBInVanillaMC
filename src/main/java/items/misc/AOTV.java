@@ -54,6 +54,7 @@ public class AOTV implements AbilityItem {
 
 		data.lore(lore);
 		aotv.setItemMeta(data);
+		Utils.setEnchantability(aotv, Utils.SKYBLOCK_ENCHANTABILITY);
 
 		return aotv;
 	}

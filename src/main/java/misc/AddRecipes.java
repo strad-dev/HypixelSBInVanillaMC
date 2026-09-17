@@ -6,8 +6,11 @@ import items.ingredients.misc.*;
 import items.ingredients.witherLords.*;
 import items.misc.*;
 import items.weapons.Claymore;
+import items.weapons.ManhuntHyperion;
 import items.weapons.Scylla;
 import items.weapons.Terminator;
+import manhunt.ManhuntTier;
+import org.bukkit.Keyed;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -15,7 +18,9 @@ import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.plugin.Plugin;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class AddRecipes {
@@ -430,5 +435,49 @@ public class AddRecipes {
 		godAppleRecipe.setIngredient('A', Material.APPLE);
 
 		return godAppleRecipe;
+	}
+
+	/**
+	 * One recipe per Manhunt Hyperion rung: the rung below it plus that many swords of the new material,
+	 * <b>shapeless</b>, so the arrangement in the grid is nobody's problem. Registered only when Manhunt is
+	 * on.
+	 *
+	 * <p>The Hyperion ingredient can only be matched on its MATERIAL - one carries the owner's enchantments
+	 * and a live damage figure, so no {@code ExactChoice} would ever match. That makes a bare stick plus
+	 * eight wooden swords match too, which is why {@code ManhuntListener.onPrepareCraft} re-checks that
+	 * ingredient and throws the result away if it is not really a Hyperion. It also puts the right
+	 * enchantments and lore on the result, and is the reason {@code KeepEnchantsOnCraft} has to keep its
+	 * hands off these recipes: shapeless means grid slot 4 is whatever the player happened to drop there.
+	 */
+	public static List<Recipe> addManhuntRecipes(Plugin plugin) {
+		List<Recipe> out = new ArrayList<>();
+		for(ManhuntTier tier : ManhuntTier.values()) {
+			if(tier == ManhuntTier.BASE) continue;
+			ManhuntTier from = ManhuntTier.values()[tier.ordinal() - 1];
+
+			ShapelessRecipe recipe = new ShapelessRecipe(new NamespacedKey(plugin, manhuntKey(tier)), ManhuntHyperion.getItem(tier));
+			recipe.addIngredient(from.material());
+			recipe.addIngredient(tier.swordsToUpgrade(), tier.material());
+			out.add(recipe);
+		}
+		return out;
+	}
+
+	/** Whether {@code recipe} is one of the Manhunt upgrades, i.e. one nothing else may touch the result of. */
+	public static boolean isManhuntRecipe(Recipe recipe) {
+		return recipe instanceof Keyed keyed && keyed.getKey().getKey().startsWith("manhunt_");
+	}
+
+	private static String manhuntKey(ManhuntTier tier) {
+		return "manhunt_" + tier.name().toLowerCase(java.util.Locale.ROOT);
+	}
+
+	/** Keys of every Manhunt recipe, so they can be force-discovered on join like the rest. */
+	public static Set<NamespacedKey> manhuntRecipeKeys(Plugin plugin) {
+		Set<NamespacedKey> keys = new HashSet<>();
+		for(Recipe recipe : addManhuntRecipes(plugin)) {
+			keys.add(((Keyed) recipe).getKey());
+		}
+		return keys;
 	}
 }

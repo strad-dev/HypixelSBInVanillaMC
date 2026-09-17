@@ -1,5 +1,7 @@
 package misc;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.Enchantable;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import net.kyori.adventure.text.Component;
@@ -13,6 +15,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
@@ -20,6 +23,7 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -90,6 +94,116 @@ public class Utils {
 			return String.valueOf((long) d);
 		}
 		return new java.math.BigDecimal(d).setScale(2, java.math.RoundingMode.HALF_UP).stripTrailingZeros().toPlainString();
+	}
+
+	/**
+	 * The enchantability every high-end SkyBlock item gets: the Hyperion, the Dark Claymore, every custom
+	 * armour piece, Aspect of the Void and Divan's Pickaxe. Well above vanilla's best (gold, 22), so a
+	 * level-30 table reaches the top cost bands on them.
+	 *
+	 * @see #setEnchantability
+	 */
+	public static final int SKYBLOCK_ENCHANTABILITY = 30;
+
+	/**
+	 * Sets how much enchanting power an item gets out of a table - vanilla's {@code minecraft:enchantable}
+	 * component, which a material's own value is only the default for.
+	 *
+	 * <p>It buys <b>better rolls, not a cheaper price</b>: the table adds
+	 * {@code 1 + rand(value/4 + 1) + rand(value/4 + 1)} to the slot's level before deciding which
+	 * enchantments are in range, so a high value reaches cost bands a low one never will. The XP and lapis
+	 * cost, and anvil work, are untouched. For reference, vanilla runs gold 22, wood and netherite 15, iron
+	 * 14, copper 13, diamond 10, stone 5, and a bow 1.
+	 *
+	 * <p><b>Call this last</b>, after the final {@code setItemMeta} - an {@code ItemMeta} is a snapshot of the
+	 * item's components and applying one would put the default back.
+	 *
+	 * <p>{@code value <= 0} removes the component, which makes the item <b>unenchantable at a table</b>
+	 * (books and anvils still work). That is deliberate for the Stick Manhunt Hyperion.
+	 */
+	public static void setEnchantability(ItemStack item, int value) {
+		if(value <= 0) {
+			item.unsetData(DataComponentTypes.ENCHANTABLE);
+			return;
+		}
+		item.setData(DataComponentTypes.ENCHANTABLE, Enchantable.enchantable(value));
+	}
+
+	/**
+	 * Rounds to the nearest 0.1 for display.  Lore that quotes a live damage figure uses this so the number
+	 * stays readable - the raw value keeps its full precision on the way into the damage pipeline.
+	 */
+	public static String tenthNumber(double d) {
+		return damageNumber(Math.round(d * 10) / 10.0);
+	}
+
+	/**
+	 * The player's melee damage as it would be with {@code weapon} in their main hand, Sharpness included.
+	 *
+	 * <p>Resolved by hand rather than read off {@code getValue()} because the callers need the figure for a
+	 * weapon that <b>is not necessarily held</b> - the Hyperion's lore is rewritten when the player switches
+	 * slots, picks the item up or logs in.  Every main-hand modifier is dropped and {@code weapon}'s own put
+	 * in its place; everything else on the attribute (Strength, Weakness, an armour piece) still counts.
+	 *
+	 * @see CustomDamage#sharpnessBonus
+	 */
+	public static double meleeDamageWith(@Nullable Player p, @Nullable ItemStack weapon) {
+		double base = 1; // a player's own attack damage, before any weapon
+		double add = 0;
+		double addScalar = 0;
+		List<Double> multiply = new ArrayList<>();
+
+		if(p != null) {
+			AttributeInstance instance = p.getAttribute(Attribute.ATTACK_DAMAGE);
+			if(instance != null) {
+				base = instance.getBaseValue();
+				for(AttributeModifier modifier : instance.getModifiers()) {
+					if(heldSlot(modifier.getSlotGroup())) continue; // whatever is in their hand right now, not our weapon
+					switch(modifier.getOperation()) {
+						case ADD_NUMBER -> add += modifier.getAmount();
+						case ADD_SCALAR -> addScalar += modifier.getAmount();
+						case MULTIPLY_SCALAR_1 -> multiply.add(modifier.getAmount());
+					}
+				}
+			}
+		}
+
+		if(weapon != null && weapon.hasItemMeta()) {
+			Collection<AttributeModifier> own = weapon.getItemMeta().getAttributeModifiers(Attribute.ATTACK_DAMAGE);
+			if(own != null) {
+				for(AttributeModifier modifier : own) {
+					switch(modifier.getOperation()) {
+						case ADD_NUMBER -> add += modifier.getAmount();
+						case ADD_SCALAR -> addScalar += modifier.getAmount();
+						case MULTIPLY_SCALAR_1 -> multiply.add(modifier.getAmount());
+					}
+				}
+			}
+		}
+
+		// The order AttributeInstance.calculateValue uses: every ADD_NUMBER, then each ADD_SCALAR off the
+		// summed base, then each MULTIPLY_SCALAR_1 in turn.
+		double value = base + add;
+		value += base * addScalar;
+		for(double factor : multiply) {
+			value *= 1 + factor;
+		}
+
+		if(weapon != null) {
+			value += CustomDamage.sharpnessBonus(weapon.getEnchantmentLevel(Enchantment.SHARPNESS));
+		}
+		// Strength's modifier is on the attribute, so its vanilla +3/level is already in the sum above and
+		// has to come back down to this plugin's +2 - the same subtraction CustomDamage.rebuildMelee makes,
+		// so the Hyperion's lore and its implosion quote what a swing actually pays out.
+		if(p != null) {
+			value -= CustomDamage.strengthPenalty(p);
+		}
+		return Math.max(0, value);
+	}
+
+	/** Whether a modifier with this slot group is there because of whatever is in the player's main hand. */
+	private static boolean heldSlot(EquipmentSlotGroup group) {
+		return group == EquipmentSlotGroup.MAINHAND || group == EquipmentSlotGroup.HAND;
 	}
 
 	/**

@@ -33,6 +33,13 @@ public class Terminator implements AbilityItem {
 	private static final String SHOT_COOLDOWN_TAG = "TerminatorShotCooldown";
 	private static final int SHOT_COOLDOWN = 3;
 
+	/**
+	 * Enchanting-table power, against a vanilla bow's 1 and the other high-end SkyBlock items' 30.
+	 *
+	 * @see misc.Utils#setEnchantability
+	 */
+	private static final int ENCHANTABILITY = 20;
+
 	/** An ordinary shot's own damage, before Power. */
 	private static final double ARROW_BASE = 2.5;
 	/** The Salvation beam's own damage, before Power. */
@@ -98,6 +105,10 @@ public class Terminator implements AbilityItem {
 		data.lore(lore);
 		term.setItemMeta(data);
 		term.addUnsafeEnchantments(enchants);
+		// Deliberately under the other high-end items' 30: a vanilla bow is 1, so 20 is already an enormous
+		// lift - enough to put Power V in reach of a level-30 table (it needs a modified level of 41) without
+		// making it the near-certainty 30 would.
+		Utils.setEnchantability(term, ENCHANTABILITY);
 
 		return term;
 	}
