@@ -172,9 +172,9 @@ public class CustomItems implements Listener {
 				if(leftClickNoAbility) {
 					// no-op: no left-click ability, so skip all ability handling for this click
 				} else if(!Cooldowns.onCooldown(p, "AbilityCooldown") || ((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && item instanceof Terminator)) {
-					if(score.getScore() < item.manaCost() && !p.getGameMode().equals(GameMode.CREATIVE)) {
+					if(score.getScore() < item.manaCost(itemInUse) && !p.getGameMode().equals(GameMode.CREATIVE)) {
 						if(!((e.getAction().equals(Action.LEFT_CLICK_BLOCK) || e.getAction().equals(Action.LEFT_CLICK_AIR)) && !item.hasLeftClickAbility())) {
-							p.sendMessage(Utils.msg("<red>You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost()));
+							p.sendMessage(Utils.msg("<red>You do not have enough Intelligence to use this ability!  Required Intelligence: " + item.manaCost(itemInUse)));
 							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 						}
 					} else if(Cooldowns.onCooldown(p, item.cooldownTag()) && !(item.cooldownTag().equals("SalvationCooldown") && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))) {
@@ -194,8 +194,8 @@ public class CustomItems implements Listener {
 						if(abilitySuccessful) {
 							if(!p.getGameMode().equals(GameMode.CREATIVE)) {
 								Score score = CustomItems.currentScore();
-								score.setScore(score.getScore() - item.manaCost());
-								pvp.PvpHooks.trackMana(p, item.manaCost());
+								score.setScore(score.getScore() - item.manaCost(itemInUse));
+								pvp.PvpHooks.trackMana(p, item.manaCost(itemInUse));
 							}
 							Cooldowns.start(p, item.cooldownTag(), item.cooldown());
 							Cooldowns.start(p, "AbilityCooldown", 3);

@@ -60,6 +60,7 @@ public class Claymore implements CustomItem {
 
 		data.lore(lore);
 		claymore.setItemMeta(data);
+		Utils.setEnchantability(claymore, Utils.SKYBLOCK_ENCHANTABILITY);
 		claymore.addUnsafeEnchantments(enchants);
 
 		return claymore;

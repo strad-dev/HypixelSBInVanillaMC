@@ -4,6 +4,10 @@ chat:
   # Enables a lightweight custom chat that bypasses Mojang chat reporting
   enabled: true
 
+# Enables Minecraft Manhunt mode: /manhunt, the Manhunt Hyperion upgrade ladder, and the Manhunt
+# intelligence rules (a per-Hyperion cap and regen rate, mana only off other players, wiped on death).
+manhunt: false
+
 pvp:
   ffa:
     # Enables the Free-For-All PvP arena.

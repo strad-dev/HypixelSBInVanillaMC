@@ -49,6 +49,7 @@ public class MaxorBoots implements Armor {
 
 		data.lore(lore);
 		maxorBoots.setItemMeta(data);
+		Utils.setEnchantability(maxorBoots, Utils.SKYBLOCK_ENCHANTABILITY);
 
 		return maxorBoots;
 	}

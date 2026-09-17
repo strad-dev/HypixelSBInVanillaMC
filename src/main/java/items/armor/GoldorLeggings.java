@@ -45,6 +45,7 @@ public class GoldorLeggings implements Armor {
 
 		data.lore(lore);
 		goldorLeggings.setItemMeta(data);
+		Utils.setEnchantability(goldorLeggings, Utils.SKYBLOCK_ENCHANTABILITY);
 
 		return goldorLeggings;
 	}

@@ -2,6 +2,7 @@ package items;
 
 import items.misc.*;
 import items.summonItems.HighlyInfuriatedWitherSkeletonSpawnEgg;
+import items.weapons.ManhuntHyperion;
 import items.weapons.Scylla;
 import items.weapons.SwordOfBadHealth;
 import items.weapons.Terminator;
@@ -32,6 +33,8 @@ public interface CustomItem {
 			ITEMS.put("skyblock/combat/tactical_insertion", new TacticalInsertion());
 			ITEMS.put("skyblock/combat/gyro", new GyrokineticWand());
 			ITEMS.put("skyblock/combat/sword_of_bad_health", new SwordOfBadHealth());
+			ITEMS.put("skyblock/manhunt/hyperion", new ManhuntHyperion());
+			ITEMS.put("skyblock/manhunt/compass", new ManhuntCompass());
 			ITEMS.put("skyblock/summon/wither_skeleton_spawn_egg", new HighlyInfuriatedWitherSkeletonSpawnEgg());
 		}
 

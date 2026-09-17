@@ -49,6 +49,7 @@ public class WardenHelmet implements Armor {
 
 		data.lore(lore);
 		wardenHelmet.setItemMeta(data);
+		Utils.setEnchantability(wardenHelmet, Utils.SKYBLOCK_ENCHANTABILITY);
 
 		return wardenHelmet;
 	}

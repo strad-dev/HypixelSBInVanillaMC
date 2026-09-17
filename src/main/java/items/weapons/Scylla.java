@@ -21,10 +21,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.UUID;
+import java.util.function.ToDoubleFunction;
 
 public class Scylla implements AbilityItem {
 	private static final int MANA_COST = 15;
@@ -32,16 +35,43 @@ public class Scylla implements AbilityItem {
 	/** This weapon's own attack damage, before any enchantment. Quoted on the lore line. */
 	private static final double BASE_DAMAGE = 8;
 
+	/** Share of the wielder's melee damage the implosion deals. */
+	public static final double IMPLOSION_SHARE = 0.60;
+
 	public static ItemStack getItem() {
 		return getItem(Map.of());
+	}
+
+	public static ItemStack getItem(Map<Enchantment, Integer> enchants) {
+		return getItem(enchants, null);
+	}
+
+	public static final String ID = "skyblock/combat/scylla";
+
+	/** Whether {@code item} is a full Hyperion, as opposed to a Manhunt one or a plain netherite sword. */
+	public static boolean isScylla(ItemStack item) {
+		if(item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) return false;
+		return ID.equals(Utils.firstLorePlain(item.getItemMeta()));
+	}
+
+	/**
+	 * The implosion damage this weapon would deal in {@code p}'s hands - the figure quoted on the lore, and
+	 * the one {@link #onRightClick} pays out before any Smite/Bane bonus.
+	 */
+	public static double implosionDamage(@Nullable Player p, ItemStack weapon) {
+		return Utils.meleeDamageWith(p, weapon) * IMPLOSION_SHARE;
 	}
 
 	/**
 	 * The item, carrying {@code enchants} and with lore that says so. <b>The enchantments go on here rather
 	 * than being applied by the caller afterwards</b> - that was the desync: the caller built the item, got
 	 * lore for whatever it named, and then enchanted the stack by material type.
+	 *
+	 * <p>{@code p} is the player the implosion line is written for, and may be null (a recipe result, the
+	 * creative palette) - the line then reads for a player with no other damage modifiers. It is kept in
+	 * step by {@code ItemReloader}, which rewrites the held Hyperion on join and on every slot switch.
 	 */
-	public static ItemStack getItem(Map<Enchantment, Integer> enchants) {
+	public static ItemStack getItem(Map<Enchantment, Integer> enchants, @Nullable Player p) {
 		ItemStack scylla = new ItemStack(Material.NETHERITE_SWORD);
 
 		ItemMeta data = scylla.getItemMeta();
@@ -52,9 +82,15 @@ public class Scylla implements AbilityItem {
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeed);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
+		scylla.setItemMeta(data);
+		scylla.addUnsafeEnchantments(enchants);
+
+		// The implosion figure is read off the FINISHED stack, so the lore quotes exactly what the ability
+		// pays out rather than a second copy of the same sum.
+		double implosion = implosionDamage(p, scylla);
 
 		List<Component> lore = new ArrayList<>();
-		lore.add(Utils.mm("skyblock/combat/scylla"));
+		lore.add(Utils.mm(ID));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.damageLore(BASE_DAMAGE, enchants));
 		lore.addAll(Utils.bonusDamageLore(enchants));
@@ -64,19 +100,19 @@ public class Scylla implements AbilityItem {
 		lore.add(Utils.mm("<gold>Ability: Wither Impact <green><bold>RIGHT CLICK"));
 		lore.add(Utils.mm("<gray>Teleport <green>10 blocks<gray> ahead of"));
 		lore.add(Utils.mm("<gray>you.  Then implode, dealing"));
-		lore.add(Utils.mm("<red>61%<gray> of your Melee Damage to"));
-		lore.add(Utils.mm("<gray>nearby enemies.  Also applies"));
-		lore.add(Utils.mm("<gray>the Wither Shield Scroll Ability,"));
-		lore.add(Utils.mm("<gray>reducing damage taken and"));
-		lore.add(Utils.mm("<gray>granting an absorption shield"));
-		lore.add(Utils.mm("<gray>for <yellow>5 seconds."));
+		lore.add(Utils.mm("<red>" + Utils.tenthNumber(implosion) + " damage <gray>to enemies"));
+		lore.add(Utils.mm("<gray>within <green>10 blocks<gray>.  Also"));
+		lore.add(Utils.mm("<gray>reduces damage taken by <red>15% <gray>and"));
+		lore.add(Utils.mm("<gray>grants an Absorption Shield with"));
+		lore.add(Utils.mm("<gray><red>10 HP <gray>for <yellow>5 seconds."));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC SWORD <obfuscated>a</obfuscated>"));
 
+		data = scylla.getItemMeta();
 		data.lore(lore);
 		scylla.setItemMeta(data);
-		scylla.addUnsafeEnchantments(enchants);
+		Utils.setEnchantability(scylla, Utils.SKYBLOCK_ENCHANTABILITY);
 
 		return scylla;
 	}
@@ -88,11 +124,48 @@ public class Scylla implements AbilityItem {
 
 	@Override
 	public boolean onRightClick(Player p) {
+		ItemStack held = p.getInventory().getItemInMainHand();
+		// The same figures the melee pipeline pays out, so the number on the lore stays true through the
+		// Sharpness/Smite retune - and all three are read, where the old else-if chain counted exactly one of
+		// them and quoted numbers (level, level * 2) that matched neither vanilla nor this plugin.
+		double targetDamage = Utils.meleeDamageWith(p, held);
+		double smite = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.SMITE));
+		double bane = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS));
+
+		return witherImpact(p, 10, 10, 10, 0.50, 0.15, entity -> {
+			double tempDamage = targetDamage;
+			if(entity instanceof Wither) {
+				tempDamage += 4 + smite;
+			} else if(entity instanceof Zombie || entity instanceof AbstractSkeleton || entity instanceof SkeletonHorse || entity instanceof ZombieHorse || entity instanceof Phantom || entity instanceof Zoglin) {
+				tempDamage += smite;
+			} else if(entity instanceof Spider || entity instanceof Bee || entity instanceof Silverfish || entity instanceof Endermite) {
+				tempDamage += bane;
+			}
+			return tempDamage * IMPLOSION_SHARE;
+		});
+	}
+
+	/**
+	 * Wither Impact: teleport {@code distance} blocks ahead, implode on everything within {@code radius},
+	 * then put up the Wither Shield.
+	 *
+	 * <p><b>Shared with the Manhunt Hyperion</b>, which is the same ability on smaller numbers, so the two
+	 * cannot drift apart - the placement search below is the fiddly part and there is no second copy of it.
+	 *
+	 * @param distance        blocks to teleport, and how far the block raytrace reaches
+	 * @param radius          implosion radius
+	 * @param absorption      absorption HP the shield grants
+	 * @param healShare       share of the absorption still standing at expiry that becomes real health
+	 * @param damageReduction share taken off incoming damage while the shield is up
+	 * @param damage          per-target implosion damage
+	 */
+	public static boolean witherImpact(Player p, double distance, double radius, double absorption,
+									   double healShare, double damageReduction, ToDoubleFunction<LivingEntity> damage) {
 		Location origin = p.getLocation().clone();
 		Location l = null;
-		RayTraceResult result = p.rayTraceBlocks(11.65);
+		RayTraceResult result = p.rayTraceBlocks(distance + 1.65);
 		if(result == null) {
-			l = p.getLocation().add(p.getLocation().getDirection().multiply(10));
+			l = p.getLocation().add(p.getLocation().getDirection().multiply(distance));
 			l.setX(Math.floor(l.getX()) + 0.5);
 			l.setY(Math.floor(l.getY()));
 			l.setZ(Math.floor(l.getZ()) + 0.5);
@@ -234,50 +307,33 @@ public class Scylla implements AbilityItem {
 
 		// implosion
 		p.getWorld().spawnParticle(Particle.EXPLOSION, l, 20);
-		List<Entity> entities = new ArrayList<>(l.getWorld().getNearbyEntities(l, 10, 10, 10));
+		List<Entity> entities = new ArrayList<>(l.getWorld().getNearbyEntities(l, radius, radius, radius));
 		List<EntityType> doNotKill = CustomItems.createList();
-		double targetDamage = Objects.requireNonNull(p.getAttribute(Attribute.ATTACK_DAMAGE)).getValue();
 		int damaged = 0;
-		double damage = 0;
-		// The same figures the melee pipeline pays out, so "61% of your Melee Damage" stays true through the
-		// Sharpness/Smite retune - and all three are read, where the old else-if chain counted exactly one of
-		// them and quoted numbers (level, level * 2) that matched neither vanilla nor this plugin.
-		ItemStack held = p.getInventory().getItemInMainHand();
-		targetDamage += CustomDamage.sharpnessBonus(held.getEnchantmentLevel(Enchantment.SHARPNESS));
-		double smite = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.SMITE));
-		double bane = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS));
+		double total = 0;
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
-				double tempDamage = targetDamage;
-				if(entity1 instanceof Wither) {
-					tempDamage += 4 + smite;
-				} else if(entity1 instanceof Zombie || entity1 instanceof AbstractSkeleton || entity1 instanceof SkeletonHorse || entity1 instanceof ZombieHorse || entity1 instanceof Phantom || entity1 instanceof Zoglin) {
-					tempDamage += smite;
-				} else if(entity1 instanceof Spider || entity1 instanceof Bee || entity1 instanceof Silverfish || entity1 instanceof Endermite) {
-					tempDamage += bane;
-				}
-				tempDamage = Math.ceil(tempDamage * 0.61);
+				double tempDamage = damage.applyAsDouble(entity1);
 				CustomDamage.customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC);
 				damaged += 1;
-				damage += tempDamage;
+				total += tempDamage;
 			}
 		}
 		if(damaged > 0) {
-			p.sendMessage(Utils.msg("<red>Your Implosion hit " + damaged + " enemies for " + ((int) damage) + " damage."));
+			p.sendMessage(Utils.msg("<red>Your Implosion hit " + damaged + " enemies for " + Utils.tenthNumber(total) + " damage."));
 		}
 		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		// wither shield
 		if(!p.getScoreboardTags().contains("WitherShield")) { // reduced damage
 			double absorptionBefore = p.getAbsorptionAmount();
-			double witherShieldBonus = 10.0;
-			AttributeModifier temp = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "witherShield"), 10, AttributeModifier.Operation.ADD_NUMBER);
+			AttributeModifier temp = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "witherShield"), absorption, AttributeModifier.Operation.ADD_NUMBER);
 			p.getAttribute(Attribute.MAX_ABSORPTION).addModifier(temp);
-			p.setAbsorptionAmount(absorptionBefore + witherShieldBonus);
+			p.setAbsorptionAmount(absorptionBefore + absorption);
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 0.66666F);
 			Location finalL = l;
 			Utils.scheduleTask(() -> { // convert to healing after 5 seconds
-				p.setHealth(Math.min(p.getHealth() + (Math.max(0, (p.getAbsorptionAmount() - absorptionBefore)) / 2), p.getAttribute(Attribute.MAX_HEALTH).getValue()));
+				p.setHealth(Math.min(p.getHealth() + (Math.max(0, (p.getAbsorptionAmount() - absorptionBefore)) * healShare), p.getAttribute(Attribute.MAX_HEALTH).getValue()));
 				p.getAttribute(Attribute.MAX_ABSORPTION).removeModifier(temp);
 				if(p.getAbsorptionAmount() > absorptionBefore) {
 					p.setAbsorptionAmount(absorptionBefore);
@@ -285,9 +341,29 @@ public class Scylla implements AbilityItem {
 				p.playSound(finalL, Sound.ENTITY_PLAYER_LEVELUP, 2.0F, 2.0F);
 			}, 101L);
 			p.addScoreboardTag("WitherShield");
-			Utils.scheduleTask(() -> p.removeScoreboardTag("WitherShield"), 101);
+			// The reduction is per-Hyperion, so CustomDamage cannot read it off the tag alone.
+			WITHER_SHIELDS.put(p.getUniqueId(), damageReduction);
+			Utils.scheduleTask(() -> {
+				p.removeScoreboardTag("WitherShield");
+				WITHER_SHIELDS.remove(p.getUniqueId());
+			}, 101);
 		}
 		return true;
+	}
+
+	/**
+	 * How much every live Wither Shield takes off incoming damage, keyed by its owner. The share is the
+	 * Hyperion's, not the shield's, so a Manhunt Hyperion's weaker shield can't be told apart from the full
+	 * item's by the {@code WitherShield} tag that {@code CustomDamage} keys on.
+	 */
+	private static final Map<UUID, Double> WITHER_SHIELDS = new HashMap<>();
+
+	/**
+	 * The share to take off damage aimed at {@code e}, given it carries the {@code WitherShield} tag. Falls
+	 * back to the full Hyperion's 15% for a shield nothing here put up.
+	 */
+	public static double witherShieldReduction(LivingEntity e) {
+		return WITHER_SHIELDS.getOrDefault(e.getUniqueId(), 0.15);
 	}
 
 	@Override

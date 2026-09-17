@@ -44,6 +44,7 @@ public class NecronElytra implements Armor {
 
 		data.lore(lore);
 		necronElytra.setItemMeta(data);
+		Utils.setEnchantability(necronElytra, Utils.SKYBLOCK_ENCHANTABILITY);
 
 		return necronElytra;
 	}

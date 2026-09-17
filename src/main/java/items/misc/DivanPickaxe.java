@@ -50,6 +50,7 @@ public class DivanPickaxe implements CustomItem {
 
 		data.lore(lore);
 		divanPickaxe.setItemMeta(data);
+		Utils.setEnchantability(divanPickaxe, Utils.SKYBLOCK_ENCHANTABILITY);
 
 		return divanPickaxe;
 	}

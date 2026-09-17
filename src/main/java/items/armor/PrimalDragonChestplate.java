@@ -45,6 +45,7 @@ public class PrimalDragonChestplate {
 
 		data.lore(lore);
 		primalChestplate.setItemMeta(data);
+		Utils.setEnchantability(primalChestplate, Utils.SKYBLOCK_ENCHANTABILITY);
 
 		return primalChestplate;
 	}
