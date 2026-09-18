@@ -1,6 +1,7 @@
 package items.ingredients.witherLords;
 
 import items.ingredients.Ingredients;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -35,6 +36,6 @@ public class NecronSecrets implements Ingredients {
 		data.lore(lore);
 		necronSecrets.setItemMeta(data);
 
-		return necronSecrets;
+		return SkyblockId.stamp(necronSecrets);
 	}
 }

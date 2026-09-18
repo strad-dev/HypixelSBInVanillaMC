@@ -137,8 +137,22 @@ public class CreativeMenu implements Listener {
 	public static List<ItemStack> loadoutPalette() {
 		List<ItemStack> out = new ArrayList<>();
 		List<ItemStack> items = ITEMS.get("items");
-		if (items != null) for (ItemStack it : items) if (it != null) out.add(it.clone());
+		// Rebuilt for the same reason the menu rebuilds, but with no player: the palette is a static list
+		// with no viewer, so a live figure reads for somebody carrying no other modifiers.  ItemReloader
+		// corrects that the moment a real owner touches the item.
+		if (items != null) for (ItemStack it : items) if (it != null) out.add(fresh(it, null).clone());
 		return out;
+	}
+
+	/**
+	 * One catalog entry, rebuilt from its own {@code getItem()} for {@code viewer}.  Hands the original back
+	 * untouched when {@code ItemReloader} does not recognise it - the enchanted-book tab is not made of
+	 * custom items and has nothing to rebuild from.
+	 */
+	private static ItemStack fresh(ItemStack item, Player viewer) {
+		if (item == null) return null;
+		ItemStack rebuilt = ItemReloader.refreshItem(item, viewer);
+		return rebuilt == null ? item : rebuilt;
 	}
 
 	private static ItemStack getEnchantedBook(Enchantment enchantment, int level) {
@@ -170,14 +184,19 @@ public class CreativeMenu implements Listener {
 		// Add tabs at top
 		addTabs(gui, currentTab);
 
-		// Add items for current tab
+		// Add items for current tab.  Each icon is REBUILT for the viewer on the way in rather than shown
+		// as ITEMS holds it: that map is a static initialiser, so its stacks are snapshots from class load,
+		// made before any player existed.  They therefore miss anything getItem() has learned since - the
+		// SkyBlock id, a lore change, a retune - and any live figure in them (the Hyperion's implosion) was
+		// computed for nobody.  Refreshing here rather than at the three take sites below means the icon a
+		// player reads and the item they walk away with are the same thing.
 		List<ItemStack> items = ITEMS.get(currentTab);
 		if (items != null) {
 			int startIndex = page * 36; // 36 items per page (excluding tab row)
 			int endIndex = Math.min(startIndex + 36, items.size());
 
 			for (int i = startIndex; i < endIndex; i++) {
-				gui.setItem(9 + (i - startIndex), items.get(i));
+				gui.setItem(9 + (i - startIndex), fresh(items.get(i), player));
 			}
 		}
 

@@ -10,13 +10,18 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
+import pvp.PvpJson;
 
 import javax.annotation.Nullable;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -24,8 +29,9 @@ import java.util.UUID;
  * {@code manhunt: true} in the config, at which point {@code /manhunt} appears and the intelligence rules
  * below take over.
  *
- * <p>Everything here is in memory - a Manhunt is one sitting, and a restart mid-match means re-running
- * {@code /manhunt speedrunner add} and {@code /manhunt start}.
+ * <p>The teams, the match flag and the intelligence ceilings are kept in {@code manhunt.json} in the plugin
+ * folder, so nobody loses their side by dropping out: a Speedrunner who disconnects - or who is thrown off by
+ * a restart mid-match - is still a Speedrunner when they come back, and still on the rung they had reached.
  */
 public final class Manhunt {
 	private Manhunt() {}
@@ -50,11 +56,111 @@ public final class Manhunt {
 	 */
 	private static final Map<UUID, Integer> CEILINGS = new HashMap<>();
 
+	/**
+	 * Everybody who has already been handed a kit this match. A rejoin is <b>not</b> a fresh kit: without
+	 * this, stashing a Hyperion in an ender chest (or handing it to somebody) and relogging paid out another
+	 * bottom-rung one, and another compass, as often as a player cared to do it.
+	 */
+	private static final Set<UUID> KITTED = new HashSet<>();
+
 	/** The rung above Netherite: a real Hyperion, which has no {@link ManhuntTier} of its own. */
 	public static final int FULL_RUNG = ManhuntTier.values().length;
 
+	/** Where the three maps above are kept between sittings. Null until {@link #load} - so, while off, never. */
+	private static Path file;
+
 	public static void setEnabled(boolean on) {
 		enabled = on;
+	}
+
+	/**
+	 * Reads the teams, the match flag and the ceilings back off disk, and from here on writes them out again
+	 * on every change. Run once from {@link ManhuntModule#enable}, before anybody can have joined.
+	 *
+	 * <p>Nothing else needs a hook for a rejoin: the roster is keyed on UUID, so surviving the restart is the
+	 * whole of it - {@code equip} on join then sees a Speedrunner and hands out no compass, and
+	 * {@link #maxIntelligence} finds their rung where they left it.
+	 */
+	static void load(JavaPlugin plugin) {
+		file = plugin.getDataFolder().toPath().resolve("manhunt.json");
+		State state = PvpJson.load(file, State.class, null);
+		if(state == null) return;
+
+		started = state.started;
+		SPEEDRUNNERS.clear();
+		NAMES.clear();
+		CEILINGS.clear();
+		KITTED.clear();
+		// A list, not a set, and walked in order: a compass stores an index into it.
+		if(state.speedrunners != null) {
+			for(String id : state.speedrunners) {
+				UUID uuid = parse(id);
+				if(uuid != null && !SPEEDRUNNERS.contains(uuid)) SPEEDRUNNERS.add(uuid);
+			}
+		}
+		if(state.names != null) {
+			for(Map.Entry<String, String> entry : state.names.entrySet()) {
+				UUID uuid = parse(entry.getKey());
+				if(uuid != null) NAMES.put(uuid, entry.getValue());
+			}
+		}
+		if(state.ceilings != null) {
+			for(Map.Entry<String, Integer> entry : state.ceilings.entrySet()) {
+				UUID uuid = parse(entry.getKey());
+				if(uuid != null) CEILINGS.put(uuid, entry.getValue());
+			}
+		}
+		if(state.kitted != null) {
+			for(String id : state.kitted) {
+				UUID uuid = parse(id);
+				if(uuid != null) KITTED.add(uuid);
+			}
+		}
+	}
+
+	/**
+	 * Writes the lot out. Called on every change to the teams, the match flag or a ceiling - all of them
+	 * rare, so there is nothing to batch: a ceiling moves on an upgrade or a death, not on the tick loop.
+	 */
+	private static void save() {
+		if(file == null) return;
+		State state = new State();
+		state.started = started;
+		state.speedrunners = new ArrayList<>();
+		for(UUID uuid : SPEEDRUNNERS) {
+			state.speedrunners.add(uuid.toString());
+		}
+		state.names = new LinkedHashMap<>();
+		for(Map.Entry<UUID, String> entry : NAMES.entrySet()) {
+			state.names.put(entry.getKey().toString(), entry.getValue());
+		}
+		state.ceilings = new LinkedHashMap<>();
+		for(Map.Entry<UUID, Integer> entry : CEILINGS.entrySet()) {
+			state.ceilings.put(entry.getKey().toString(), entry.getValue());
+		}
+		state.kitted = new ArrayList<>();
+		for(UUID uuid : KITTED) {
+			state.kitted.add(uuid.toString());
+		}
+		PvpJson.save(file, state);
+	}
+
+	@Nullable
+	private static UUID parse(String id) {
+		try {
+			return UUID.fromString(id);
+		} catch(IllegalArgumentException exception) {
+			return null;
+		}
+	}
+
+	/** The file's shape. Gson fills these by name, so anything the file is missing simply stays null. */
+	private static final class State {
+		boolean started;
+		List<String> speedrunners;
+		Map<String, String> names;
+		Map<String, Integer> ceilings;
+		List<String> kitted;
 	}
 
 	public static boolean enabled() {
@@ -83,6 +189,15 @@ public final class Manhunt {
 
 	public static boolean isSpeedrunner(Player p) {
 		return SPEEDRUNNERS.contains(p.getUniqueId());
+	}
+
+	/**
+	 * Whether these two are on opposite sides of the Manhunt. Hunters are defined as everyone who is not a
+	 * Speedrunner, so a team is one boolean and this is one comparison rather than a roster lookup - which
+	 * also means it answers correctly for a player who joined mid-match and was never assigned anything.
+	 */
+	public static boolean opposingTeams(Player a, Player b) {
+		return isSpeedrunner(a) != isSpeedrunner(b);
 	}
 
 	/** Everyone online who is not a Speedrunner. Hunters are the default, so this is a subtraction. */
@@ -140,6 +255,7 @@ public final class Manhunt {
 		if(started && online != null) {
 			removeManhuntItems(online, false, true);
 		}
+		save();
 		return true;
 	}
 
@@ -157,22 +273,40 @@ public final class Manhunt {
 		if(started && online != null && !hasCompass(online)) {
 			give(online, ManhuntCompass.getItem());
 		}
+		save();
 		return true;
+	}
+
+	/**
+	 * Notes a Speedrunner's current name on the way in. The roster now outlives the server, so a name taken
+	 * down at {@code /manhunt speedrunner add} time can be any age by the time the teams list quotes it.
+	 */
+	public static void noteName(Player p) {
+		if(!isSpeedrunner(p)) return;
+		String previous = NAMES.put(p.getUniqueId(), p.getName());
+		if(!p.getName().equals(previous)) save();
 	}
 
 	// ---- match ----------------------------------------------------------------------------------------
 
 	/**
 	 * Hands everybody a Stick Manhunt Hyperion and every Hunter a compass, and puts every ceiling back on
-	 * the bottom rung - so a match always opens on 160 ticks and 250, whatever the last one ended on. A
-	 * player sitting above the new cap is clamped down to it by {@code Plugin.passiveIntel}.
+	 * the bottom rung - so a match always opens on 160 ticks and 250, whatever the last one ended on.
+	 *
+	 * <p><b>Everybody starts on nothing.</b> Mana is zeroed outright rather than left to
+	 * {@code Plugin.passiveIntel} to clamp: that only pulls a player down to the new 250 cap, so whoever
+	 * happened to be sitting on a full 2500 would open the match with 250 banked and everybody else with
+	 * whatever they walked in on. The banked regen ticks go with it, so nobody is paid a point on tick one.
 	 */
 	public static void start() {
 		started = true;
 		CEILINGS.clear();
+		KITTED.clear();
 		for(Player p : Bukkit.getOnlinePlayers()) {
+			Plugin.zeroIntelligence(p);
 			equip(p);
 		}
+		save();
 	}
 
 	/**
@@ -186,9 +320,11 @@ public final class Manhunt {
 	public static void reset() {
 		started = false;
 		CEILINGS.clear();
+		KITTED.clear();
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			removeManhuntItems(p, true, true);
 		}
+		save();
 	}
 
 	/**
@@ -198,12 +334,31 @@ public final class Manhunt {
 	 */
 	public static void equip(Player p) {
 		if(!started) return;
-		if(bestRungIn(p.getInventory()) < 0) {
+		KITTED.add(p.getUniqueId());
+		// A real Hyperion is NOT one of these, deliberately: it is the ladder's reward, not a rung on it, and
+		// it has no Change Target, no rung to upgrade and no part in the intelligence ceiling's bottom end.
+		// Gating on bestRungIn meant anyone who walked into a match already carrying one started with no
+		// Manhunt Hyperion at all.  It still sets their ceiling - observe() reads bestRungIn, not this.
+		if(!hasManhuntHyperion(p)) {
 			give(p, ManhuntHyperion.getItem(ManhuntTier.BASE));
 		}
 		if(!isSpeedrunner(p) && !hasCompass(p)) {
 			give(p, ManhuntCompass.getItem());
 		}
+		save();
+	}
+
+	/**
+	 * The join-time kit, which is <b>once per match</b>: somebody turning up partway through a Manhunt is
+	 * not left empty-handed, but somebody rejoining it gets nothing, whatever they are carrying. Losing a
+	 * Hyperion is meant to cost - it is on the ground where they died, to be picked back up or lost - and a
+	 * rejoin used to be a way to be handed a new one, or a second one on top of a stashed first.
+	 *
+	 * <p>Respawning still goes through {@link #equip} unconditionally: dying is the one way back to a kit.
+	 */
+	public static void equipOnJoin(Player p) {
+		if(!started || KITTED.contains(p.getUniqueId())) return;
+		equip(p);
 	}
 
 	private static void give(Player p, ItemStack item) {
@@ -227,6 +382,14 @@ public final class Manhunt {
 		if((hyperions && ManhuntTier.of(cursor) != null) || (compasses && isCompass(cursor))) {
 			p.setItemOnCursor(null);
 		}
+	}
+
+	/** Whether {@code p} is carrying a Manhunt Hyperion on any rung. A full Hyperion is not one. */
+	private static boolean hasManhuntHyperion(Player p) {
+		for(ItemStack item : p.getInventory().getContents()) {
+			if(ManhuntTier.of(item) != null) return true;
+		}
+		return false;
 	}
 
 	private static boolean hasCompass(Player p) {
@@ -257,18 +420,15 @@ public final class Manhunt {
 		int best = bestRungIn(p.getInventory());
 		if(best > rung(p)) {
 			CEILINGS.put(p.getUniqueId(), best);
+			save();
 		}
 	}
 
-	/** Back to the Stick's numbers, with nothing left in the tank. */
+	/** Back to the Stick's numbers, with nothing left in the tank - the banked regen ticks included. */
 	public static void onDeath(Player p) {
 		if(!active()) return;
-		CEILINGS.remove(p.getUniqueId());
-		try {
-			Plugin.getIntelligence(p).setScore(0);
-		} catch(Exception exception) {
-			// the objective is gone; passiveIntel already broadcasts about that
-		}
+		if(CEILINGS.remove(p.getUniqueId()) != null) save();
+		Plugin.zeroIntelligence(p);
 	}
 
 	/** The rung {@code p}'s intelligence rules are read off: their high-water mark, the Stick at worst. */

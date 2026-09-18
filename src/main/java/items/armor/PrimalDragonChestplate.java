@@ -1,6 +1,7 @@
 package items.armor;
 
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -47,6 +48,6 @@ public class PrimalDragonChestplate {
 		primalChestplate.setItemMeta(data);
 		Utils.setEnchantability(primalChestplate, Utils.SKYBLOCK_ENCHANTABILITY);
 
-		return primalChestplate;
+		return SkyblockId.stamp(primalChestplate);
 	}
 }

@@ -1,6 +1,7 @@
 package misc;
 
 import net.minecraft.world.entity.LightningBolt;
+import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.entity.CraftLightningStrike;
@@ -27,11 +28,20 @@ public class DamageData {
 	// 1.5x in it, and the particles, the sound and the PvP hit stats all have to agree with it.  Re-asking
 	// later would not, either - the mace branch in dealDamage zeroes the fall distance the answer is built on.
 	public boolean isCrit = false;
+	/**
+	 * Where the blow came FROM, which is what a shield's blocking cone is measured against. Vanilla's
+	 * {@code DamageSource.getSourcePosition()}, so for a projectile it is the ARROW's position and not the
+	 * shooter's - by the time {@code CustomDamage.customMobs} reaches the shield it has already rewritten
+	 * {@code damager} to the shooter, and an arrow that curved in, or a shooter who has since moved, are
+	 * exactly the cases the two disagree on. Null when there is no attacker to measure from.
+	 */
+	public Location sourcePosition = null;
 
 	public DamageData(EntityDamageByEntityEvent e) {
 		this.originalDamage = e.getDamage();
 		this.e = e;
 		this.isBlocking = e.getEntity() instanceof Player p && p.isBlocking();
+		this.sourcePosition = e.getDamager().getLocation();
 		if(e.getDamager() instanceof Projectile projectile) {
 			// stop stupidly annoying arrows
 			if(projectile instanceof Trident temp) {
@@ -83,6 +93,7 @@ public class DamageData {
 	public DamageData(LivingEntity damagee, Entity damager, double originalDamage) {
 		this.originalDamage = originalDamage;
 		this.isBlocking = damagee instanceof Player p && p.isBlocking();
+		this.sourcePosition = damager == null ? null : damager.getLocation();
 		if(damager instanceof Projectile projectile) {
 			// stop stupidly annoying arrows
 			if(projectile instanceof Trident temp) {

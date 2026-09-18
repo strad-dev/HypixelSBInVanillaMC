@@ -2,6 +2,7 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -51,7 +52,7 @@ public class WandOfAtonement implements AbilityItem {
 		data.lore(lore);
 		wandOfAtonement.setItemMeta(data);
 
-		return wandOfAtonement;
+		return SkyblockId.stamp(wandOfAtonement);
 	}
 
 	@Override

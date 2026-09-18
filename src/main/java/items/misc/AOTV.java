@@ -2,6 +2,7 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -56,7 +57,24 @@ public class AOTV implements AbilityItem {
 		aotv.setItemMeta(data);
 		Utils.setEnchantability(aotv, Utils.SKYBLOCK_ENCHANTABILITY);
 
-		return aotv;
+		// The two extra keys are what makes a client read this as a WARPED Aspect of the Void rather than a
+		// plain one, and they are the same ones M7 TAS writes.  Catharsis resolves the model from the id
+		// alone and then picks the warped variant off a catharsis:data_type condition on ethermerge; a pack
+		// may also range on tuned_transmission.
+		//
+		// modifier is the REFORGE, and Hypixel spells it after the reforge STONE, not the reforge: Warped
+		// comes from the Warped Stone, whose item id is AOTE_STONE, so the value is aote_stone and not
+		// warped.  It is a different key from ethermerge and means a different thing - ethermerge is the
+		// Etherwarp upgrade, which is the sneak right-click above - but without it the item reads as
+		// unreforged to anything selecting on reforges.
+		//
+		// ethermerge goes in as an INT and still reads as true: a boolean lookup runs
+		// CompoundTag.getBoolean -> Tag.asBoolean -> NumericTag.asByte, which any numeric tag answers.
+		return SkyblockId.stamp(aotv, nbt -> {
+			nbt.putInt("ethermerge", 1);
+			nbt.putInt("tuned_transmission", 4);
+			nbt.putString("modifier", "aote_stone");
+		});
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package items.armor;
 
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -51,6 +52,6 @@ public class MaxorBoots implements Armor {
 		maxorBoots.setItemMeta(data);
 		Utils.setEnchantability(maxorBoots, Utils.SKYBLOCK_ENCHANTABILITY);
 
-		return maxorBoots;
+		return SkyblockId.stamp(maxorBoots);
 	}
 }

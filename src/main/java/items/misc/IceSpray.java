@@ -4,6 +4,7 @@ import items.AbilityItem;
 import listeners.CustomItems;
 import listeners.DamageType;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
@@ -63,7 +64,7 @@ public class IceSpray implements AbilityItem {
 		data.lore(lore);
 		iceSpray.setItemMeta(data);
 
-		return iceSpray;
+		return SkyblockId.stamp(iceSpray);
 	}
 
 	@Override

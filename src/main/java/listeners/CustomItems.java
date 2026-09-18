@@ -2,8 +2,6 @@ package listeners;
 
 import items.AbilityItem;
 import items.CustomItem;
-import items.misc.AOTV;
-import items.weapons.Scylla;
 import items.weapons.Terminator;
 import misc.Cooldowns;
 import misc.Plugin;
@@ -164,7 +162,7 @@ public class CustomItems implements Listener {
 			}
 			if(item != null) {
 				// A left click on an item whose ability isn't bound to left-click does nothing - and must
-				// never spam ability messages (not enough intelligence / on cooldown / "too fast").
+				// never spam ability messages (not enough intelligence, or on cooldown).
 				boolean leftClickNoAbility = (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) && !item.hasLeftClickAbility();
 				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
 					e.setCancelled(true);
@@ -201,11 +199,12 @@ public class CustomItems implements Listener {
 							Cooldowns.start(p, "AbilityCooldown", 3);
 						}
 					}
-				} else {
-					if(!(item instanceof AOTV) && !(item instanceof Scylla)) {
-						p.sendMessage(Utils.msg("<red>You are doing that too fast!"));
-					}
 				}
+				// No message when the 3-tick AbilityCooldown swallows a click.  The gate itself stays - it
+				// is what stops an ability firing every tick - it just no longer announces itself.  The
+				// Aspect of the Void and the Hyperion had already been exempted from the message one by
+				// one, which was the tell that it was noise rather than information: the items people
+				// actually spam are exactly the ones that tripped it.
 			}
 			Plugin.sendIntelligenceBar(p, score);
 		}

@@ -1,5 +1,6 @@
 package items.summonItems;
 
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -34,6 +35,6 @@ public class GiantZombieFlesh implements SummonItem {
 		data.lore(lore);
 		giantZombieFlesh.setItemMeta(data);
 
-		return giantZombieFlesh;
+		return SkyblockId.stamp(giantZombieFlesh);
 	}
 }

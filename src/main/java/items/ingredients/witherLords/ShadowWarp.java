@@ -1,6 +1,7 @@
 package items.ingredients.witherLords;
 
 import items.ingredients.Ingredients;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -34,6 +35,6 @@ public class ShadowWarp implements Ingredients {
 		data.lore(lore);
 		shadowWarp.setItemMeta(data);
 
-		return shadowWarp;
+		return SkyblockId.stamp(shadowWarp);
 	}
 }

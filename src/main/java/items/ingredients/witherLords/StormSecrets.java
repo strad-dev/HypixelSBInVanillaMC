@@ -1,6 +1,7 @@
 package items.ingredients.witherLords;
 
 import items.ingredients.Ingredients;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -36,6 +37,6 @@ public class StormSecrets implements Ingredients {
 		data.lore(lore);
 		stormSecrets.setItemMeta(data);
 
-		return stormSecrets;
+		return SkyblockId.stamp(stormSecrets);
 	}
 }

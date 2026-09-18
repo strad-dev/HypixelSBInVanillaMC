@@ -1,6 +1,7 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -33,6 +34,6 @@ public class BraidedFeather implements Ingredients {
 		data.lore(lore);
 		braidedFeather.setItemMeta(data);
 
-		return braidedFeather;
+		return SkyblockId.stamp(braidedFeather);
 	}
 }

@@ -45,7 +45,10 @@ public class TarantulaBroodfather implements CustomMob {
 			if(finalDamage < damagee.getHealth()) {
 				teleport(damagee, 12, false);
 			}
-			CustomDamage.calculateFinalDamage(damagee, damager, finalDamage, type);
+			// data, not the 4-arg overload: this is the SAME blow with its damage reduced, so the crit
+			// verdict, the blocking flag and the arrow/trident flags all still describe it.  Rebuilding
+			// DamageData here dropped isCrit, and the hit landed for crit damage with no crit particles.
+			CustomDamage.calculateFinalDamage(damagee, damager, finalDamage, type, data);
 			return false;
 		}
 		if(originalDamage < damagee.getHealth()) {

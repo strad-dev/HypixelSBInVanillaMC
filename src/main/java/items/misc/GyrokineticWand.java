@@ -2,6 +2,7 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -52,7 +53,7 @@ public class GyrokineticWand implements AbilityItem {
 		data.lore(lore);
 		gyro.setItemMeta(data);
 
-		return gyro;
+		return SkyblockId.stamp(gyro);
 	}
 
 	@Override

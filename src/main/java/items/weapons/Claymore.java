@@ -2,6 +2,7 @@ package items.weapons;
 
 import items.CustomItem;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -63,6 +64,6 @@ public class Claymore implements CustomItem {
 		Utils.setEnchantability(claymore, Utils.SKYBLOCK_ENCHANTABILITY);
 		claymore.addUnsafeEnchantments(enchants);
 
-		return claymore;
+		return SkyblockId.stamp(claymore);
 	}
 }

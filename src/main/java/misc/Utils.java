@@ -23,7 +23,6 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.player.PlayerItemBreakEvent;
-import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -138,6 +137,18 @@ public class Utils {
 	}
 
 	/**
+	 * A 0-1 SHARE as a percentage for a lore line: {@code 0.15 -> "15%"}, {@code 0.335 -> "33.5%"}.
+	 *
+	 * <p>Takes the share rather than an already-multiplied number on purpose - every caller holds the share
+	 * (a damage reduction, a heal share, an implosion share), so the x100 belongs here where it happens once
+	 * and not at each call site.  Rounded to a tenth of a percent, then through {@link #damageNumber} so a
+	 * whole number loses its {@code .0}.
+	 */
+	public static String percent(double share) {
+		return damageNumber(Math.round(share * 1000) / 10.0) + "%";
+	}
+
+	/**
 	 * The player's melee damage as it would be with {@code weapon} in their main hand, Sharpness included.
 	 *
 	 * <p>Resolved by hand rather than read off {@code getValue()} because the callers need the figure for a
@@ -154,11 +165,29 @@ public class Utils {
 		List<Double> multiply = new ArrayList<>();
 
 		if(p != null) {
+			// Whatever is in their main hand right now must NOT count - `weapon` takes its place - and it
+			// cannot be recognised by slot group: a modifier read off a LIVE attribute always comes back as
+			// EquipmentSlotGroup.ANY, because the NMS modifier has no slot on it at all and
+			// CraftAttributeInstance.convert fills ANY in.  So the old slot test never matched once and the
+			// held weapon was counted TWICE - the Hyperion quoted 60% of 30.5 for a player whose melee was
+			// 22.5.  Matched by KEY instead: the held item's own modifier keys, plus
+			// minecraft:base_attack_damage, the key vanilla gives a weapon's own attack damage (armour
+			// never uses it, so a damage-granting helmet still counts).
+			Set<NamespacedKey> heldKeys = new HashSet<>();
+			heldKeys.add(NamespacedKey.minecraft("base_attack_damage"));
+			ItemStack held = p.getInventory().getItemInMainHand();
+			if(held.hasItemMeta()) {
+				Collection<AttributeModifier> heldOwn = held.getItemMeta().getAttributeModifiers(Attribute.ATTACK_DAMAGE);
+				if(heldOwn != null) {
+					for(AttributeModifier modifier : heldOwn) heldKeys.add(modifier.getKey());
+				}
+			}
+
 			AttributeInstance instance = p.getAttribute(Attribute.ATTACK_DAMAGE);
 			if(instance != null) {
 				base = instance.getBaseValue();
 				for(AttributeModifier modifier : instance.getModifiers()) {
-					if(heldSlot(modifier.getSlotGroup())) continue; // whatever is in their hand right now, not our weapon
+					if(heldKeys.contains(modifier.getKey())) continue;
 					switch(modifier.getOperation()) {
 						case ADD_NUMBER -> add += modifier.getAmount();
 						case ADD_SCALAR -> addScalar += modifier.getAmount();
@@ -199,11 +228,6 @@ public class Utils {
 			value -= CustomDamage.strengthPenalty(p);
 		}
 		return Math.max(0, value);
-	}
-
-	/** Whether a modifier with this slot group is there because of whatever is in the player's main hand. */
-	private static boolean heldSlot(EquipmentSlotGroup group) {
-		return group == EquipmentSlotGroup.MAINHAND || group == EquipmentSlotGroup.HAND;
 	}
 
 	/**

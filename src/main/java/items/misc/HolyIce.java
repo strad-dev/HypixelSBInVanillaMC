@@ -2,6 +2,7 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -52,7 +53,7 @@ public class HolyIce implements AbilityItem {
 		data.lore(lore);
 		holyIce.setItemMeta(data);
 
-		return holyIce;
+		return SkyblockId.stamp(holyIce);
 	}
 
 	@Override

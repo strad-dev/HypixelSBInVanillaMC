@@ -4,6 +4,7 @@ import items.AbilityItem;
 import listeners.CustomDamage;
 import listeners.DamageType;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -68,7 +69,7 @@ public class SwordOfBadHealth implements AbilityItem {
 		swordOfBadHealth.setItemMeta(data);
 		swordOfBadHealth.addUnsafeEnchantments(enchants);
 
-		return swordOfBadHealth;
+		return SkyblockId.stamp(swordOfBadHealth);
 	}
 
 	@Override

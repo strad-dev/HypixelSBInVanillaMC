@@ -2,6 +2,7 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -49,7 +50,7 @@ public class TacticalInsertion implements AbilityItem {
 		data.lore(lore);
 		tac.setItemMeta(data);
 
-		return tac;
+		return SkyblockId.stamp(tac);
 	}
 
 	@Override

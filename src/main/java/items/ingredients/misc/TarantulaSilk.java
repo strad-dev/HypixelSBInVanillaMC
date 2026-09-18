@@ -1,6 +1,7 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -34,6 +35,6 @@ public class TarantulaSilk implements Ingredients {
 		data.lore(lore);
 		taraSilk.setItemMeta(data);
 
-		return taraSilk;
+		return SkyblockId.stamp(taraSilk);
 	}
 }

@@ -1,5 +1,7 @@
 package listeners;
 
+import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
+import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import items.armor.*;
 import items.ingredients.mining.*;
 import items.ingredients.misc.*;
@@ -11,6 +13,7 @@ import items.weapons.ManhuntHyperion;
 import items.weapons.Scylla;
 import items.weapons.SwordOfBadHealth;
 import items.weapons.Terminator;
+import misc.SkyblockId;
 import misc.Utils;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -22,12 +25,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -37,30 +43,46 @@ public class ItemReloader implements Listener {
 	public void onItemPickup(EntityPickupItemEvent e) {
 		if(!(e.getEntity() instanceof Player p)) return;
 
-		ItemStack item = e.getItem().getItemStack();
-		ItemStack refreshed = refreshItem(item, p);
-		if(refreshed != null) {
-			e.getItem().setItemStack(refreshed);
-		} else {
-			modifyVanillaArmor(e.getItem().getItemStack());
-		}
+		ItemStack rebuilt = rebuild(e.getItem().getItemStack(), p);
+		if(rebuilt != null) e.getItem().setItemStack(rebuilt);
 	}
 
+	/**
+	 * Rebuilds the whole inventory a tick after the player lands, never on the event itself. A weapon whose
+	 * lore quotes a live figure - the Hyperion's implosion damage - reads it off the player's ATTACK_DAMAGE
+	 * attribute, and the modifiers their armour contributes are TRANSIENT: the server re-derives them when
+	 * the player first ticks, which is after PlayerJoinEvent. Rebuilding inline wrote the figure for a naked
+	 * player, so a Hyperion in full custom armour said 5.4 and imploded for 10.2 until the next slot switch.
+	 */
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
-		PlayerInventory inventory = p.getInventory();
+		Utils.scheduleTask(() -> {
+			if(!p.isOnline()) return;
+			PlayerInventory inventory = p.getInventory();
 
-		for(int i = 0; i < inventory.getSize(); i++) {
-			ItemStack item = inventory.getItem(i);
-			if(item == null) continue;
-			ItemStack refreshed = refreshItem(item, p);
-			if(refreshed != null) {
-				inventory.setItem(i, refreshed);
-			} else {
-				modifyVanillaArmor(item);
+			for(int i = 0; i < inventory.getSize(); i++) {
+				ItemStack rebuilt = rebuild(inventory.getItem(i), p);
+				if(rebuilt != null) inventory.setItem(i, rebuilt);
 			}
-		}
+		}, 1);
+	}
+
+	/**
+	 * Rewrites the held weapon when the player's armour changes, for the same reason {@link #onItemHeld}
+	 * does it on a slot switch: an armour piece carrying ATTACK_DAMAGE moves the implosion figure, and
+	 * nothing else would rewrite the lore of an item they are already holding. A tick late, because the
+	 * attribute modifiers the new piece contributes are not on the attribute yet while this event runs.
+	 */
+	@EventHandler
+	public void onArmorChange(PlayerArmorChangeEvent e) {
+		Player p = e.getPlayer();
+		Utils.scheduleTask(() -> {
+			if(!p.isOnline()) return;
+			PlayerInventory inventory = p.getInventory();
+			ItemStack rebuilt = rebuild(inventory.getItemInMainHand(), p);
+			if(rebuilt != null) inventory.setItemInMainHand(rebuilt);
+		}, 1);
 	}
 
 	/**
@@ -72,12 +94,8 @@ public class ItemReloader implements Listener {
 	public void onItemHeld(PlayerItemHeldEvent e) {
 		Player p = e.getPlayer();
 		PlayerInventory inventory = p.getInventory();
-		ItemStack item = inventory.getItem(e.getNewSlot());
-		if(item == null) return;
-		ItemStack refreshed = refreshItem(item, p);
-		if(refreshed != null) {
-			inventory.setItem(e.getNewSlot(), refreshed);
-		}
+		ItemStack rebuilt = rebuild(inventory.getItem(e.getNewSlot()), p);
+		if(rebuilt != null) inventory.setItem(e.getNewSlot(), rebuilt);
 	}
 
 	@EventHandler
@@ -85,26 +103,102 @@ public class ItemReloader implements Listener {
 		if(!(e.getWhoClicked() instanceof Player p)) return;
 
 		Utils.scheduleTask(() -> {
-			ItemStack cursor = p.getItemOnCursor();
-			if(!cursor.getType().isAir()) {
-				ItemStack refreshed = refreshItem(cursor, p);
-				if(refreshed != null) {
-					p.setItemOnCursor(refreshed);
-				} else {
-					modifyVanillaArmor(cursor);
-				}
-			}
+			ItemStack cursor = rebuild(p.getItemOnCursor(), p);
+			if(cursor != null) p.setItemOnCursor(cursor);
 
-			ItemStack current = e.getCurrentItem();
-			if(current != null && !current.getType().isAir()) {
-				ItemStack refreshed = refreshItem(current, p);
-				if(refreshed != null) {
-					e.setCurrentItem(refreshed);
-				} else {
-					modifyVanillaArmor(current);
-				}
-			}
+			ItemStack current = rebuild(e.getCurrentItem(), p);
+			if(current != null) e.setCurrentItem(current);
 		}, 1);
+	}
+
+	/**
+	 * Stamps whatever a creative-mode player pulls out of the creative menu, <b>as they pull it</b>. The
+	 * creative tabs themselves are built by the client off its own item registry, so nothing here can touch
+	 * how they render - but the stack the client then asks the server to put in a slot arrives as a bare
+	 * vanilla item, and it arrives through the creative set-slot packet, which is not a click the other
+	 * handlers see and does not go through {@code onSlotChange} either.
+	 *
+	 * <p>Handled inline rather than a tick later: the cursor here is the item being placed, and rewriting it
+	 * is the only chance to stamp it before the client's own copy of the slot is authoritative.
+	 */
+	@EventHandler
+	public void onCreativeSet(InventoryCreativeEvent e) {
+		if(!(e.getWhoClicked() instanceof Player p)) return;
+		ItemStack cursor = e.getCursor();
+		if(cursor == null || cursor.getType().isAir()) return;
+
+		// On a clone, because modifyVanillaArmor re-stats the stack in place and the id table does not cover
+		// every material it handles - the Elytra has no counterpart, so rebuild hands back null for it and
+		// the re-statting is only visible on the copy.
+		ItemStack copy = cursor.clone();
+		ItemStack stamped = rebuild(copy, p);
+		if(stamped != null) {
+			e.setCursor(stamped);
+		} else if(!copy.equals(cursor)) {
+			e.setCursor(copy);
+		}
+	}
+
+	/**
+	 * Stamps the result a crafting grid is showing. The result slot is filled by the recipe rather than out
+	 * of anybody's inventory, so a vanilla craft - a diamond sword, a netherite helmet - sat there as a
+	 * plain item and only picked up its id once it landed in a slot and {@code onSlotChange} caught it, a
+	 * tick after the player had already seen the wrong texture.
+	 *
+	 * <p>Only {@code stampVanilla}, deliberately: a custom result came out of its own {@code getItem()} with
+	 * its id already on it, and rebuilding it here would fight {@code ManhuntListener.onPrepareCraft}, which
+	 * writes the upgrade result on this same event.
+	 */
+	@EventHandler
+	public void onPrepareCraft(PrepareItemCraftEvent e) {
+		ItemStack stamped = SkyblockId.stampVanilla(e.getInventory().getResult());
+		if(stamped != null) e.getInventory().setResult(stamped);
+	}
+
+	/**
+	 * Rebuilds a single slot of the player's own inventory whenever anything changes it. This is the
+	 * catch-all the other handlers cannot be: {@code onInventoryClick} only ever sees the clicked stack and
+	 * the cursor, so an item <b>shift-clicked</b> somewhere - most visibly a crafting bench's result, which
+	 * skips the cursor entirely - landed in the inventory with no id on it. Dragging, hotbar swaps, a
+	 * hopper and {@code /give} were all equally invisible.
+	 *
+	 * <p><b>The equality test is what stops this looping.</b> Writing the slot fires this event again, so a
+	 * rebuild that changed nothing must not write: {@code getItem()} hands back a fresh object every time,
+	 * but an equal one, so an already-correct stack is left alone and the cycle ends. A stack that really
+	 * did need rebuilding is written once and its re-fire settles on the second pass.
+	 */
+	@EventHandler
+	public void onSlotChange(PlayerInventorySlotChangeEvent e) {
+		Player p = e.getPlayer();
+		int slot = e.getSlot();
+		Utils.scheduleTask(() -> {
+			if(!p.isOnline()) return;
+			PlayerInventory inventory = p.getInventory();
+			ItemStack current = inventory.getItem(slot);
+			ItemStack rebuilt = rebuild(current, p);
+			if(rebuilt != null && !rebuilt.equals(current)) inventory.setItem(slot, rebuilt);
+		}, 1);
+	}
+
+	/**
+	 * The one rebuild, and what every handler above calls: a custom item comes back from its own
+	 * {@code getItem()}, a vanilla one is re-statted in place and stamped with its SkyBlock id.
+	 * <b>Null means leave the slot alone</b> - nothing about the stack needed to change.
+	 *
+	 * <p>The two used to be an if/else repeated at each call site, which is how {@code onItemHeld} ended up
+	 * as the one handler that rebuilt custom items but never touched vanilla ones.
+	 *
+	 * <p>It must stay <b>idempotent</b>: {@code onSlotChange} compares its result against what was already
+	 * there and would loop if an unchanged stack came back unequal.
+	 */
+	@Nullable
+	private static ItemStack rebuild(ItemStack item, Player p) {
+		if(item == null || item.getType().isAir()) return null;
+		ItemStack refreshed = refreshItem(item, p);
+		if(refreshed != null) return refreshed;
+		// Mutates in place and covers materials the id table does not, so it runs either way.
+		modifyVanillaArmor(item);
+		return SkyblockId.stampVanilla(item);
 	}
 
 	public static void modifyVanillaArmor(ItemStack item) {

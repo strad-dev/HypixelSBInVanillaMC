@@ -1,5 +1,6 @@
 package manhunt;
 
+import misc.SkyblockId;
 import misc.Utils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -17,17 +18,25 @@ import java.util.Map;
  * <p><b>A rung is identified by the stack's MATERIAL</b>, not by anything written into its NBT - every tier
  * shares the one item ID {@code skyblock/manhunt/hyperion}. Netherite is shared with the full Hyperion, which
  * is why {@link #of} checks the item ID first.
+ *
+ * <p>That shared item ID is also why the SkyBlock id is resolved here rather than by a row in
+ * {@link misc.SkyblockId}'s {@code IDS} table: every other custom item's id is looked up from its lore id, and
+ * these eight would all collide on one. <b>The two are separate identities</b> - the lore id is ours and picks
+ * the behaviour, the SkyBlock id is Hypixel's and picks the client-side texture. A rung reads as whatever a
+ * plain sword of the same material reads as, so {@link #skyblockId()} just asks
+ * {@link misc.SkyblockId#vanillaFor}.
  */
 public enum ManhuntTier {
-	//                                             swords  dmg cost abs  heal  reduce  implode radius  tick  intel  ench
-	BASE(Material.STICK, "", Rank.COMMON,               0,   0,  20,  1,  0.33,  0.05,      1,     5,   160,   250,    0),
-	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,  8,   1,  20,  2,  0.35,  0.06,      2,     6,   150,   400,   10),
-	STONE(Material.STONE_SWORD, "Stone", Rank.COMMON,   8,   2,  20,  3,  0.37,  0.07,    2.5,   6.5,   140,   500,   12),
-	COPPER(Material.COPPER_SWORD, "Copper", Rank.UNCOMMON, 8, 3, 20,  4,  0.39,  0.08,      3,     7,   130,   600,   14),
-	IRON(Material.IRON_SWORD, "Iron", Rank.RARE,        8,   4,  19,  5,  0.41,  0.09,    3.5,   7.5,   120,   700,   16),
-	GOLD(Material.GOLDEN_SWORD, "Golden", Rank.RARE,    8,   5,  18,  6,  0.43,  0.10,      4,     8,   110,   800,   18),
-	DIAMOND(Material.DIAMOND_SWORD, "Diamond", Rank.EPIC, 4, 6,  17,  7,  0.45,  0.11,    4.5,   8.5,   100,   900,   20),
-	NETHERITE(Material.NETHERITE_SWORD, "Netherite", Rank.LEGENDARY, 2, 7, 16, 8, 0.47, 0.13, 5,   9,    90,  1000,   25);
+	//                                                                swords  dmg   cost  abs  reduce  implode  radius  tick  intel  ench
+	// The teleport is NOT in here: it is a flat 10 blocks on every rung, so upgrading never moves it.
+	BASE(Material.STICK, "", Rank.COMMON,                            0,      0,    20,   1,   0.00,   0.5,     7.5,    160,  250,   0),
+	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,               8,      2,    19,   2,   0.05,   2.5,     8,      150,  400,   10),
+	STONE(Material.STONE_SWORD, "Stone", Rank.UNCOMMON,              8,      3,    18,   3,   0.06,   3,       8.5,    140,  525,   12),
+	COPPER(Material.COPPER_SWORD, "Copper", Rank.UNCOMMON,           4,      3.5,  18,   4,   0.07,   3.25,    8.5,    130,  575,   14),
+	IRON(Material.IRON_SWORD, "Iron", Rank.RARE,                     4,      4.5,  17,   6,   0.09,   3.75,    9,      115,  700,   16),
+	GOLD(Material.GOLDEN_SWORD, "Golden", Rank.RARE,                 4,      5,    17,   7,   0.10,   4,       9,      105,  750,   18),
+	DIAMOND(Material.DIAMOND_SWORD, "Diamond", Rank.EPIC,            2,      6,    16,   9,   0.12,   4.5,     9.5,    90,   875,   20),
+	NETHERITE(Material.NETHERITE_SWORD, "Netherite", Rank.LEGENDARY, 1,      7,    15,   10,  0.15,   5,       10,     80,   1000,  25);
 
 	/** Item rarity, in the colours the rest of the plugin's lore uses. */
 	public enum Rank {
@@ -43,8 +52,12 @@ public enum ManhuntTier {
 			return colour;
 		}
 
+		/**
+		 * The bottom rarity line, in the house style every other custom item uses: bold, the rank's colour,
+		 * and a single obfuscated glyph shimmering at each end.
+		 */
 		public String lore() {
-			return "<" + colour + "><bold>" + name() + " SWORD";
+			return "<" + colour + "><bold><obfuscated>a</obfuscated> " + name() + " SWORD <obfuscated>a</obfuscated>";
 		}
 	}
 
@@ -69,7 +82,6 @@ public enum ManhuntTier {
 	private final double damage;
 	private final int manaCost;
 	private final double absorption;
-	private final double healShare;
 	private final double damageReduction;
 	private final double implosionDamage;
 	private final double radius;
@@ -78,7 +90,7 @@ public enum ManhuntTier {
 	private final int enchantability;
 
 	ManhuntTier(Material material, String prefix, Rank rank, int swordsToUpgrade, double damage, int manaCost,
-				double absorption, double healShare, double damageReduction, double implosionDamage, double radius,
+				double absorption, double damageReduction, double implosionDamage, double radius,
 				int ticksPerMana, int maxIntelligence, int enchantability) {
 		this.material = material;
 		this.prefix = prefix;
@@ -87,7 +99,6 @@ public enum ManhuntTier {
 		this.damage = damage;
 		this.manaCost = manaCost;
 		this.absorption = absorption;
-		this.healShare = healShare;
 		this.damageReduction = damageReduction;
 		this.implosionDamage = implosionDamage;
 		this.radius = radius;
@@ -149,11 +160,6 @@ public enum ManhuntTier {
 		return absorption;
 	}
 
-	/** Share of the absorption still standing when the shield expires that becomes real health. */
-	public double healShare() {
-		return healShare;
-	}
-
 	/** Share taken off incoming damage while the Wither Shield is up. */
 	public double damageReduction() {
 		return damageReduction;
@@ -164,7 +170,10 @@ public enum ManhuntTier {
 		return implosionDamage;
 	}
 
-	/** Implosion radius, and the Shadow Warp teleport distance - always the same number. */
+	/**
+	 * Implosion radius. <b>The teleport is a flat 10 blocks on every rung</b>, deliberately - it is the one
+	 * number a player builds muscle memory around, so upgrading must not move it.
+	 */
 	public double radius() {
 		return radius;
 	}
@@ -187,5 +196,19 @@ public enum ManhuntTier {
 	 */
 	public int enchantability() {
 		return enchantability;
+	}
+
+	/**
+	 * The real Hypixel item id this rung is stamped with, which is what a client-side pack reads to pick the
+	 * item's texture. <b>A rung renders as whatever a plain sword of its material renders as</b> - Undead
+	 * Sword through to Necron's Blade - so it is read straight out of {@link misc.SkyblockId#vanillaFor}
+	 * rather than copied into a column here, where the two could drift apart.
+	 *
+	 * <p>Null on the Stick, which is not a sword material and has no counterpart: the bottom rung stays a
+	 * plain stick client-side, the same as any other stick.
+	 */
+	@Nullable
+	public String skyblockId() {
+		return SkyblockId.vanillaFor(material);
 	}
 }

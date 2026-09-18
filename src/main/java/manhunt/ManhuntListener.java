@@ -3,6 +3,7 @@ package manhunt;
 import items.weapons.ManhuntHyperion;
 import misc.AddRecipes;
 import misc.Plugin;
+import misc.Utils;
 import org.bukkit.Keyed;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -10,20 +11,24 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
 /**
- * The Manhunt rules that hang off events: kitting players out, resetting a dead one's intelligence, and
- * vetting the Hyperion upgrade craft. Registered only when Manhunt is on.
+ * The Manhunt rules that hang off events: kitting players out on join and on respawn, resetting a dead
+ * one's intelligence, and vetting the Hyperion upgrade craft. Registered only when Manhunt is on.
  */
 public class ManhuntListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 		p.discoverRecipes(AddRecipes.manhuntRecipeKeys(Plugin.getInstance()));
-		// Somebody arriving into a match already under way still gets their kit.
-		Manhunt.equip(p);
+		// A rejoining Speedrunner is still a Speedrunner - the roster is on disk, keyed on UUID - so this is
+		// only about the name the teams list quotes for them.
+		Manhunt.noteName(p);
+		// Somebody arriving into a match already under way still gets their kit - once.
+		Manhunt.equipOnJoin(p);
 	}
 
 	/**
@@ -33,6 +38,27 @@ public class ManhuntListener implements Listener {
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		Manhunt.onDeath(e.getEntity());
+	}
+
+	/**
+	 * Kits a player back out after they respawn. Death drops their Hyperion and compass on the floor, and
+	 * {@code equip} otherwise only runs on {@code /manhunt start} and on join - so without this a death put
+	 * a Hunter out of the match for good, with no way back to a compass short of a rejoin.
+	 *
+	 * <p>They come back on the <b>Stick</b>, which is the same demotion {@link Manhunt#onDeath} applies to
+	 * their intelligence ceiling: whatever rung they had reached is on the ground with the rest of their
+	 * things, to be picked back up or lost.
+	 *
+	 * <p>A tick late, for two reasons: with keepInventory off the inventory is not settled while the event
+	 * runs, and {@code equip} drops anything that will not fit at {@code p.getLocation()} - which is still
+	 * the DEATH spot during the event, so an overflow would land back where they died.
+	 */
+	@EventHandler
+	public void onPlayerRespawn(PlayerRespawnEvent e) {
+		Player p = e.getPlayer();
+		Utils.scheduleTask(() -> {
+			if(p.isOnline()) Manhunt.equip(p);
+		}, 1);
 	}
 
 	/**
