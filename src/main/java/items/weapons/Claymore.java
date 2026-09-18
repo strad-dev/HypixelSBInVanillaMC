@@ -39,7 +39,7 @@ public class Claymore implements CustomItem {
 		data.setUnbreakable(true);
 		data.displayName(Utils.mm("<light_purple>Dark Claymore"));
 		AttributeModifier attackSpeed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "claymoreModifier"), 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
-		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "claymoreModifierDmg"), 9, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
+		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "claymoreModifierDmg"), BASE_DAMAGE, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		AttributeModifier attackRange = new AttributeModifier(new NamespacedKey(Plugin.getInstance(),  "claymoreModifierRange"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeed);
@@ -49,8 +49,7 @@ public class Claymore implements CustomItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/dark_claymore"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.damageLore(BASE_DAMAGE, enchants));
-		lore.add(Utils.mm("<gray>Swing Range: <red>+2"));
+		lore.addAll(Utils.statLore(data, enchants));
 		lore.addAll(Utils.bonusDamageLore(enchants));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>That thing was too big to be"));

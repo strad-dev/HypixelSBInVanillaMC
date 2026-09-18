@@ -37,7 +37,7 @@ public class TacticalInsertion implements AbilityItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/tactical_insertion"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Gorilla Tactics <green><bold>RIGHT CLICK"));
 		lore.add(Utils.mm("<gray>Marks your location and teleports"));

@@ -4,6 +4,7 @@ import items.AbilityItem;
 import listeners.CustomDamage;
 import listeners.CustomItems;
 import listeners.DamageType;
+import misc.DamageData;
 import misc.MinecraftFont;
 import misc.Plugin;
 import misc.SkyblockId;
@@ -39,6 +40,9 @@ public class Scylla implements AbilityItem {
 
 	/** Share of the wielder's melee damage the implosion deals. */
 	public static final double IMPLOSION_SHARE = 0.60;
+	/** Flat bonus every Hyperion deals to Withers. <b>Read by
+	 *  {@link listeners.CustomDamage#calculateFinalDamage} and quoted by the lore.</b> */
+	public static final double WITHER_BONUS = 4;
 
 	/**
 	 * Share of the absorption still standing when the Wither Shield expires that becomes real health.
@@ -88,7 +92,7 @@ public class Scylla implements AbilityItem {
 		data.setUnbreakable(true);
 		data.displayName(Utils.mm("<light_purple>Hyperion"));
 		AttributeModifier attackSpeed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "scyllaModifier"), 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
-		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "scyllaModifierDmg"), 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
+		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "scyllaModifierDmg"), BASE_DAMAGE, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, attackSpeed);
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
@@ -102,10 +106,10 @@ public class Scylla implements AbilityItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm(ID));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.damageLore(BASE_DAMAGE, enchants));
+		lore.addAll(Utils.statLore(data, enchants));
 		lore.addAll(Utils.bonusDamageLore(enchants));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Deals <red>+4<gray> damage to Withers."));
+		lore.add(Utils.mm("<gray>Deals <red>+" + Utils.damageNumber(WITHER_BONUS) + "<gray> damage to Withers."));
 		lore.add(Utils.mm(""));
 		// This header is the line every lore tooltip in the plugin is measured against, so it is never
 		// wrapped - see MinecraftFont.LORE_WIDTH.
@@ -172,9 +176,12 @@ public class Scylla implements AbilityItem {
 									   double damageReduction, ToDoubleFunction<LivingEntity> damage) {
 		Location origin = p.getLocation().clone();
 		Location l = null;
-		RayTraceResult result = p.rayTraceBlocks(distance + 1.65);
+		// The world border counts as a solid block: clipped to it, so a Wither Impact aimed through the
+		// border lands just inside rather than outside. Shared with the Manhunt Hyperion, like the rest.
+		double reach = Utils.borderDistance(p.getLocation(), p.getLocation().getDirection(), distance + 1.65);
+		RayTraceResult result = p.rayTraceBlocks(reach);
 		if(result == null) {
-			l = p.getLocation().add(p.getLocation().getDirection().multiply(distance));
+			l = p.getLocation().add(p.getLocation().getDirection().multiply(Math.min(distance, reach)));
 			l.setX(Math.floor(l.getX()) + 0.5);
 			l.setY(Math.floor(l.getY()));
 			l.setZ(Math.floor(l.getZ()) + 0.5);
@@ -328,10 +335,16 @@ public class Scylla implements AbilityItem {
 		double total = 0;
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
+				// The counter reports what the implosion actually LANDED, not the figure it asked for: the
+				// pipeline still has armour, the Ice Spray modifiers, a shield, a totem and the PvP layer to
+				// put between the two.  Read back off DamageData rather than from the target's health, which
+				// would cap every kill at whatever the mob had left and lose the overkill.
 				double tempDamage = damage.applyAsDouble(entity1);
-				CustomDamage.customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC);
+				DamageData data = new DamageData(entity1, p, tempDamage);
+				CustomDamage.customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC, data);
+				if(data.damageDealt == 0) continue; // soaked to nothing, or suppressed: not a hit either
 				damaged += 1;
-				total += tempDamage;
+				total += data.damageDealt;
 			}
 		}
 		if(damaged > 0) {

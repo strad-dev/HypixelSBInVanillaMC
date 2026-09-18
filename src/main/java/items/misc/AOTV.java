@@ -26,6 +26,9 @@ import java.util.List;
 
 public class AOTV implements AbilityItem {
 	private static final int MANA_COST = 1;
+	/** Instant Transmission's blind hop, and how far Ether Transmission can see. Both quoted by the lore. */
+	public static final int INSTANT_DISTANCE = 12;
+	public static final int ETHER_DISTANCE = 61;
 
 	public static ItemStack getItem() {
 		ItemStack aotv = new ItemStack(Material.NETHERITE_SHOVEL);
@@ -40,15 +43,15 @@ public class AOTV implements AbilityItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/aspect_of_the_void"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Instant Transmission <green><bold>RIGHT CLICK"));
-		lore.add(Utils.mm("<gray>Teleport <green>12 blocks<gray> ahead of you."));
+		lore.add(Utils.mm("<gray>Teleport <green>" + INSTANT_DISTANCE + " blocks<gray> ahead of you."));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Ether Transmission <green><bold>SNEAK RIGHT CLICK"));
 		lore.add(Utils.mm("<gray>Teleport to your targetted block"));
-		lore.add(Utils.mm("<gray>up to <green>61 blocks<gray> blocks away."));
+		lore.add(Utils.mm("<gray>up to <green>" + ETHER_DISTANCE + " blocks<gray> away."));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC SHOVEL <obfuscated>a</obfuscated>"));
@@ -85,7 +88,10 @@ public class AOTV implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		if(p.isSneaking()) {
-			RayTraceResult result = p.rayTraceBlocks(61);
+			// The border is a solid block, so it also blocks the LINE OF SIGHT: a block beyond it cannot be
+			// picked as a warp target, and the ray simply stops there.
+			double reach = Utils.borderDistance(p.getEyeLocation(), p.getEyeLocation().getDirection(), ETHER_DISTANCE);
+			RayTraceResult result = p.rayTraceBlocks(reach);
 			if(result != null) {
 				Block b = result.getHitBlock();
 				Location l = b.getLocation().add(0.5, 1, 0.5);
@@ -102,9 +108,12 @@ public class AOTV implements AbilityItem {
 			return false;
 		} else {
 			Location origin = p.getLocation().clone();
-			RayTraceResult result = p.rayTraceBlocks(13.65);
+			// Raytraced only as far as the border, so a border nearer than the first block wins and the hop
+			// below lands just inside it - the same branch a solid block ahead would take.
+			double reach = Utils.borderDistance(origin, origin.getDirection(), 13.65);
+			RayTraceResult result = p.rayTraceBlocks(reach);
 			if(result == null) {
-				Location targetLoc = p.getLocation().add(p.getLocation().getDirection().multiply(12));
+				Location targetLoc = p.getLocation().add(p.getLocation().getDirection().multiply(Math.min(INSTANT_DISTANCE, reach)));
 				targetLoc.setX(Math.floor(targetLoc.getX()) + 0.5);
 				targetLoc.setY(Math.floor(targetLoc.getY()));
 				targetLoc.setZ(Math.floor(targetLoc.getZ()) + 0.5);

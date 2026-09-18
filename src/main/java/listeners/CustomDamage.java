@@ -1,6 +1,9 @@
 package listeners;
 
+import items.misc.HolyIce;
+import items.misc.IceSpray;
 import items.weapons.Scylla;
+import items.weapons.SwordOfBadHealth;
 import misc.DamageData;
 import misc.Plugin;
 import misc.Utils;
@@ -343,7 +346,19 @@ public class CustomDamage implements Listener {
 				if(arrow.getPierceLevel() == 0) {
 					arrow.remove();
 				} else {
-					arrow.setPierceLevel(arrow.getPierceLevel() - 1);
+					// DO NOT decrement the pierce level. Vanilla counts its own hits, in
+					// AbstractArrow.onHitEntity: it keeps the entity ids it has already pierced in
+					// piercingIgnoreEntityIds and discards the arrow once that set reaches
+					// getPierceLevel() + 1. Lowering the level here counted every hit TWICE, so the two
+					// counters met early - a Terminator arrow (pierce 4, lore "up to 5 foes") stopped
+					// dealing damage after THREE, and the fourth hit was swallowed without a scratch,
+					// which is exactly what a shot phasing through a target looks like.
+					//
+					// The velocity IS ours to put back. Cancelling the damage event makes hurtOrSimulate
+					// return false, so vanilla takes its miss branch and deflects the arrow REVERSE at 0.2
+					// of its speed - the bounce you see off a mob. Scheduler tasks run before entities
+					// tick, so restoring it next tick lands before that reversed vector can move the
+					// arrow, though the client still renders one frame of the flip.
 					Vector arrowSpeed = arrow.getVelocity();
 					Utils.scheduleTask(() -> arrow.setVelocity(arrowSpeed), 1L);
 				}
@@ -419,12 +434,12 @@ public class CustomDamage implements Listener {
 		if(!(DamageType.isAbsoluteDamage(type))) {
 			// bonus damage to withers from hyperion
 			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && p.getInventory().getItemInMainHand().hasItemMeta() && Utils.firstLorePlain(p.getInventory().getItemInMainHand().getItemMeta()).equals("skyblock/combat/scylla")) {
-				finalDamage += 4;
+				finalDamage += Scylla.WITHER_BONUS;
 			}
 
 			// ice spray logic
 			if(damagee.getScoreboardTags().contains("IceSprayed")) {
-				finalDamage *= 1.1;
+				finalDamage *= IceSpray.DAMAGE_TAKEN_BONUS;
 			}
 
 			// The share is the Hyperion's, not the tag's - a Manhunt Hyperion shields for as little as 5%.
@@ -433,16 +448,16 @@ public class CustomDamage implements Listener {
 			}
 
 			if(damagee.getScoreboardTags().contains("HolyIce")) {
-				finalDamage *= 0.25;
+				finalDamage *= HolyIce.DAMAGE_TAKEN;
 			}
 
 			if(damager instanceof LivingEntity entity1) {
 				if(entity1.getScoreboardTags().contains("IceSprayed")) {
-					finalDamage *= 0.85;
+					finalDamage *= IceSpray.DAMAGE_DEALT_PENALTY;
 				}
 
 				if(entity1.getScoreboardTags().contains("BadHealthBuffed")) {
-					finalDamage *= 1.1;
+					finalDamage *= SwordOfBadHealth.DAMAGE_BONUS;
 				}
 			}
 
@@ -556,6 +571,12 @@ public class CustomDamage implements Listener {
 
 			double absorption = damagee.getAbsorptionAmount();
 			double oldHealth = damagee.getHealth();
+
+			// What the blow landed, for an ability that reports its own damage (the Hyperion's implosion
+			// counter). Here rather than lower down because this is the last word on the figure: the
+			// absorption split below spends part of it, and the health it removes is capped by whatever the
+			// target had left, neither of which is the damage dealt.
+			data.damageDealt = finalDamage;
 
 			// PvP layer (config-gated, inert off the pvp server): record this hit for arena/duel combat stats.
 			pvp.PvpHooks.trackHit(damagee, damager, finalDamage,

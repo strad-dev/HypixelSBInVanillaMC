@@ -35,9 +35,7 @@ public class DivanPickaxe implements CustomItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/divan_pickaxe"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>0"));
-		lore.add(Utils.mm("<gray>Mining Speed: <red>x1.33"));
-		lore.add(Utils.mm("<gray>Range: <red>+1"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Passive Ability: Double Drops"));
 		lore.add(Utils.mm("<gray>Grants <red>x2<gray> drops from"));

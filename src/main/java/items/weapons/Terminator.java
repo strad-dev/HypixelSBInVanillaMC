@@ -33,6 +33,9 @@ public class Terminator implements AbilityItem {
 	private static final int COOLDOWN = 16;
 	private static final String SHOT_COOLDOWN_TAG = "TerminatorShotCooldown";
 	private static final int SHOT_COOLDOWN = 3;
+	/** How many further foes an arrow passes through. The lore quotes {@code PIERCE + 1}, the number it
+	 *  actually hits: {@code CustomDamage} spends one level per hit and removes the arrow at zero. */
+	private static final int PIERCE = 4;
 
 	/**
 	 * Enchanting-table power, against a vanilla bow's 1 and the other high-end SkyBlock items' 30.
@@ -90,16 +93,19 @@ public class Terminator implements AbilityItem {
 		lore.add(Utils.mm("skyblock/combat/terminator"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray>Damage: <red>+" + loreDamage));
-		lore.add(Utils.mm("<gray>Shot Cooldown: <green>0.2s"));
+		// SHOT_COOLDOWN + 1, not SHOT_COOLDOWN: the tag is gone on the tick the task runs, so a player
+		// spamming the button can sneak a shot in at 3 ticks, but holding right-click fires on the NEXT
+		// tick after that and lands at 4.  The published figure is the one everybody holding it gets.
+		lore.add(Utils.mm("<gray>Shot Cooldown: <green>" + Utils.damageNumber((SHOT_COOLDOWN + 1) / 20.0) + "s"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Shortbow: Instantly Shoots!"));
 		lore.add(Utils.mm("<gray>Shoots <aqua>3<gray> arrows at once."));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Salvation <green><bold>LEFT CLICK"));
 		lore.add(Utils.mm("<gray>Shoot a beam, penetrating up to"));
-		lore.add(Utils.mm("<yellow>5<gray> foes and dealing <red>" + salvationDamage));
+		lore.add(Utils.mm("<yellow>" + (PIERCE + 1) + "<gray> foes and dealing <red>" + salvationDamage));
 		lore.add(Utils.mm("<gray>damage to each enemy."));
-		lore.add(Utils.mm("<gray>Cooldown: <green>0.8s"));
+		lore.add(Utils.mm("<gray>Cooldown: <green>" + Utils.damageNumber(COOLDOWN / 20.0) + "s"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC BOW <obfuscated>a</obfuscated>"));
 
@@ -116,6 +122,12 @@ public class Terminator implements AbilityItem {
 
 	@Override
 	public boolean hasLeftClickAbility() {
+		return true;
+	}
+
+	/** Salvation is the attack button on a bow with a 0.8s cooldown - see {@link AbilityItem#quietCooldown}. */
+	@Override
+	public boolean quietCooldown() {
 		return true;
 	}
 
@@ -146,10 +158,12 @@ public class Terminator implements AbilityItem {
 		// Calculate spawn position
 		Location spawnLoc = p.getEyeLocation().add(baseDirection.clone());
 
-		// Create NMS arrows directly (26.2: EntityType.ARROW constant removed; use the position+item constructor with a null weapon)
-		net.minecraft.world.entity.projectile.arrow.Arrow nmsLeft = new net.minecraft.world.entity.projectile.arrow.Arrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
-		net.minecraft.world.entity.projectile.arrow.Arrow nmsMiddle = new net.minecraft.world.entity.projectile.arrow.Arrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
-		net.minecraft.world.entity.projectile.arrow.Arrow nmsRight = new net.minecraft.world.entity.projectile.arrow.Arrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
+		// Create NMS arrows directly (26.2: EntityType.ARROW constant removed; use the position+item
+		// constructor with a null weapon). TerminatorArrow, not vanilla's Arrow, so our own cancelled damage
+		// event cannot deflect them - see that class.
+		TerminatorArrow nmsLeft = new TerminatorArrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
+		TerminatorArrow nmsMiddle = new TerminatorArrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
+		TerminatorArrow nmsRight = new TerminatorArrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
 
 		// Set positions
 		nmsLeft.setPos(spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ());
@@ -190,7 +204,7 @@ public class Terminator implements AbilityItem {
 		// Set Bukkit properties
 		for(Arrow arrow : Arrays.asList(left, middle, right)) {
 			arrow.setDamage(damage + strengthBonus);
-			arrow.setPierceLevel(4);
+			arrow.setPierceLevel(PIERCE);
 			arrow.setShooter(p);
 			arrow.setWeapon(p.getInventory().getItemInMainHand());
 			arrow.addScoreboardTag("TerminatorArrow");

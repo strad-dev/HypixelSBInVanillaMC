@@ -38,7 +38,7 @@ public class BonzoStaff implements AbilityItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/bonzo_staff"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Showtime <green><bold>RIGHT CLICK"));
 		lore.add(Utils.mm("<gray>Shoots Wind Charges that create an"));
