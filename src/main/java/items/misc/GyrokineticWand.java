@@ -40,7 +40,7 @@ public class GyrokineticWand implements AbilityItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/gyro"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Gravity Storm <green><bold>LEFT CLICK"));
 		lore.add(Utils.mm("<gray>Creates a large <dark_purple>rift<gray> at the aimed"));

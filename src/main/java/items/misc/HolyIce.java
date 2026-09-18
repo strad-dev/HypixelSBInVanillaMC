@@ -24,6 +24,12 @@ public class HolyIce implements AbilityItem {
 	private static final int MANA_COST = 20;
 	private static final String COOLDOWN_TAG = "IceCooldown";
 	private static final int COOLDOWN = 60;
+	/** Share of incoming damage taken while the {@code HolyIce} tag is up. <b>Read by
+	 *  {@link listeners.CustomDamage#calculateFinalDamage} and quoted by the lore</b>, so the number lives
+	 *  here and nowhere else. */
+	public static final double DAMAGE_TAKEN = 0.25;
+	/** How long the tag is up. */
+	public static final long DURATION = 20L;
 
 	public static ItemStack getItem() {
 		ItemStack holyIce = new ItemStack(Material.DIAMOND);
@@ -40,11 +46,11 @@ public class HolyIce implements AbilityItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/holy_ice"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Splash Yo Face <green><bold>RIGHT CLICK"));
-		lore.add(Utils.mm("<gray>Take <green>75%<gray> less damage"));
-		lore.add(Utils.mm("<gray>for <green>1<gray> second!"));
+		lore.add(Utils.mm("<gray>Take <green>" + Utils.percent(1 - DAMAGE_TAKEN) + "<gray> less damage"));
+		lore.add(Utils.mm("<gray>for <green>" + DURATION / 20 + "<gray> second!"));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
 		lore.add(Utils.mm("<dark_gray>Cooldown: <green>" + COOLDOWN / 20 + "s"));
 		lore.add(Utils.mm(""));
@@ -64,7 +70,7 @@ public class HolyIce implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		p.addScoreboardTag("HolyIce");
-		Utils.scheduleTask(() -> p.removeScoreboardTag("HolyIce"), 20);
+		Utils.scheduleTask(() -> p.removeScoreboardTag("HolyIce"), DURATION);
 		p.getWorld().spawnParticle(Particle.DRIPPING_WATER, p.getEyeLocation(), 256);
 		p.playSound(p, Sound.ENTITY_PLAYER_SPLASH_HIGH_SPEED, 0.5F, 1.0F);
 		return true;

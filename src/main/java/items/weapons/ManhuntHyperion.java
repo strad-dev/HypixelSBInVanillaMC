@@ -63,7 +63,7 @@ public class ManhuntHyperion implements AbilityItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm(ManhuntTier.ID));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.damageLore(tier.damage(), enchants));
+		lore.addAll(Utils.statLore(data, enchants));
 		lore.addAll(Utils.bonusDamageLore(enchants));
 		lore.add(Utils.mm(""));
 		// The header is the line the tooltip is measured against, so it is never wrapped.

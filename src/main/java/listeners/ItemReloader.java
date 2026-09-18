@@ -1,7 +1,6 @@
 package listeners;
 
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
-import io.papermc.paper.event.player.PlayerInventorySlotChangeEvent;
 import items.armor.*;
 import items.ingredients.mining.*;
 import items.ingredients.misc.*;
@@ -25,11 +24,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCreativeEvent;
-import org.bukkit.event.inventory.InventoryCreativeEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -40,131 +37,117 @@ import java.util.List;
 import java.util.Map;
 
 public class ItemReloader implements Listener {
-	@EventHandler
-	public void onItemPickup(EntityPickupItemEvent e) {
-		if(!(e.getEntity() instanceof Player p)) return;
+	/**
+	 * <b>THE item updater.</b>  Every slot a player owns plus their cursor, rebuilt and written back when it
+	 * differs.  This replaced seven separate event handlers - pickup, join, armour change, slot switch,
+	 * inventory click, creative set and slot change - which between them still missed cases and, worse,
+	 * could not make the client believe them.
+	 *
+	 * <p>Driven by the four moments Hypixel refreshes on - <b>login, switching to a hotbar slot, picking an
+	 * item up off the ground, and clicking in an inventory</b> - plus <b>an armour change</b>, which is ours
+	 * alone because this plugin puts ATTACK_DAMAGE on armour and Hypixel does not.  No ticker: a repeating
+	 * sweep of every online player would cost the server real work to catch changes that only ever happen
+	 * on one of those actions anyway.
+	 *
+	 * <p><b>{@code updateInventory()} is the load-bearing line</b>, and its absence is why the per-event
+	 * approach looked broken for so long.  {@code handleSetCreativeModeSlot} ends with
+	 * {@code InventoryMenu.setRemoteSlot(...)}, and a held-slot switch behaves the same way: the server
+	 * records the client as already holding that stack, so rewriting the slot afterwards finds nothing to
+	 * broadcast and the client keeps rendering the item it made up.  {@code updateInventory} resets that
+	 * record and resends the container, which is the only thing that defeats it.  Guarded on
+	 * {@code changed}, so a settled inventory costs one comparison per slot and sends nothing.
+	 */
+	public static void sweep(Player p) {
+		PlayerInventory inventory = p.getInventory();
+		boolean changed = false;
 
-		ItemStack rebuilt = rebuild(e.getItem().getItemStack(), p);
-		if(rebuilt != null) e.getItem().setItemStack(rebuilt);
+		for(int i = 0; i < inventory.getSize(); i++) {
+			ItemStack current = inventory.getItem(i);
+			ItemStack rebuilt = rebuild(current, p);
+			if(rebuilt != null && !rebuilt.equals(current)) {
+				inventory.setItem(i, rebuilt);
+				changed = true;
+			}
+		}
+
+		ItemStack cursor = p.getItemOnCursor();
+		ItemStack rebuiltCursor = rebuild(cursor, p);
+		if(rebuiltCursor != null && !rebuiltCursor.equals(cursor)) {
+			p.setItemOnCursor(rebuiltCursor);
+			changed = true;
+		}
+
+		if(changed) p.updateInventory();
 	}
 
 	/**
-	 * Rebuilds the whole inventory a tick after the player lands, never on the event itself. A weapon whose
-	 * lore quotes a live figure - the Hyperion's implosion damage - reads it off the player's ATTACK_DAMAGE
-	 * attribute, and the modifiers their armour contributes are TRANSIENT: the server re-derives them when
-	 * the player first ticks, which is after PlayerJoinEvent. Rebuilding inline wrote the figure for a naked
-	 * player, so a Hyperion in full custom armour said 5.4 and imploded for 10.2 until the next slot switch.
+	 * Login.  A tick late, deliberately: the ATTACK_DAMAGE modifiers a player's armour contributes are
+	 * TRANSIENT, re-derived when the entity first ticks, which is after PlayerJoinEvent.  Sweeping inline
+	 * wrote every live figure for a naked player - a Hyperion in the full custom set said 5.4 and imploded
+	 * for 10.2.
 	 */
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 		Utils.scheduleTask(() -> {
-			if(!p.isOnline()) return;
-			PlayerInventory inventory = p.getInventory();
+			if(p.isOnline()) sweep(p);
+		}, 1);
+	}
 
-			for(int i = 0; i < inventory.getSize(); i++) {
-				ItemStack rebuilt = rebuild(inventory.getItem(i), p);
-				if(rebuilt != null) inventory.setItem(i, rebuilt);
-			}
+	/** Switching to a hotbar slot.  The classic desync: without the sweep's updateInventory the client kept
+	 *  showing whatever it had cached for that slot. */
+	@EventHandler
+	public void onItemHeld(PlayerItemHeldEvent e) {
+		sweep(e.getPlayer());
+	}
+
+	/** Picking an item up off the ground. */
+	@EventHandler
+	public void onItemPickup(EntityPickupItemEvent e) {
+		if(!(e.getEntity() instanceof Player p)) return;
+		// The stack is still on the ground entity when this fires, so re-stat it there too - a vanilla
+		// armour piece picked up has to arrive already carrying its attribute values.
+		modifyVanillaArmor(e.getItem().getItemStack());
+		Utils.scheduleTask(() -> {
+			if(p.isOnline()) sweep(p);
 		}, 1);
 	}
 
 	/**
-	 * Rewrites the held weapon when the player's armour changes, for the same reason {@link #onItemHeld}
-	 * does it on a slot switch: an armour piece carrying ATTACK_DAMAGE moves the implosion figure, and
-	 * nothing else would rewrite the lore of an item they are already holding. A tick late, because the
-	 * attribute modifiers the new piece contributes are not on the attribute yet while this event runs.
+	 * Changing armour - the one refresh point that is ours rather than Hypixel's, and it is here because
+	 * this plugin puts <b>ATTACK_DAMAGE on armour</b> (the crown +3, the Primal chestplate +2, Necromancer
+	 * leggings +2, Maxor boots +1).  That moves the Hyperion's implosion figure, and equipping by
+	 * right-click is not a click, a pickup or a slot switch, so nothing else here would catch it: the lore
+	 * sat stale until the next click.  A tick late, because the modifiers the new piece contributes are not
+	 * on the attribute yet while the event runs.
 	 */
 	@EventHandler
 	public void onArmorChange(PlayerArmorChangeEvent e) {
 		Player p = e.getPlayer();
 		Utils.scheduleTask(() -> {
-			if(!p.isOnline()) return;
-			PlayerInventory inventory = p.getInventory();
-			ItemStack rebuilt = rebuild(inventory.getItemInMainHand(), p);
-			if(rebuilt != null) inventory.setItemInMainHand(rebuilt);
+			if(p.isOnline()) sweep(p);
 		}, 1);
 	}
 
 	/**
-	 * Rewrites the item the player just switched to. Weapons whose lore quotes a live figure - the Hyperion's
-	 * implosion damage - go stale when whatever it is read off changes, so the item is rebuilt on every slot
-	 * switch as well as on join and on pickup.
-	 */
-	@EventHandler
-	public void onItemHeld(PlayerItemHeldEvent e) {
-		Player p = e.getPlayer();
-		PlayerInventory inventory = p.getInventory();
-		ItemStack rebuilt = rebuild(inventory.getItem(e.getNewSlot()), p);
-		if(rebuilt != null) inventory.setItem(e.getNewSlot(), rebuilt);
-	}
-
-	/**
-	 * Also handles pulling an item out of the <b>vanilla</b> creative inventory, which is the only moment we
-	 * get a say in it: the client builds the creative tabs from its own registry and sends the finished
-	 * stack up in a {@code ServerboundSetCreativeModeSlotPacket}, which the server takes as-is.  Stamping it
-	 * here is immediate rather than a tick late, because the event carries the stack itself.
-	 *
-	 * <p>Done as a branch inside this handler rather than as its own {@code InventoryCreativeEvent} method:
-	 * that subclass does not declare a {@code HandlerList}, so it shares {@code InventoryClickEvent}'s, and
-	 * a listener registered for the subclass would be handed ordinary clicks too.
-	 *
-	 * <p><b>The creative menu's own icons cannot be fixed.</b>  Their contents never leave the client, so
-	 * there is nothing server-side to stamp - a diamond sword in the palette shows a diamond sword, and only
-	 * becomes a Giant's Sword once it is taken.
+	 * Clicking in an inventory.  A tick late because the click has not been applied yet while the event
+	 * runs.  <b>This also covers the creative menu</b>: {@code InventoryCreativeEvent} extends
+	 * {@code InventoryClickEvent}, so taking an item out of the creative palette arrives here, and the
+	 * sweep's {@code updateInventory} is what finally makes the stamp visible.
 	 */
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
 		if(!(e.getWhoClicked() instanceof Player p)) return;
-
-		if(e instanceof InventoryCreativeEvent creative) {
-			ItemStack rebuilt = rebuild(creative.getCursor(), p);
-			if(rebuilt != null) creative.setCursor(rebuilt);
-			return;
-		}
-
 		Utils.scheduleTask(() -> {
-			ItemStack cursor = rebuild(p.getItemOnCursor(), p);
-			if(cursor != null) p.setItemOnCursor(cursor);
-
-			ItemStack current = rebuild(e.getCurrentItem(), p);
-			if(current != null) e.setCurrentItem(current);
+			if(p.isOnline()) sweep(p);
 		}, 1);
-	}
-
-	/**
-	 * Stamps whatever a creative-mode player pulls out of the creative menu, <b>as they pull it</b>. The
-	 * creative tabs themselves are built by the client off its own item registry, so nothing here can touch
-	 * how they render - but the stack the client then asks the server to put in a slot arrives as a bare
-	 * vanilla item, and it arrives through the creative set-slot packet, which is not a click the other
-	 * handlers see and does not go through {@code onSlotChange} either.
-	 *
-	 * <p>Handled inline rather than a tick later: the cursor here is the item being placed, and rewriting it
-	 * is the only chance to stamp it before the client's own copy of the slot is authoritative.
-	 */
-	@EventHandler
-	public void onCreativeSet(InventoryCreativeEvent e) {
-		if(!(e.getWhoClicked() instanceof Player p)) return;
-		ItemStack cursor = e.getCursor();
-		if(cursor == null || cursor.getType().isAir()) return;
-
-		// On a clone, because modifyVanillaArmor re-stats the stack in place and the id table does not cover
-		// every material it handles - the Elytra has no counterpart, so rebuild hands back null for it and
-		// the re-statting is only visible on the copy.
-		ItemStack copy = cursor.clone();
-		ItemStack stamped = rebuild(copy, p);
-		if(stamped != null) {
-			e.setCursor(stamped);
-		} else if(!copy.equals(cursor)) {
-			e.setCursor(copy);
-		}
 	}
 
 	/**
 	 * Stamps the result a crafting grid is showing. The result slot is filled by the recipe rather than out
 	 * of anybody's inventory, so a vanilla craft - a diamond sword, a netherite helmet - sat there as a
-	 * plain item and only picked up its id once it landed in a slot and {@code onSlotChange} caught it, a
-	 * tick after the player had already seen the wrong texture.
+	 * plain item and only picked up its id once the player clicked it into a slot - a tick after they had
+	 * already read the wrong texture off the result.
 	 *
 	 * <p>Only {@code stampVanilla}, deliberately: a custom result came out of its own {@code getItem()} with
 	 * its id already on it, and rebuilding it here would fight {@code ManhuntListener.onPrepareCraft}, which
@@ -177,31 +160,6 @@ public class ItemReloader implements Listener {
 	}
 
 	/**
-	 * Rebuilds a single slot of the player's own inventory whenever anything changes it. This is the
-	 * catch-all the other handlers cannot be: {@code onInventoryClick} only ever sees the clicked stack and
-	 * the cursor, so an item <b>shift-clicked</b> somewhere - most visibly a crafting bench's result, which
-	 * skips the cursor entirely - landed in the inventory with no id on it. Dragging, hotbar swaps, a
-	 * hopper and {@code /give} were all equally invisible.
-	 *
-	 * <p><b>The equality test is what stops this looping.</b> Writing the slot fires this event again, so a
-	 * rebuild that changed nothing must not write: {@code getItem()} hands back a fresh object every time,
-	 * but an equal one, so an already-correct stack is left alone and the cycle ends. A stack that really
-	 * did need rebuilding is written once and its re-fire settles on the second pass.
-	 */
-	@EventHandler
-	public void onSlotChange(PlayerInventorySlotChangeEvent e) {
-		Player p = e.getPlayer();
-		int slot = e.getSlot();
-		Utils.scheduleTask(() -> {
-			if(!p.isOnline()) return;
-			PlayerInventory inventory = p.getInventory();
-			ItemStack current = inventory.getItem(slot);
-			ItemStack rebuilt = rebuild(current, p);
-			if(rebuilt != null && !rebuilt.equals(current)) inventory.setItem(slot, rebuilt);
-		}, 1);
-	}
-
-	/**
 	 * The one rebuild, and what every handler above calls: a custom item comes back from its own
 	 * {@code getItem()}, a vanilla one is re-statted in place and stamped with its SkyBlock id.
 	 * <b>Null means leave the slot alone</b> - nothing about the stack needed to change.
@@ -209,8 +167,8 @@ public class ItemReloader implements Listener {
 	 * <p>The two used to be an if/else repeated at each call site, which is how {@code onItemHeld} ended up
 	 * as the one handler that rebuilt custom items but never touched vanilla ones.
 	 *
-	 * <p>It must stay <b>idempotent</b>: {@code onSlotChange} compares its result against what was already
-	 * there and would loop if an unchanged stack came back unequal.
+	 * <p>It must stay <b>idempotent</b>: {@link #sweep} compares its result against what is already in the
+	 * slot, so a rebuild that never comes back equal would rewrite and resend all 41 slots every time.
 	 */
 	@Nullable
 	private static ItemStack rebuild(ItemStack item, Player p) {

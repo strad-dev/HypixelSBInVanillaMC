@@ -30,6 +30,13 @@ public class IceSpray implements AbilityItem {
 	private static final int MANA_COST = 8;
 	private static final String COOLDOWN_TAG = "IceSprayCooldown";
 	private static final int COOLDOWN = 100;
+	/** Damage the cone deals, and how long the slow and the {@code IceSprayed} tag last. */
+	public static final double DAMAGE = 1;
+	public static final long SLOW_TICKS = 101L;
+	/** What the {@code IceSprayed} tag does to damage a frozen enemy TAKES and DEALS. <b>Both read by
+	 *  {@link listeners.CustomDamage#calculateFinalDamage} and quoted by the lore.</b> */
+	public static final double DAMAGE_TAKEN_BONUS = 1.1;
+	public static final double DAMAGE_DEALT_PENALTY = 0.85;
 
 	public static ItemStack getItem() {
 		ItemStack iceSpray = new ItemStack(Material.STICK);
@@ -46,16 +53,16 @@ public class IceSpray implements AbilityItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/ice_spray_wand"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Ice Spray <green><bold>RIGHT CLICK"));
 		lore.add(Utils.mm("<gray>Produces a cone of ice in front"));
 		lore.add(Utils.mm("<gray>of the caster that deals"));
-		lore.add(Utils.mm("<red>1<gray> damage to enemies and"));
-		lore.add(Utils.mm("<gray>halves their speed for <green>5"));
+		lore.add(Utils.mm("<red>" + Utils.damageNumber(DAMAGE) + "<gray> damage to enemies and"));
+		lore.add(Utils.mm("<gray>halves their speed for <green>" + SLOW_TICKS / 20));
 		lore.add(Utils.mm("<gray>seconds!  Frozen enemies take"));
-		lore.add(Utils.mm("<red>+10%<gray> increased damage"));
-		lore.add(Utils.mm("<gray>and deal <red>-15%<gray> damage!"));
+		lore.add(Utils.mm("<red>+" + Utils.percent(DAMAGE_TAKEN_BONUS - 1) + "<gray> increased damage"));
+		lore.add(Utils.mm("<gray>and deal <red>-" + Utils.percent(1 - DAMAGE_DEALT_PENALTY) + "<gray> damage!"));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
 		lore.add(Utils.mm("<dark_gray>Cooldown: <green>" + COOLDOWN / 20 + "s"));
 		lore.add(Utils.mm(""));
@@ -89,12 +96,12 @@ public class IceSpray implements AbilityItem {
 					alreadyDebuffed++;
 				} else {
 					damage += 1;
-					customMobs(entity1, p, 1, DamageType.PLAYER_MAGIC);
-					Utils.iceSpraySlow(entity1, 101L);
+					customMobs(entity1, p, DAMAGE, DamageType.PLAYER_MAGIC);
+					Utils.iceSpraySlow(entity1, SLOW_TICKS);
 					entity1.addScoreboardTag("IceSprayed");
-					Utils.scheduleTask(() -> entity1.removeScoreboardTag("IceSprayed"), 101L);
+					Utils.scheduleTask(() -> entity1.removeScoreboardTag("IceSprayed"), SLOW_TICKS);
 					if(entity1 instanceof Player enemy) {
-						enemy.showTitle(Title.title(Utils.msg("<aqua><bold>❄ ❅ ❆"), Utils.msg("<blue>Brrrr..."), Title.Times.times(Duration.ZERO, Duration.ofMillis(101L * 50L), Duration.ZERO)));
+						enemy.showTitle(Title.title(Utils.msg("<aqua><bold>❄ ❅ ❆"), Utils.msg("<blue>Brrrr..."), Title.Times.times(Duration.ZERO, Duration.ofMillis(SLOW_TICKS * 50L), Duration.ZERO)));
 						enemy.sendMessage(Utils.msg("<aqua><bold>" + p.getName() + " has Ice Sprayed you for 5 seconds!"));
 					}
 				}

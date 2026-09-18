@@ -39,7 +39,7 @@ public class WandOfAtonement implements AbilityItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/wand_of_atonement"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>0"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Big Heal <green><bold>RIGHT CLICK"));
 		lore.add(Utils.mm("<gray>Gain +<red>0.5❤<gray> every <green>0.6"));

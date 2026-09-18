@@ -148,45 +148,82 @@ public class Utils {
 		return damageNumber(Math.round(share * 1000) / 10.0) + "%";
 	}
 
-	/**
-	 * The stat block for a piece of custom armour, read off the modifiers <b>already on {@code data}</b>
-	 * rather than from figures the caller writes out a second time by hand.  <b>Call it after the
-	 * {@code addAttributeModifier} calls and before {@code lore(...)}.</b>
-	 *
-	 * <p>Hand-written stats drift, and silently: the Crown of the Wither King granted +3 damage while its
-	 * lore said +2, and the Warden Helmet +2 while its lore said +1, because changing one number never
-	 * forced anyone to change the other.  Same reason {@link #damageLore} reads a weapon's enchantments off
-	 * the stack.
-	 *
-	 * <p>Fixed order - Damage, Armor, Knockback Resistance, Speed, Fall Damage - and a line appears only
-	 * when the item actually carries that attribute.  Damage and Armor are quoted as they are; the 0-1
-	 * attributes (knockback resistance, fall damage) and Speed, which is always a
-	 * {@code MULTIPLY_SCALAR_1}, are quoted as a signed percentage.  One operation per attribute is
-	 * assumed, which is what every piece does - an attribute carrying both a flat and a scalar modifier
-	 * would need its own line here.
-	 */
+	/** One line {@link #statLore} can quote: the attribute, its label, and whether its value is a 0-1
+	 *  SHARE (printed as a percentage) rather than a flat figure. */
+	private record StatLine(Attribute attribute, String label, boolean share) {}
+
+	/** Every stat the lore quotes, IN THE ORDER IT IS QUOTED. An attribute absent from an item is simply not
+	 *  printed, so one list covers armour, weapons and tools. Add a row to give a new attribute a line. */
+	private static final List<StatLine> STAT_LINES = List.of(
+			new StatLine(Attribute.ATTACK_DAMAGE, "Damage", false),
+			new StatLine(Attribute.ARMOR, "Armor", false),
+			new StatLine(Attribute.ENTITY_INTERACTION_RANGE, "Swing Range", false),
+			new StatLine(Attribute.BLOCK_BREAK_SPEED, "Mining Speed", false),
+			new StatLine(Attribute.BLOCK_INTERACTION_RANGE, "Range", false),
+			new StatLine(Attribute.KNOCKBACK_RESISTANCE, "Knockback Resistance", true),
+			new StatLine(Attribute.MOVEMENT_SPEED, "Speed", true),
+			new StatLine(Attribute.FALL_DAMAGE_MULTIPLIER, "Fall Damage", true));
+
+	/** @see #statLore(ItemMeta, Map) */
 	public static List<Component> statLore(ItemMeta data) {
+		return statLore(data, null);
+	}
+
+	/**
+	 * An item's whole stat block, read off the modifiers <b>already on {@code data}</b> rather than from
+	 * figures the caller writes out a second time by hand. <b>Call it after the {@code addAttributeModifier}
+	 * calls and before {@code lore(...)}</b>, and pass {@code enchants} for a weapon so Sharpness lands on the
+	 * damage line ({@link #damageLore}); armour and tools pass none.
+	 *
+	 * <p>Hand-written stats drift, and silently: the Crown of the Wither King granted +3 damage while its lore
+	 * said +2, and the Warden Helmet +2 while its lore said +1, because changing one number never forced
+	 * anyone to change the other. The numbers now live in the modifiers and nowhere else.
+	 *
+	 * <p>Order and labels come from {@link #STAT_LINES}; an attribute the item does not carry prints nothing.
+	 * Flat amounts print as they are, a {@code share} attribute as a signed percentage, and a
+	 * {@code MULTIPLY_SCALAR_1} through {@link #multiplier}. <b>Damage is special twice over</b>: a tool's
+	 * {@code -1000} is how it says "not a weapon" and the attribute floors at 0 anyway, so the line reads
+	 * {@code 0}; and it is the one line Sharpness is folded into. No item carries both a flat and a scalar
+	 * modifier on one attribute - if one ever does, it gets two lines.
+	 */
+	public static List<Component> statLore(ItemMeta data, @Nullable Map<Enchantment, Integer> enchants) {
 		List<Component> out = new ArrayList<>();
-		statLine(out, data, Attribute.ATTACK_DAMAGE, "Damage", false);
-		statLine(out, data, Attribute.ARMOR, "Armor", false);
-		statLine(out, data, Attribute.KNOCKBACK_RESISTANCE, "Knockback Resistance", true);
-		statLine(out, data, Attribute.MOVEMENT_SPEED, "Speed", true);
-		statLine(out, data, Attribute.FALL_DAMAGE_MULTIPLIER, "Fall Damage", true);
+		for(StatLine line : STAT_LINES) {
+			Collection<AttributeModifier> modifiers = data.getAttributeModifiers(line.attribute());
+			if(modifiers == null || modifiers.isEmpty()) continue;
+
+			double flat = 0;
+			double scalar = 0;
+			for(AttributeModifier modifier : modifiers) {
+				if(modifier.getOperation() == AttributeModifier.Operation.MULTIPLY_SCALAR_1) {
+					scalar += modifier.getAmount();
+				} else {
+					flat += modifier.getAmount();
+				}
+			}
+
+			if(line.attribute() == Attribute.ATTACK_DAMAGE) {
+				out.add(damageLore(Math.max(0, flat), enchants));
+				continue;
+			}
+			if(scalar != 0) {
+				out.add(mm("<gray>" + line.label() + ": <red>" + multiplier(scalar)));
+			}
+			if(flat != 0) {
+				out.add(mm("<gray>" + line.label() + ": <red>" + (flat > 0 ? "+" : "-")
+						+ (line.share() ? percent(Math.abs(flat)) : damageNumber(Math.abs(flat)))));
+			}
+		}
 		return out;
 	}
 
-	/** @see #statLore */
-	private static void statLine(List<Component> out, ItemMeta data, Attribute attribute, String label, boolean share) {
-		Collection<AttributeModifier> modifiers = data.getAttributeModifiers(attribute);
-		if(modifiers == null) return;
-		double total = 0;
-		for(AttributeModifier modifier : modifiers) {
-			total += modifier.getAmount();
-		}
-		if(total == 0) return;
-		String sign = total > 0 ? "+" : "-";
-		out.add(mm("<gray>" + label + ": <red>" + sign
-				+ (share ? percent(Math.abs(total)) : damageNumber(Math.abs(total)))));
+	/**
+	 * A {@code MULTIPLY_SCALAR_1} amount as lore reads it: a buff as the multiplier it is ({@code x2},
+	 * {@code x1.33}), a penalty as the reduction it is ({@code -25%}). Vanilla's operation is
+	 * {@code value *= 1 + amount}, so both forms describe the same number from the side that reads better.
+	 */
+	private static String multiplier(double amount) {
+		return amount > 0 ? "x" + damageNumber(1 + amount) : "-" + percent(Math.abs(amount));
 	}
 
 	/**
@@ -284,9 +321,12 @@ public class Utils {
 	 *
 	 * @see CustomDamage#sharpnessBonus
 	 */
-	public static Component damageLore(double baseDamage, Map<Enchantment, Integer> enchants) {
+	public static Component damageLore(double baseDamage, @Nullable Map<Enchantment, Integer> enchants) {
 		int sharpness = enchants == null ? 0 : enchants.getOrDefault(Enchantment.SHARPNESS, 0);
-		return mm("<gray>Damage: <red>+" + damageNumber(baseDamage + CustomDamage.sharpnessBonus(sharpness)));
+		double total = baseDamage + CustomDamage.sharpnessBonus(sharpness);
+		// No "+" in front of a zero: the ability tools all zero their attack damage and their line reads
+		// `Damage: 0`, which is a statement rather than a bonus.
+		return mm("<gray>Damage: <red>" + (total > 0 ? "+" : "") + damageNumber(total));
 	}
 
 	/**
@@ -535,6 +575,40 @@ public class Utils {
 			fb.setDropItem(false); // ...and drop nothing either if it never lands and times out over a void
 		});
 		return true;
+	}
+
+	/**
+	 * How much of a player's own hitbox has to stay inside the border. Vanilla shoves an entity back the
+	 * moment its bounding box crosses, so landing exactly ON the line is landing outside.
+	 */
+	private static final double BORDER_MARGIN = 0.5;
+
+	/**
+	 * How far a teleport may travel from {@code origin} along {@code direction} before it reaches the world
+	 * border, capped at {@code distance}. <b>The border is a solid block.</b> An ability that would carry a
+	 * player through it puts them down just inside instead, exactly the way a wall does - teleporting past it
+	 * dumps them somewhere vanilla immediately shoves them back out of, in chunks nobody asked the server to
+	 * load.
+	 *
+	 * <p>Only the four vertical walls exist, so the ray is clipped on X and Z alone and the Y component is
+	 * ignored. The border is a SQUARE centred on {@code getCenter()} with {@code getSize()} as its full
+	 * width. A player already outside it may still travel: the wall picked is the one ahead of them, so
+	 * moving back in works and moving further out does not.
+	 */
+	public static double borderDistance(Location origin, Vector direction, double distance) {
+		WorldBorder border = origin.getWorld().getWorldBorder();
+		double half = border.getSize() / 2 - BORDER_MARGIN;
+		Location centre = border.getCenter();
+		double limit = Math.min(distance, borderAxis(origin.getX() - centre.getX(), direction.getX(), half, distance));
+		limit = Math.min(limit, borderAxis(origin.getZ() - centre.getZ(), direction.getZ(), half, distance));
+		return Math.max(0, limit);
+	}
+
+	/** One axis of {@link #borderDistance}: the blocks travelled before this pair of walls is reached. */
+	private static double borderAxis(double offset, double towards, double half, double distance) {
+		if(towards == 0) return distance; // parallel to these two walls, so they are never reached
+		double hit = ((towards > 0 ? half : -half) - offset) / towards;
+		return hit < 0 ? 0 : hit; // already past it and still heading out
 	}
 
 	/**

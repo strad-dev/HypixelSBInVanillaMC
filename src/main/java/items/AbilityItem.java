@@ -24,6 +24,19 @@ public interface AbilityItem extends CustomItem {
 		return manaCost();
 	}
 
+	/**
+	 * Whether a cast refused because the ability is still on cooldown should say NOTHING - no chat line, no
+	 * sound. Default false: a player who pressed the button is owed an explanation for nothing happening.
+	 *
+	 * <p>True for a RAPID-FIRE ability, where the explanation is noise. The Terminator's Salvation is a left
+	 * click carrying a 0.8s cooldown, i.e. the attack button on a bow, so a player holding it down collected
+	 * a chat line every few ticks for the whole fight. A cooldown that short is its own feedback - the beam
+	 * visibly does not fire.
+	 */
+	default boolean quietCooldown() {
+		return false;
+	}
+
 	String cooldownTag();
 
 	int cooldown();

@@ -29,6 +29,18 @@ public class DamageData {
 	// later would not, either - the mace branch in dealDamage zeroes the fall distance the answer is built on.
 	public boolean isCrit = false;
 	/**
+	 * How much damage this blow actually LANDED, written by {@code CustomDamage.dealDamage} for an ability
+	 * that wants to report its own work. Everything the pipeline does to the figure is already in it -
+	 * armour, resistance, a shield, the Ice Spray modifiers - and absorption counts, since a shielded
+	 * target did take the hit.
+	 *
+	 * <p><b>Overkill is included</b>, so it is the damage dealt and not the health removed: pass a blow of
+	 * 40 into a mob with 2 HP left and this reads 40. A blow that never landed at all (i-framed, dead,
+	 * soaked to nothing, suppressed by the PvP layer) leaves it 0, which is how a caller tells the
+	 * difference. Reading a target's health either side of the call cannot do any of this.
+	 */
+	public double damageDealt = 0;
+	/**
 	 * Where the blow came FROM, which is what a shield's blocking cone is measured against. Vanilla's
 	 * {@code DamageSource.getSourcePosition()}, so for a projectile it is the ARROW's position and not the
 	 * shooter's - by the time {@code CustomDamage.customMobs} reaches the shield it has already rewritten

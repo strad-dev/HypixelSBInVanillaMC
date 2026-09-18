@@ -176,7 +176,7 @@ public class CustomItems implements Listener {
 							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
 						}
 					} else if(Cooldowns.onCooldown(p, item.cooldownTag()) && !(item.cooldownTag().equals("SalvationCooldown") && (e.getAction().equals(Action.RIGHT_CLICK_AIR) || e.getAction().equals(Action.RIGHT_CLICK_BLOCK)))) {
-						if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
+						if(!item.quietCooldown() && !(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
 							String secondsLeft = String.format("%.2f", Cooldowns.remaining(p, item.cooldownTag()) / 20.0);
 							p.sendMessage(Utils.msg("<red>This ability is on cooldown for " + secondsLeft + " seconds!"));
 							p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
