@@ -38,11 +38,7 @@ public class MaxorBoots implements Armor {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/maxor_boots"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>+1"));
-		lore.add(Utils.mm("<gray>Armor: <red>+4.5"));
-		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+10%"));
-		lore.add(Utils.mm("<gray>Speed: <red>x2"));
-		lore.add(Utils.mm("<gray>Fall Damage: <red>-10%"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>Zoooooooooooooooooooooooooooooom"));
 		lore.add(Utils.mm(""));

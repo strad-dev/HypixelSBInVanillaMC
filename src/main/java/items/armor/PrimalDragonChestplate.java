@@ -34,9 +34,7 @@ public class PrimalDragonChestplate {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/primal_chestplate"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>+2"));
-		lore.add(Utils.mm("<gray>Armor: <red>+10.5"));
-		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+20%"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>A powerful chestplate forged from"));
 		lore.add(Utils.mm("<gray><italic>the remnants of the Primal Dragon."));

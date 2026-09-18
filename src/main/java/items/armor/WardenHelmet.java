@@ -23,7 +23,7 @@ public class WardenHelmet implements Armor {
 		ItemMeta data = wardenHelmet.getItemMeta();
 		data.setUnbreakable(true);
 		data.displayName(Utils.mm("<light_purple>Warden Helmet"));
-		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
+		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetArmor"), 5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier speed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "wardenHelmetSpeed"), -0.25, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.HEAD);
@@ -36,10 +36,7 @@ public class WardenHelmet implements Armor {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/warden_helmet"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>+1"));
-		lore.add(Utils.mm("<gray>Armor: <red>+5"));
-		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+20%"));
-		lore.add(Utils.mm("<gray>Speed: <red>-25%"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>The brute force of the Warden"));
 		lore.add(Utils.mm("<gray><italic>packed into a single helmet."));

@@ -23,7 +23,7 @@ public class WitherKingCrown implements Armor {
 		ItemMeta data = crown.getItemMeta();
 		data.setUnbreakable(true);
 		data.displayName(Utils.mm("<light_purple>Crown of the Wither King"));
-		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownDamage"), 3, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
+		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownArmor"), 4.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "crownAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.HEAD);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
@@ -34,9 +34,7 @@ public class WitherKingCrown implements Armor {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/wither_king_crown"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>+2"));
-		lore.add(Utils.mm("<gray>Armor: <red>+4.5"));
-		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+10%"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>The Wither King left behind this"));
 		lore.add(Utils.mm("<gray><italic>crown after His unfortunate demise."));
