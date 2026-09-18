@@ -149,6 +149,47 @@ public class Utils {
 	}
 
 	/**
+	 * The stat block for a piece of custom armour, read off the modifiers <b>already on {@code data}</b>
+	 * rather than from figures the caller writes out a second time by hand.  <b>Call it after the
+	 * {@code addAttributeModifier} calls and before {@code lore(...)}.</b>
+	 *
+	 * <p>Hand-written stats drift, and silently: the Crown of the Wither King granted +3 damage while its
+	 * lore said +2, and the Warden Helmet +2 while its lore said +1, because changing one number never
+	 * forced anyone to change the other.  Same reason {@link #damageLore} reads a weapon's enchantments off
+	 * the stack.
+	 *
+	 * <p>Fixed order - Damage, Armor, Knockback Resistance, Speed, Fall Damage - and a line appears only
+	 * when the item actually carries that attribute.  Damage and Armor are quoted as they are; the 0-1
+	 * attributes (knockback resistance, fall damage) and Speed, which is always a
+	 * {@code MULTIPLY_SCALAR_1}, are quoted as a signed percentage.  One operation per attribute is
+	 * assumed, which is what every piece does - an attribute carrying both a flat and a scalar modifier
+	 * would need its own line here.
+	 */
+	public static List<Component> statLore(ItemMeta data) {
+		List<Component> out = new ArrayList<>();
+		statLine(out, data, Attribute.ATTACK_DAMAGE, "Damage", false);
+		statLine(out, data, Attribute.ARMOR, "Armor", false);
+		statLine(out, data, Attribute.KNOCKBACK_RESISTANCE, "Knockback Resistance", true);
+		statLine(out, data, Attribute.MOVEMENT_SPEED, "Speed", true);
+		statLine(out, data, Attribute.FALL_DAMAGE_MULTIPLIER, "Fall Damage", true);
+		return out;
+	}
+
+	/** @see #statLore */
+	private static void statLine(List<Component> out, ItemMeta data, Attribute attribute, String label, boolean share) {
+		Collection<AttributeModifier> modifiers = data.getAttributeModifiers(attribute);
+		if(modifiers == null) return;
+		double total = 0;
+		for(AttributeModifier modifier : modifiers) {
+			total += modifier.getAmount();
+		}
+		if(total == 0) return;
+		String sign = total > 0 ? "+" : "-";
+		out.add(mm("<gray>" + label + ": <red>" + sign
+				+ (share ? percent(Math.abs(total)) : damageNumber(Math.abs(total)))));
+	}
+
+	/**
 	 * The player's melee damage as it would be with {@code weapon} in their main hand, Sharpness included.
 	 *
 	 * <p>Resolved by hand rather than read off {@code getValue()} because the callers need the figure for a

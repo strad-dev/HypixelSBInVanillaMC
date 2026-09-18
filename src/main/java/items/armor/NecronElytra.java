@@ -34,9 +34,7 @@ public class NecronElytra implements Armor {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/necron_elytra"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>+1"));
-		lore.add(Utils.mm("<gray>Armor: <red>+10"));
-		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+10%"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>This Elytra has the stats of a Netherite"));
 		lore.add(Utils.mm("<gray><italic>Chestplate, while still allowing you to fly!"));

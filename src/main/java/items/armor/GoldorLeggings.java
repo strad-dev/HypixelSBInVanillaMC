@@ -34,9 +34,7 @@ public class GoldorLeggings implements Armor {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/goldor_pants"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>+1"));
-		lore.add(Utils.mm("<gray>Armor: <red>+7.5"));
-		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+20%"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>Goldor has spent centuries"));
 		lore.add(Utils.mm("<gray><italic>researching how to make Netherite"));

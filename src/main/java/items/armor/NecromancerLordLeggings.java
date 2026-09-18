@@ -33,9 +33,7 @@ public class NecromancerLordLeggings implements Armor {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm("skyblock/combat/necromancer_pants"));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<gray>Damage: <red>+2"));
-		lore.add(Utils.mm("<gray>Armor: <red>+7"));
-		lore.add(Utils.mm("<gray>Knockback Resistance: <red>+10%"));
+		lore.addAll(Utils.statLore(data));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray><italic>A powerful pair of pants that allow"));
 		lore.add(Utils.mm("<gray><italic>the wearer to punch slightly harder."));

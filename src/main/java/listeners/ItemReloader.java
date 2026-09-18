@@ -26,6 +26,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -98,9 +99,29 @@ public class ItemReloader implements Listener {
 		if(rebuilt != null) inventory.setItem(e.getNewSlot(), rebuilt);
 	}
 
+	/**
+	 * Also handles pulling an item out of the <b>vanilla</b> creative inventory, which is the only moment we
+	 * get a say in it: the client builds the creative tabs from its own registry and sends the finished
+	 * stack up in a {@code ServerboundSetCreativeModeSlotPacket}, which the server takes as-is.  Stamping it
+	 * here is immediate rather than a tick late, because the event carries the stack itself.
+	 *
+	 * <p>Done as a branch inside this handler rather than as its own {@code InventoryCreativeEvent} method:
+	 * that subclass does not declare a {@code HandlerList}, so it shares {@code InventoryClickEvent}'s, and
+	 * a listener registered for the subclass would be handed ordinary clicks too.
+	 *
+	 * <p><b>The creative menu's own icons cannot be fixed.</b>  Their contents never leave the client, so
+	 * there is nothing server-side to stamp - a diamond sword in the palette shows a diamond sword, and only
+	 * becomes a Giant's Sword once it is taken.
+	 */
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
 		if(!(e.getWhoClicked() instanceof Player p)) return;
+
+		if(e instanceof InventoryCreativeEvent creative) {
+			ItemStack rebuilt = rebuild(creative.getCursor(), p);
+			if(rebuilt != null) creative.setCursor(rebuilt);
+			return;
+		}
 
 		Utils.scheduleTask(() -> {
 			ItemStack cursor = rebuild(p.getItemOnCursor(), p);
