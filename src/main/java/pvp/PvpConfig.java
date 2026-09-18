@@ -31,23 +31,51 @@ public class PvpConfig {
 
 	/**
 	 * Adds any keys present in the jar's bundled config.yml but missing from the on-disk file, with
-	 * their default values. Existing values (and, on modern Paper, comments) are left untouched, so a
-	 * config written before new options were added gets them filled in automatically on startup.
+	 * their default values <b>and the comment that explains them</b>. Existing values and comments are
+	 * left untouched, so a config written before new options were added gets them filled in
+	 * automatically on startup - an admin never has to delete config.yml to pick up a new option.
+	 *
+	 * <p>Only additive: a key dropped from the bundled file is left alone rather than deleted.
+	 *
+	 * <p>The comments have to be copied by hand. {@code set} carries the value and nothing else, so
+	 * without this a new option turned up as a bare {@code manhunt: false} at the end of the file with
+	 * no hint of what it does - which is half a default.
 	 */
 	private void mergeMissingDefaults() {
 		InputStream in = plugin.getResource("config.yml");
 		if (in == null) return;
 		YamlConfiguration bundled = YamlConfiguration.loadConfiguration(new InputStreamReader(in, StandardCharsets.UTF_8));
 		FileConfiguration live = plugin.getConfig();
+
+		// Which sections are new has to be settled BEFORE anything is written, because copying a leaf
+		// creates its parents as a side effect.
+		List<String> newSections = new java.util.ArrayList<>();
+		for (String key : bundled.getKeys(true)) {
+			if (bundled.isConfigurationSection(key) && !live.contains(key)) newSections.add(key);
+		}
+
 		boolean changed = false;
 		for (String key : bundled.getKeys(true)) {
 			// Only copy leaf values; sections are created implicitly by their children.
 			if (!bundled.isConfigurationSection(key) && !live.contains(key)) {
 				live.set(key, bundled.get(key));
+				copyComments(bundled, live, key);
 				changed = true;
 			}
 		}
+		// Section headers last: the path only exists once its children have been written.
+		for (String key : newSections) {
+			if (live.contains(key)) copyComments(bundled, live, key);
+		}
+
 		if (changed) plugin.saveConfig();
+	}
+
+	private static void copyComments(YamlConfiguration bundled, FileConfiguration live, String key) {
+		List<String> comments = bundled.getComments(key);
+		if (!comments.isEmpty()) live.setComments(key, comments);
+		List<String> inline = bundled.getInlineComments(key);
+		if (!inline.isEmpty()) live.setInlineComments(key, inline);
 	}
 
 	private ConfigurationSection cfg() {

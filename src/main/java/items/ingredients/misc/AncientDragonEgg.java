@@ -1,6 +1,7 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -32,6 +33,6 @@ public class AncientDragonEgg implements Ingredients  {
 		data.lore(lore);
 		egg.setItemMeta(data);
 
-		return egg;
+		return SkyblockId.stamp(egg);
 	}
 }

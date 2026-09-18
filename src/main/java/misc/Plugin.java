@@ -323,6 +323,23 @@ public class Plugin extends JavaPlugin implements Listener {
 	private static final java.util.Map<java.util.UUID, Integer> intelTicks = new java.util.HashMap<>();
 
 	/**
+	 * Empties {@code p}'s mana <b>and the regen they had banked towards their next point</b>, which is the
+	 * only way to leave them with nothing in the tank: zeroing the score alone leaves the bank untouched, so
+	 * somebody 159 ticks into a 160-tick rate is paid a point on the very next tick.
+	 *
+	 * <p>Swallows a missing Intelligence objective: {@link #passiveIntel} already broadcasts about that
+	 * every tick, and this is never the place to find out.
+	 */
+	public static void zeroIntelligence(Player p) {
+		intelTicks.put(p.getUniqueId(), 0);
+		try {
+			getIntelligence(p).setScore(0);
+		} catch(Exception exception) {
+			// the objective is gone; passiveIntel already broadcasts about that
+		}
+	}
+
+	/**
 	 * Passive intelligence regen, run <b>every tick</b> - each player banks a tick and is paid a point once
 	 * they have banked their own rate's worth. It used to run every 20 ticks with a 0-3 counter, i.e. one
 	 * point every 4 seconds for everyone, which cannot express a Manhunt's per-rung rates.

@@ -1,5 +1,6 @@
 package items.summonItems;
 
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -33,6 +34,6 @@ public class CorruptPearl implements SummonItem {
 		data.lore(lore);
 		corruptPearl.setItemMeta(data);
 
-		return corruptPearl;
+		return SkyblockId.stamp(corruptPearl);
 	}
 }

@@ -4,7 +4,9 @@ import items.AbilityItem;
 import listeners.CustomDamage;
 import listeners.CustomItems;
 import listeners.DamageType;
+import misc.MinecraftFont;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.*;
@@ -37,6 +39,14 @@ public class Scylla implements AbilityItem {
 
 	/** Share of the wielder's melee damage the implosion deals. */
 	public static final double IMPLOSION_SHARE = 0.60;
+
+	/**
+	 * Share of the absorption still standing when the Wither Shield expires that becomes real health.
+	 * <p>The same on every Hyperion, Manhunt rungs included - it used to be a {@code ManhuntTier} column, but
+	 * the absorption HP already scales what there is to convert, so scaling the share as well made the rungs
+	 * differ twice over for one effect.
+	 */
+	public static final double HEAL_SHARE = 0.50;
 
 	public static ItemStack getItem() {
 		return getItem(Map.of());
@@ -97,14 +107,14 @@ public class Scylla implements AbilityItem {
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray>Deals <red>+4<gray> damage to Withers."));
 		lore.add(Utils.mm(""));
+		// This header is the line every lore tooltip in the plugin is measured against, so it is never
+		// wrapped - see MinecraftFont.LORE_WIDTH.
 		lore.add(Utils.mm("<gold>Ability: Wither Impact <green><bold>RIGHT CLICK"));
-		lore.add(Utils.mm("<gray>Teleport <green>10 blocks<gray> ahead of"));
-		lore.add(Utils.mm("<gray>you.  Then implode, dealing"));
-		lore.add(Utils.mm("<red>" + Utils.tenthNumber(implosion) + " damage <gray>to enemies"));
-		lore.add(Utils.mm("<gray>within <green>10 blocks<gray>.  Also"));
-		lore.add(Utils.mm("<gray>reduces damage taken by <red>15% <gray>and"));
-		lore.add(Utils.mm("<gray>grants an Absorption Shield with"));
-		lore.add(Utils.mm("<gray><red>10 HP <gray>for <yellow>5 seconds."));
+		lore.addAll(MinecraftFont.wrapLore(
+				"<gray>Teleport <green>10 blocks<gray> ahead of you.  Then implode, dealing <red>"
+				+ Utils.tenthNumber(implosion) + " damage <gray>to enemies within <green>10 blocks<gray>.  Also"
+				+ " reduces damage taken by <red>15%<gray> and grants an Absorption Shield with <red>10 HP"
+				+ " <gray>for <yellow>5 seconds<gray>."));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC SWORD <obfuscated>a</obfuscated>"));
@@ -114,7 +124,7 @@ public class Scylla implements AbilityItem {
 		scylla.setItemMeta(data);
 		Utils.setEnchantability(scylla, Utils.SKYBLOCK_ENCHANTABILITY);
 
-		return scylla;
+		return SkyblockId.stamp(scylla);
 	}
 
 	@Override
@@ -132,7 +142,7 @@ public class Scylla implements AbilityItem {
 		double smite = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.SMITE));
 		double bane = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS));
 
-		return witherImpact(p, 10, 10, 10, 0.50, 0.15, entity -> {
+		return witherImpact(p, 10, 10, 10, 0.15, entity -> {
 			double tempDamage = targetDamage;
 			if(entity instanceof Wither) {
 				tempDamage += 4 + smite;
@@ -155,12 +165,11 @@ public class Scylla implements AbilityItem {
 	 * @param distance        blocks to teleport, and how far the block raytrace reaches
 	 * @param radius          implosion radius
 	 * @param absorption      absorption HP the shield grants
-	 * @param healShare       share of the absorption still standing at expiry that becomes real health
 	 * @param damageReduction share taken off incoming damage while the shield is up
 	 * @param damage          per-target implosion damage
 	 */
 	public static boolean witherImpact(Player p, double distance, double radius, double absorption,
-									   double healShare, double damageReduction, ToDoubleFunction<LivingEntity> damage) {
+									   double damageReduction, ToDoubleFunction<LivingEntity> damage) {
 		Location origin = p.getLocation().clone();
 		Location l = null;
 		RayTraceResult result = p.rayTraceBlocks(distance + 1.65);
@@ -302,6 +311,12 @@ public class Scylla implements AbilityItem {
 				}
 			}
 		}
+		// Not every path above finds somewhere to stand: a SELF hit (the ray started inside a block) does
+		// nothing at all, and the side-face backtrack can run out of room without ever finding a safe spot.
+		// Both left l null and the implosion NPE'd on the particle call.  A blocked teleport does NOT cancel
+		// Wither Impact - it still implodes, just where the player already is.
+		if(l == null) l = p.getLocation();
+
 		p.setFallDistance(0);
 		p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
@@ -320,7 +335,7 @@ public class Scylla implements AbilityItem {
 			}
 		}
 		if(damaged > 0) {
-			p.sendMessage(Utils.msg("<red>Your Implosion hit " + damaged + " enemies for " + Utils.tenthNumber(total) + " damage."));
+			p.sendMessage(Utils.msg("<red>Your Implosion hit " + damaged + (damaged == 1 ? " enemy" : " enemies") + " for " + Utils.tenthNumber(total) + " damage."));
 		}
 		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
@@ -333,7 +348,7 @@ public class Scylla implements AbilityItem {
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 0.66666F);
 			Location finalL = l;
 			Utils.scheduleTask(() -> { // convert to healing after 5 seconds
-				p.setHealth(Math.min(p.getHealth() + (Math.max(0, (p.getAbsorptionAmount() - absorptionBefore)) * healShare), p.getAttribute(Attribute.MAX_HEALTH).getValue()));
+				p.setHealth(Math.min(p.getHealth() + (Math.max(0, (p.getAbsorptionAmount() - absorptionBefore)) * HEAL_SHARE), p.getAttribute(Attribute.MAX_HEALTH).getValue()));
 				p.getAttribute(Attribute.MAX_ABSORPTION).removeModifier(temp);
 				if(p.getAbsorptionAmount() > absorptionBefore) {
 					p.setAbsorptionAmount(absorptionBefore);

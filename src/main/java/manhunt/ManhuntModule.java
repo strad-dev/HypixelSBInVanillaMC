@@ -20,6 +20,9 @@ public final class ManhuntModule {
 			return;
 		}
 
+		// The teams outlive the server, so they are read back before anybody can join.
+		Manhunt.load(plugin);
+
 		ManhuntCommand command = new ManhuntCommand();
 		var bound = plugin.getCommand("manhunt");
 		if(bound != null) {

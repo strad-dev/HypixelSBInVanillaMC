@@ -1,5 +1,6 @@
 package items.summonItems;
 
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -34,6 +35,6 @@ public class OmegaEgg implements SummonItem {
 		data.lore(lore);
 		omegaEgg.setItemMeta(data);
 
-		return omegaEgg;
+		return SkyblockId.stamp(omegaEgg);
 	}
 }

@@ -1,6 +1,7 @@
 package items.ingredients.misc;
 
 import items.ingredients.Ingredients;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -36,6 +37,6 @@ public class EnchantmentUpgrader implements Ingredients {
 		data.lore(lore);
 		upgrader.setItemMeta(data);
 
-		return upgrader;
+		return SkyblockId.stamp(upgrader);
 	}
 }

@@ -2,6 +2,7 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -51,7 +52,7 @@ public class WandOfRestoration implements AbilityItem {
 		data.lore(lore);
 		wand.setItemMeta(data);
 
-		return wand;
+		return SkyblockId.stamp(wand);
 	}
 
 	@Override

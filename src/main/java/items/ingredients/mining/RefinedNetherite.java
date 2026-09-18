@@ -1,6 +1,7 @@
 package items.ingredients.mining;
 
 import items.ingredients.Ingredients;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -33,6 +34,6 @@ public class RefinedNetherite implements Ingredients {
 		data.lore(lore);
 		refinedNetherite.setItemMeta(data);
 
-		return refinedNetherite;
+		return SkyblockId.stamp(refinedNetherite);
 	}
 }

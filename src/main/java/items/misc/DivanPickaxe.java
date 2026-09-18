@@ -2,6 +2,7 @@ package items.misc;
 
 import items.CustomItem;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -52,6 +53,6 @@ public class DivanPickaxe implements CustomItem {
 		divanPickaxe.setItemMeta(data);
 		Utils.setEnchantability(divanPickaxe, Utils.SKYBLOCK_ENCHANTABILITY);
 
-		return divanPickaxe;
+		return SkyblockId.stamp(divanPickaxe);
 	}
 }

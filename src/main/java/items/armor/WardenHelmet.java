@@ -1,6 +1,7 @@
 package items.armor;
 
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -51,6 +52,6 @@ public class WardenHelmet implements Armor {
 		wardenHelmet.setItemMeta(data);
 		Utils.setEnchantability(wardenHelmet, Utils.SKYBLOCK_ENCHANTABILITY);
 
-		return wardenHelmet;
+		return SkyblockId.stamp(wardenHelmet);
 	}
 }

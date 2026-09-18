@@ -1,6 +1,7 @@
 package items.ingredients.mining;
 
 import items.ingredients.Ingredients;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -32,6 +33,6 @@ public class RefinedEmerald implements Ingredients {
 		data.lore(lore);
 		refinedEmerald.setItemMeta(data);
 
-		return refinedEmerald;
+		return SkyblockId.stamp(refinedEmerald);
 	}
 }

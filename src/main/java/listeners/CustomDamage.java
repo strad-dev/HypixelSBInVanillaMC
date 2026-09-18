@@ -32,6 +32,7 @@ import org.bukkit.craftbukkit.entity.*;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
+import com.destroystokyo.paper.event.player.PlayerAttackEntityCooldownResetEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -129,26 +130,118 @@ public class CustomDamage implements Listener {
 		return level <= 0 ? 0 : level * 2.5;
 	}
 
+	// ================================ the swing's charge ================================
+	//
+	// Paper zeroes the attack-strength ticker INSIDE Player.attack, before the blow lands: onAttack(target)
+	// fires PlayerAttackEntityCooldownResetEvent and then calls resetOnlyAttackStrengthTicker(), and only
+	// after that does hurtOrSimulate fire the damage event this class listens to.  Vanilla does not care -
+	// Player.attack read getAttackStrengthScale ONCE at the top and kept it in a local, and both its crit
+	// verdict and its enchantment bonus ride on that copy - but anything re-reading the LIVE ticker later
+	// gets 0.5/delay instead of what vanilla judged: 0.025 on a 20-tick weapon where vanilla had 1.
+	//
+	// It hid behind the plugin's own weapons, which all carry ATTACK_SPEED +100: that puts full charge at
+	// about 0.19 ticks, so even a zeroed ticker still clamps to 1 and they behaved.  Every VANILLA weapon
+	// silently lost both its crit (no 1.5x, no particles, no sound) and its whole Sharpness retune, since
+	// rebuildMelee scales our enchantment delta by the same number.
+	//
+	// So the charge is taken from the event that fires immediately before the reset, for this exact attack,
+	// and canCrit and rebuildMelee read it from there rather than off the ticker.
+
+	/** One swing's charge: the tick it was taken on, and the scale vanilla judged that swing by. */
+	private record SwingCharge(int tick, float scale) {}
+
+	private static final Map<Player, SwingCharge> swingCharges = new WeakHashMap<>();
+
+	/**
+	 * Snapshot the charge while it is still there.  Paper fires this from {@code Player.onAttack}, one call
+	 * before it zeroes the ticker and two before our damage event, so the live read here is still the number
+	 * {@code Player.attack} cached for itself.  Read at {@code 0.5f} rather than taken off the event, whose
+	 * own figure is {@code getAttackStrengthScale(0.0f)} - half a tick short of vanilla's.
+	 */
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onAttackCooldownReset(PlayerAttackEntityCooldownResetEvent e) {
+		ServerPlayer sp = ((CraftPlayer) e.getPlayer()).getHandle();
+		swingCharges.put(e.getPlayer(), new SwingCharge(Bukkit.getCurrentTick(), sp.getAttackStrengthScale(0.5f)));
+	}
+
+	/**
+	 * The charge vanilla judged this swing by - {@link #onAttackCooldownReset}'s snapshot when it is from
+	 * this tick, the live ticker otherwise.
+	 *
+	 * <p>The fallback is for a blow that never went through {@code Player.attack} at all (a boss calling
+	 * into the pipeline, {@code /damage}), where nothing has been reset and the live value is correct.  An
+	 * older snapshot is refused rather than trusted: it describes a different swing.
+	 */
+	private static float attackCharge(Player p) {
+		SwingCharge charge = swingCharges.get(p);
+		if(charge != null && charge.tick() == Bukkit.getCurrentTick()) return charge.scale();
+		return ((CraftPlayer) p).getHandle().getAttackStrengthScale(0.5f);
+	}
+
 	/**
 	 * Can this player land a critical hit on that target?  {@code Player.canCriticalAttack} copied out of the
-	 * 26.2 jar with ONE clause dropped - {@code !isSprinting()} - plus the attack-cooldown gate that lives in
+	 * 26.2 jar with {@code !isSprinting()} dropped - the rule change, so a crit is available while chasing
+	 * someone - and {@code !onGround()} dropped as redundant, plus the attack-cooldown gate that lives in
 	 * {@code Player.attack} beside the call rather than inside it ({@code getAttackStrengthScale > 0.9}).
 	 *
-	 * <p>The cooldown is read here rather than assumed, and it is still the value vanilla used: the ticker is
-	 * reset by the packet handler AFTER {@code attack()} returns, and the damage event this is called from
-	 * fires inside it.  With the plugin's own weapons it is always 1 anyway - they all carry ATTACK_SPEED +100.
+	 * <p>The cooldown comes from {@link #attackCharge}, not from the live ticker - Paper has already zeroed
+	 * that by the time this runs, so reading it here refused every crit a vanilla weapon earned.
 	 */
 	public static boolean canCrit(Player p, Entity target) {
 		if(!(target instanceof LivingEntity)) return false;
 		ServerPlayer sp = ((CraftPlayer) p).getHandle();
-		return sp.getAttackStrengthScale(0.5f) > 0.9f
+		return attackCharge(p) > 0.9f
+				// Falling ALREADY means airborne, so vanilla's companion !onGround() clause is dropped:
+				// fallDistance only grows while y-velocity is negative, and Entity.checkFallDamage ends its
+				// onGround branch with an unconditional resetFallDistance(), so on the ground it is 0.
+				// What this really asks is that you connect on the way DOWN - the rising half of a jump
+				// does not crit, which is the vanilla jump-crit and is deliberate.
 				&& p.getFallDistance() > 0
-				&& !sp.onGround()
 				&& !sp.onClimbable()
 				&& !sp.isInWater()
 				&& !sp.isMobilityRestricted()
 				&& !sp.isPassenger()
 				&& critsEnabled(p.getWorld());
+	}
+
+	/**
+	 * Half of vanilla's {@code horizontal_blocking_angle}: the shield's cone reaches this many degrees to
+	 * either side of where the defender is looking, so 90 is the 180-degree arc in front. It is the default
+	 * on vanilla's {@code minecraft:blocks_attacks} component, and it is read per-item there - we apply the
+	 * one number to every shield rather than reading the component, since nothing here varies it.
+	 */
+	private static final double SHIELD_BLOCKING_ANGLE = 90;
+
+	/**
+	 * Did this blow come from inside the defender's shield cone?  <b>The rule our pipeline was missing
+	 * entirely</b>: a shield used to reduce damage from any direction, back included, because cancelling the
+	 * vanilla damage event skips {@code LivingEntity.applyItemBlocking} where the test lives.
+	 *
+	 * <p>Copied from the 26.2 jar.  Vanilla builds a HORIZONTAL look vector -
+	 * {@code calculateViewVector(0.0F, getYHeadRot())}, so pitch is ignored and looking at your feet does not
+	 * drop your guard - flattens the vector to the attacker the same way, and refuses the block when
+	 * {@code acos(dot)} exceeds the cone ({@code DamageReduction.resolve} returns 0 above it).
+	 *
+	 * <p>Two deliberate departures.  Vanilla uses {@code acos} on the dot product and compares radians; a
+	 * 90-degree cone is exactly {@code dot >= 0}, but the {@code acos} is kept so the angle stays a readable
+	 * number to change.  And where vanilla treats a source with NO position as angle PI (outside every cone,
+	 * so no block at all), we keep the block: a missing position here means our own pipeline lost the
+	 * attacker, not that the damage genuinely came from nowhere, and the reduction should only be taken away
+	 * when we positively know the blow came from behind.
+	 */
+	private static boolean blockedFromFront(LivingEntity damagee, Location source) {
+		if(source == null || !source.getWorld().equals(damagee.getWorld())) return true;
+
+		double yaw = Math.toRadians(damagee.getLocation().getYaw());
+		Vector look = new Vector(-Math.sin(yaw), 0, Math.cos(yaw));
+
+		Vector toSource = source.toVector().subtract(damagee.getLocation().toVector()).setY(0);
+		// Vanilla's Vec3.normalize returns ZERO below 1e-4, making the dot 0 and the angle exactly 90 - which
+		// its own `angle > cone` test then lets through.  Standing in the defender's own column blocks.
+		if(toSource.lengthSquared() < 1.0E-8) return true;
+
+		double dot = Math.max(-1, Math.min(1, toSource.normalize().dot(look)));
+		return Math.acos(dot) <= Math.toRadians(SHIELD_BLOCKING_ANGLE);
 	}
 
 	/** Paper can switch player crits off per world.  If it ever is, vanilla did not crit either, so both the
@@ -199,7 +292,7 @@ public class CustomDamage implements Listener {
 		ServerLevel level = ((CraftWorld) p.getWorld()).getHandle();
 		// The enchantment bonus is scaled by the swing's charge and the base damage by its square; the crit
 		// multiplies neither of the two, it multiplies what they add up to.
-		float scale = sp.getAttackStrengthScale(0.5f);
+		float scale = attackCharge(p);
 		float attributeDamage = (float) sp.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
 		DamageSource source = level.damageSources().playerAttack(sp);
 		double vanillaEnchant = scale * (net.minecraft.world.item.enchantment.EnchantmentHelper.modifyDamage(
@@ -361,8 +454,15 @@ public class CustomDamage implements Listener {
 				finalDamage *= 0.75;
 			}
 
-			// shield logic (for weirdos)
-			if(data.isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL)) {
+			// shield logic (for weirdos).  A raised shield only counts against a blow from the FRONT - see
+			// blockedFromFront.  The 0.4 itself is ours and is NOT vanilla's number: a vanilla shield is
+			// base 0 / factor 1, i.e. a blocked hit is reduced to nothing.
+			// The projectile's own position where we have it, the attacker's otherwise - the fallback is for
+			// the DamageData built off a plain EntityDamageEvent, which never saw an attacker.
+			Location shieldSource = data.sourcePosition != null ? data.sourcePosition
+					: (damager == null ? null : damager.getLocation());
+			if(data.isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL)
+					&& blockedFromFront(damagee, shieldSource)) {
 				finalDamage *= 0.4;
 			}
 
@@ -466,9 +566,13 @@ public class CustomDamage implements Listener {
 			// Intelligence for landing a melee blow. Granted here, at the end of the pipeline, rather than
 			// at the damage event, so a swing that ends up dealing nothing (armor/resistance soaking it to
 			// 0, a blocked hit, an i-framed target, or a blow the PvP layer suppressed) pays out nothing.
-			// Any living target pays out - except during a Manhunt, where only hitting another player does.
+			// Any living target pays out - except during a Manhunt, where it has to be a player on the
+			// OPPOSING side.  Mobs paying out would let a Hunter farm mana off a cow instead of hunting, and
+			// hitting your own team for it is worse still: two Hunters stood in a corner punching each other
+			// would out-regen anybody actually playing, and a Speedrunner could feed a teammate the same way.
 			if(finalDamage > 0 && type == DamageType.MELEE && damager instanceof Player p
-					&& (!manhunt.Manhunt.active() || damagee instanceof Player)) {
+					&& (!manhunt.Manhunt.active()
+							|| (damagee instanceof Player victim && manhunt.Manhunt.opposingTeams(p, victim)))) {
 				try {
 					Score score = Plugin.getIntelligence(p);
 					if(score.getScore() < Plugin.maxIntelligence(p)) {
@@ -487,12 +591,15 @@ public class CustomDamage implements Listener {
 			if(damager instanceof Player p) {
 				Location particleLoc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
 				ItemStack weapon = p.getEquipment().getItemInMainHand();
-				boolean isCrit = data.isCrit;
 
-				// Critical hit particles
-				if(isCrit) {
+				// Critical hit particles and sound, placed the way vanilla places them: the particles on the
+				// TARGET (Player.crit) but the sound on the ATTACKER, in the PLAYERS category
+				// (Player.playServerSideSound plays it at the attacker's own x/y/z, at getSoundSource()).
+				// It used to come from the victim with no category, so it panned to the wrong place and
+				// ignored the players slider.
+				if(data.isCrit) {
 					damagee.getWorld().spawnParticle(Particle.CRIT, particleLoc, 24);
-					damagee.getWorld().playSound(damagee, Sound.ENTITY_PLAYER_ATTACK_CRIT, 1.0F, 1.0F);
+					p.getWorld().playSound(p, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.0F, 1.0F);
 				}
 
 				// Enchanted hit particles

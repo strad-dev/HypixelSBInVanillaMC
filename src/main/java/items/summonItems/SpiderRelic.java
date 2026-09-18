@@ -1,5 +1,6 @@
 package items.summonItems;
 
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -33,6 +34,6 @@ public class SpiderRelic implements SummonItem {
 		data.lore(lore);
 		spiderRelic.setItemMeta(data);
 
-		return spiderRelic;
+		return SkyblockId.stamp(spiderRelic);
 	}
 }

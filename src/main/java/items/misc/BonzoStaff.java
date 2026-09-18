@@ -2,6 +2,7 @@ package items.misc;
 
 import items.AbilityItem;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -49,7 +50,7 @@ public class BonzoStaff implements AbilityItem {
 		data.lore(lore);
 		bonzoStaff.setItemMeta(data);
 
-		return bonzoStaff;
+		return SkyblockId.stamp(bonzoStaff);
 	}
 
 	@Override

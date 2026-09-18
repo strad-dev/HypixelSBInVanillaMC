@@ -1,6 +1,7 @@
 package items.weapons;
 
 import items.AbilityItem;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -110,7 +111,7 @@ public class Terminator implements AbilityItem {
 		// making it the near-certainty 30 would.
 		Utils.setEnchantability(term, ENCHANTABILITY);
 
-		return term;
+		return SkyblockId.stamp(term);
 	}
 
 	@Override

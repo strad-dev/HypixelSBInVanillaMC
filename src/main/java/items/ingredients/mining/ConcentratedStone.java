@@ -1,6 +1,7 @@
 package items.ingredients.mining;
 
 import items.ingredients.Ingredients;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -32,6 +33,6 @@ public class ConcentratedStone implements Ingredients {
 		data.lore(lore);
 		heavyStone.setItemMeta(data);
 
-		return heavyStone;
+		return SkyblockId.stamp(heavyStone);
 	}
 }

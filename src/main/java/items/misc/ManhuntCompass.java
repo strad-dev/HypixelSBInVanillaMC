@@ -2,7 +2,9 @@ package items.misc;
 
 import items.AbilityItem;
 import manhunt.Manhunt;
+import misc.MinecraftFont;
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Location;
@@ -54,6 +56,9 @@ public class ManhuntCompass implements AbilityItem {
 		CompassMeta data = (CompassMeta) compass.getItemMeta();
 		data.displayName(Utils.mm("<red>Manhunt Compass"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+		// Held OFF, not merely left unset: a needle is a lodestone target, and vanilla glints any compass
+		// carrying one.  Without this the compass is dull until its first Track and glowing afterwards.
+		data.setEnchantmentGlintOverride(false);
 		data.getPersistentDataContainer().set(targetKey(), PersistentDataType.INTEGER, Math.max(0, target));
 		if(needle != null) {
 			// Not lodestone-TRACKED: that is what lets the needle sit on bare coordinates with no
@@ -68,18 +73,17 @@ public class ManhuntCompass implements AbilityItem {
 		lore.add(Utils.mm("<gray>Tracking: <yellow>" + Manhunt.speedrunnerName(target)));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Track <green><bold>RIGHT CLICK"));
-		lore.add(Utils.mm("<gray>Point the needle at the tracked"));
-		lore.add(Utils.mm("<gray>Speedrunner's position right now."));
+		lore.addAll(MinecraftFont.wrapLore("<gray>Point the needle at the tracked Speedrunner's position right now."));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Ability: Change Target <green><bold>SNEAK RIGHT CLICK"));
-		lore.add(Utils.mm("<gray>Move to the next Speedrunner."));
+		lore.addAll(MinecraftFont.wrapLore("<gray>Move to the next Speedrunner."));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<green><bold>UNCOMMON ITEM"));
 
 		data.lore(lore);
 		compass.setItemMeta(data);
 
-		return compass;
+		return SkyblockId.stamp(compass);
 	}
 
 	/** Which Speedrunner this stack is pointed at, as an index into the list. */
@@ -118,8 +122,9 @@ public class ManhuntCompass implements AbilityItem {
 		}
 
 		p.getInventory().setItemInMainHand(getItem(targetOf(held), target.getLocation()));
+		// Silent on purpose: a Hunter tracks constantly, and the click got old fast.  The Change Target
+		// click and the cannot-track buzz above are still there - both are one-offs.
 		p.sendMessage(Utils.msg("<green>Tracking " + target.getName()));
-		p.playSound(p, Sound.UI_BUTTON_CLICK, 1, 1);
 		return true;
 	}
 

@@ -1,6 +1,7 @@
 package items.armor;
 
 import misc.Plugin;
+import misc.SkyblockId;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -46,6 +47,6 @@ public class WitherKingCrown implements Armor {
 		crown.setItemMeta(data);
 		Utils.setEnchantability(crown, Utils.SKYBLOCK_ENCHANTABILITY);
 
-		return crown;
+		return SkyblockId.stamp(crown);
 	}
 }

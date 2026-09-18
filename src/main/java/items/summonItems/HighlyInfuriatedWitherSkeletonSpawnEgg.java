@@ -1,6 +1,7 @@
 package items.summonItems;
 
 import items.AbilityItem;
+import misc.SkyblockId;
 import misc.Utils;
 import mobs.generic.InfuriatedWitherSkeleton;
 import net.kyori.adventure.text.Component;
@@ -40,7 +41,7 @@ public class HighlyInfuriatedWitherSkeletonSpawnEgg implements AbilityItem, Summ
 		data.lore(lore);
 		egg.setItemMeta(data);
 
-		return egg;
+		return SkyblockId.stamp(egg);
 	}
 
 	@Override
