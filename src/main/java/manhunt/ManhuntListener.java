@@ -20,6 +20,8 @@ import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Recipe;
 
+import java.util.Iterator;
+
 /**
  * The Manhunt rules that hang off events: kitting players out on join and on respawn, resetting a dead
  * one's intelligence, vetting the Hyperion upgrade craft, and the nether rules in {@link ManhuntPiglins}.
@@ -40,16 +42,45 @@ public class ManhuntListener implements Listener {
 	/**
 	 * Death costs a player their whole intelligence ceiling, not just what was in the tank: they are back on
 	 * the Stick's numbers until they get their hands on a Hyperion again.
+	 *
+	 * <p>Their compasses are the one thing they keep. The Hyperion lying where they died is the point of the
+	 * ladder, but a Hunter who has to walk back to their body before they can track anything is out of the
+	 * match for the whole walk - and a compass on the floor is a compass a Speedrunner can pick up.
 	 */
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		Manhunt.onDeath(e.getEntity());
+		keepCompasses(e);
 	}
 
 	/**
-	 * Kits a player back out after they respawn. Death drops their Hyperion and compass on the floor, and
-	 * {@code equip} otherwise only runs on {@code /manhunt start} and on join - so without this a death put
-	 * a Hunter out of the match for good, with no way back to a compass short of a rejoin.
+	 * Moves every Manhunt Compass out of the death drops and into the keep list - Paper's per-item
+	 * keepInventory, which puts the stack back in the inventory on respawn. It has to come out of the drops
+	 * in the same breath, or the compass is kept AND dropped.
+	 *
+	 * <p>The stack is carried over whole, so the target it was pointed at and the needle's last fix survive
+	 * the death. Nothing to do with keepInventory on: the drop list is empty, so this finds nothing and the
+	 * whole inventory is kept anyway.
+	 *
+	 * <p>At the default priority, which is after {@code PvpLoadoutMenu.onDeath} - it REBUILDS the drop list
+	 * at LOWEST for anyone who died with the loadout editor open, so a compass pulled before that would be
+	 * put straight back.
+	 */
+	private static void keepCompasses(PlayerDeathEvent e) {
+		Iterator<ItemStack> drops = e.getDrops().iterator();
+		while(drops.hasNext()) {
+			ItemStack item = drops.next();
+			if(Manhunt.isCompass(item)) {
+				drops.remove();
+				e.getItemsToKeep().add(item);
+			}
+		}
+	}
+
+	/**
+	 * Kits a player back out after they respawn. Death drops their Hyperion on the floor, and {@code equip}
+	 * otherwise only runs on {@code /manhunt start} and on join - so without this a death put a Hunter back
+	 * in the match with nothing but the compass {@link #keepCompasses} saved for them.
 	 *
 	 * <p>They come back on the <b>Stick</b>, which is the same demotion {@link Manhunt#onDeath} applies to
 	 * their intelligence ceiling: whatever rung they had reached is on the ground with the rest of their

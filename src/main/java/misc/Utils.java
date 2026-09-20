@@ -183,8 +183,9 @@ public class Utils {
 	 * Flat amounts print as they are, a {@code share} attribute as a signed percentage, and a
 	 * {@code MULTIPLY_SCALAR_1} through {@link #multiplier}. <b>Damage is special twice over</b>: a tool's
 	 * {@code -1000} is how it says "not a weapon" and the attribute floors at 0 anyway, so the line reads
-	 * {@code 0}; and it is the one line Sharpness is folded into. No item carries both a flat and a scalar
-	 * modifier on one attribute - if one ever does, it gets two lines.
+	 * {@code 0} ({@link #damageLore}, which is handed the raw amount so it can tell that apart from a weapon
+	 * that really adds nothing); and it is the one line Sharpness is folded into. No item carries both a flat
+	 * and a scalar modifier on one attribute - if one ever does, it gets two lines.
 	 */
 	public static List<Component> statLore(ItemMeta data, @Nullable Map<Enchantment, Integer> enchants) {
 		List<Component> out = new ArrayList<>();
@@ -203,7 +204,7 @@ public class Utils {
 			}
 
 			if(line.attribute() == Attribute.ATTACK_DAMAGE) {
-				out.add(damageLore(Math.max(0, flat), enchants));
+				out.add(damageLore(flat, enchants));
 				continue;
 			}
 			if(scalar != 0) {
@@ -323,10 +324,14 @@ public class Utils {
 	 */
 	public static Component damageLore(double baseDamage, @Nullable Map<Enchantment, Integer> enchants) {
 		int sharpness = enchants == null ? 0 : enchants.getOrDefault(Enchantment.SHARPNESS, 0);
-		double total = baseDamage + CustomDamage.sharpnessBonus(sharpness);
-		// No "+" in front of a zero: the ability tools all zero their attack damage and their line reads
-		// `Damage: 0`, which is a statement rather than a bonus.
-		return mm("<gray>Damage: <red>" + (total > 0 ? "+" : "") + damageNumber(total));
+		// Floored here rather than by the caller, because the sign below has to read the RAW amount.
+		double total = Math.max(0, baseDamage + CustomDamage.sharpnessBonus(sharpness));
+		// `Damage: 0` and `Damage: +0` are different claims, and the raw amount is what tells them apart.  An
+		// ability tool subtracts its way out of being a weapon (-1000) and reads a bare `0` - a statement.  A
+		// weapon that adds nothing YET - the Manhunt Stick, bottom of a ladder that goes up from there - adds
+		// zero on top of the player's own damage, and keeps its sign.
+		boolean bonus = baseDamage >= 0;
+		return mm("<gray>Damage: <red>" + (total > 0 || bonus ? "+" : "") + damageNumber(total));
 	}
 
 	/**
