@@ -1036,12 +1036,16 @@ public class CustomDamage implements Listener {
 							}
 						}
 
-						// All non-resistance knockback modifiers (enchant, sprint, fall, block, term).
+						// All non-resistance knockback modifiers (enchant, sprint, crit, block, term).
 						double modifiers = enchantments;
 
 						if(type == DamageType.MELEE) {
-							if(damager.getFallDistance() > 0) {
-								modifiers *= 1.25;
+							// The crit is the one the DAMAGE was priced with, not a fresh getFallDistance() test:
+							// that gate is looser than canCrit, which also wants the attack cooldown, no ladder, no
+							// water and crits enabled, so a half-charged swing on the way down was knocked back as a
+							// crit while being damaged as a normal hit.  It also let a falling MOB earn the bonus.
+							if(data.isCrit) {
+								modifiers *= 1.2;
 							}
 
 							if(damager instanceof Player p && p.isSprinting()) {
