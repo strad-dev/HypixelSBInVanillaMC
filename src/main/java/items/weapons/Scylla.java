@@ -170,7 +170,10 @@ public class Scylla implements AbilityItem {
 	 * @param radius          implosion radius
 	 * @param absorption      absorption HP the shield grants
 	 * @param damageReduction share taken off incoming damage while the shield is up
-	 * @param damage          per-target implosion damage
+	 * @param damage          per-target implosion damage. <b>0 or less means skip that target</b> - it is
+	 *                        never run through the pipeline at all, so it takes no knockback and is not
+	 *                        counted as hit. The Manhunt Hyperion honours its per-Speedrunner implosion
+	 *                        cooldown that way.
 	 */
 	public static boolean witherImpact(Player p, double distance, double radius, double absorption,
 									   double damageReduction, ToDoubleFunction<LivingEntity> damage) {
@@ -340,6 +343,7 @@ public class Scylla implements AbilityItem {
 				// put between the two.  Read back off DamageData rather than from the target's health, which
 				// would cap every kill at whatever the mob had left and lose the overkill.
 				double tempDamage = damage.applyAsDouble(entity1);
+				if(tempDamage <= 0) continue; // refused outright - not a target, never mind a hit
 				DamageData data = new DamageData(entity1, p, tempDamage);
 				CustomDamage.customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC, data);
 				if(data.damageDealt == 0) continue; // soaked to nothing, or suppressed: not a hit either

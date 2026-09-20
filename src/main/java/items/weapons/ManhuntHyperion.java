@@ -1,6 +1,7 @@
 package items.weapons;
 
 import items.AbilityItem;
+import manhunt.Manhunt;
 import manhunt.ManhuntTier;
 import misc.MinecraftFont;
 import misc.Plugin;
@@ -146,8 +147,12 @@ public class ManhuntHyperion implements AbilityItem {
 		if(tier == null) return false;
 		// The teleport is 10 blocks on every rung - the same reach as the full Hyperion, so a player's aim
 		// does not have to be relearned each upgrade.  Only the implosion grows.
-		return Scylla.witherImpact(p, 10, tier.radius(), tier.absorption(),
-				tier.damageReduction(), entity -> tier.implosionDamage());
+		//
+		// A player can only be imploded once a second, across ALL attackers - claimImplosion returns false
+		// while their window is up and 0 damage is witherImpact's "skip this one", so they are left out of
+		// the blast entirely rather than hit for nothing.  Mobs are not on a clock.
+		return Scylla.witherImpact(p, 10, tier.radius(), tier.absorption(), tier.damageReduction(),
+				entity -> Manhunt.claimImplosion(entity) ? tier.implosionDamage() : 0);
 	}
 
 	@Override

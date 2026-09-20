@@ -6,7 +6,10 @@ import items.weapons.Scylla;
 import misc.Plugin;
 import misc.Utils;
 import org.bukkit.Bukkit;
+import org.bukkit.GameRule;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -63,6 +66,12 @@ public final class Manhunt {
 	 */
 	private static final Set<UUID> KITTED = new HashSet<>();
 
+	/**
+	 * Every world's {@code locatorBar} gamerule as it was when the match started, keyed on world NAME so it
+	 * can be put back after a restart mid-match. Empty outside a match.
+	 */
+	private static final Map<String, Boolean> LOCATOR_BARS = new LinkedHashMap<>();
+
 	/** The rung above Netherite: a real Hyperion, which has no {@link ManhuntTier} of its own. */
 	public static final int FULL_RUNG = ManhuntTier.values().length;
 
@@ -116,6 +125,17 @@ public final class Manhunt {
 				if(uuid != null) KITTED.add(uuid);
 			}
 		}
+		// Keyed on world name rather than UUID, so these come back verbatim.
+		LOCATOR_BARS.clear();
+		if(state.locatorBars != null) LOCATOR_BARS.putAll(state.locatorBars);
+		// Restarting mid-match must not hand the Hunters the bar back. The gamerule is in level.dat and so
+		// is already off, but this also covers a world that was not around when the match started.
+		// save() because hideLocatorBar may have picked up a world the file has never seen; without it a
+		// second restart would have nothing to put that one back to.
+		if(started) {
+			hideLocatorBar();
+			save();
+		}
 	}
 
 	/**
@@ -142,6 +162,7 @@ public final class Manhunt {
 		for(UUID uuid : KITTED) {
 			state.kitted.add(uuid.toString());
 		}
+		state.locatorBars = new LinkedHashMap<>(LOCATOR_BARS);
 		PvpJson.save(file, state);
 	}
 
@@ -161,6 +182,7 @@ public final class Manhunt {
 		Map<String, String> names;
 		Map<String, Integer> ceilings;
 		List<String> kitted;
+		Map<String, Boolean> locatorBars;
 	}
 
 	public static boolean enabled() {
@@ -297,11 +319,21 @@ public final class Manhunt {
 	 * {@code Plugin.passiveIntel} to clamp: that only pulls a player down to the new 250 cap, so whoever
 	 * happened to be sitting on a full 2500 would open the match with 250 banked and everybody else with
 	 * whatever they walked in on. The banked regen ticks go with it, so nobody is paid a point on tick one.
+	 *
+	 * <p>The locator bar goes off in every dimension too - the whole game is the Hunters not knowing where
+	 * the Speedrunners are, and the bar hands them that for free. {@link #reset} puts it back.
+	 *
+	 * <p>Every piglin brute already loaded is swapped for a piglin here; the rest are caught as they spawn
+	 * or as their chunk loads. Unlike the locator bar this one does not come back - see
+	 * {@link ManhuntPiglins#demote}.
 	 */
 	public static void start() {
 		started = true;
 		CEILINGS.clear();
 		KITTED.clear();
+		LAST_IMPLOSION.clear();
+		hideLocatorBar();
+		ManhuntPiglins.demoteLoaded();
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			Plugin.zeroIntelligence(p);
 			equip(p);
@@ -316,15 +348,47 @@ public final class Manhunt {
 	 * <p>Every ceiling is dropped to the bottom rung <b>in memory only</b>: with the match over
 	 * {@link #active} is false, so what everybody actually plays on is the standard 80 ticks and 2500 - and
 	 * nobody's mana is clamped on the way out, because the cap went up rather than down.
+	 *
+	 * <p>Every world's locator bar goes back to whatever it was set to before the match, on or off.
 	 */
 	public static void reset() {
 		started = false;
 		CEILINGS.clear();
 		KITTED.clear();
+		LAST_IMPLOSION.clear();
+		restoreLocatorBar();
 		for(Player p : Bukkit.getOnlinePlayers()) {
 			removeManhuntItems(p, true, true);
 		}
 		save();
+	}
+
+	/**
+	 * Turns {@code locatorBar} off in every loaded world, noting first what each one was set to. Loaded is
+	 * every dimension in practice - Paper brings the overworld, the nether and the end up at boot and they
+	 * stay up; a world something else loads mid-match would not be covered.
+	 *
+	 * <p><b>{@code putIfAbsent}, not {@code put}</b>: {@code /manhunt start} run twice must not record the
+	 * off we ourselves set as the value to go back to.
+	 */
+	private static void hideLocatorBar() {
+		for(World world : Bukkit.getWorlds()) {
+			LOCATOR_BARS.putIfAbsent(world.getName(), Boolean.TRUE.equals(world.getGameRuleValue(GameRule.LOCATOR_BAR)));
+			world.setGameRule(GameRule.LOCATOR_BAR, false);
+		}
+	}
+
+	/**
+	 * Puts every world's {@code locatorBar} back where the match found it. A world that has since been
+	 * unloaded is skipped rather than waited for: its gamerule lives in its own level.dat and nothing has
+	 * touched it since the match started.
+	 */
+	private static void restoreLocatorBar() {
+		for(Map.Entry<String, Boolean> entry : LOCATOR_BARS.entrySet()) {
+			World world = Bukkit.getWorld(entry.getKey());
+			if(world != null) world.setGameRule(GameRule.LOCATOR_BAR, entry.getValue());
+		}
+		LOCATOR_BARS.clear();
 	}
 
 	/**
@@ -402,6 +466,37 @@ public final class Manhunt {
 	public static boolean isCompass(@Nullable ItemStack item) {
 		if(item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) return false;
 		return ManhuntCompass.ID.equals(Utils.firstLorePlain(item.getItemMeta()));
+	}
+
+	// ---- implosion ------------------------------------------------------------------------------------
+
+	/**
+	 * How long a player is immune to Manhunt Hyperion implosions for after one lands on them.
+	 *
+	 * <p>The implosion has no hit cooldown and no cast time worth the name, so without this anyone cornered
+	 * by four Hyperions is deleted by four simultaneous right-clicks with nothing they can do about it. One
+	 * second per victim, shared across every attacker, so piling on stops paying.
+	 */
+	public static final long IMPLOSION_IMMUNITY_TICKS = 20;
+
+	/** The tick each player last took an implosion on. Match state, not worth persisting. */
+	private static final Map<UUID, Long> LAST_IMPLOSION = new HashMap<>();
+
+	/**
+	 * Whether a Manhunt Hyperion's implosion may damage {@code target} right now, <b>claiming the window if
+	 * it may</b> - so call it exactly once per target per implosion, where the damage is decided.
+	 *
+	 * <p>Every player is on the clock, whichever side they are on; mobs are not, so a Hyperion clears a
+	 * crowd as fast as ever. The window is claimed on the attempt rather than once the damage has landed,
+	 * which is the cheap end of the trade: a blow the pipeline soaks to nothing still spends it.
+	 */
+	public static boolean claimImplosion(LivingEntity target) {
+		if(!(target instanceof Player victim)) return true;
+		long now = Bukkit.getCurrentTick();
+		Long last = LAST_IMPLOSION.get(victim.getUniqueId());
+		if(last != null && now - last < IMPLOSION_IMMUNITY_TICKS) return false;
+		LAST_IMPLOSION.put(victim.getUniqueId(), now);
+		return true;
 	}
 
 	// ---- intelligence ---------------------------------------------------------------------------------

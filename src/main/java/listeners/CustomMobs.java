@@ -11,6 +11,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.potion.PotionEffectType;
 
@@ -131,6 +132,17 @@ public class CustomMobs implements Listener {
 				// colors - the red ❤ would turn <aqua> - and MiniMessage can't parse the § codes. HP stays
 				// current via Utils.changeName(entity) on hits.
 				if(entity.customName() != null) {
+					// One exception: a cube mob splitting inherits its parent's name WHOLE - vanilla's
+					// ConversionType.COMPONENTS_TO_COPY is {CUSTOM_NAME, CUSTOM_DATA} - while setSize has
+					// already put the child on its own, smaller max health.  So a size-1 slime off a
+					// size-4 walked around advertising 16/16 on 1 HP until something hit it and
+					// Utils.changeName(entity) fixed it up.  Do that here instead: the one-arg overload
+					// swaps only the trailing numbers, so the colours and any name-tagged base name
+					// survive, which rebuilding from getName() would not.
+					if(e instanceof CreatureSpawnEvent spawn
+							&& spawn.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SLIME_SPLIT) {
+						Utils.changeName(entity);
+					}
 					entity.setCustomNameVisible(true);
 					return;
 				}

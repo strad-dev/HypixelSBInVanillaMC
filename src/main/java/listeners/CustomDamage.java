@@ -243,7 +243,7 @@ public class CustomDamage implements Listener {
 		// its own `angle > cone` test then lets through.  Standing in the defender's own column blocks.
 		if(toSource.lengthSquared() < 1.0E-8) return true;
 
-		double dot = Math.max(-1, Math.min(1, toSource.normalize().dot(look)));
+		double dot = Math.clamp(toSource.normalize().dot(look), -1, 1);
 		return Math.acos(dot) <= Math.toRadians(SHIELD_BLOCKING_ANGLE);
 	}
 
@@ -464,8 +464,9 @@ public class CustomDamage implements Listener {
 			// Golden-sword piglins hit disproportionately hard for how commonly they spawn holding one;
 			// shave 25% off. Multiplicative here, so the sword's +3 and any vanilla difficulty scaling
 			// baked into the incoming damage are both scaled proportionally.
-			if(type == DamageType.MELEE && damager instanceof org.bukkit.entity.Piglin piglin
-					&& piglin.getEquipment().getItemInMainHand().getType() == Material.GOLDEN_SWORD) {
+			if(type == DamageType.MELEE && (damager instanceof Piglin piglin
+					&& piglin.getEquipment().getItemInMainHand().getType() == Material.GOLDEN_SWORD) || (damager instanceof WitherSkeleton skeleton
+					&& skeleton.getEquipment().getItemInMainHand().getType() == Material.STONE_SWORD)) {
 				finalDamage *= 0.75;
 			}
 
