@@ -31,14 +31,14 @@ import java.util.Map;
 public enum ManhuntTier {
 	//                                                                swords  dmg   cost  abs  reduce  implode  radius  tick  intel  ench
 	// The teleport is NOT in here: it is a flat 10 blocks on every rung, so upgrading never moves it.
-	BASE(Material.STICK, "", Rank.COMMON,                            0, 0,   25, 1,  0.00, 0.5,  7.5, 200, 250,  0),
-	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,               8, 1.5, 24, 3,  0.05, 0.75, 8,   180, 325,  10),
-	STONE(Material.STONE_SWORD, "Stone", Rank.UNCOMMON,              8, 2.5, 23, 4,  0.06, 1.25, 8.5, 160, 400,  12),
-	COPPER(Material.COPPER_SWORD, "Copper", Rank.UNCOMMON,           4, 3,   22, 4,  0.06, 1.5,  8.5, 150, 450,  14),
-	IRON(Material.IRON_SWORD, "Iron", Rank.RARE,                     4, 4,   20, 5,  0.08, 2,    9,   130, 575,  16),
-	GOLD(Material.GOLDEN_SWORD, "Golden", Rank.RARE,                 4, 4.5, 19, 5,  0.08, 2.25, 9,   120, 625,  18),
-	DIAMOND(Material.DIAMOND_SWORD, "Diamond", Rank.EPIC,            2, 5.5, 17, 6,  0.10, 2.75, 9.5, 100, 750,  20),
-	NETHERITE(Material.NETHERITE_SWORD, "Netherite", Rank.LEGENDARY, 1, 7,   15, 10, 0.15, 3.5,  10,  80,  1000, 25);
+	BASE(Material.STICK, "", Rank.COMMON,                            0, 0,   25, 1, 0.00, 1,    7.5, 200, 250,  0),
+	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,               8, 1.5, 24, 3, 0.05, 1.25, 8,   180, 325,  10),
+	STONE(Material.STONE_SWORD, "Stone", Rank.UNCOMMON,              8, 2.5, 23, 4, 0.06, 1.75, 8.5, 160, 400,  12),
+	COPPER(Material.COPPER_SWORD, "Copper", Rank.UNCOMMON,           4, 3,   22, 4, 0.06, 2,    8.5, 150, 450,  14),
+	IRON(Material.IRON_SWORD, "Iron", Rank.RARE,                     4, 4,   20, 5, 0.07, 2.5,  9,   130, 575,  16),
+	GOLD(Material.GOLDEN_SWORD, "Golden", Rank.RARE,                 4, 4.5, 19, 5, 0.07, 2.75, 9,   120, 625,  18),
+	DIAMOND(Material.DIAMOND_SWORD, "Diamond", Rank.EPIC,            2, 5.5, 17, 6, 0.08, 3.25, 9.5, 100, 750,  20),
+	NETHERITE(Material.NETHERITE_SWORD, "Netherite", Rank.LEGENDARY, 1, 6.5, 15, 8, 0.10, 3.75, 10,  80,  1000, 25);
 
 	/** Item rarity, in the colours the rest of the plugin's lore uses. */
 	public enum Rank {
