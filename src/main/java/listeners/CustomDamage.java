@@ -1613,6 +1613,15 @@ public class CustomDamage implements Listener {
 				if(entity.getNoDamageTicks() == 0 || e.getDamager() instanceof AbstractArrow) {
 					Entity damager = e.getDamager();
 
+					// 26.2 takes amount/4 + min(amount, 1) off every blow that does not land on the dragon's
+					// HEAD, the neck included - and the neck is what an aimed hit usually connects with.
+					// Put a neck hit back to what was thrown, which is what 26.3 does by counting the neck as
+					// the head.  Before rebuildMelee, so the rebuild works off the same figure a head hit
+					// gives it.  BACKPORT - delete with DragonNeck on 26.3.
+					if(entity instanceof EnderDragon) {
+						e.setDamage(DragonNeck.unquarter(damager, e.getDamage()));
+					}
+
 					// Normalize custom boss damage to remove vanilla difficulty scaling
 					// Easy = 0.5x, Normal = 1x, Hard = 1.5x
 					if(damager instanceof Mob && damager.getScoreboardTags().contains("SkyblockBoss") && (type == DamageType.MELEE || type == DamageType.RANGED)) {

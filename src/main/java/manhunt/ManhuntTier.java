@@ -2,6 +2,8 @@ package manhunt;
 
 import misc.SkyblockId;
 import misc.Utils;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
