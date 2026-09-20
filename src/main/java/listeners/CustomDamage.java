@@ -1620,8 +1620,10 @@ public class CustomDamage implements Listener {
 					// 26.2 takes amount/4 + min(amount, 1) off every blow that does not land on the dragon's
 					// HEAD, the neck included - and the neck is what an aimed hit usually connects with.
 					// Put a neck hit back to what was thrown, which is what 26.3 does by counting the neck as
-					// the head.  Before rebuildMelee, so the rebuild works off the same figure a head hit
-					// gives it.  BACKPORT - delete with DragonNeck on 26.3.
+					// the head.  MELEE ONLY: DragonNeck records a part off the swing event and nothing else,
+					// so an arrow on the neck stays quartered and the 4x is a melee reward.  Before
+					// rebuildMelee, so the rebuild works off the same figure a head hit gives it.
+					// BACKPORT - delete with DragonNeck on 26.3.
 					if(entity instanceof EnderDragon) {
 						e.setDamage(DragonNeck.unquarter(damager, e.getDamage()));
 					}
