@@ -10,6 +10,7 @@ import misc.Utils;
 import mobs.CustomMob;
 import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -26,6 +27,7 @@ import net.minecraft.world.entity.projectile.hurtingprojectile.WitherSkull;
 import net.minecraft.world.entity.projectile.hurtingprojectile.windcharge.AbstractWindCharge;
 import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.BlocksAttacks;
 import net.minecraft.world.level.block.SculkSpreader;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
@@ -216,6 +218,15 @@ public class CustomDamage implements Listener {
 	private static final double SHIELD_BLOCKING_ANGLE = 90;
 
 	/**
+	 * What a blocked blow is multiplied by: a shield takes <b>two thirds</b> off whatever would have landed.
+	 *
+	 * <p>Ours, not vanilla's. Vanilla's shield is {@code base 0, factor 1} on its {@code blocks_attacks}
+	 * component - a blocked hit is reduced to nothing - which is no good in a plugin where a hit is worth
+	 * dozens of hearts. The cone that decides WHETHER this applies is vanilla's; the number is not.
+	 */
+	private static final double SHIELD_BLOCK_MULTIPLIER = 1.0 / 3.0;
+
+	/**
 	 * Did this blow come from inside the defender's shield cone?  <b>The rule our pipeline was missing
 	 * entirely</b>: a shield used to reduce damage from any direction, back included, because cancelling the
 	 * vanilla damage event skips {@code LivingEntity.applyItemBlocking} where the test lives.
@@ -245,6 +256,47 @@ public class CustomDamage implements Listener {
 
 		double dot = Math.clamp(toSource.normalize().dot(look), -1, 1);
 		return Math.acos(dot) <= Math.toRadians(SHIELD_BLOCKING_ANGLE);
+	}
+
+	/**
+	 * Everything vanilla does to the defender once a blow is blocked: the {@code item.shield.block} thud, and
+	 * an axe taking the shield away. <b>Both are rules lost to cancelling the vanilla event</b> - the sound
+	 * lives in {@code LivingEntity.hurtServer} and the disable in {@code Player.blockUsingItem}, and neither
+	 * runs here - and both are a call INTO vanilla rather than a copy of it, so the volumes, the pitch roll,
+	 * the cooldown length and Paper's {@code PlayerShieldDisableEvent} are all vanilla's own.
+	 *
+	 * <p>{@code onBlocked} plays the block sound at the defender. Vanilla plays it INSTEAD of the hurt sound;
+	 * ours is on top of whatever the hurt sound does here, because we never suppressed that.
+	 *
+	 * <p>The axe rule: the attacker's {@code getSecondsToDisableBlocking()} reads their weapon's
+	 * {@code minecraft:weapon} component ({@code disable_blocking_for_seconds}, which only an axe has - 5
+	 * seconds, every tier, no enchantment and no chance roll), and {@code BlocksAttacks.disable} scales it by
+	 * the blocking item's {@code disable_cooldown_scale} (1.0 on a shield, so 100 ticks), puts the item on
+	 * cooldown, drops the block and plays {@code item.shield.break}. {@code melee} is false for anything shot:
+	 * vanilla tests the DIRECT entity behind the damage, which is then the projectile and never a
+	 * {@code LivingEntity}, so a bow cannot disable a shield however the shooter is armed.
+	 *
+	 * <p>Only the defender's ACTIVE blocking item is touched, so the 0.25s raise delay is already accounted
+	 * for: {@code getItemBlockingWith} is the same method {@code isBlocking} is built on. Players only, which
+	 * is all {@code DamageData.isBlocking} ever reports.
+	 */
+	private static void onShieldBlock(LivingEntity damagee, Entity damager, boolean melee) {
+		if(!(damagee instanceof Player player)) return;
+
+		ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+		net.minecraft.world.item.ItemStack blocking = nmsPlayer.getItemBlockingWith();
+		if(blocking == null) return;
+
+		BlocksAttacks blocks = blocking.get(DataComponents.BLOCKS_ATTACKS);
+		if(blocks == null) return;
+
+		blocks.onBlocked(nmsPlayer.level(), nmsPlayer);
+
+		if(!melee || !(damager instanceof LivingEntity attacker)) return;
+
+		net.minecraft.world.entity.LivingEntity nmsAttacker = ((CraftLivingEntity) attacker).getHandle();
+		float seconds = nmsAttacker.getSecondsToDisableBlocking();
+		if(seconds > 0) blocks.disable(nmsPlayer.level(), nmsPlayer, seconds, blocking, nmsAttacker);
 	}
 
 	/** Paper can switch player crits off per world.  If it ever is, vanilla did not crit either, so both the
@@ -471,15 +523,21 @@ public class CustomDamage implements Listener {
 			}
 
 			// shield logic (for weirdos).  A raised shield only counts against a blow from the FRONT - see
-			// blockedFromFront.  The 0.4 itself is ours and is NOT vanilla's number: a vanilla shield is
-			// base 0 / factor 1, i.e. a blocked hit is reduced to nothing.
+			// blockedFromFront.  The multiplier itself is ours and is NOT vanilla's number - see
+			// SHIELD_BLOCK_MULTIPLIER.
 			// The projectile's own position where we have it, the attacker's otherwise - the fallback is for
 			// the DamageData built off a plain EntityDamageEvent, which never saw an attacker.
 			Location shieldSource = data.sourcePosition != null ? data.sourcePosition
 					: (damager == null ? null : damager.getLocation());
 			if(data.isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL)
 					&& blockedFromFront(damagee, shieldSource)) {
-				finalDamage *= 0.4;
+				// Vanilla's own test for "the block did something": it plays the block sound (and takes the
+				// hurt sound away) only when the amount it took off is greater than zero.
+				boolean reduced = finalDamage > 0;
+				finalDamage *= SHIELD_BLOCK_MULTIPLIER;
+				// Vanilla only ever disables blocking off a MELEE blow: it tests the DIRECT entity behind the
+				// damage, which for anything shot is the projectile and never a LivingEntity.
+				if(reduced) onShieldBlock(damagee, damager, type == DamageType.MELEE || type == DamageType.MELEE_SWEEP);
 			}
 
 			double breach = 0;
