@@ -1041,11 +1041,11 @@ public class CustomDamage implements Listener {
 
 						if(type == DamageType.MELEE) {
 							if(damager.getFallDistance() > 0) {
-								modifiers *= 1.2;
+								modifiers *= 1.25;
 							}
 
 							if(damager instanceof Player p && p.isSprinting()) {
-								modifiers *= 1.2;
+								modifiers *= 1.5;
 							}
 						}
 
