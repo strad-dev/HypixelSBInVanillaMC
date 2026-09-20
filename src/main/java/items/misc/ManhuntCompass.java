@@ -78,7 +78,7 @@ public class ManhuntCompass implements AbilityItem {
 		lore.add(Utils.mm("<gold>Ability: Change Target <green><bold>SNEAK RIGHT CLICK"));
 		lore.addAll(MinecraftFont.wrapLore("<gray>Move to the next Speedrunner."));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm("<green><bold>UNCOMMON ITEM"));
+		lore.add(Utils.mm("<red><bold><obfuscated>a</obfuscated> VERY SPECIAL ITEM <obfuscated>a</obfuscated>"));
 
 		data.lore(lore);
 		compass.setItemMeta(data);
