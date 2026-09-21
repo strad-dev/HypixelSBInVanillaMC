@@ -7,6 +7,7 @@ import items.ingredients.witherLords.*;
 import items.misc.*;
 import items.summonItems.*;
 import items.weapons.Claymore;
+import items.weapons.ManhuntHyperion;
 import items.weapons.Scylla;
 import items.weapons.SwordOfBadHealth;
 import items.weapons.Terminator;
@@ -133,6 +134,23 @@ public class CreativeMenu implements Listener {
 		));
 	}
 
+	/**
+	 * The catalog behind {@code tab}. Every tab but Manhunt is a static list in {@link #ITEMS}; the Manhunt
+	 * rungs are built here instead, because the ladder only exists when {@code manhunt} is on in config.yml
+	 * and that is read long after this class's static initialiser has run. Empty when it is off, though the
+	 * tab is not offered at all then.
+	 */
+	private static List<ItemStack> catalog(String tab) {
+		if (!tab.equals("manhunt")) return ITEMS.get(tab);
+		if (!manhunt.Manhunt.enabled()) return List.of();
+
+		List<ItemStack> out = new ArrayList<>();
+		for (manhunt.ManhuntTier tier : manhunt.ManhuntTier.values()) {
+			out.add(ManhuntHyperion.getItem(tier));
+		}
+		return out;
+	}
+
 	/** The "Items" catalog (weapons/armor/tools), cloned - reused as the PvP loadout editor palette. */
 	public static List<ItemStack> loadoutPalette() {
 		List<ItemStack> out = new ArrayList<>();
@@ -169,12 +187,19 @@ public class CreativeMenu implements Listener {
 			case "ingredients" -> "Ingredients";
 			case "summon" -> "Summon Items";
 			case "enchantments" -> "Enchantments";
+			case "manhunt" -> "Manhunt";
 			default -> throw new IllegalStateException("Unexpected value: " + tab);
 		};
 	}
 
 	public static void openCreativeMenu(Player player) {
 		String currentTab = playerTabs.getOrDefault(player.getUniqueId(), "items");
+		// Manhunt off: the tab is gone from the row, so a player remembered on it would open an empty menu
+		// with nothing to click back to.  Put them on Items instead.
+		if (currentTab.equals("manhunt") && !manhunt.Manhunt.enabled()) {
+			currentTab = "items";
+			playerTabs.put(player.getUniqueId(), currentTab);
+		}
 		int page = playerPages.getOrDefault(player.getUniqueId(), 0);
 
 		CreativeMenuHolder holder = new CreativeMenuHolder();
@@ -190,7 +215,7 @@ public class CreativeMenu implements Listener {
 		// SkyBlock id, a lore change, a retune - and any live figure in them (the Hyperion's implosion) was
 		// computed for nobody.  Refreshing here rather than at the three take sites below means the icon a
 		// player reads and the item they walk away with are the same thing.
-		List<ItemStack> items = ITEMS.get(currentTab);
+		List<ItemStack> items = catalog(currentTab);
 		if (items != null) {
 			int startIndex = page * 36; // 36 items per page (excluding tab row)
 			int endIndex = Math.min(startIndex + 36, items.size());
@@ -260,15 +285,34 @@ public class CreativeMenu implements Listener {
 
 		// Enchantments items tab
 		ItemStack enchantment = new ItemStack(Material.ENCHANTED_BOOK);
-		ItemMeta enchantmentMeta = summon.getItemMeta();
-		summonMeta.displayName(Utils.mm("Enchantments"));
+		// Its own meta, its own stack: this read summon's meta and wrote summon's, so the book went in
+		// unnamed and never glinted for the tab it was on.
+		ItemMeta enchantmentMeta = enchantment.getItemMeta();
+		enchantmentMeta.displayName(Utils.mm("Enchantments"));
 
 		if (currentTab.equals("enchantments")) {
-			summonMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
-			summonMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			enchantmentMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
+			enchantmentMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
 		}
-		summon.setItemMeta(enchantmentMeta);
+		enchantment.setItemMeta(enchantmentMeta);
 		gui.setItem(3, enchantment);
+
+		// Manhunt tab - only where the ladder exists, so the row is one shorter with manhunt off in
+		// config.yml and the glass starts a slot earlier.
+		int firstGlass = 4;
+		if (manhunt.Manhunt.enabled()) {
+			ItemStack manhuntTab = new ItemStack(Material.COMPASS);
+			ItemMeta manhuntMeta = manhuntTab.getItemMeta();
+			manhuntMeta.displayName(Utils.mm("Manhunt"));
+
+			if (currentTab.equals("manhunt")) {
+				manhuntMeta.addEnchant(Enchantment.UNBREAKING, 1, true);
+				manhuntMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+			}
+			manhuntTab.setItemMeta(manhuntMeta);
+			gui.setItem(4, manhuntTab);
+			firstGlass = 5;
+		}
 
 		// Fill rest of top row with glass
 		ItemStack glass = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
@@ -276,7 +320,7 @@ public class CreativeMenu implements Listener {
 		glassMeta.displayName(Utils.mm(" "));
 		glass.setItemMeta(glassMeta);
 
-		for (int i = 4; i < 9; i++) {
+		for (int i = firstGlass; i < 9; i++) {
 			gui.setItem(i, glass);
 		}
 	}
@@ -321,6 +365,14 @@ public class CreativeMenu implements Listener {
 						playerTabs.put(player.getUniqueId(), "enchantments");
 						playerPages.put(player.getUniqueId(), 0);
 						openCreativeMenu(player);
+					}
+					// With manhunt off slot 4 is a glass pane, so the click falls through and does nothing.
+					case 4 -> {
+						if (manhunt.Manhunt.enabled()) {
+							playerTabs.put(player.getUniqueId(), "manhunt");
+							playerPages.put(player.getUniqueId(), 0);
+							openCreativeMenu(player);
+						}
 					}
 				}
 			}

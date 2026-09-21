@@ -75,14 +75,15 @@ public class ManhuntHyperion implements AbilityItem {
 				+ Utils.tenthNumber(tier.implosionDamage()) + " damage <gray>to enemies within <green>"
 				+ Utils.damageNumber(tier.radius()) + " blocks<gray>.  Also reduces damage taken by <red>"
 				+ Utils.percent(tier.damageReduction()) + "<gray> and grants an Absorption Shield with <red>"
-				+ Utils.damageNumber(tier.absorption()) + " HP <gray>for <yellow>5 seconds<gray>."));
+				+ Utils.damageNumber(tier.absorption()) + " HP <gray>for <green>5<gray> seconds."));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + tier.manaCost()));
 		// The shield's own clock, not the ability's: Wither Impact itself has no cooldown on any rung.
 		lore.add(Utils.mm("<dark_gray>Wither Shield Cooldown: <green>"
 				+ Utils.damageNumber(tier.witherShieldCooldown() / 20.0) + "s"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<dark_gray>Max Intelligence: <dark_aqua>" + tier.maxIntelligence()));
-		lore.add(Utils.mm("<dark_gray>Intelligence Regen: <dark_aqua>1 per " + tier.ticksPerMana() + " ticks"));
+		lore.add(Utils.mm("<dark_gray>Intelligence Regen: <dark_aqua>1 per "
+				+ Utils.damageNumber(tier.ticksPerMana() / 20.0) + "s"));
 		lore.add(Utils.mm(""));
 		lore.addAll(upgradeLines(tier));
 		lore.add(Utils.mm(""));
@@ -126,7 +127,7 @@ public class ManhuntHyperion implements AbilityItem {
 		delta(out, "Damage Reduction", "red", (tier.damageReduction() - next.damageReduction()) * 100, "%");
 		delta(out, "Shield Cooldown", "green", (next.witherShieldCooldown() - tier.witherShieldCooldown()) / 20.0, "s");
 		delta(out, "Max Intelligence", "dark_aqua", next.maxIntelligence() - tier.maxIntelligence(), "");
-		delta(out, "Intel Regen", "dark_aqua", next.ticksPerMana() - tier.ticksPerMana(), "<dark_gray> ticks/intel");
+		delta(out, "Intel Regen", "dark_aqua", (next.ticksPerMana() - tier.ticksPerMana()) / 20.0, "s<dark_gray>/intel");
 		delta(out, "Ability Cost", "dark_aqua", next.manaCost() - tier.manaCost(), "");
 		return out;
 	}

@@ -129,7 +129,7 @@ public class Scylla implements AbilityItem {
 				"<gray>Teleport <green>10 blocks<gray> ahead of you.  Then implode, dealing <red>"
 				+ Utils.tenthNumber(implosion) + " damage <gray>to enemies within <green>10 blocks<gray>.  Also"
 				+ " reduces damage taken by <red>15%<gray> and grants an Absorption Shield with <red>10 HP"
-				+ " <gray>for <yellow>5 seconds<gray>."));
+				+ " <gray>for <green>5<gray> seconds."));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + MANA_COST));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<light_purple><bold><obfuscated>a</obfuscated> MYTHIC SWORD <obfuscated>a</obfuscated>"));
@@ -377,7 +377,8 @@ public class Scylla implements AbilityItem {
 		// wither shield
 		// Two gates: a shield already standing, as ever, and the refresh cooldown the caller hands in.  So a
 		// cooldown shorter than SHIELD_DURATION buys nothing - there is never a second shield over the first.
-		if(!p.getScoreboardTags().contains("WitherShield") && !Cooldowns.onCooldown(p, SHIELD_COOLDOWN)) { // reduced damage
+		boolean shieldStanding = p.getScoreboardTags().contains("WitherShield");
+		if(!shieldStanding && !Cooldowns.onCooldown(p, SHIELD_COOLDOWN)) { // reduced damage
 			Cooldowns.start(p, SHIELD_COOLDOWN, shieldCooldown);
 			double absorptionBefore = p.getAbsorptionAmount();
 			AttributeModifier temp = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "witherShield"), absorption, AttributeModifier.Operation.ADD_NUMBER);
@@ -400,6 +401,13 @@ public class Scylla implements AbilityItem {
 				p.removeScoreboardTag("WitherShield");
 				WITHER_SHIELDS.remove(p.getUniqueId());
 			}, SHIELD_DURATION);
+		} else if(!shieldStanding) {
+			// Their shield has run out but the refresh has not come round yet, so this cast leaves them with
+			// no shield at all - the one refusal worth saying out loud.  NOT while one is still standing:
+			// they already have the thing the message would be about, and Wither Impact is spammable.
+			// Only reachable on a cooldown longer than SHIELD_DURATION; the full Hyperion passes 0.
+			p.sendMessage(Utils.msg("<red>Your Wither Shield is on cooldown for "
+					+ String.format("%.2f", Cooldowns.remaining(p, SHIELD_COOLDOWN) / 20.0) + " seconds!"));
 		}
 		return true;
 	}
