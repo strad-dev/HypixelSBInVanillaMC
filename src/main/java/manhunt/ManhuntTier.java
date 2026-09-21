@@ -34,7 +34,7 @@ public enum ManhuntTier {
 	BASE(Material.STICK, "", Rank.COMMON,                            0, 0,   25, 1, 0.00, 200, 1,    7.5, 200, 250,  0),
 	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,               8, 1.5, 24, 3, 0.05, 200, 1.25, 8,   180, 325,  10),
 	STONE(Material.STONE_SWORD, "Stone", Rank.UNCOMMON,              8, 2.5, 23, 4, 0.06, 200, 1.75, 8.5, 160, 400,  12),
-	COPPER(Material.COPPER_SWORD, "Copper", Rank.UNCOMMON,           4, 3,   22, 4, 0.06, 180, 2,    8.5, 150, 450,  14),
+	COPPER(Material.COPPER_SWORD, "Copper", Rank.UNCOMMON,           6, 3,   22, 4, 0.06, 180, 2,    8.5, 150, 450,  14),
 	IRON(Material.IRON_SWORD, "Iron", Rank.RARE,                     4, 4,   20, 5, 0.07, 180, 2.5,  9,   130, 575,  16),
 	GOLD(Material.GOLDEN_SWORD, "Golden", Rank.RARE,                 4, 4.5, 19, 5, 0.07, 160, 2.75, 9,   120, 625,  18),
 	DIAMOND(Material.DIAMOND_SWORD, "Diamond", Rank.EPIC,            2, 5.5, 17, 6, 0.08, 160, 3.25, 9.5, 100, 750,  20),
