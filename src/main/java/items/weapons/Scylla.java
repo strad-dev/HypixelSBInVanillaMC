@@ -4,6 +4,7 @@ import items.AbilityItem;
 import listeners.CustomDamage;
 import listeners.CustomItems;
 import listeners.DamageType;
+import misc.Cooldowns;
 import misc.DamageData;
 import misc.MinecraftFont;
 import misc.Plugin;
@@ -51,6 +52,16 @@ public class Scylla implements AbilityItem {
 	 * differ twice over for one effect.
 	 */
 	public static final double HEAL_SHARE = 0.50;
+
+	/**
+	 * Ticks the Wither Shield's absorption stands before it converts to healing. The same on every Hyperion,
+	 * Manhunt rungs included - {@link manhunt.ManhuntTier#witherShieldCooldown} decides when the shield may
+	 * go up AGAIN and never how long this one lasts.
+	 */
+	public static final int SHIELD_DURATION = 101;
+
+	/** {@link Cooldowns} tag for the shield's refresh, which runs on its own clock, not the ability's. */
+	private static final String SHIELD_COOLDOWN = "witherShield";
 
 	public static ItemStack getItem() {
 		return getItem(Map.of());
@@ -146,7 +157,9 @@ public class Scylla implements AbilityItem {
 		double smite = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.SMITE));
 		double bane = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS));
 
-		return witherImpact(p, 10, 10, 10, 0.15, entity -> {
+		// 0 refresh cooldown: the full Hyperion's shield is gated only by the one already standing, as ever.
+		// The ladder's cooldown is a Manhunt stat - see ManhuntTier.witherShieldCooldown.
+		return witherImpact(p, 10, 10, 10, 0.15, 0, entity -> {
 			double tempDamage = targetDamage;
 			if(entity instanceof Wither) {
 				tempDamage += 4 + smite;
@@ -170,13 +183,18 @@ public class Scylla implements AbilityItem {
 	 * @param radius          implosion radius
 	 * @param absorption      absorption HP the shield grants
 	 * @param damageReduction share taken off incoming damage while the shield is up
+	 * @param shieldCooldown  ticks before the shield may go up again, on top of the one still standing
+	 *                        blocking it; 0 leaves the standing shield as the only gate. It does <b>not</b>
+	 *                        move {@link #SHIELD_DURATION}, so the absorption and the healing it turns into
+	 *                        always run to 5 seconds
 	 * @param damage          per-target implosion damage. <b>0 or less means skip that target</b> - it is
 	 *                        never run through the pipeline at all, so it takes no knockback and is not
 	 *                        counted as hit. The Manhunt Hyperion honours its per-Speedrunner implosion
 	 *                        cooldown that way.
 	 */
 	public static boolean witherImpact(Player p, double distance, double radius, double absorption,
-									   double damageReduction, ToDoubleFunction<LivingEntity> damage) {
+									   double damageReduction, int shieldCooldown,
+									   ToDoubleFunction<LivingEntity> damage) {
 		Location origin = p.getLocation().clone();
 		Location l = null;
 		// The world border counts as a solid block: clipped to it, so a Wither Impact aimed through the
@@ -357,7 +375,10 @@ public class Scylla implements AbilityItem {
 		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		// wither shield
-		if(!p.getScoreboardTags().contains("WitherShield")) { // reduced damage
+		// Two gates: a shield already standing, as ever, and the refresh cooldown the caller hands in.  So a
+		// cooldown shorter than SHIELD_DURATION buys nothing - there is never a second shield over the first.
+		if(!p.getScoreboardTags().contains("WitherShield") && !Cooldowns.onCooldown(p, SHIELD_COOLDOWN)) { // reduced damage
+			Cooldowns.start(p, SHIELD_COOLDOWN, shieldCooldown);
 			double absorptionBefore = p.getAbsorptionAmount();
 			AttributeModifier temp = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "witherShield"), absorption, AttributeModifier.Operation.ADD_NUMBER);
 			p.getAttribute(Attribute.MAX_ABSORPTION).addModifier(temp);
@@ -371,14 +392,14 @@ public class Scylla implements AbilityItem {
 					p.setAbsorptionAmount(absorptionBefore);
 				}
 				p.playSound(finalL, Sound.ENTITY_PLAYER_LEVELUP, 2.0F, 2.0F);
-			}, 101L);
+			}, SHIELD_DURATION);
 			p.addScoreboardTag("WitherShield");
 			// The reduction is per-Hyperion, so CustomDamage cannot read it off the tag alone.
 			WITHER_SHIELDS.put(p.getUniqueId(), damageReduction);
 			Utils.scheduleTask(() -> {
 				p.removeScoreboardTag("WitherShield");
 				WITHER_SHIELDS.remove(p.getUniqueId());
-			}, 101);
+			}, SHIELD_DURATION);
 		}
 		return true;
 	}

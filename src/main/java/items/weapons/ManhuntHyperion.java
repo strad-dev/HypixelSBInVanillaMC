@@ -28,8 +28,9 @@ import java.util.Map;
  * {@link ManhuntTier} rung it sits on. Everyone in a Manhunt starts with the Stick and upgrades it with
  * swords; the Netherite rung crafts into a real Hyperion through the ordinary recipe.
  *
- * <p>Wither Impact itself is {@link Scylla#witherImpact}, so the two items cannot drift apart. The one real
- * difference is the implosion: a flat number here, a share of melee damage there.
+ * <p>Wither Impact itself is {@link Scylla#witherImpact}, so the two items cannot drift apart. Two things
+ * differ: the implosion is a flat number here and a share of melee damage there, and the Wither Shield has a
+ * refresh cooldown per rung ({@link ManhuntTier#witherShieldCooldown}) where the full Hyperion has none.
  */
 public class ManhuntHyperion implements AbilityItem {
 	public static ItemStack getItem() {
@@ -76,6 +77,9 @@ public class ManhuntHyperion implements AbilityItem {
 				+ Utils.percent(tier.damageReduction()) + "<gray> and grants an Absorption Shield with <red>"
 				+ Utils.damageNumber(tier.absorption()) + " HP <gray>for <yellow>5 seconds<gray>."));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + tier.manaCost()));
+		// The shield's own clock, not the ability's: Wither Impact itself has no cooldown on any rung.
+		lore.add(Utils.mm("<dark_gray>Wither Shield Cooldown: <green>"
+				+ Utils.damageNumber(tier.witherShieldCooldown() / 20.0) + "s"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<dark_gray>Max Intelligence: <dark_aqua>" + tier.maxIntelligence()));
 		lore.add(Utils.mm("<dark_gray>Intelligence Regen: <dark_aqua>1 per " + tier.ticksPerMana() + " ticks"));
@@ -120,6 +124,7 @@ public class ManhuntHyperion implements AbilityItem {
 		delta(out, "Implosion Radius", "green", next.radius() - tier.radius(), " blocks");
 		delta(out, "Absorption HP", "red", next.absorption() - tier.absorption(), "");
 		delta(out, "Damage Reduction", "red", (tier.damageReduction() - next.damageReduction()) * 100, "%");
+		delta(out, "Shield Cooldown", "green", (next.witherShieldCooldown() - tier.witherShieldCooldown()) / 20.0, "s");
 		delta(out, "Max Intelligence", "dark_aqua", next.maxIntelligence() - tier.maxIntelligence(), "");
 		delta(out, "Intel Regen", "dark_aqua", next.ticksPerMana() - tier.ticksPerMana(), "<dark_gray> ticks/intel");
 		delta(out, "Ability Cost", "dark_aqua", next.manaCost() - tier.manaCost(), "");
@@ -151,8 +156,9 @@ public class ManhuntHyperion implements AbilityItem {
 		// A player can only be imploded once a second, across ALL attackers - claimImplosion returns false
 		// while their window is up and 0 damage is witherImpact's "skip this one", so they are left out of
 		// the blast entirely rather than hit for nothing.  Mobs are not on a clock.
+		// The Wither Shield has its own refresh cooldown per rung; the teleport and the implosion have none.
 		return Scylla.witherImpact(p, 10, tier.radius(), tier.absorption(), tier.damageReduction(),
-				entity -> Manhunt.claimImplosion(entity) ? tier.implosionDamage() : 0);
+				tier.witherShieldCooldown(), entity -> Manhunt.claimImplosion(entity) ? tier.implosionDamage() : 0);
 	}
 
 	@Override

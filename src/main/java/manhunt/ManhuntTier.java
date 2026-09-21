@@ -29,16 +29,16 @@ import java.util.Map;
  * {@link misc.SkyblockId#vanillaFor}.
  */
 public enum ManhuntTier {
-	//                                                                swords  dmg   cost  abs  reduce  implode  radius  tick  intel  ench
+	//                                                                swords  dmg   cost  abs  reduce  shieldCd  implode  radius  tick  intel  ench
 	// The teleport is NOT in here: it is a flat 10 blocks on every rung, so upgrading never moves it.
-	BASE(Material.STICK, "", Rank.COMMON,                            0, 0,   25, 1, 0.00, 1,    7.5, 200, 250,  0),
-	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,               8, 1.5, 24, 3, 0.05, 1.25, 8,   180, 325,  10),
-	STONE(Material.STONE_SWORD, "Stone", Rank.UNCOMMON,              8, 2.5, 23, 4, 0.06, 1.75, 8.5, 160, 400,  12),
-	COPPER(Material.COPPER_SWORD, "Copper", Rank.UNCOMMON,           4, 3,   22, 4, 0.06, 2,    8.5, 150, 450,  14),
-	IRON(Material.IRON_SWORD, "Iron", Rank.RARE,                     4, 4,   20, 5, 0.07, 2.5,  9,   130, 575,  16),
-	GOLD(Material.GOLDEN_SWORD, "Golden", Rank.RARE,                 4, 4.5, 19, 5, 0.07, 2.75, 9,   120, 625,  18),
-	DIAMOND(Material.DIAMOND_SWORD, "Diamond", Rank.EPIC,            2, 5.5, 17, 6, 0.08, 3.25, 9.5, 100, 750,  20),
-	NETHERITE(Material.NETHERITE_SWORD, "Netherite", Rank.LEGENDARY, 1, 6.5, 15, 8, 0.10, 3.75, 10,  80,  1000, 25);
+	BASE(Material.STICK, "", Rank.COMMON,                            0, 0,   25, 1, 0.00, 200, 1,    7.5, 200, 250,  0),
+	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,               8, 1.5, 24, 3, 0.05, 200, 1.25, 8,   180, 325,  10),
+	STONE(Material.STONE_SWORD, "Stone", Rank.UNCOMMON,              8, 2.5, 23, 4, 0.06, 200, 1.75, 8.5, 160, 400,  12),
+	COPPER(Material.COPPER_SWORD, "Copper", Rank.UNCOMMON,           4, 3,   22, 4, 0.06, 180, 2,    8.5, 150, 450,  14),
+	IRON(Material.IRON_SWORD, "Iron", Rank.RARE,                     4, 4,   20, 5, 0.07, 180, 2.5,  9,   130, 575,  16),
+	GOLD(Material.GOLDEN_SWORD, "Golden", Rank.RARE,                 4, 4.5, 19, 5, 0.07, 160, 2.75, 9,   120, 625,  18),
+	DIAMOND(Material.DIAMOND_SWORD, "Diamond", Rank.EPIC,            2, 5.5, 17, 6, 0.08, 160, 3.25, 9.5, 100, 750,  20),
+	NETHERITE(Material.NETHERITE_SWORD, "Netherite", Rank.LEGENDARY, 1, 6.5, 15, 8, 0.10, 150, 3.75, 10,  80,  1000, 25);
 
 	/** Item rarity, in the colours the rest of the plugin's lore uses. */
 	public enum Rank {
@@ -85,6 +85,7 @@ public enum ManhuntTier {
 	private final int manaCost;
 	private final double absorption;
 	private final double damageReduction;
+	private final int witherShieldCooldown;
 	private final double implosionDamage;
 	private final double radius;
 	private final int ticksPerMana;
@@ -92,8 +93,8 @@ public enum ManhuntTier {
 	private final int enchantability;
 
 	ManhuntTier(Material material, String prefix, Rank rank, int swordsToUpgrade, double damage, int manaCost,
-				double absorption, double damageReduction, double implosionDamage, double radius,
-				int ticksPerMana, int maxIntelligence, int enchantability) {
+				double absorption, double damageReduction, int witherShieldCooldown, double implosionDamage,
+				double radius, int ticksPerMana, int maxIntelligence, int enchantability) {
 		this.material = material;
 		this.prefix = prefix;
 		this.rank = rank;
@@ -102,6 +103,7 @@ public enum ManhuntTier {
 		this.manaCost = manaCost;
 		this.absorption = absorption;
 		this.damageReduction = damageReduction;
+		this.witherShieldCooldown = witherShieldCooldown;
 		this.implosionDamage = implosionDamage;
 		this.radius = radius;
 		this.ticksPerMana = ticksPerMana;
@@ -165,6 +167,18 @@ public enum ManhuntTier {
 	/** Share taken off incoming damage while the Wither Shield is up. */
 	public double damageReduction() {
 		return damageReduction;
+	}
+
+	/**
+	 * Ticks before the Wither Shield can go up again. <b>Not how long the shield lasts</b>: the absorption
+	 * and its conversion to healing always run on {@link items.weapons.Scylla#SHIELD_DURATION}, on every
+	 * rung, and this only decides when the next one may land.
+	 *
+	 * <p>A shield still standing blocks a refresh as well, so anything under {@code SHIELD_DURATION} buys
+	 * nothing - that is the floor. Manhunt only; the full Hyperion has no refresh cooldown of its own.
+	 */
+	public int witherShieldCooldown() {
+		return witherShieldCooldown;
 	}
 
 	/** Flat implosion damage. The full Hyperion is the one rung that scales off melee damage instead. */
