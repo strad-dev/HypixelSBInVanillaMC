@@ -20,18 +20,14 @@ import java.util.List;
 import java.util.Map;
 
 public class Claymore implements CustomItem {
-	/** This weapon's own attack damage, before any enchantment. Quoted on the lore line. */
+	/** Before enchants. Quoted on the lore. */
 	private static final double BASE_DAMAGE = 9;
 
 	public static ItemStack getItem() {
 		return getItem(Map.of());
 	}
 
-	/**
-	 * The item, carrying {@code enchants} and with lore that says so. <b>The enchantments go on here rather
-	 * than being applied by the caller afterwards</b> - that was the desync: the caller built the item, got
-	 * lore for whatever it named, and then enchanted the stack by material type.
-	 */
+	/** Enchants go on here, not by the caller after; that was the lore desync. */
 	public static ItemStack getItem(Map<Enchantment, Integer> enchants) {
 		ItemStack claymore = new ItemStack(Material.STONE_SWORD);
 

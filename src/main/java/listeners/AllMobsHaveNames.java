@@ -14,10 +14,9 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class AllMobsHaveNames implements Listener {
-	// Entities waiting to be named.  EntitiesLoadEvent fires per chunk as its stored entities load, which
-	// happens in a big burst when a player teleports (especially at high render distance). Naming every mob
-	// inline ran a MiniMessage parse per entity, so a teleport into a mob-dense area meant hundreds of parses
-	// in one tick → a lag spike. Instead we queue them here and drain a few per tick.
+	// Entities waiting to be named. EntitiesLoadEvent fires per chunk, in a big burst on teleport (worse at high
+	// render distance). Naming inline ran one MiniMessage parse per entity, so hundreds in one tick = lag spike.
+	// Queued here and drained a few per tick instead.
 	private static final Deque<LivingEntity> pending = new ArrayDeque<>();
 	private static final int PER_TICK = 20;
 	private static BukkitTask drainer;
@@ -41,7 +40,7 @@ public class AllMobsHaveNames implements Listener {
 				while(processed < PER_TICK && !pending.isEmpty()) {
 					LivingEntity entity = pending.poll();
 					processed++;
-					// Skip anything that unloaded/died or got named some other way since being queued.
+					// Skip anything unloaded, dead or named some other way since being queued.
 					if(entity == null || !entity.isValid() || entity.customName() != null) {
 						continue;
 					}

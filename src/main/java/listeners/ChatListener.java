@@ -20,8 +20,7 @@ public class ChatListener implements Listener {
 	}
 
 	public static void sendChat(CommandSender sender, String message) {
-		// Player name and chat text are inserted as UNPARSED placeholders so a player cannot inject MiniMessage
-		// tags (e.g. <red>, <rainbow>, <click>) by typing them; they render as literal text.
+		// Name and text go in as UNPARSED placeholders, so typed MiniMessage tags (<red>, <click>) render literally.
 		Component formatted;
 		if (sender instanceof Player player) {
 			String color = player.getName().equals("Beethoven_") ? "<blue>" : "<green>";

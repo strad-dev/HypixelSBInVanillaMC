@@ -1,5 +1,6 @@
 package commands;
 
+import misc.Menus;
 import misc.Plugin;
 import misc.Utils;
 import net.kyori.adventure.text.Component;
@@ -21,7 +22,6 @@ import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
@@ -33,21 +33,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 /*
- * Eq (/eq) - ported from the M7 TAS plugin. Opens a 1-row chest GUI showing the player's worn armor
- * (helmet/chestplate/leggings/boots in slots 0-3) and a sugar cane in slot 8 whose stack size encodes
- * the player's current movement speed (100 = vanilla), with the exact speed on its tooltip. Clicking an
- * armor piece in your own inventory while the menu is open equips it (and mirrors it into the GUI slot).
- *
- * Registered both as the /eq executor and as an event listener (the GUI is identified by its EqHolder).
+ * /eq, ported from M7 TAS. 1-row GUI: worn armor in slots 0-3, sugar cane in slot 8 whose count encodes
+ * speed (100 = vanilla, exact figure on the tooltip). Clicking armor in your own inventory equips it.
+ * Both the executor and a listener; the GUI is identified by EqHolder.
  */
 public class Eq implements CommandExecutor, Listener {
 
 	private static final Component TITLE = Utils.msg("<dark_gray>Equipment");
 	private static final int SPEED_SLOT = 8;
-	/** Modifiers currentSpeed resolves the attribute WITHOUT - vanilla mechanics that aren't part of the speed
-	 *  stat. Add a key here and it stops counting; Speed/Soul Speed are deliberately absent, they do count. */
+	/** Modifiers currentSpeed skips: vanilla mechanics, not the speed stat. Speed/Soul Speed deliberately count. */
 	private static final Set<NamespacedKey> IGNORED_SPEED_MODIFIERS = Set.of(NamespacedKey.minecraft("sprinting"));
-	/** Last server tick a swap ran per player - collapses a double-click's burst of events into one swap. */
+	/** Last swap tick per player; collapses a double-click burst into one swap. */
 	private static final Map<UUID, Integer> lastSwapTick = new HashMap<>();
 
 	@Override
@@ -66,10 +62,10 @@ public class Eq implements CommandExecutor, Listener {
 		holder.setInventory(gui);
 		refresh(p, gui);
 		p.openInventory(gui);
-		applySpeedCane(p); // must run after the menu exists - writes the cane via NMS (see below)
+		applySpeedCane(p); // after the menu exists: writes via NMS
 	}
 
-	/** Mirror the player's worn armor into slots 0-3. The speed cane (slot 8) is set separately via NMS. */
+	/** Armor into slots 0-3. The cane is set separately via NMS. */
 	private static void refresh(Player p, Inventory gui) {
 		for(int i = 0; i < 4; i++) {
 			ItemStack worn = getArmor(p, i);
@@ -78,9 +74,8 @@ public class Eq implements CommandExecutor, Listener {
 	}
 
 	/**
-	 * Write the speed cane into slot 8 via NMS. The cane's count is speed/10, since the client clamps a
-	 * stack count to max_stack_size (itself hard-capped at 99) - so a literal 3-digit speed can't be a
-	 * count. The exact speed stays on the tooltip. We raise MAX_STACK_SIZE so counts of 65..99 render.
+	 * Count is speed/10: the client clamps count to max_stack_size, hard-capped at 99. MAX_STACK_SIZE is raised
+	 * so 65-99 render.
 	 */
 	private static void applySpeedCane(Player p) {
 		ServerPlayer sp = ((CraftPlayer) p).getHandle();
@@ -105,16 +100,13 @@ public class Eq implements CommandExecutor, Listener {
 		return cane;
 	}
 
-	/** Player's current movement speed on the 100-based scale (100 = vanilla default), sprinting excluded. */
+	/** 100 = vanilla, sprinting excluded. */
 	private static int currentSpeed(Player p) {
 		var attr = p.getAttribute(Attribute.MOVEMENT_SPEED);
 		if(attr == null || attr.getBaseValue() == 0) return 100;
-		// Resolved here rather than via getValue() so IGNORED_SPEED_MODIFIERS can be skipped outright: sprinting
-		// is a transient +30% MULTIPLY_SCALAR_1 modifier vanilla puts on this same attribute, getValue() resolves
-		// it like any other, and that made a sprinting player read 30% high. The three passes mirror
-		// AttributeInstance.calculateValue (base + ADD_NUMBER, then ADD_SCALAR off that base, then each
-		// MULTIPLY_SCALAR_1); negatives are clamped like vanilla's sanitizeValue, whose floor here is 0.
-		double vanillaBase = attr.getBaseValue(); // the 100-point scale is relative to this, so keep it separate
+		// Not getValue(): sprinting is a +30% MULTIPLY_SCALAR_1 modifier and read 30% high. The three passes
+		// mirror AttributeInstance.calculateValue; floor 0 like sanitizeValue.
+		double vanillaBase = attr.getBaseValue(); // the 100 scale is relative to this
 		Collection<AttributeModifier> mods = attr.getModifiers();
 
 		double base = vanillaBase;
@@ -131,18 +123,17 @@ public class Eq implements CommandExecutor, Listener {
 		return (int) Math.round(Math.max(0, value) / vanillaBase * 100);
 	}
 
-	/** Whether a modifier belongs in op's pass of currentSpeed's sum. */
 	private static boolean counts(AttributeModifier mod, AttributeModifier.Operation op) {
 		return mod.getOperation() == op && !IGNORED_SPEED_MODIFIERS.contains(mod.getKey());
 	}
 
-	// =================== Click handling: swap armor from the player's inventory ===================
+	// =================== Click handling ===================
 
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
 		if(!(e.getView().getTopInventory().getHolder() instanceof EqHolder)) return;
-		e.setCancelled(true); // the GUI is fully controlled - only the armor swap below mutates anything
-		if(e.getClick() == ClickType.DOUBLE_CLICK) return;
+		if(Menus.ignoreDoubleClick(e)) return;
+		e.setCancelled(true); // only the armor swap below changes anything
 		if(!(e.getWhoClicked() instanceof Player p)) return;
 		Inventory clicked = e.getClickedInventory();
 		if(clicked == null || !clicked.equals(p.getInventory())) return; // only bottom-inventory clicks act
@@ -152,7 +143,7 @@ public class Eq implements CommandExecutor, Listener {
 		int idx = armorSlotIndex(item.getType());
 		if(idx < 0) return;
 
-		// A double-click fires several events in the same tick - perform at most one swap per player per tick.
+		// One swap per player per tick.
 		int now = MinecraftServer.currentTick;
 		if(lastSwapTick.getOrDefault(p.getUniqueId(), -1) == now) return;
 		lastSwapTick.put(p.getUniqueId(), now);
@@ -181,7 +172,7 @@ public class Eq implements CommandExecutor, Listener {
 
 	// =================== Armor helpers ===================
 
-	/** GUI/equipment slot for an armor material: 0 helmet, 1 chestplate, 2 leggings, 3 boots, else -1. */
+	/** 0 helmet, 1 chestplate, 2 leggings, 3 boots, else -1. */
 	private static int armorSlotIndex(Material m) {
 		String n = m.name();
 		if(n.endsWith("_HELMET") || m == Material.PLAYER_HEAD || m == Material.CARVED_PUMPKIN) return 0;
@@ -212,7 +203,7 @@ public class Eq implements CommandExecutor, Listener {
 		}
 	}
 
-	/** Marker holder identifying the /eq GUI in the click/drag handlers. */
+	/** Identifies the /eq GUI. */
 	public static final class EqHolder implements InventoryHolder {
 		private Inventory inv;
 		void setInventory(Inventory inv) { this.inv = inv; }

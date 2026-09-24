@@ -27,10 +27,9 @@ public class PlayerLoginHandler implements Listener {
 				<reset><red><bold>YOUTUBE: <reset><click:open_url:'https://www.youtube.com/@Stradivarius_Violin'><u>https://www.youtube.com/@Stradivarius_Violin</u></click>
 
 				<reset><yellow>Found a bug?  Have a suggestion?  Make a ticket in the Github or contact stradivariusviolin on Discord."""));
-		// The scoreboard-tag cooldowns are the ones that need clearing: a tag is saved in the player's own
-		// data and the task that would have removed it died with the server, so a restart leaves it stuck on.
-		// Cooldowns (the tick-timestamp map) is NOT cleared - it lives in memory and is empty after a restart
-		// anyway, so wiping it on join only ever handed a relogging player every ability off cooldown.
+		// Tag cooldowns need clearing: the tag is saved in player data and the task that removed it died with the
+		// server, so a restart leaves it stuck. Cooldowns (tick map) is NOT cleared: it's empty after a restart
+		// anyway, and wiping it on join just gave a relogging player every ability off cooldown.
 		p.removeScoreboardTag("AbilityCooldown");
 		p.removeScoreboardTag("TerminatorCooldown");
 		p.removeScoreboardTag("IceSprayed");

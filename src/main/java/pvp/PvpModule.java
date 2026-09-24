@@ -4,21 +4,19 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * Wires the (config-gated) PvP feature into SkyBlock: stats writer, duel manager, the damage/FFA
- * listener, and the /joinarena /leavearena /pvpstats /pvptop /duel /pvploadout commands. The combat
- * listener no-ops unless enabled; each command is only registered when its feature is on and otherwise
- * unregistered from the command map, so SkyBlock stays standalone and inert on non-pvp servers.
+ * Wires config-gated PvP: stats, duel manager, damage/FFA listener, /joinarena /leavearena /pvpstats /pvptop
+ * /duel /pvploadout. A command is registered only when its feature is on and unregistered otherwise, so
+ * SkyBlock stays inert off the pvp server.
  */
 public final class PvpModule {
 	private PvpModule() {}
 
-	/** The live loadout editor, held only so {@link #disable} can shut it down. Null with duels off. */
+	/** Held only so {@link #disable} can shut it down. Null with duels off. */
 	private static PvpLoadoutMenu loadoutMenu;
 
 	/**
-	 * Hand back the real inventory of anyone still inside the loadout editor. While one is open the editor IS the
-	 * player's inventory, so a shutdown that skipped this would leave them holding palette copies - i.e. their own
-	 * items gone. Called from the plugin's onDisable, before players are dropped.
+	 * Give back the real inventory of anyone still in the loadout editor, which IS their inventory while open;
+	 * skipping this leaves them with palette copies and their items gone. From onDisable, before players drop.
 	 */
 	public static void disable() {
 		if (loadoutMenu != null) loadoutMenu.restoreAll();
@@ -33,16 +31,13 @@ public final class PvpModule {
 		PvpListener listener = new PvpListener(cfg, stats, duels);
 		plugin.getServer().getPluginManager().registerEvents(listener, plugin);
 		listener.start(plugin);
-		// Layer the duel/FFA combat handling on top of SkyBlock's CustomDamage flow.
 		PvpHooks.install(listener);
 
-		// Only register the commands whose feature is actually on; unregister the rest so disabled modes
-		// don't clutter tab-complete / help with commands that would just print "disabled". plugin.yml
-		// declares them all, so the unused ones are actively removed from the command map here.
+		// Register only commands whose feature is on. plugin.yml declares them all, so the rest are removed from
+		// the command map to keep them out of tab-complete and help.
 		boolean ffa = cfg.ffaEnabled();
 		boolean duel = cfg.duelEnabled();
 
-		// FFA arena, only with FFA on.
 		if (ffa) {
 			JoinArenaCommand arena = new JoinArenaCommand(cfg, duels);
 			bind(plugin, "joinarena", arena);
@@ -51,8 +46,7 @@ public final class PvpModule {
 			unregister(plugin, "joinarena", "leavearena");
 		}
 
-		// Stats and leaderboard, only when at least one tracked mode is on (FFA kills or 1v1 wins).  /pvptop
-		// tab-completes just the enabled board(s) via StatsCommand's TabCompleter.
+		// Stats + leaderboard when FFA or duels is on. /pvptop tab-completes only enabled boards (StatsCommand).
 		if (ffa || duel) {
 			StatsCommand statsCmd = new StatsCommand(cfg);
 			bind(plugin, "pvpstats", statsCmd);
@@ -63,9 +57,7 @@ public final class PvpModule {
 			unregister(plugin, "pvpstats", "pvptop");
 		}
 
-		// Duels and loadout editor, only with 1v1 duels on.  Loadouts live wherever pvp.duel.loadouts-file
-
-		// points (own folder by default; the network's shared ~/data on a network pvp server).
+		// Duels + loadout editor. Loadouts at pvp.duel.loadouts-file (own folder by default, shared ~/data on network).
 		if (duel) {
 			DuelCommand duelCmd = new DuelCommand(duels);
 			bind(plugin, "duel", duelCmd);
@@ -80,9 +72,8 @@ public final class PvpModule {
 			unregister(plugin, "duel", "pvploadout");
 		}
 
-		// On the network's pvp server (pvp.duel.catalog-file set), export the duel item palette + default
-		// kit to the shared data folder so servers WITHOUT SkyBlock can offer the same items in their own
-		// /pvploadout editor. Skipped when unset, so a standalone server exports nothing.
+		// pvp.duel.catalog-file set (network pvp server): export palette + default kit to shared data so servers
+		// WITHOUT SkyBlock offer the same items in their /pvploadout. Unset = no export.
 		java.nio.file.Path catalogFile = cfg.catalogFile();
 		if (catalogFile != null) {
 			PvpCatalogExport.write(catalogFile, PvpLoadoutMenu.palette(), DuelKit.defaultLoadout(),
@@ -101,10 +92,8 @@ public final class PvpModule {
 	}
 
 	/**
-	 * Remove plugin.yml-declared commands from the command map for PvP features that are turned off, so they
-	 * don't show up in tab-complete / {@code /help} at all. plugin.yml registers every declared command
-	 * regardless of config, so the disabled ones have to be actively unregistered (both the bare label and
-	 * the {@code skyblock:} form). Same technique as {@code Plugin.releaseChatCommands}.
+	 * Unregister commands of disabled PvP features (bare label and {@code skyblock:} form); plugin.yml registers
+	 * all of them regardless of config. Same technique as {@code Plugin.releaseChatCommands}.
 	 */
 	private static void unregister(JavaPlugin plugin, String... names) {
 		try {

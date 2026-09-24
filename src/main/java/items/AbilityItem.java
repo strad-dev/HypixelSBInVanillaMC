@@ -16,22 +16,14 @@ public interface AbilityItem extends CustomItem {
 
 	int manaCost();
 
-	/**
-	 * What the specific stack costs to fire. Only the Manhunt Hyperion overrides this - its cost is the rung
-	 * the stack sits on - so the ability dispatcher asks this rather than {@link #manaCost()}.
-	 */
+	/** Per-stack cost; the dispatcher calls this. Only the Manhunt Hyperion overrides it (cost depends on rung). */
 	default int manaCost(ItemStack item) {
 		return manaCost();
 	}
 
 	/**
-	 * Whether a cast refused because the ability is still on cooldown should say NOTHING - no chat line, no
-	 * sound. Default false: a player who pressed the button is owed an explanation for nothing happening.
-	 *
-	 * <p>True for a RAPID-FIRE ability, where the explanation is noise. The Terminator's Salvation is a left
-	 * click carrying a 0.8s cooldown, i.e. the attack button on a bow, so a player holding it down collected
-	 * a chat line every few ticks for the whole fight. A cooldown that short is its own feedback - the beam
-	 * visibly does not fire.
+	 * True = a cast refused by cooldown says nothing, no chat or sound. For rapid-fire abilities: Salvation is
+	 * left click with a 0.8s cooldown and spammed chat all fight.
 	 */
 	default boolean quietCooldown() {
 		return false;

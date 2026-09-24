@@ -8,10 +8,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Tick-timestamp ability cooldowns, ported from the M7 TAS plugin. Instead of adding a scoreboard tag
- * and scheduling a removal task per use, each (player, cooldownTag) records the server tick the ability
- * is next usable. Checks compare against {@link MinecraftServer#currentTick} (the same tick source M7
- * uses), so the remaining time is always known and no per-use scheduler task is needed.
+ * Tick-timestamp ability cooldowns, ported from M7 TAS. Each (player, tag) records the tick the ability is next
+ * usable, checked against {@link MinecraftServer#currentTick} (M7's tick source), instead of a scoreboard tag and a
+ * removal task per use. Remaining time is always known.
  */
 public final class Cooldowns {
 	private static final Map<UUID, Map<String, Integer>> NEXT_USABLE = new ConcurrentHashMap<>();

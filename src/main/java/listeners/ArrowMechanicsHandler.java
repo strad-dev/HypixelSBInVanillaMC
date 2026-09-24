@@ -23,8 +23,8 @@ public class ArrowMechanicsHandler implements Listener {
 		}
 	}
 
-	// 26.2: Bukkit's EntityKnockbackByEntityEvent is deprecated for removal. Paper's unified EntityKnockbackEvent
-	// delivers the by-entity case as EntityPushedByEntityAttackEvent, whose getPushedBy() replaces getSourceEntity().
+	// 26.2: EntityKnockbackByEntityEvent is deprecated for removal. Paper's EntityKnockbackEvent delivers the
+	// by-entity case as EntityPushedByEntityAttackEvent; getPushedBy() replaces getSourceEntity().
 	@EventHandler
 	public void onEntityKnockback(EntityKnockbackEvent e) {
 		if(e instanceof EntityPushedByEntityAttackEvent pushed
@@ -43,11 +43,9 @@ public class ArrowMechanicsHandler implements Listener {
 					arrow.remove();
 				}
 			} else {
-				// Phase Terminator arrows through falling blocks. Vanilla projectile targeting isn't limited to
-				// LivingEntity, so a FallingBlock is a legal arrow target - that turns a Gyrokinetic Wand's 64-block
-				// swarm into an arrow-proof wall, each block burning one of the arrow's 4 pierce levels. The blocks
-				// are invulnerable decoration so the hit does nothing anyway; cancelling before vanilla's onHitEntity
-				// runs keeps the pierce level intact.
+				// Phase Terminator arrows through falling blocks. A FallingBlock is a legal arrow target, so a
+				// Gyrokinetic Wand's 64-block swarm became an arrow-proof wall, each block burning one of 4 pierce
+				// levels. The blocks are invulnerable decoration anyway; cancelling before onHitEntity keeps pierce.
 				if(e.getHitEntity() instanceof FallingBlock && arrow.getScoreboardTags().contains("TerminatorArrow")) {
 					e.setCancelled(true);
 				}
@@ -85,10 +83,9 @@ public class ArrowMechanicsHandler implements Listener {
 
 					serverPlayer.setOnGround(false);
 					p.setVelocity(direction);
-					// Send the motion packet NOW instead of waiting for hurtMarked to be serviced on the
-					// player's next aiStep, and that deferral ships it a tick late (this fires in the windcharge's
-					// entity tick, after the player's own tick that frame), so the client integrates a tick late
-					// and the full first-tick rise is lost. Immediate send matches Hypixel (full 0.5 on tick 1).
+					// Send the motion packet NOW. Waiting for hurtMarked ships it on the player's next aiStep, a tick
+					// late (this fires in the windcharge's tick, after the player's), so the first-tick rise is lost.
+					// Immediate send matches Hypixel (full 0.5 on tick 1).
 					serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(serverPlayer));
 					serverPlayer.hurtMarked = false;
 				}

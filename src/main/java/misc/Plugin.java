@@ -53,8 +53,7 @@ public class Plugin extends JavaPlugin implements Listener {
 	public void onEnable() {
 		instance = this;
 
-		// PvP + chat config. When chat is disabled (e.g. on the strad.dev network), the hub plugin
-		// owns chat, so SkyBlock skips registering its own chat commands/listeners below.
+		// PvP + chat config. Chat disabled (strad.dev network) = the hub owns chat, so we skip our chat commands/listeners.
 		pvp.PvpConfig pvpCfg = new pvp.PvpConfig(this);
 		boolean chatEnabled = pvpCfg.chatEnabled();
 
@@ -74,9 +73,8 @@ public class Plugin extends JavaPlugin implements Listener {
 			Objects.requireNonNull(this.getCommand("say")).setExecutor(new Say());
 			Objects.requireNonNull(this.getCommand("me")).setExecutor(new Me());
 		} else {
-			// Chat is disabled (network hub owns whisper/chat). Our plugin.yml still REGISTERS these commands
-			// even though we set no executor, which shadows the hub's /w, /tell, /msg, /say, /me. Unregister
-			// ours so the hub's versions are reachable.
+			// Chat disabled: plugin.yml still REGISTERS these with no executor, shadowing the hub's /w, /tell, /msg,
+			// /say, /me. Unregister ours.
 			releaseChatCommands("w", "tell", "msg", "say", "me");
 		}
 
@@ -155,9 +153,8 @@ public class Plugin extends JavaPlugin implements Listener {
 	}
 
 	/**
-	 * Remove our own copies of the given commands from the command map. plugin.yml registers every declared
-	 * command whether or not we set an executor, so with chat disabled (on the network) our /w, /tell, /msg,
-	 * /say, /me would otherwise shadow the hub's. This releases them so the hub's versions are reachable.
+	 * Removes our copies of these commands from the command map. plugin.yml registers every declared command even
+	 * without an executor, so on the network our /w, /tell, /msg, /say, /me would shadow the hub's.
 	 */
 	private void releaseChatCommands(String... names) {
 		try {
@@ -224,12 +221,10 @@ public class Plugin extends JavaPlugin implements Listener {
 	private static void loadAdvancement(String name, String parent, String icon, String title, String description, String frame, boolean showToast, boolean announceToChat, float x, float y, String background) {
 		NamespacedKey key = new NamespacedKey(instance, name);
 
-		// loadAdvancement saves the json into world/datapacks/bukkit, and newer Paper builds load that
-		// datapack again at boot, so our advancements can already be in the registry before onEnable runs.
-		// removeAdvancement only deletes the json file, it never drops the live registry entry, so the old
-		// remove-then-reload made loadAdvancement throw "already exists" and took the whole plugin down.
-		// Keep whatever is already registered instead; the keys and the "requirement" criterion never change,
-		// so granting still works. Delete the datapack folder and restart to pick up edits made here.
+		// loadAdvancement saves json into world/datapacks/bukkit, which newer Paper loads at boot, so ours can be
+		// registered before onEnable. removeAdvancement only deletes the file, never the registry entry, so the old
+		// remove-then-reload threw "already exists" and took the plugin down. Keep what's registered; keys and the
+		// "requirement" criterion never change. Delete the datapack folder and restart to pick up edits here.
 		if(Bukkit.getAdvancement(key) != null) {
 			keptAdvancements++;
 			return;
@@ -318,18 +313,15 @@ public class Plugin extends JavaPlugin implements Listener {
 	}
 
 	/**
-	 * Ticks of regen each player has banked. Per-player because the rate is theirs: off a Manhunt it is one
-	 * point every 80 ticks for everybody, during one it is the Hyperion rung they have reached.
+	 * Regen ticks each player has banked. Per-player since the rate is theirs: 1 point per 80 ticks off a Manhunt,
+	 * their Hyperion rung's rate during one.
 	 */
 	private static final java.util.Map<java.util.UUID, Integer> intelTicks = new java.util.HashMap<>();
 
 	/**
-	 * Empties {@code p}'s mana <b>and the regen they had banked towards their next point</b>, which is the
-	 * only way to leave them with nothing in the tank: zeroing the score alone leaves the bank untouched, so
-	 * somebody 159 ticks into a 160-tick rate is paid a point on the very next tick.
-	 *
-	 * <p>Swallows a missing Intelligence objective: {@link #passiveIntel} already broadcasts about that
-	 * every tick, and this is never the place to find out.
+	 * Empties {@code p}'s mana <b>and their banked regen</b>. Zeroing the score alone leaves the bank, so someone 159
+	 * ticks into a 160-tick rate gets a point next tick. Swallows a missing Intelligence objective:
+	 * {@link #passiveIntel} already broadcasts about that every tick.
 	 */
 	public static void zeroIntelligence(Player p) {
 		intelTicks.put(p.getUniqueId(), 0);
@@ -341,15 +333,13 @@ public class Plugin extends JavaPlugin implements Listener {
 	}
 
 	/**
-	 * Passive intelligence regen, run <b>every tick</b> - each player banks a tick and is paid a point once
-	 * they have banked their own rate's worth. It used to run every 20 ticks with a 0-3 counter, i.e. one
-	 * point every 4 seconds for everyone, which cannot express a Manhunt's per-rung rates.
+	 * Passive intelligence regen, run <b>every tick</b>: each player banks a tick and is paid once they reach their
+	 * rate. Used to run every 20 ticks with a 0-3 counter (1 point / 4s for all), which can't do per-rung rates.
 	 */
 	public static void passiveIntel() {
 		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
 			try {
-				// Picking a Hyperion up is what raises a Manhunt intelligence ceiling, and it can happen
-				// any tick - crafted, looted off a body, pulled out of a chest.
+				// Picking up a Hyperion raises the Manhunt intelligence ceiling, and that can happen any tick.
 				manhunt.Manhunt.observe(p);
 
 				Score score = Plugin.getIntelligence(p);
@@ -358,8 +348,7 @@ public class Plugin extends JavaPlugin implements Listener {
 					score.setScore(max);
 				}
 
-				// No passive regen in the Free-For-All safe zone: mana has to be earned in the arena.
-				// Always false off the pvp server / with PvP disabled.
+				// No passive regen in the FFA safe zone: mana is earned in the arena. Always false off pvp / PvP disabled.
 				if(score.getScore() >= max || pvp.PvpHooks.inSafezone(p)) {
 					intelTicks.put(p.getUniqueId(), 0);
 				} else if(intelTicks.merge(p.getUniqueId(), 1, Integer::sum) >= manhunt.Manhunt.ticksPerMana(p)) {

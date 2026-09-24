@@ -20,16 +20,15 @@ import java.time.Duration;
 import java.util.*;
 
 /**
- * 1v1 duel lifecycle, layered on top of SkyBlock's CustomDamage system (it never registers its own
- * damage listener; CustomDamage drives it through {@link PvpHooks}). Handles invites, the
- * network-facing force-pair, arena placement + countdown, win-on-(would-be-)death without a death
- * screen, intelligence swapping, stats, and returning both players to their pre-duel location.
+ * 1v1 duel lifecycle on top of CustomDamage (no damage listener of its own; driven through {@link PvpHooks}).
+ * Invites, network force-pair, arena + countdown, win on would-be death with no death screen, intelligence
+ * swap, stats, return home.
  */
 public class DuelManager {
-	// Resistance V makes a player fully immune under CustomDamage (it reduces damage by 20% per level).
+	// Resistance V = fully immune under CustomDamage (20% per level).
 	private static final int MAX_RESISTANCE = 4;
 	private static final int RETURN_DELAY_TICKS = 100;  // 5s
-	private static final long INVITE_TIMEOUT_TICKS = 1200L; // 60s before a duel request expires
+	private static final long INVITE_TIMEOUT_TICKS = 1200L; // 60s
 
 	private final JavaPlugin plugin;
 	private final PvpConfig cfg;
@@ -40,12 +39,10 @@ public class DuelManager {
 	private final Map<UUID, UUID> invites = new HashMap<>();         // target -> inviter
 	private final Map<UUID, Integer> inviteTokens = new HashMap<>(); // target -> token, so a stale timeout can't cancel a newer request
 	private int inviteCounter = 0;
-	// Players who disconnected mid-duel: the return-home teleport (5s later) skips them while offline, so
-	// move them out of the arena to a safe spot on their next join instead.
+	// Quit mid-duel: return-home (5s later) skips offline players, so move them out on next join instead.
 	private final Set<UUID> strandedInArena = new HashSet<>();
-	// Single arena: at most one duel runs at a time. Pairs that accept while it's busy wait here (FIFO)
-	// and start automatically when it frees. arenaOccupied stays true through the post-match grace period
-	// (until both fighters have been returned home), so the next pair never spawns on top of them.
+	// Single arena, one duel at a time. Pairs accepting while busy wait here (FIFO). arenaOccupied stays true
+	// through the post-match grace (until both are sent home) so the next pair never spawns on top of them.
 	private final Deque<Queued> queue = new ArrayDeque<>();
 	private boolean arenaOccupied = false;
 
@@ -89,7 +86,7 @@ public class DuelManager {
 				Placeholder.unparsed("s", from.getName())));
 		from.sendMessage(Utils.msg("<green>Challenge sent to <white><t></white>  <gray>Click <click:run_command:'/duel cancel'><red><u>here</u></red></click> to cancel",
 				Placeholder.unparsed("t", to.getName())));
-		// Expire the request after 60s if it's still the active one for this target.
+		// Expire after 60s if still the active request for this target.
 		UUID fromId = from.getUniqueId();
 		String fromName = from.getName(), toName = to.getName();
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -115,7 +112,7 @@ public class DuelManager {
 		start(from, target);
 	}
 
-	/** The receiver declines a pending duel request. */
+	/** Receiver declines a pending request. */
 	public void decline(Player target) {
 		UUID inv = invites.remove(target.getUniqueId());
 		inviteTokens.remove(target.getUniqueId());
@@ -128,7 +125,7 @@ public class DuelManager {
 		if (from != null) from.sendMessage(Utils.msg("<red><white><t></white> declined your duel request", Placeholder.unparsed("t", target.getName())));
 	}
 
-	/** The sender cancels their outgoing duel request. */
+	/** Sender cancels their outgoing request. */
 	public void cancel(Player sender) {
 		UUID senderId = sender.getUniqueId();
 		UUID targetId = null;
@@ -150,14 +147,10 @@ public class DuelManager {
 	}
 
 	/**
-	 * Clear every duel state a player is in: an ACTIVE duel ends as a draw, a queued pair is dropped, and
-	 * any request they sent or received is cancelled. Returns true if there was anything to clear.
-	 *
-	 * <p>A draw and not a forfeit on purpose - neither fighter chose to stop, so neither should take a loss
-	 * for it. Reached by console/op through {@code /duel forceclear <player>}, which the network plugin uses
-	 * before force-pairing someone who's already busy; harmless standalone (it's just an admin tool).
-	 * The arena stays occupied for the usual grace period, so a pair force-started right after simply waits
-	 * in the queue and is pumped in when it frees.
+	 * Clear every duel state: ACTIVE duel ends as a draw, queued pair dropped, requests sent/received cancelled.
+	 * True if anything was cleared. Draw, not forfeit: neither fighter chose to stop. Reached via
+	 * {@code /duel forceclear <player>}, which the network uses before force-pairing a busy player. Arena stays
+	 * occupied for the grace period, so a pair force-started right after waits in the queue.
 	 */
 	public boolean forceClear(Player p) {
 		UUID id = p.getUniqueId();
@@ -176,7 +169,7 @@ public class DuelManager {
 		return true;
 	}
 
-	/** Drop the request this player is waiting on and any they sent, telling the other side. */
+	/** Drop requests they received or sent, telling the other side. */
 	private boolean clearInvites(UUID id) {
 		boolean any = false;
 		UUID inviter = invites.remove(id);
@@ -216,8 +209,7 @@ public class DuelManager {
 			a.sendMessage(Utils.msg("<red>The duel arena isn't configured yet"));
 			return;
 		}
-		// Single arena: if a duel is in progress (or still clearing out), queue this pair instead of
-		// spawning them on top of the current fight. They start automatically when the arena frees.
+		// Arena busy (or still clearing out): queue this pair; they start when it frees.
 		if (arenaOccupied) {
 			queue.addLast(new Queued(a.getUniqueId(), b.getUniqueId()));
 			Component msg = Utils.msg("<yellow>The duel arena is busy - you're <white>#<n></white> in the queue. You'll be sent in automatically when it's free.  <gray><click:run_command:'/duel leave'>(<red><u>leave queue</u></red>)</click>",
@@ -229,7 +221,7 @@ public class DuelManager {
 		begin(a, b);
 	}
 
-	/** Place a pair into the (now free) arena and run the countdown. */
+	/** Place a pair in the free arena and run the countdown. */
 	private void begin(Player a, Player b) {
 		Location sa = cfg.duelSpawn(0);
 		Location sb = cfg.duelSpawn(1);
@@ -239,44 +231,39 @@ public class DuelManager {
 		}
 		arenaOccupied = true;
 		Duel d = new Duel(a.getUniqueId(), b.getUniqueId(), a.getLocation().clone(), b.getLocation().clone());
-		// Stash each player's real intelligence, hunger and saturation so the duel can run everyone at
-		// fixed values and restore the originals when it ends.
+		// Stash real intelligence, hunger, saturation: the duel runs fixed values and restores these at the end.
 		d.intelA = readIntelligence(a);
 		d.intelB = readIntelligence(b);
 		d.foodA = a.getFoodLevel();
 		d.foodB = b.getFoodLevel();
 		d.satA = a.getSaturation();
 		d.satB = b.getSaturation();
-		// Save the real inventories so the standardized kit can replace them and be restored at the end.
 		d.invA = cloneContents(a.getInventory().getContents());
 		d.invB = cloneContents(b.getInventory().getContents());
-		// Save each player's real potion effects; they're wiped at FIGHT and restored when the duel ends.
+		// Effects are wiped at FIGHT, restored at end.
 		d.effA = new ArrayList<>(a.getActivePotionEffects());
 		d.effB = new ArrayList<>(b.getActivePotionEffects());
-		// Save game modes; both players fight in Adventure and are restored to their originals at the end.
 		d.gmA = a.getGameMode();
 		d.gmB = b.getGameMode();
 		byPlayer.put(a.getUniqueId(), d);
 		byPlayer.put(b.getUniqueId(), d);
 		prepare(a, sa);
 		prepare(b, sb);
-		// Intelligence, saturation, and the corner snap all happen when the countdown ends (see snapToCorner).
+		// Intelligence, saturation and corner snap happen when the countdown ends (snapToCorner).
 		runCountdown(d, a.getUniqueId(), b.getUniqueId());
 	}
 
 	private void prepare(Player p, Location spawn) {
 		p.teleport(spawn);
-		p.setGameMode(GameMode.ADVENTURE); // duels are fought in Adventure; restored in finishPlayer
+		p.setGameMode(GameMode.ADVENTURE); // restored in finishPlayer
 		healFull(p);
 		p.setFoodLevel(20);
-		// Use the player's saved PvP loadout if they have one; otherwise the standardized kit. (Their real
-		// inventory was saved in start() and is restored when the duel ends.) The saved copy is refreshed
-		// against the current item definitions first, so a loadout saved before an item change doesn't
-		// bring stale items into the duel.
+		// Saved loadout if any, else the default kit. Refreshed against current item definitions first so a loadout
+		// saved before an item change brings no stale items.
 		ItemStack[] saved = PvpItemRefresh.refreshSaved(loadouts, p.getUniqueId()).arr();
 		if (saved != null) PvpLoadouts.apply(p, saved);
 		else DuelKit.apply(p);
-		// Players may walk around during the countdown; max Resistance keeps them invulnerable until FIGHT.
+		// Free to walk during countdown; max Resistance keeps them invulnerable until FIGHT.
 		p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, (cfg.duelCountdown() + 2) * 20, MAX_RESISTANCE, false, false));
 	}
 
@@ -303,8 +290,7 @@ public class DuelManager {
 				}
 				left[0]--;
 			} else {
-				// Movement was free during the countdown, so snap both back to their corners, drop the
-				// immunity, top them off, and start.
+				// Snap back to corners, drop immunity, top off, start.
 				d.armed = true;
 				snapToCorner(a, cfg.duelSpawn(0));
 				snapToCorner(b, cfg.duelSpawn(1));
@@ -323,12 +309,10 @@ public class DuelManager {
 
 	private void snapToCorner(Player p, Location corner) {
 		if (corner != null) p.teleport(corner);
-		// Battle start: wipe every effect (the countdown Resistance + anything the player walked in with) so
-		// both fight on a clean slate. Their pre-duel effects are restored when the duel ends.
+		// Wipe every effect (countdown Resistance + whatever they walked in with). Pre-duel effects come back at end.
 		for (PotionEffect eff : new ArrayList<>(p.getActivePotionEffects())) p.removePotionEffect(eff.getType());
 		healFull(p);
-		// Fixed combat state, applied when the countdown ends: hunger always full, configurable
-		// saturation and intelligence.
+		// Fixed state: full hunger, configured saturation and intelligence.
 		p.setFoodLevel(20);
 		p.setSaturation((float) cfg.duelSaturation());
 		setIntelligence(p, cfg.duelIntelligence());
@@ -341,8 +325,8 @@ public class DuelManager {
 	}
 
 	/**
-	 * Remove a waiting pair containing {@code id} (they quit or left the queue) and tell their partner.
-	 * Returns true if an entry was removed. A player who is actually dueling is left untouched.
+	 * Remove the waiting pair containing {@code id} and tell their partner. True if removed. A player
+	 * actually dueling is untouched.
 	 */
 	private boolean removeFromQueue(UUID id) {
 		Iterator<Queued> it = queue.iterator();
@@ -359,7 +343,7 @@ public class DuelManager {
 		return false;
 	}
 
-	/** Arena just cleared: start the next still-valid queued pair, skipping any who went offline. */
+	/** Arena cleared: start the next queued pair, skipping offline ones. */
 	private void pumpQueue() {
 		while (!queue.isEmpty()) {
 			Queued q = queue.pollFirst();
@@ -380,7 +364,7 @@ public class DuelManager {
 		}
 	}
 
-	/** Re-tell each still-waiting pair their current position (positions shift as duels start / people leave). */
+	/** Re-tell each waiting pair their queue position. */
 	private void announcePositions() {
 		int pos = 0;
 		for (Queued q : queue) {
@@ -393,7 +377,7 @@ public class DuelManager {
 		}
 	}
 
-	/** A lethal blow landed on the loser; CustomDamage skips the kill and we end the duel here. */
+	/** Lethal blow on the loser; CustomDamage skips the kill and the duel ends here. */
 	public void handleDeath(Player loser) {
 		Duel d = byPlayer.get(loser.getUniqueId());
 		if (d == null) return;
@@ -401,20 +385,18 @@ public class DuelManager {
 	}
 
 	public void handleQuit(Player p) {
-		if (removeFromQueue(p.getUniqueId())) return; // was only waiting in the queue, not fighting
+		if (removeFromQueue(p.getUniqueId())) return; // only queued, not fighting
 		Duel d = byPlayer.get(p.getUniqueId());
 		if (d == null) return;
-		// Disconnecting forfeits: the opponent wins, and we restore the quitter's inventory/intel/food
-		// (via finishPlayer in end()) before they fully leave so their real state is saved.
+		// Quitting forfeits. finishPlayer restores the quitter's inventory/intel/food before they leave so their
+		// real state is what gets saved.
 		end(d, Bukkit.getPlayer(d.other(p.getUniqueId())), p, true);
-		strandedInArena.add(p.getUniqueId()); // move them out of the arena on their next join
+		strandedInArena.add(p.getUniqueId());
 	}
 
 	/**
-	 * If this player disconnected mid-duel, move them out of the arena to a safe spot on rejoin (the FFA
-	 * safezone, else the world spawn). Their duel was already ended/forfeited and their inventory restored
-	 * when they quit; this just gets them out of the (otherwise sealed) arena. Network servers send the
-	 * player to the lobby on reconnect anyway, so this only matters for a standalone / direct pvp relog.
+	 * Quit mid-duel: on rejoin move them out of the sealed arena (FFA safezone, else world spawn). Duel and
+	 * inventory were already handled on quit. Network sends them to the lobby anyway, so standalone only.
 	 */
 	public void restoreOnJoin(Player p) {
 		if (!strandedInArena.remove(p.getUniqueId())) return;
@@ -423,7 +405,7 @@ public class DuelManager {
 		p.teleport(safe);
 	}
 
-	/** A player leaves their duel via /duel leave - they forfeit and the opponent wins. */
+	/** /duel leave: forfeit. */
 	public boolean leave(Player p) {
 		if (removeFromQueue(p.getUniqueId())) {
 			p.sendMessage(Utils.msg("<yellow>You left the duel queue"));
@@ -438,7 +420,7 @@ public class DuelManager {
 		return true;
 	}
 
-	/** A /kill (or other absolute death) during a 1v1 ends it as a draw - no win/loss recorded. */
+	/** /kill (or other absolute death) mid-duel = draw, no win/loss. */
 	public void draw(Player who) {
 		Duel d = byPlayer.get(who.getUniqueId());
 		if (d == null) return;
@@ -449,13 +431,12 @@ public class DuelManager {
 		byPlayer.remove(d.a);
 		byPlayer.remove(d.b);
 
-		// Capture the winner's remaining health BEFORE finishPlayer heals them, to show the loser.
+		// Winner's health BEFORE finishPlayer heals them, to show the loser.
 		double winnerHealth = winner != null ? winner.getHealth() + winner.getAbsorptionAmount() : 0;
 
 		if (winner != null && loser != null && stats != null) stats.recordDuel(winner, loser);
 
-		// Heal both immediately (the loser never sees a death screen) and restore their real
-		// intelligence. They stay invulnerable for the grace period before being sent home.
+		// Heal both now (no death screen) and restore intelligence. Invulnerable during grace before going home.
 		finishPlayer(winner, d);
 		finishPlayer(loser, d);
 
@@ -486,7 +467,7 @@ public class DuelManager {
 		scheduleReturnHome(d);
 	}
 
-	/** Ends the duel as a draw (e.g. a /kill): both players finish, no win/loss recorded. */
+	/** Draw: both finish, no win/loss. */
 	private void drawEnd(Duel d) {
 		byPlayer.remove(d.a);
 		byPlayer.remove(d.b);
@@ -505,7 +486,7 @@ public class DuelManager {
 		scheduleReturnHome(d);
 	}
 
-	/** Returns both players to their pre-duel location 5s after the match ends. */
+	/** Both back to their pre-duel location 5s after the match. */
 	private void scheduleReturnHome(Duel d) {
 		final UUID aId = d.a, bId = d.b;
 		final Location prevA = d.prevA, prevB = d.prevB;
@@ -514,12 +495,10 @@ public class DuelManager {
 			Player b = Bukkit.getPlayer(bId);
 			returnHome(a, prevA);
 			returnHome(b, prevB);
-			// Announce the duel end as a plain Bukkit event.  SkyBlock depends on nothing external, so this
-			// fires into the void when nothing listens (so it stays standalone), and an optional glue plugin
-			// may listen to send players who came from another server back home (its transfer makes the local
-			// returnHome above a harmless no-op for them).
+			// Plain Bukkit event, so SkyBlock stays standalone. A glue plugin may listen to send players from another
+			// server back (its transfer makes returnHome above a no-op for them).
 			Bukkit.getPluginManager().callEvent(new DuelEndEvent(a, b));
-			// Arena is now empty - free it and pull in the next queued pair, if any.
+			// Arena empty: free it, pull in the next queued pair.
 			arenaOccupied = false;
 			pumpQueue();
 		}, RETURN_DELAY_TICKS);
@@ -534,7 +513,7 @@ public class DuelManager {
 		restoreInventory(p, d);
 		restoreGameMode(p, d);
 		restoreEffects(p, d);
-		// Invulnerable during the 5s grace so neither player can be re-hit before returning home.
+		// Invulnerable during the 5s grace so neither is re-hit before going home.
 		p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, RETURN_DELAY_TICKS + 20, MAX_RESISTANCE, false, false));
 	}
 
@@ -567,7 +546,7 @@ public class DuelManager {
 		if (gm != null) p.setGameMode(gm);
 	}
 
-	/** Wipe any effects gained during the duel, then re-apply the player's saved pre-duel potion effects. */
+	/** Wipe duel effects, re-apply saved pre-duel ones. */
 	private void restoreEffects(Player p, Duel d) {
 		Collection<PotionEffect> saved = d.a.equals(p.getUniqueId()) ? d.effA : d.effB;
 		for (PotionEffect e : new ArrayList<>(p.getActivePotionEffects())) p.removePotionEffect(e.getType());
@@ -575,10 +554,8 @@ public class DuelManager {
 	}
 
 	/**
-	 * Accumulates a landed hit's damage for the end-of-match summary. {@code hits} counts every
-	 * connect (including those negated by the victim's i-frames); {@code iframes} counts only the
-	 * negated ones, so effective landed hits = hits - iframes. Crits only count when the hit actually
-	 * landed (not negated by i-frames).
+	 * Hit for the match summary. {@code hits} counts every connect including i-framed ones; {@code iframes}
+	 * counts only those, so landed = hits - iframes. Crits count only if not i-framed.
 	 */
 	public void recordHit(Player attacker, Player victim, double damage, boolean crit, boolean iframe) {
 		Duel d = byPlayer.get(attacker.getUniqueId());
@@ -596,7 +573,7 @@ public class DuelManager {
 		}
 	}
 
-	/** Accumulates intelligence (mana) spent on an ability for the end-of-match summary. */
+	/** Mana spent on an ability, for the match summary. */
 	public void recordMana(Player p, int amount) {
 		Duel d = byPlayer.get(p.getUniqueId());
 		if (d == null) return;
@@ -604,7 +581,7 @@ public class DuelManager {
 		else if (d.b.equals(p.getUniqueId())) d.manaUsedB += amount;
 	}
 
-	/** A swing/shot - counts toward hit-accuracy (landed hits / attempts). */
+	/** Swing/shot, for accuracy (landed / attempts). */
 	public void recordAttempt(Player p) {
 		Duel d = byPlayer.get(p.getUniqueId());
 		if (d == null || !d.armed) return;
@@ -632,7 +609,6 @@ public class DuelManager {
 		if (prev != null) p.teleport(prev);
 	}
 
-	/** Sends both players a summary of the match they just fought. */
 	private void printMatchStats(Duel d, Player one, Player two) {
 		Component summary = Utils.msg("""
 				<gray><st>                                                  </st>
@@ -685,7 +661,7 @@ public class DuelManager {
 		try {
 			return Plugin.getIntelligence(p).getScore();
 		} catch (Exception e) {
-			return -1;  // objective missing; nothing to restore
+			return -1;  // objective missing
 		}
 	}
 
@@ -717,7 +693,7 @@ public class DuelManager {
 		if (attr != null) p.setHealth(attr.getValue());
 	}
 
-	/** A pair waiting for the arena to free up. */
+	/** Pair waiting for the arena. */
 	private static final class Queued {
 		final UUID a, b;
 		Queued(UUID a, UUID b) {
@@ -732,17 +708,17 @@ public class DuelManager {
 		int intelA = -1, intelB = -1;
 		int foodA = 20, foodB = 20;
 		float satA, satB;
-		GameMode gmA, gmB;          // saved real game mode (restored when the duel ends)
-		ItemStack[] invA, invB;     // saved real inventory (restored when the duel ends)
-		Collection<PotionEffect> effA, effB; // saved real potion effects (wiped at FIGHT, restored at end)
-		double dmgA, dmgB;          // damage dealt by each player this match
-		int hitsA, hitsB;           // hits landed by each player this match
+		GameMode gmA, gmB;          // saved real game mode
+		ItemStack[] invA, invB;     // saved real inventory
+		Collection<PotionEffect> effA, effB; // saved real effects
+		double dmgA, dmgB;          // damage dealt
+		int hitsA, hitsB;           // hits landed
 		int attemptsA, attemptsB;   // hit attempts (melee swings + bow shots)
-		double healedA, healedB;    // health regained this match
-		int foodEatenA, foodEatenB; // food items consumed this match
-		int critsA, critsB;         // critical hits landed this match
-		int iframesA, iframesB;     // hits landed during the victim's invulnerability frames this match
-		int manaUsedA, manaUsedB;   // intelligence (mana) spent on abilities this match
+		double healedA, healedB;    // health regained
+		int foodEatenA, foodEatenB; // food eaten
+		int critsA, critsB;         // crits landed
+		int iframesA, iframesB;     // hits into the victim's i-frames
+		int manaUsedA, manaUsedB;   // mana spent on abilities
 		boolean armed;
 
 		Duel(UUID a, UUID b, Location prevA, Location prevB) {

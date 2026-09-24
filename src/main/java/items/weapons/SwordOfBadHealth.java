@@ -26,25 +26,20 @@ import java.util.Map;
 public class SwordOfBadHealth implements AbilityItem {
 	private static final String COOLDOWN_TAG = "BadHealthCooldown";
 	private static final int COOLDOWN = 100;
-	/** What the ability costs and what it buys. The cost is a SHARE of max health, not a flat figure, so
-	 *  it keeps hurting a player whose health pool has grown. <b>{@code DAMAGE_BONUS} is read by
-	 *  {@link CustomDamage#calculateFinalDamage} and all three are quoted by the lore.</b> */
+	/** Cost is a share of max health so it scales with a bigger pool. {@code DAMAGE_BONUS} is read by
+	 *  {@link CustomDamage#calculateFinalDamage}; all three are quoted by the lore. */
 	public static final double HEALTH_SHARE = 0.10;
 	public static final double DAMAGE_BONUS = 1.1;
 	public static final long BUFF_TICKS = 100L;
 
-	/** This weapon's own attack damage, before any enchantment. Quoted on the lore line. */
+	/** Before enchants. Quoted on the lore. */
 	private static final double BASE_DAMAGE = 1;
 
 	public static ItemStack getItem() {
 		return getItem(Map.of());
 	}
 
-	/**
-	 * The item, carrying {@code enchants} and with lore that says so. <b>The enchantments go on here rather
-	 * than being applied by the caller afterwards</b> - that was the desync: the caller built the item, got
-	 * lore for whatever it named, and then enchanted the stack by material type.
-	 */
+	/** Enchants go on here, not by the caller after; that was the lore desync. */
 	public static ItemStack getItem(Map<Enchantment, Integer> enchants) {
 		ItemStack swordOfBadHealth = new ItemStack(Material.WOODEN_SWORD);
 
@@ -86,8 +81,7 @@ public class SwordOfBadHealth implements AbilityItem {
 
 	@Override
 	public boolean onRightClick(Player p) {
-		// A SHARE of max health, not the flat 2 this used to take: the lore always claimed 10%, and a flat
-		// 2 was only ever that for a player on the vanilla 20.  Absolute damage, so armour cannot soak it.
+		// Was a flat 2, which is only 10% on 20 max health. Absolute damage, so armour can't soak it.
 		double cost = p.getAttribute(Attribute.MAX_HEALTH).getValue() * HEALTH_SHARE;
 		if(p.getHealth() > cost) {
 			CustomDamage.calculateFinalDamage(p, p, cost, DamageType.ABSOLUTE);

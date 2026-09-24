@@ -28,13 +28,9 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Minecraft Manhunt: a handful of Speedrunners running the game while everybody else hunts them. Off unless
- * {@code manhunt: true} in the config, at which point {@code /manhunt} appears and the intelligence rules
- * below take over.
- *
- * <p>The teams, the match flag and the intelligence ceilings are kept in {@code manhunt.json} in the plugin
- * folder, so nobody loses their side by dropping out: a Speedrunner who disconnects - or who is thrown off by
- * a restart mid-match - is still a Speedrunner when they come back, and still on the rung they had reached.
+ * Manhunt: a few Speedrunners beat the game while everyone else hunts them. Off unless {@code manhunt: true}.
+ * Teams, match flag and ceilings persist in {@code manhunt.json}, so a disconnect or restart mid-match keeps
+ * a player's side and rung.
  */
 public final class Manhunt {
 	private Manhunt() {}
@@ -42,40 +38,28 @@ public final class Manhunt {
 	private static boolean enabled;
 	private static boolean started;
 
-	/**
-	 * The Speedrunners, in the order they were added - <b>the order is load-bearing</b>: a Manhunt Compass
-	 * stores an index into this list, so Change Target walks it in a fixed order.
-	 */
+	/** In add order. Order is load-bearing: a compass stores an index into this list. */
 	private static final List<UUID> SPEEDRUNNERS = new ArrayList<>();
 
-	/** Last seen name per Speedrunner, so the teams list and compass lore read properly for offline ones. */
+	/** Last seen name per Speedrunner, for the teams list and compass lore while they're offline. */
 	private static final Map<UUID, String> NAMES = new LinkedHashMap<>();
 
 	/**
-	 * Highest rung each player has held a Hyperion of this match, which is what their intelligence ceiling
-	 * and regen rate are read off. It only ever goes <b>up</b> - upgrade and the ceiling stays there even if
-	 * the sword is lost - until they die, when the whole entry goes and they are back on the Stick's numbers.
-	 * Recovering a Hyperion off a body raises it again, but nothing here ever hands mana back.
+	 * Highest Hyperion rung each player has held this match; sets their intelligence cap and regen. Only goes
+	 * up, even if the sword is lost, until death drops them back to the Stick. Never refunds mana.
 	 */
 	private static final Map<UUID, Integer> CEILINGS = new HashMap<>();
 
-	/**
-	 * Everybody who has already been handed a kit this match. A rejoin is <b>not</b> a fresh kit: without
-	 * this, stashing a Hyperion in an ender chest (or handing it to somebody) and relogging paid out another
-	 * bottom-rung one, and another compass, as often as a player cared to do it.
-	 */
+	/** Kitted this match. Without it, stashing a Hyperion and relogging printed a new kit every time. */
 	private static final Set<UUID> KITTED = new HashSet<>();
 
-	/**
-	 * Every world's {@code locatorBar} gamerule as it was when the match started, keyed on world NAME so it
-	 * can be put back after a restart mid-match. Empty outside a match.
-	 */
+	/** Each world's {@code locatorBar} at match start, keyed on world name so it survives a restart. */
 	private static final Map<String, Boolean> LOCATOR_BARS = new LinkedHashMap<>();
 
-	/** The rung above Netherite: a real Hyperion, which has no {@link ManhuntTier} of its own. */
+	/** Rung above Netherite: a real Hyperion, which has no {@link ManhuntTier}. */
 	public static final int FULL_RUNG = ManhuntTier.values().length;
 
-	/** Where the three maps above are kept between sittings. Null until {@link #load} - so, while off, never. */
+	/** Null until {@link #load}, so always null while Manhunt is off. */
 	private static Path file;
 
 	public static void setEnabled(boolean on) {
@@ -83,12 +67,8 @@ public final class Manhunt {
 	}
 
 	/**
-	 * Reads the teams, the match flag and the ceilings back off disk, and from here on writes them out again
-	 * on every change. Run once from {@link ManhuntModule#enable}, before anybody can have joined.
-	 *
-	 * <p>Nothing else needs a hook for a rejoin: the roster is keyed on UUID, so surviving the restart is the
-	 * whole of it - {@code equip} on join then sees a Speedrunner and hands out no compass, and
-	 * {@link #maxIntelligence} finds their rung where they left it.
+	 * Loads state from disk; saved again on every change. Run once from {@link ManhuntModule#enable} before
+	 * anyone joins. Roster is keyed on UUID, so a rejoin needs no extra hook.
 	 */
 	static void load(JavaPlugin plugin) {
 		file = plugin.getDataFolder().toPath().resolve("manhunt.json");
@@ -100,7 +80,7 @@ public final class Manhunt {
 		NAMES.clear();
 		CEILINGS.clear();
 		KITTED.clear();
-		// A list, not a set, and walked in order: a compass stores an index into it.
+		// List, walked in order: a compass stores an index into it.
 		if(state.speedrunners != null) {
 			for(String id : state.speedrunners) {
 				UUID uuid = parse(id);
@@ -125,23 +105,17 @@ public final class Manhunt {
 				if(uuid != null) KITTED.add(uuid);
 			}
 		}
-		// Keyed on world name rather than UUID, so these come back verbatim.
 		LOCATOR_BARS.clear();
 		if(state.locatorBars != null) LOCATOR_BARS.putAll(state.locatorBars);
-		// Restarting mid-match must not hand the Hunters the bar back. The gamerule is in level.dat and so
-		// is already off, but this also covers a world that was not around when the match started.
-		// save() because hideLocatorBar may have picked up a world the file has never seen; without it a
-		// second restart would have nothing to put that one back to.
+		// Gamerule is already off in level.dat, but this covers a world that wasn't loaded at match start.
+		// save() so a second restart can restore that new world too.
 		if(started) {
 			hideLocatorBar();
 			save();
 		}
 	}
 
-	/**
-	 * Writes the lot out. Called on every change to the teams, the match flag or a ceiling - all of them
-	 * rare, so there is nothing to batch: a ceiling moves on an upgrade or a death, not on the tick loop.
-	 */
+	/** Called on every change. All rare (a ceiling moves on upgrade or death), so no batching. */
 	private static void save() {
 		if(file == null) return;
 		State state = new State();
@@ -175,7 +149,7 @@ public final class Manhunt {
 		}
 	}
 
-	/** The file's shape. Gson fills these by name, so anything the file is missing simply stays null. */
+	/** File shape. Gson fills by name; anything missing stays null. */
 	private static final class State {
 		boolean started;
 		List<String> speedrunners;
@@ -194,10 +168,8 @@ public final class Manhunt {
 	}
 
 	/**
-	 * Whether the Manhunt rules are in force right now. <b>Not the same as {@link #enabled()}</b>: with
-	 * {@code manhunt: true} the command, the items and the upgrade recipes all exist, but the intelligence
-	 * rules and the players-only mana rule only apply between {@code /manhunt start} and
-	 * {@code /manhunt reset}. Outside a match everybody is back on the standard 80 ticks and 2500.
+	 * Not the same as {@link #enabled()}: enabled gives the command, items and recipes, but the mana rules only
+	 * apply between {@code /manhunt start} and {@code reset}. Outside a match it's the standard 80 ticks and 2500.
 	 */
 	public static boolean active() {
 		return enabled && started;
@@ -213,16 +185,11 @@ public final class Manhunt {
 		return SPEEDRUNNERS.contains(p.getUniqueId());
 	}
 
-	/**
-	 * Whether these two are on opposite sides of the Manhunt. Hunters are defined as everyone who is not a
-	 * Speedrunner, so a team is one boolean and this is one comparison rather than a roster lookup - which
-	 * also means it answers correctly for a player who joined mid-match and was never assigned anything.
-	 */
+	/** Hunters are everyone not a Speedrunner, so this also works for a late joiner never assigned a team. */
 	public static boolean opposingTeams(Player a, Player b) {
 		return isSpeedrunner(a) != isSpeedrunner(b);
 	}
 
-	/** Everyone online who is not a Speedrunner. Hunters are the default, so this is a subtraction. */
 	public static List<Player> onlineHunters() {
 		List<Player> out = new ArrayList<>();
 		for(Player p : Bukkit.getOnlinePlayers()) {
@@ -240,34 +207,25 @@ public final class Manhunt {
 		return out;
 	}
 
-	/**
-	 * Wraps a compass's stored index into the list. Wrapping rather than rejecting, because taking somebody
-	 * off the Speedrunner team shortens the list under every compass already pointed past them - they should
-	 * fall back onto a real Speedrunner, not onto nobody.
-	 */
+	/** Wraps rather than rejects: removing a Speedrunner shortens the list under compasses pointed past them. */
 	private static int index(int i) {
 		return SPEEDRUNNERS.isEmpty() ? -1 : Math.floorMod(i, SPEEDRUNNERS.size());
 	}
 
-	/** The Speedrunner a compass pointed at index {@code i} is after, or null if they are not online. */
+	/** Null if offline. */
 	@Nullable
 	public static Player speedrunnerAt(int i) {
 		int at = index(i);
 		return at < 0 ? null : Bukkit.getPlayer(SPEEDRUNNERS.get(at));
 	}
 
-	/** A name for the Speedrunner at {@code i}, online or not, for lore and chat. */
+	/** Online or not, for lore and chat. */
 	public static String speedrunnerName(int i) {
 		int at = index(i);
 		return at < 0 ? "nobody" : NAMES.getOrDefault(SPEEDRUNNERS.get(at), "unknown");
 	}
 
-	/**
-	 * Puts {@code target} on the Speedrunner team. Mid-match they lose their compasses on the way across -
-	 * they are being hunted now, not hunting.
-	 *
-	 * @return false if they were already a Speedrunner
-	 */
+	/** Mid-match they lose their compasses. False if already a Speedrunner. */
 	public static boolean addSpeedrunner(OfflinePlayer target) {
 		if(SPEEDRUNNERS.contains(target.getUniqueId())) return false;
 		SPEEDRUNNERS.add(target.getUniqueId());
@@ -281,12 +239,7 @@ public final class Manhunt {
 		return true;
 	}
 
-	/**
-	 * Puts {@code target} back on the Hunter team, handing them a compass mid-match since they are hunting
-	 * again.
-	 *
-	 * @return false if they were not a Speedrunner
-	 */
+	/** Back to Hunter, with a compass mid-match. False if not a Speedrunner. */
 	public static boolean removeSpeedrunner(OfflinePlayer target) {
 		if(!SPEEDRUNNERS.remove(target.getUniqueId())) return false;
 		NAMES.remove(target.getUniqueId());
@@ -299,10 +252,7 @@ public final class Manhunt {
 		return true;
 	}
 
-	/**
-	 * Notes a Speedrunner's current name on the way in. The roster now outlives the server, so a name taken
-	 * down at {@code /manhunt speedrunner add} time can be any age by the time the teams list quotes it.
-	 */
+	/** Refreshes the name on join; the roster outlives restarts, so the stored one can be stale. */
 	public static void noteName(Player p) {
 		if(!isSpeedrunner(p)) return;
 		String previous = NAMES.put(p.getUniqueId(), p.getName());
@@ -312,20 +262,10 @@ public final class Manhunt {
 	// ---- match ----------------------------------------------------------------------------------------
 
 	/**
-	 * Hands everybody a Stick Manhunt Hyperion and every Hunter a compass, and puts every ceiling back on
-	 * the bottom rung - so a match always opens on 160 ticks and 250, whatever the last one ended on.
-	 *
-	 * <p><b>Everybody starts on nothing.</b> Mana is zeroed outright rather than left to
-	 * {@code Plugin.passiveIntel} to clamp: that only pulls a player down to the new 250 cap, so whoever
-	 * happened to be sitting on a full 2500 would open the match with 250 banked and everybody else with
-	 * whatever they walked in on. The banked regen ticks go with it, so nobody is paid a point on tick one.
-	 *
-	 * <p>The locator bar goes off in every dimension too - the whole game is the Hunters not knowing where
-	 * the Speedrunners are, and the bar hands them that for free. {@link #reset} puts it back.
-	 *
-	 * <p>Every piglin brute already loaded is swapped for a piglin here; the rest are caught as they spawn
-	 * or as their chunk loads. Unlike the locator bar this one does not come back - see
-	 * {@link ManhuntPiglins#demote}.
+	 * Everyone gets a Stick Hyperion, Hunters a compass, and every ceiling resets, so a match opens on 200
+	 * ticks and 250. Mana is zeroed (banked regen ticks too), not left to passiveIntel's clamp, which would let
+	 * anyone on 2500 start with 250. Locator bar goes off everywhere ({@link #reset} restores it). Loaded
+	 * piglin brutes become piglins, permanently: see {@link ManhuntPiglins#demote}.
 	 */
 	public static void start() {
 		started = true;
@@ -342,14 +282,9 @@ public final class Manhunt {
 	}
 
 	/**
-	 * Takes every Manhunt Hyperion and Manhunt Compass back. Teams are left alone, so a rematch is one
-	 * command.
-	 *
-	 * <p>Every ceiling is dropped to the bottom rung <b>in memory only</b>: with the match over
-	 * {@link #active} is false, so what everybody actually plays on is the standard 80 ticks and 2500 - and
-	 * nobody's mana is clamped on the way out, because the cap went up rather than down.
-	 *
-	 * <p>Every world's locator bar goes back to whatever it was set to before the match, on or off.
+	 * Takes back every Manhunt Hyperion and compass; teams stay, so a rematch is one command. Ceilings clear,
+	 * but with {@link #active} false everyone plays on 80 ticks and 2500 anyway. Locator bars go back to what
+	 * they were.
 	 */
 	public static void reset() {
 		started = false;
@@ -364,12 +299,8 @@ public final class Manhunt {
 	}
 
 	/**
-	 * Turns {@code locatorBar} off in every loaded world, noting first what each one was set to. Loaded is
-	 * every dimension in practice - Paper brings the overworld, the nether and the end up at boot and they
-	 * stay up; a world something else loads mid-match would not be covered.
-	 *
-	 * <p><b>{@code putIfAbsent}, not {@code put}</b>: {@code /manhunt start} run twice must not record the
-	 * off we ourselves set as the value to go back to.
+	 * Loaded worlds only; Paper keeps all three dimensions up, but a world loaded mid-match is missed.
+	 * {@code putIfAbsent} so a second {@code start} doesn't record our own off as the original.
 	 */
 	private static void hideLocatorBar() {
 		for(World world : Bukkit.getWorlds()) {
@@ -378,11 +309,7 @@ public final class Manhunt {
 		}
 	}
 
-	/**
-	 * Puts every world's {@code locatorBar} back where the match found it. A world that has since been
-	 * unloaded is skipped rather than waited for: its gamerule lives in its own level.dat and nothing has
-	 * touched it since the match started.
-	 */
+	/** Skips unloaded worlds: their level.dat hasn't been touched since the match started. */
 	private static void restoreLocatorBar() {
 		for(Map.Entry<String, Boolean> entry : LOCATOR_BARS.entrySet()) {
 			World world = Bukkit.getWorld(entry.getKey());
@@ -391,18 +318,12 @@ public final class Manhunt {
 		LOCATOR_BARS.clear();
 	}
 
-	/**
-	 * Gives {@code p} whatever their team is owed, skipping anything they already hold. Run by
-	 * {@code /manhunt start} and again when somebody joins a match already under way, so a late arrival is
-	 * not left empty-handed.
-	 */
+	/** Gives the team kit, skipping anything already held. Run on start, respawn and late join. */
 	public static void equip(Player p) {
 		if(!started) return;
 		KITTED.add(p.getUniqueId());
-		// A real Hyperion is NOT one of these, deliberately: it is the ladder's reward, not a rung on it, and
-		// it has no Change Target, no rung to upgrade and no part in the intelligence ceiling's bottom end.
-		// Gating on bestRungIn meant anyone who walked into a match already carrying one started with no
-		// Manhunt Hyperion at all.  It still sets their ceiling - observe() reads bestRungIn, not this.
+		// A real Hyperion doesn't count: it's the ladder's reward, not a rung. Gating on bestRungIn left anyone
+		// carrying one with no Manhunt Hyperion. It still sets their ceiling via observe().
 		if(!hasManhuntHyperion(p)) {
 			give(p, ManhuntHyperion.getItem(ManhuntTier.BASE));
 		}
@@ -413,12 +334,8 @@ public final class Manhunt {
 	}
 
 	/**
-	 * The join-time kit, which is <b>once per match</b>: somebody turning up partway through a Manhunt is
-	 * not left empty-handed, but somebody rejoining it gets nothing, whatever they are carrying. Losing a
-	 * Hyperion is meant to cost - it is on the ground where they died, to be picked back up or lost - and a
-	 * rejoin used to be a way to be handed a new one, or a second one on top of a stashed first.
-	 *
-	 * <p>Respawning still goes through {@link #equip} unconditionally: dying is the one way back to a kit.
+	 * Once per match: a late joiner gets a kit, a rejoin gets nothing. Losing a Hyperion is meant to cost, and
+	 * rejoining used to hand out another. Respawn still calls {@link #equip} directly.
 	 */
 	public static void equipOnJoin(Player p) {
 		if(!started || KITTED.contains(p.getUniqueId())) return;
@@ -432,7 +349,7 @@ public final class Manhunt {
 		}
 	}
 
-	/** Strips Manhunt gear out of every slot {@code p} owns, including their cursor. */
+	/** Includes the cursor. */
 	public static void removeManhuntItems(Player p, boolean hyperions, boolean compasses) {
 		Inventory inventory = p.getInventory();
 		for(int i = 0; i < inventory.getSize(); i++) {
@@ -448,7 +365,7 @@ public final class Manhunt {
 		}
 	}
 
-	/** Whether {@code p} is carrying a Manhunt Hyperion on any rung. A full Hyperion is not one. */
+	/** A full Hyperion doesn't count. */
 	private static boolean hasManhuntHyperion(Player p) {
 		for(ItemStack item : p.getInventory().getContents()) {
 			if(ManhuntTier.of(item) != null) return true;
@@ -471,24 +388,17 @@ public final class Manhunt {
 	// ---- implosion ------------------------------------------------------------------------------------
 
 	/**
-	 * How long a player is immune to Manhunt Hyperion implosions for after one lands on them.
-	 *
-	 * <p>The implosion has no hit cooldown and no cast time worth the name, so without this anyone cornered
-	 * by four Hyperions is deleted by four simultaneous right-clicks with nothing they can do about it. One
-	 * second per victim, shared across every attacker, so piling on stops paying.
+	 * Implosion immunity after one lands. The implosion has no real cooldown, so four Hyperions deleted anyone
+	 * instantly. Shared across all attackers, so piling on stops paying.
 	 */
 	public static final long IMPLOSION_IMMUNITY_TICKS = 20;
 
-	/** The tick each player last took an implosion on. Match state, not worth persisting. */
+	/** Tick of each player's last implosion. Not persisted. */
 	private static final Map<UUID, Long> LAST_IMPLOSION = new HashMap<>();
 
 	/**
-	 * Whether a Manhunt Hyperion's implosion may damage {@code target} right now, <b>claiming the window if
-	 * it may</b> - so call it exactly once per target per implosion, where the damage is decided.
-	 *
-	 * <p>Every player is on the clock, whichever side they are on; mobs are not, so a Hyperion clears a
-	 * crowd as fast as ever. The window is claimed on the attempt rather than once the damage has landed,
-	 * which is the cheap end of the trade: a blow the pipeline soaks to nothing still spends it.
+	 * Tests AND claims the window, so call once per target per implosion. Players only, either team; mobs are
+	 * exempt. Claimed on the attempt, so a blow soaked to 0 still spends it.
 	 */
 	public static boolean claimImplosion(LivingEntity target) {
 		if(!(target instanceof Player victim)) return true;
@@ -502,15 +412,12 @@ public final class Manhunt {
 	// ---- intelligence ---------------------------------------------------------------------------------
 
 	/**
-	 * Raises {@code p}'s ceiling to the best Hyperion they are carrying. Called every tick off the
-	 * intelligence loop, which covers every way one can arrive - crafted, picked up off a body, pulled out
-	 * of a chest - without a hook per route. Cheap: the material rules out all but eight stacks before any
-	 * lore is read.
+	 * Raises the ceiling to the best Hyperion carried. Runs every tick off the intelligence loop, which covers
+	 * craft, pickup and chest without a hook each. Cheap: material is checked before lore.
 	 */
 	public static void observe(Player p) {
 		if(!active()) return;
-		// Not while they are lying there: the death drop is not always out of the inventory by the time this
-		// runs, and a corpse re-raising its own ceiling would undo what onDeath just did.
+		// Death drop isn't always out of the inventory yet; a corpse would re-raise what onDeath just cleared.
 		if(p.isDead()) return;
 		int best = bestRungIn(p.getInventory());
 		if(best > rung(p)) {
@@ -519,24 +426,23 @@ public final class Manhunt {
 		}
 	}
 
-	/** Back to the Stick's numbers, with nothing left in the tank - the banked regen ticks included. */
+	/** Back to the Stick, mana and banked regen ticks zeroed. */
 	public static void onDeath(Player p) {
 		if(!active()) return;
 		if(CEILINGS.remove(p.getUniqueId()) != null) save();
 		Plugin.zeroIntelligence(p);
 	}
 
-	/** The rung {@code p}'s intelligence rules are read off: their high-water mark, the Stick at worst. */
+	/** High-water mark, Stick at worst. */
 	private static int rung(Player p) {
 		return CEILINGS.getOrDefault(p.getUniqueId(), 0);
 	}
 
-	/** The best rung anywhere in {@code inventory}, {@link #FULL_RUNG} for a real Hyperion, -1 for none. */
+	/** {@link #FULL_RUNG} for a real Hyperion, -1 for none. */
 	private static int bestRungIn(Inventory inventory) {
 		int best = -1;
 		for(ItemStack item : inventory.getContents()) {
 			if(item == null) continue;
-			// Material first: every rung is a sword (or a stick), so this is the whole check for most slots.
 			if(item.getType() == ManhuntTier.NETHERITE.material() && Scylla.isScylla(item)) {
 				return FULL_RUNG;
 			}

@@ -134,17 +134,11 @@ public class Storm implements CustomWither {
 
 	private static final double SKULL_SPEED = 0.4;
 
-	/**
-	 * Spawns a wither skull aimed along {@code dir}. The spawn location is faced toward the target so
-	 * the skull's inherited acceleration points the right way (a bare setDirection on a freshly spawned
-	 * skull is ignored, leaving it to fly along the wither's facing), and an initial velocity is added.
-	 */
 	private static void fireSkull(Wither wither, Location spawn, Vector dir) {
 		Vector d = dir.clone().normalize();
-		// A fireball follows its ACCELERATION, not its velocity - setVelocity alone is overridden each
-		// tick, so the skull curved back along the wither's facing. Set the acceleration in the spawn
-		// consumer (before the entity ticks) so it actually flies at the target. Magnitude is tuned so
-		// its terminal speed stays ~SKULL_SPEED (fireball drag is ~0.95/tick).
+		// A fireball follows its ACCELERATION; velocity alone is overridden each tick and the skull curved
+		// back along the wither's facing. Set it in the spawn consumer, before the first tick. Tuned so
+		// terminal speed stays ~SKULL_SPEED (drag ~0.95/tick).
 		WitherSkull skull = wither.getWorld().spawn(spawn, WitherSkull.class, s -> {
 			s.setShooter(wither);
 			s.setAcceleration(d.clone().multiply(SKULL_SPEED * 0.05));
@@ -187,8 +181,8 @@ public class Storm implements CustomWither {
 
 		if(damagee.getScoreboardTags().contains("Invulnerable")) {
 			Utils.changeName(damagee);
-			if(!damagee.getScoreboardTags().contains("Dead")) { // tell the player why their hits do nothing DURING a
-				if(damager instanceof Player p) {              // survival phase, not while the corpse plays out
+			if(!damagee.getScoreboardTags().contains("Dead")) { // not while the corpse plays out
+				if(damager instanceof Player p) {
 					p.showTitle(Title.title(Utils.msg("<red><bold>IMMUNE"), Utils.msg("<yellow>You cannot damage Storm!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 				}
 				damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);

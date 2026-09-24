@@ -15,10 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * {@code /manhunt} - manage a game of Minecraft Manhunt. Only bound when {@code manhunt: true}, so the
- * command does not exist at all on an ordinary server.
- */
+/** {@code /manhunt}. Only bound when {@code manhunt: true}. */
 public class ManhuntCommand implements CommandExecutor, TabCompleter {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -27,7 +24,7 @@ public class ManhuntCommand implements CommandExecutor, TabCompleter {
 			return true;
 		}
 
-		// Anyone can look at the teams; only an operator gets to change them or run a match.
+		// Anyone can view teams; everything else is op only.
 		if(!args[0].equalsIgnoreCase("teams") && !sender.isOp()) {
 			sender.sendMessage(Utils.msg("<red>You do not have permission to do that."));
 			return true;
@@ -102,7 +99,7 @@ public class ManhuntCommand implements CommandExecutor, TabCompleter {
 				+ (hunters.isEmpty() ? "<gray>nobody online" : String.join("<gray>, ", hunters))));
 	}
 
-	/** Online first, then anybody the server has playerdata for, so an offline Speedrunner can be set up. */
+	/** Online first, then any known offline player, so an offline Speedrunner can be added. */
 	@Nullable
 	private OfflinePlayer resolve(String name) {
 		Player online = Bukkit.getPlayerExact(name);
@@ -125,7 +122,6 @@ public class ManhuntCommand implements CommandExecutor, TabCompleter {
 				if(sub.startsWith(args[1].toLowerCase(java.util.Locale.ROOT))) out.add(sub);
 			}
 		} else if(args.length == 3 && args[0].equalsIgnoreCase("speedrunner")) {
-			// add offers whoever is not a Speedrunner yet, remove offers only the ones who are
 			boolean adding = args[1].equalsIgnoreCase("add");
 			for(Player p : adding ? Manhunt.onlineHunters() : Manhunt.onlineSpeedrunners()) {
 				if(p.getName().toLowerCase(java.util.Locale.ROOT).startsWith(args[2].toLowerCase(java.util.Locale.ROOT))) {

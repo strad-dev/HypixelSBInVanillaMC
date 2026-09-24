@@ -15,10 +15,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * /pvpstats [player] view a player's PvP stats (self if omitted). /pvptop <ffa|1v1> leaderboard.
- * Reads the shared stats file fresh each call, so it works on any SkyBlock server. Each /pvptop board is
- * gated on whether that mode is enabled (FFA kills / 1v1 wins); PvpModule only registers /pvptop at all
- * when at least one is on.
+ * /pvpstats [player] (self if omitted), /pvptop <ffa|1v1>. Reads the shared file fresh each call, so it works
+ * on any SkyBlock server. Each board is gated on its mode; PvpModule registers /pvptop only if one is on.
  */
 public class StatsCommand implements CommandExecutor, TabCompleter {
 	private final PvpConfig cfg;
@@ -60,10 +58,10 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
 				Placeholder.unparsed("m", String.valueOf(e.matches)),
 				Placeholder.unparsed("ws", String.valueOf(e.winStreak)),
 				Placeholder.unparsed("bws", String.valueOf(e.bestWinStreak))));
-		int landed = e.hitsLanded - e.iframeHits; // hits that actually dealt damage (not negated by i-frames)
+		int landed = e.hitsLanded - e.iframeHits; // dealt damage, not i-framed
 		int acc = e.hitAttempts > 0 ? (int) Math.round(e.hitsLanded * 100.0 / e.hitAttempts) : 0;
 		int critPct = e.hitsLanded > 0 ? (int) Math.round(e.criticalHits * 100.0 / e.hitsLanded) : 0;
-		// hits = landed (dealt damage) / total connects (incl. i-frame-blocked) / left clicks; acc = connects/clicks.
+		// hits = landed / connects (incl. i-framed) / clicks; acc = connects/clicks.
 		sender.sendMessage(Utils.msg("<yellow>Combat:</yellow> <red><dmg></red> dmg <dark_gray>|</dark_gray> <aqua><ln>/<h>/<ha> hits (<acc>%)</aqua> <dark_gray>|</dark_gray> <gold><cr>/<h> crit (<cp>%)</gold> <dark_gray>|</dark_gray> <dark_aqua><intel></dark_aqua> intelligence used <dark_gray>|</dark_gray> <green><heal></green> HP healed <dark_gray>|</dark_gray> <yellow><food></yellow> food eaten",
 				Placeholder.unparsed("dmg", fmt(e.damageDealt)),
 				Placeholder.unparsed("ln", String.valueOf(landed)),
@@ -81,7 +79,7 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
 	private boolean top(CommandSender sender, String[] args, PvpStats.Data data) {
 		boolean ffaOn = cfg.ffaEnabled();
 		boolean duelOn = cfg.duelEnabled();
-		if (!ffaOn && !duelOn) { // pvptop is unregistered when both are off; guard for safety
+		if (!ffaOn && !duelOn) { // unregistered when both off; guard anyway
 			sender.sendMessage(Utils.msg("<red>PvP leaderboards are disabled."));
 			return true;
 		}
@@ -95,7 +93,7 @@ public class StatsCommand implements CommandExecutor, TabCompleter {
 			sender.sendMessage(Utils.msg("<red>The FFA leaderboard is disabled."));
 			return true;
 		}
-		// No arg (or unrecognised): default to FFA, falling back to 1v1 if only duels are enabled.
+		// No/unknown arg: FFA, or 1v1 if only duels are on.
 		boolean oneVone = explicit1v1 || (!explicitFfa && !ffaOn);
 		List<PvpStats.Entry> entries = new ArrayList<>(data.players.values());
 		entries.sort(oneVone

@@ -10,10 +10,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * PvP stats writer for the pvp server. Held in memory and flushed to the shared
- * {@code pvp-stats.json} periodically (so frequent per-hit damage updates don't thrash the disk)
- * plus immediately on milestones (kills, deaths, duel results). The pvp server is the only writer;
- * other servers read the file directly for /pvpstats.
+ * PvP stats, in memory. Flushed to shared {@code pvp-stats.json} on a timer (per-hit updates would thrash
+ * disk) and at once on kills, deaths, duel results. pvp server is the only writer; others read it directly.
  */
 public class PvpStats {
 	private final Path file;
@@ -83,7 +81,7 @@ public class PvpStats {
 		w.matches++;
 		w.winStreak++;
 		w.bestWinStreak = Math.max(w.bestWinStreak, w.winStreak);
-		w.kills++;   // 1v1 results carry into the overall kills/deaths totals
+		w.kills++;   // 1v1 counts toward overall kills/deaths
 		Entry l = entry(loser.getUniqueId(), loser.getName());
 		l.losses++;
 		l.matches++;
@@ -93,7 +91,7 @@ public class PvpStats {
 		flush();
 	}
 
-	// ===== combat (frequent; flushed on the timer) =====
+	// ===== combat (frequent, flushed on the timer) =====
 	public void addDamage(Player dealer, Player taker, double amount) {
 		if (!enabled) return;
 		entry(dealer.getUniqueId(), dealer.getName()).damageDealt += amount;
@@ -118,14 +116,14 @@ public class PvpStats {
 		}
 	}
 
-	/** Count an attack attempt (a swing/shot), landed or not - the denominator for hit accuracy. */
+	/** Swing/shot, landed or not: accuracy denominator. */
 	public void addHitAttempt(Player p) {
 		if (!enabled) return;
 		entry(p.getUniqueId(), p.getName()).hitAttempts++;
 		dirty = true;
 	}
 
-	/** Flag a landed hit as a critical and/or one that struck the target during its i-frames. */
+	/** Flag a landed hit as crit and/or into i-frames. */
 	public void addHitFlags(Player p, boolean critical, boolean iframe) {
 		if (!enabled) return;
 		Entry e = entry(p.getUniqueId(), p.getName());

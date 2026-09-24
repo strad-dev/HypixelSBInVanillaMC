@@ -42,8 +42,8 @@ public class Utils {
 	private static final PlainTextComponentSerializer PLAIN = PlainTextComponentSerializer.plainText();
 	private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
-	/** Item display-name / lore line from a MiniMessage string. The default item italic is suppressed unless the line
-	 *  explicitly sets italic itself (e.g. <italic> flavor text), so names/lore render non-italic like vanilla. */
+	/** Item name / lore line from MiniMessage. Default item italic is off unless the line sets it (<italic> flavor
+	 *  text), so it renders non-italic like vanilla. */
 	public static Component mm(String s) {
 		return MM.deserialize(s).decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE);
 	}
@@ -53,8 +53,8 @@ public class Utils {
 		return MM.deserialize(s);
 	}
 
-	/** Chat component from a MiniMessage template with tag resolvers. Use Placeholder.unparsed(...) for untrusted
-	 *  input (player names, chat text) so it is inserted literally and cannot inject MiniMessage tags. */
+	/** Chat component from a MiniMessage template with resolvers. Use Placeholder.unparsed(...) for untrusted input
+	 *  (names, chat text) so it can't inject tags. */
 	public static Component msg(String template, TagResolver... resolvers) {
 		return MM.deserialize(template, resolvers);
 	}
@@ -64,8 +64,8 @@ public class Utils {
 		return c == null ? "" : LEGACY.serialize(c);
 	}
 
-	/** MiniMessage string of a component to round-trip a Component (e.g. an item display name) back through the
-	 *  MiniMessage-based helpers such as {@link #changeName(LivingEntity, String)} while preserving its formatting. */
+	/** MiniMessage string of a component, to round-trip it (e.g. an item name) through helpers like
+	 *  {@link #changeName(LivingEntity, String)} keeping its formatting. */
 	public static String mmString(Component c) {
 		return c == null ? "" : MM.serialize(c);
 	}
@@ -85,8 +85,7 @@ public class Utils {
 	}
 
 	/**
-	 * A damage figure as it belongs on a lore line: no trailing {@code .0}, at most two decimals.  Sharpness
-	 * is 0.75 a level, so these are no longer whole numbers.
+	 * Damage figure for lore: no trailing {@code .0}, at most two decimals (Sharpness is 0.75 a level).
 	 */
 	public static String damageNumber(double d) {
 		if(d == Math.rint(d)) {
@@ -96,29 +95,25 @@ public class Utils {
 	}
 
 	/**
-	 * The enchantability every high-end SkyBlock item gets: the Hyperion, the Dark Claymore, every custom
-	 * armour piece, Aspect of the Void and Divan's Pickaxe. Well above vanilla's best (gold, 22), so a
-	 * level-30 table reaches the top cost bands on them.
+	 * Enchantability of high-end SkyBlock items (Hyperion, Dark Claymore, custom armour, AOTV, Divan's Pickaxe).
+	 * Well above vanilla's best (gold, 22), so a level-30 table reaches the top cost bands.
 	 *
 	 * @see #setEnchantability
 	 */
 	public static final int SKYBLOCK_ENCHANTABILITY = 30;
 
 	/**
-	 * Sets how much enchanting power an item gets out of a table - vanilla's {@code minecraft:enchantable}
-	 * component, which a material's own value is only the default for.
+	 * Sets vanilla's {@code minecraft:enchantable} component (the material's value is just the default).
 	 *
-	 * <p>It buys <b>better rolls, not a cheaper price</b>: the table adds
-	 * {@code 1 + rand(value/4 + 1) + rand(value/4 + 1)} to the slot's level before deciding which
-	 * enchantments are in range, so a high value reaches cost bands a low one never will. The XP and lapis
-	 * cost, and anvil work, are untouched. For reference, vanilla runs gold 22, wood and netherite 15, iron
-	 * 14, copper 13, diamond 10, stone 5, and a bow 1.
+	 * <p>Buys <b>better rolls, not a cheaper price</b>: the table adds {@code 1 + rand(value/4 + 1) + rand(value/4 + 1)}
+	 * to the slot's level before picking enchants. XP, lapis and anvil cost unchanged. Vanilla: gold 22, wood and
+	 * netherite 15, iron 14, copper 13, diamond 10, stone 5, bow 1.
 	 *
-	 * <p><b>Call this last</b>, after the final {@code setItemMeta} - an {@code ItemMeta} is a snapshot of the
-	 * item's components and applying one would put the default back.
+	 * <p><b>Call last</b>, after the final {@code setItemMeta}: an {@code ItemMeta} is a component snapshot and
+	 * applying one puts the default back.
 	 *
-	 * <p>{@code value <= 0} removes the component, which makes the item <b>unenchantable at a table</b>
-	 * (books and anvils still work). That is deliberate for the Stick Manhunt Hyperion.
+	 * <p>{@code value <= 0} removes the component: <b>unenchantable at a table</b> (books and anvils still work).
+	 * Deliberate for the Stick Manhunt Hyperion.
 	 */
 	public static void setEnchantability(ItemStack item, int value) {
 		if(value <= 0) {
@@ -129,31 +124,25 @@ public class Utils {
 	}
 
 	/**
-	 * Rounds to the nearest 0.1 for display.  Lore that quotes a live damage figure uses this so the number
-	 * stays readable - the raw value keeps its full precision on the way into the damage pipeline.
+	 * Rounds to 0.1 for lore quoting a live damage figure; the pipeline keeps full precision.
 	 */
 	public static String tenthNumber(double d) {
 		return damageNumber(Math.round(d * 10) / 10.0);
 	}
 
 	/**
-	 * A 0-1 SHARE as a percentage for a lore line: {@code 0.15 -> "15%"}, {@code 0.335 -> "33.5%"}.
-	 *
-	 * <p>Takes the share rather than an already-multiplied number on purpose - every caller holds the share
-	 * (a damage reduction, a heal share, an implosion share), so the x100 belongs here where it happens once
-	 * and not at each call site.  Rounded to a tenth of a percent, then through {@link #damageNumber} so a
-	 * whole number loses its {@code .0}.
+	 * A 0-1 SHARE as a lore percentage: {@code 0.15 -> "15%"}, {@code 0.335 -> "33.5%"}. Takes the share since every
+	 * caller holds one, so the x100 happens once here. Rounded to 0.1%, then {@link #damageNumber} drops a {@code .0}.
 	 */
 	public static String percent(double share) {
 		return damageNumber(Math.round(share * 1000) / 10.0) + "%";
 	}
 
-	/** One line {@link #statLore} can quote: the attribute, its label, and whether its value is a 0-1
-	 *  SHARE (printed as a percentage) rather than a flat figure. */
+	/** One {@link #statLore} line: attribute, label, and whether it's a 0-1 SHARE (printed as a percentage). */
 	private record StatLine(Attribute attribute, String label, boolean share) {}
 
-	/** Every stat the lore quotes, IN THE ORDER IT IS QUOTED. An attribute absent from an item is simply not
-	 *  printed, so one list covers armour, weapons and tools. Add a row to give a new attribute a line. */
+	/** Every stat the lore quotes, IN QUOTED ORDER. Absent attributes print nothing, so one list covers armour,
+	 *  weapons and tools. Add a row to give a new attribute a line. */
 	private static final List<StatLine> STAT_LINES = List.of(
 			new StatLine(Attribute.ATTACK_DAMAGE, "Damage", false),
 			new StatLine(Attribute.ARMOR, "Armor", false),
@@ -170,22 +159,18 @@ public class Utils {
 	}
 
 	/**
-	 * An item's whole stat block, read off the modifiers <b>already on {@code data}</b> rather than from
-	 * figures the caller writes out a second time by hand. <b>Call it after the {@code addAttributeModifier}
-	 * calls and before {@code lore(...)}</b>, and pass {@code enchants} for a weapon so Sharpness lands on the
-	 * damage line ({@link #damageLore}); armour and tools pass none.
+	 * An item's whole stat block, read off the modifiers <b>already on {@code data}</b>, not hand-written figures.
+	 * <b>Call after the {@code addAttributeModifier} calls and before {@code lore(...)}</b>; pass {@code enchants} for
+	 * a weapon so Sharpness lands on the damage line ({@link #damageLore}), none for armour and tools.
 	 *
-	 * <p>Hand-written stats drift, and silently: the Crown of the Wither King granted +3 damage while its lore
-	 * said +2, and the Warden Helmet +2 while its lore said +1, because changing one number never forced
-	 * anyone to change the other. The numbers now live in the modifiers and nowhere else.
+	 * <p>Hand-written stats drift silently: the Crown of the Wither King gave +3 damage while its lore said +2, the
+	 * Warden Helmet +2 while it said +1. The numbers now live only in the modifiers.
 	 *
-	 * <p>Order and labels come from {@link #STAT_LINES}; an attribute the item does not carry prints nothing.
-	 * Flat amounts print as they are, a {@code share} attribute as a signed percentage, and a
-	 * {@code MULTIPLY_SCALAR_1} through {@link #multiplier}. <b>Damage is special twice over</b>: a tool's
-	 * {@code -1000} is how it says "not a weapon" and the attribute floors at 0 anyway, so the line reads
-	 * {@code 0} ({@link #damageLore}, which is handed the raw amount so it can tell that apart from a weapon
-	 * that really adds nothing); and it is the one line Sharpness is folded into. No item carries both a flat
-	 * and a scalar modifier on one attribute - if one ever does, it gets two lines.
+	 * <p>Order and labels from {@link #STAT_LINES}. Flat amounts print as-is, a {@code share} as a signed percentage,
+	 * {@code MULTIPLY_SCALAR_1} through {@link #multiplier}. <b>Damage is special twice</b>: a tool's {@code -1000}
+	 * means "not a weapon" and floors at 0, so it reads {@code 0} ({@link #damageLore} gets the raw amount to tell
+	 * that from a weapon adding nothing); and Sharpness folds into it. No item has flat + scalar on one attribute;
+	 * if one does, it gets two lines.
 	 */
 	public static List<Component> statLore(ItemMeta data, @Nullable Map<Enchantment, Integer> enchants) {
 		List<Component> out = new ArrayList<>();
@@ -219,21 +204,18 @@ public class Utils {
 	}
 
 	/**
-	 * A {@code MULTIPLY_SCALAR_1} amount as lore reads it: a buff as the multiplier it is ({@code x2},
-	 * {@code x1.33}), a penalty as the reduction it is ({@code -25%}). Vanilla's operation is
-	 * {@code value *= 1 + amount}, so both forms describe the same number from the side that reads better.
+	 * A {@code MULTIPLY_SCALAR_1} amount for lore: a buff as a multiplier ({@code x2}, {@code x1.33}), a penalty as
+	 * a reduction ({@code -25%}). Vanilla does {@code value *= 1 + amount}, so both are the same number.
 	 */
 	private static String multiplier(double amount) {
 		return amount > 0 ? "x" + damageNumber(1 + amount) : "-" + percent(Math.abs(amount));
 	}
 
 	/**
-	 * The player's melee damage as it would be with {@code weapon} in their main hand, Sharpness included.
-	 *
-	 * <p>Resolved by hand rather than read off {@code getValue()} because the callers need the figure for a
-	 * weapon that <b>is not necessarily held</b> - the Hyperion's lore is rewritten when the player switches
-	 * slots, picks the item up or logs in.  Every main-hand modifier is dropped and {@code weapon}'s own put
-	 * in its place; everything else on the attribute (Strength, Weakness, an armour piece) still counts.
+	 * Player's melee damage with {@code weapon} in main hand, Sharpness included. Resolved by hand, not
+	 * {@code getValue()}, since the weapon <b>isn't necessarily held</b> (Hyperion lore is rewritten on slot switch,
+	 * pickup, login). Main-hand modifiers are dropped and {@code weapon}'s put in; everything else (Strength,
+	 * Weakness, armour) still counts.
 	 *
 	 * @see CustomDamage#sharpnessBonus
 	 */
@@ -244,14 +226,11 @@ public class Utils {
 		List<Double> multiply = new ArrayList<>();
 
 		if(p != null) {
-			// Whatever is in their main hand right now must NOT count - `weapon` takes its place - and it
-			// cannot be recognised by slot group: a modifier read off a LIVE attribute always comes back as
-			// EquipmentSlotGroup.ANY, because the NMS modifier has no slot on it at all and
-			// CraftAttributeInstance.convert fills ANY in.  So the old slot test never matched once and the
-			// held weapon was counted TWICE - the Hyperion quoted 60% of 30.5 for a player whose melee was
-			// 22.5.  Matched by KEY instead: the held item's own modifier keys, plus
-			// minecraft:base_attack_damage, the key vanilla gives a weapon's own attack damage (armour
-			// never uses it, so a damage-granting helmet still counts).
+			// The current main-hand item must NOT count, and can't be found by slot group: a modifier off a LIVE
+			// attribute always comes back EquipmentSlotGroup.ANY (NMS has no slot; CraftAttributeInstance.convert
+			// fills ANY in). The old slot test never matched and counted the held weapon TWICE: the Hyperion
+			// quoted 60% of 30.5 for a 22.5 melee. Matched by KEY instead: the held item's modifier keys plus
+			// minecraft:base_attack_damage (armour never uses it, so a damage helmet still counts).
 			Set<NamespacedKey> heldKeys = new HashSet<>();
 			heldKeys.add(NamespacedKey.minecraft("base_attack_damage"));
 			ItemStack held = p.getInventory().getItemInMainHand();
@@ -300,9 +279,8 @@ public class Utils {
 		if(weapon != null) {
 			value += CustomDamage.sharpnessBonus(weapon.getEnchantmentLevel(Enchantment.SHARPNESS));
 		}
-		// Strength's modifier is on the attribute, so its vanilla +3/level is already in the sum above and
-		// has to come back down to this plugin's +2 - the same subtraction CustomDamage.rebuildMelee makes,
-		// so the Hyperion's lore and its implosion quote what a swing actually pays out.
+		// Strength's vanilla +3/level is in the sum above; bring it down to our +2, same as
+		// CustomDamage.rebuildMelee, so lore and implosion match a real swing.
 		if(p != null) {
 			value -= CustomDamage.strengthPenalty(p);
 		}
@@ -310,26 +288,21 @@ public class Utils {
 	}
 
 	/**
-	 * The {@code Damage: +N} line for a weapon, N being its own attack damage plus whatever Sharpness it is
-	 * actually carrying.
+	 * The {@code Damage: +N} line for a weapon: its attack damage plus the Sharpness it actually carries.
 	 *
-	 * <p><b>Built from the item's enchantments rather than from an argument someone remembered to pass.</b>
-	 * The bug this replaces: the palette and the duel kit both build a weapon with {@code getItem}, get a
-	 * lore line for the enchantment they named, and THEN enchant the stack by material type - so a Claymore
-	 * whose lore said {@code Damage: +9} was handed out carrying Sharpness VII.  It also read one
-	 * enchantment only, so Sharpness on a Smite weapon never showed, and quoted numbers
-	 * ({@code level * 2} for Smite) that no longer matched what the damage pipeline paid out.
+	 * <p><b>Built from the item's enchantments, not an argument.</b> Before, the palette and duel kit got lore for
+	 * the enchant they named and THEN enchanted by material, so a Claymore saying {@code Damage: +9} carried
+	 * Sharpness VII. It also read one enchant only and quoted numbers ({@code level * 2} for Smite) the pipeline
+	 * no longer paid.
 	 *
 	 * @see CustomDamage#sharpnessBonus
 	 */
 	public static Component damageLore(double baseDamage, @Nullable Map<Enchantment, Integer> enchants) {
 		int sharpness = enchants == null ? 0 : enchants.getOrDefault(Enchantment.SHARPNESS, 0);
-		// Floored here rather than by the caller, because the sign below has to read the RAW amount.
+		// Floored here, not by the caller, because the sign below reads the RAW amount.
 		double total = Math.max(0, baseDamage + CustomDamage.sharpnessBonus(sharpness));
-		// `Damage: 0` and `Damage: +0` are different claims, and the raw amount is what tells them apart.  An
-		// ability tool subtracts its way out of being a weapon (-1000) and reads a bare `0` - a statement.  A
-		// weapon that adds nothing YET - the Manhunt Stick, bottom of a ladder that goes up from there - adds
-		// zero on top of the player's own damage, and keeps its sign.
+		// `Damage: 0` and `Damage: +0` differ. An ability tool subtracts out of being a weapon (-1000) and reads
+		// `0`. A weapon adding nothing YET (Manhunt Stick, bottom of the ladder) keeps its sign.
 		boolean bonus = baseDamage >= 0;
 		return mm("<gray>Damage: <red>" + (total > 0 || bonus ? "+" : "") + damageNumber(total));
 	}
@@ -374,10 +347,9 @@ public class Utils {
 				changeName(entity, "<aqua>" + entity.getName());
 				return;
 			}
-			// Swap the trailing "HP/maxHP" of the existing name in place, preserving all surrounding colors/formatting.
-			// Uses the legacy (§) serializer, NOT MiniMessage: this runs on EVERY hit to EVERY custom mob, and the
-			// MiniMessage serialize+parse round-trip here was a real per-hit hot-path cost. Legacy round-trips these
-			// simple color/bold names losslessly at a fraction of the cost.
+			// Swap the trailing "HP/maxHP" in place, keeping formatting. Legacy (§) serializer, NOT MiniMessage: this
+			// runs on EVERY hit to EVERY custom mob and the MiniMessage round-trip was a real hot-path cost. Legacy
+			// round-trips these simple names losslessly for a fraction of it.
 			String serialized = LEGACY.serialize(current).replaceFirst("\\d+/\\d+(\\s*)$", health + "/" + maxHealth + "$1");
 			entity.customName(LEGACY.deserialize(serialized));
 		}
@@ -557,8 +529,8 @@ public class Utils {
 	}
 
 	/**
-	 * Drops an anvil on a location.<br>The anvil is a falling block that deletes itself on impact instead of landing as
-	 * a real block, so an anvil barrage doesn't litter the arena with anvils (or anvil drops) to clean up afterwards.
+	 * Drops an anvil on a location.<br>It deletes itself on impact instead of landing, so a barrage doesn't litter
+	 * the arena with anvils or drops.
 	 *
 	 * @param l the location the anvil should fall from; nothing is spawned if that space isn't air
 	 * @return whether an anvil was spawned
@@ -568,9 +540,8 @@ public class Utils {
 		if(!b.getType().equals(Material.AIR)) {
 			return false;
 		}
-		// Vanilla only arms anvil fall damage in AnvilBlock.falling(), which runs when a *placed* block turns itself into
-		// an entity - a directly spawned falling block starts at hurtEntities = false with 0 damage per block, so both
-		// have to be set here to match a real anvil (2 per block, capped at 40).
+		// Vanilla arms anvil damage only in AnvilBlock.falling() (placed block -> entity); a spawned falling block
+		// has hurtEntities = false and 0 per block, so set both to match a real anvil (2 per block, max 40).
 		l.getWorld().spawn(b.getLocation().add(0.5, 0, 0.5), FallingBlock.class, fb -> {
 			fb.setBlockData(Material.DAMAGED_ANVIL.createBlockData());
 			fb.setHurtEntities(true);
@@ -583,22 +554,19 @@ public class Utils {
 	}
 
 	/**
-	 * How much of a player's own hitbox has to stay inside the border. Vanilla shoves an entity back the
-	 * moment its bounding box crosses, so landing exactly ON the line is landing outside.
+	 * How much of a player's hitbox must stay inside the border. Vanilla shoves an entity back once its box
+	 * crosses, so landing ON the line is outside.
 	 */
 	private static final double BORDER_MARGIN = 0.5;
 
 	/**
-	 * How far a teleport may travel from {@code origin} along {@code direction} before it reaches the world
-	 * border, capped at {@code distance}. <b>The border is a solid block.</b> An ability that would carry a
-	 * player through it puts them down just inside instead, exactly the way a wall does - teleporting past it
-	 * dumps them somewhere vanilla immediately shoves them back out of, in chunks nobody asked the server to
-	 * load.
+	 * How far a teleport may go from {@code origin} along {@code direction} before the world border, capped at
+	 * {@code distance}. <b>The border is a solid block</b>: an ability that would carry a player through stops just
+	 * inside, like a wall. Past it, vanilla shoves them back, in chunks nobody needed loaded.
 	 *
-	 * <p>Only the four vertical walls exist, so the ray is clipped on X and Z alone and the Y component is
-	 * ignored. The border is a SQUARE centred on {@code getCenter()} with {@code getSize()} as its full
-	 * width. A player already outside it may still travel: the wall picked is the one ahead of them, so
-	 * moving back in works and moving further out does not.
+	 * <p>Only the four walls exist, so X and Z only. Square, centred on {@code getCenter()}, {@code getSize()} full
+	 * width. A player already outside can still move: the wall ahead is used, so moving back in works, further out
+	 * doesn't.
 	 */
 	public static double borderDistance(Location origin, Vector direction, double distance) {
 		WorldBorder border = origin.getWorld().getWorldBorder();
@@ -629,8 +597,7 @@ public class Utils {
 
 	/**
 	 * Teleports the entity to a random position in a given radius from its current location, optionally silently.<br>
-	 * Bosses repositioning themselves mid-phase pass {@code false} - they have their own audio cue and the enderman
-	 * warp on top of it reads as a different mechanic.
+	 * Bosses repositioning mid-phase pass {@code false}: they have their own audio cue.
 	 *
 	 * @param e      The entity to be teleported
 	 * @param radius The radius of the randomness
@@ -642,7 +609,7 @@ public class Utils {
 
 	/**
 	 * Teleports the entity to a random position in a given radius from the given location.<br>The entity lands on
-	 * the nearest ground its own hitbox fits on, so it can't be stuffed into a gap that's too short for it.
+	 * the nearest ground its own hitbox fits on.
 	 *
 	 * @param e      The entity to be teleported
 	 * @param center The center of the radius to teleport from
@@ -654,8 +621,7 @@ public class Utils {
 
 	/**
 	 * Teleports the entity to a random position in a given radius from the given location, optionally silently.<br>
-	 * A {@code radius} of 0 is legal and means "stay put, but snap to a spot that actually fits" - several bosses use
-	 * it to unstick themselves when entering a phase.
+	 * {@code radius} 0 = stay put but snap to a spot that fits; bosses use it to unstick when entering a phase.
 	 *
 	 * @param e      The entity to be teleported
 	 * @param center The center of the radius to teleport from
@@ -705,9 +671,8 @@ public class Utils {
 	}
 
 	/**
-	 * The Y of the first surface found searching outward (down first, then up) from the location's own Y: the block
-	 * above the nearest non-air block in that column. Ignores hitboxes entirely - prefer
-	 * {@link #getNearestValidBlockYAt} when placing something that can get stuck.
+	 * Y of the first surface searching outward (down, then up) from the location's Y: the block above the nearest
+	 * non-air block. Ignores hitboxes; prefer {@link #getNearestValidBlockYAt} for anything that can get stuck.
 	 */
 	public static int getNearestBlockYAt(Location l) {
 		World w = l.getWorld();
@@ -740,13 +705,9 @@ public class Utils {
 	}
 
 	/**
-	 * The Y a body of the given height can actually stand at, searching outward (down first, then up) from the
-	 * location's own Y for the closest spot in that column with solid ground underfoot AND enough clear headroom
-	 * for the whole hitbox. This is what stops a tall mob being teleported/spawned into a gap it doesn't fit in -
-	 * a 2.9-block Enderman won't be dropped into a 1-block pocket or suffocated in a ceiling.
-	 *
-	 * <p>Falls back to {@link #getNearestBlockYAt} when nothing in the column fits, so a mob too tall for anywhere
-	 * in its column still lands on a surface rather than mid-air.
+	 * Y a body of the given height can stand at, searching outward (down, then up) from the location's Y for the
+	 * closest spot with solid ground AND headroom for the whole hitbox, so a 2.9-block Enderman isn't dropped into a
+	 * 1-block pocket. Falls back to {@link #getNearestBlockYAt} if nothing fits, so it still lands on a surface.
 	 *
 	 * @param l      The column to search (its Y is the starting point)
 	 * @param height Hitbox height in blocks - {@code entity.getHeight()} for a live entity, otherwise the mob's
@@ -870,9 +831,8 @@ public class Utils {
 	}
 
 	/**
-	 * Gives the entity full water-movement efficiency (equivalent to Depth Strider 3) so bosses and
-	 * their subentities don't wade slowly through water. No-op if the entity lacks the attribute
-	 * (e.g. flying withers/dragons that never had it registered).
+	 * Full water-movement efficiency (= Depth Strider 3) so bosses and subentities don't wade slowly. No-op without
+	 * the attribute (flying withers/dragons).
 	 */
 	public static void applyDepthStrider(LivingEntity entity) {
 		var attr = entity.getAttribute(Attribute.WATER_MOVEMENT_EFFICIENCY);
@@ -882,13 +842,10 @@ public class Utils {
 	}
 
 	/**
-	 * The Ice Spray freeze: halves the target's movement speed for {@code ticks}, then restores it.
-	 * A MOVEMENT_SPEED modifier rather than the Slowness effect, so milk can't clear it and it doesn't
-	 * fight with other slowness sources; MULTIPLY_SCALAR_1 applies to the running total, so -0.5 is
-	 * exactly 0.5x whatever the target's speed already is. The modifier is transient, so it is never
-	 * written to the entity's NBT and a restart mid-freeze can't leave it stuck on. Callers pair this
-	 * with the "IceSprayed" tag (which carries the +10% damage taken / -15% damage dealt) on the same
-	 * timer. No-op if the entity lacks the attribute.
+	 * Ice Spray freeze: halves movement speed for {@code ticks}, then restores it. A MOVEMENT_SPEED modifier, not
+	 * Slowness, so milk can't clear it and it doesn't fight other slowness; MULTIPLY_SCALAR_1 at -0.5 is exactly 0.5x.
+	 * Transient, so never saved to NBT and a restart can't leave it stuck. Callers pair it with the "IceSprayed" tag
+	 * (+10% damage taken / -15% dealt) on the same timer. No-op without the attribute.
 	 */
 	public static void iceSpraySlow(LivingEntity entity, long ticks) {
 		var speed = entity.getAttribute(Attribute.MOVEMENT_SPEED);
@@ -905,12 +862,10 @@ public class Utils {
 	}
 
 	/**
-	 * Applies the setup shared by every SkyBlock boss and boss-spawned subentity: no item pickup,
-	 * infinite fire resistance, name always visible, persistence across chunk unloads, the
-	 * "SkyblockBoss" tag plus any {@code extraTags} (e.g. the mob's registry key), and a target.
-	 * Pass {@code target == null} to leave targeting alone. Full water-movement efficiency is applied
-	 * here too: the SkyblockBoss sweep in {@link listeners.CustomMobs} only fires on EntitySpawnEvent,
-	 * so summon-item bosses that convert an existing mob (e.g. Atoned Horror) would otherwise miss it.
+	 * Setup shared by every boss and boss subentity: no pickup, infinite fire resistance, name visible, persistent,
+	 * "SkyblockBoss" tag plus {@code extraTags}, and a target ({@code null} leaves targeting alone). Water movement is
+	 * applied here too: the CustomMobs sweep only runs on EntitySpawnEvent, so bosses converted from an existing mob
+	 * (Atoned Horror) would miss it.
 	 */
 	public static void setupBoss(Mob e, @Nullable Player target, String... extraTags) {
 		e.setCanPickupItems(false);

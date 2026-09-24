@@ -4,11 +4,7 @@ import misc.AddRecipes;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * Wires the (config-gated) Manhunt feature into SkyBlock: {@code /manhunt}, the team/intelligence rules and
- * the Hyperion upgrade recipes. With {@code manhunt: false} nothing here registers and the command is
- * unregistered from the command map, so an ordinary server is untouched - same shape as {@code PvpModule}.
- */
+/** Wires in Manhunt. With {@code manhunt: false} nothing registers and the command is removed. Same shape as PvpModule. */
 public final class ManhuntModule {
 	private ManhuntModule() {}
 
@@ -20,7 +16,7 @@ public final class ManhuntModule {
 			return;
 		}
 
-		// The teams outlive the server, so they are read back before anybody can join.
+		// Before anyone can join.
 		Manhunt.load(plugin);
 
 		ManhuntCommand command = new ManhuntCommand();
@@ -42,9 +38,8 @@ public final class ManhuntModule {
 	}
 
 	/**
-	 * Remove {@code /manhunt} from the command map when Manhunt is off. plugin.yml registers every declared
-	 * command whether or not it has an executor, so a disabled one has to be actively taken out (both the
-	 * bare label and the {@code skyblock:} form). Same technique as {@code PvpModule.unregister}.
+	 * plugin.yml registers every declared command with or without an executor, so remove both the bare label
+	 * and the {@code skyblock:} form. Same as {@code PvpModule.unregister}.
 	 */
 	private static void unregister(JavaPlugin plugin, String... names) {
 		try {

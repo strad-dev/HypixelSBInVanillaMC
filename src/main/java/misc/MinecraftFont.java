@@ -9,12 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Minecraft's default font, in pixels, and the word wrapping that follows from it. Lore is written as one
- * sentence and broken into lines here, so a line that quotes a live number ("8.7 damage", "13.25 damage")
- * stays inside the tooltip instead of being hand-wrapped to fit whatever the number was that day.
+ * Minecraft's default font in pixels, and word wrap from it. Lore is written as one paragraph and broken here,
+ * so a line quoting a live number ("8.7 damage") stays inside the tooltip instead of being hand-wrapped.
  *
- * <p><b>The width table is a copy of StradsPlugin's {@code driving.trains.MinecraftFont}</b> - the two plugins
- * share no dependency, so keep them in step if either is corrected.
+ * <p><b>Width table copied from StradsPlugin's {@code driving.trains.MinecraftFont}</b>; no shared dependency,
+ * so keep them in step.
  */
 public final class MinecraftFont {
 	private MinecraftFont() {}
@@ -23,9 +22,8 @@ public final class MinecraftFont {
 	private static final int BOLD_EXTRA = 1;
 
 	/**
-	 * The widest a lore line may get: the Hyperion's own ability header, which is the longest line the
-	 * tooltip has to show and therefore sets the shape of the box. Measured rather than guessed, and the
-	 * {@code RIGHT CLICK} half is bold.
+	 * Widest a lore line may get: the Hyperion's ability header, the longest line, which sets the box. Measured;
+	 * the {@code RIGHT CLICK} half is bold.
 	 */
 	public static final int LORE_WIDTH = width("Ability: Wither Impact ") + width("RIGHT CLICK", true);
 
@@ -72,14 +70,12 @@ public final class MinecraftFont {
 	}
 
 	/**
-	 * Breaks {@code component} into lines no wider than {@code maxWidth}, at word boundaries, <b>keeping
-	 * every colour and decoration</b> - a line may start mid-way through a coloured run and still come out
-	 * the right colour, because the text is taken apart per glyph and put back together per style run.
+	 * Breaks {@code component} into lines no wider than {@code maxWidth} at word boundaries, <b>keeping every
+	 * colour and decoration</b>: text is split per glyph and rebuilt per style run, so a line starting mid-run keeps
+	 * its colour.
 	 *
-	 * <p>Runs of spaces are held back rather than measured into the line they would end: a wrap drops them,
-	 * so a break after {@code "you."} does not leave the next line indented by the two spaces that followed
-	 * it. A single word wider than {@code maxWidth} is left to overrun on a line of its own rather than
-	 * broken in half.
+	 * <p>Runs of spaces are held back, not measured into the line they end: a wrap drops them, so the next line isn't
+	 * indented. A word wider than {@code maxWidth} overruns on its own line rather than being split.
 	 */
 	public static List<Component> wrap(Component component, int maxWidth) {
 		List<Component> lines = new ArrayList<>();
@@ -127,10 +123,8 @@ public final class MinecraftFont {
 	}
 
 	/**
-	 * Commits the word being built to the current line, or starts a new line with it when it will not fit.
-	 * The spaces in front of it come along only if it stays put.
-	 *
-	 * @return the width of the current line afterwards
+	 * Commits the word to the current line, or starts a new line with it if it won't fit. Its leading spaces come
+	 * along only if it stays put. Returns the current line's width afterwards.
 	 */
 	private static int endWord(List<Component> lines, List<Glyph> line, List<Glyph> word, List<Glyph> spaces,
 							   int lineWidth, int wordWidth, int spaceWidth, int maxWidth) {
@@ -148,7 +142,7 @@ public final class MinecraftFont {
 		return lineWidth + spaceWidth + wordWidth;
 	}
 
-	/** One character and the style it ended up with once every parent's style had been folded in. */
+	/** One character and its style with every parent's style folded in. */
 	private record Glyph(char character, Style style) {
 		int width() {
 			return charWidth(character) + (style.hasDecoration(TextDecoration.BOLD) ? BOLD_EXTRA : 0);

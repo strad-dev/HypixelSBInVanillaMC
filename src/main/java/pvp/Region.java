@@ -3,7 +3,7 @@ package pvp;
 import org.bukkit.Location;
 
 /**
- * A simple world-bound axis-aligned box used for FFA bounds, the safe zone, and the duel arena.
+ * World-bound axis-aligned box: FFA bounds, safezone, duel arena.
  */
 public class Region {
 	public final String world;

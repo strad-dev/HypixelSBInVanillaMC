@@ -113,7 +113,7 @@ public class CustomItems implements Listener {
 	@EventHandler
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
-		if(p.getGameMode() == GameMode.SPECTATOR) return; // spectators never fire item abilities (e.g. a right-click on a block)
+		if(p.getGameMode() == GameMode.SPECTATOR) return; // spectators never fire item abilities
 		ItemStack itemInUse = e.getItem();
 		if(itemInUse != null && itemInUse.hasItemMeta()) {
 			ItemMeta meta = itemInUse.getItemMeta();
@@ -161,8 +161,7 @@ public class CustomItems implements Listener {
 				item = null;
 			}
 			if(item != null) {
-				// A left click on an item whose ability isn't bound to left-click does nothing - and must
-				// never spam ability messages (not enough intelligence, or on cooldown).
+				// Left click on an item with no left-click ability does nothing, and must not spam ability messages.
 				boolean leftClickNoAbility = (e.getAction().equals(Action.LEFT_CLICK_AIR) || e.getAction().equals(Action.LEFT_CLICK_BLOCK)) && !item.hasLeftClickAbility();
 				if(!(e.getAction().equals(Action.LEFT_CLICK_BLOCK) && !item.hasLeftClickAbility())) {
 					e.setCancelled(true);
@@ -200,11 +199,9 @@ public class CustomItems implements Listener {
 						}
 					}
 				}
-				// No message when the 3-tick AbilityCooldown swallows a click.  The gate itself stays - it
-				// is what stops an ability firing every tick - it just no longer announces itself.  The
-				// Aspect of the Void and the Hyperion had already been exempted from the message one by
-				// one, which was the tell that it was noise rather than information: the items people
-				// actually spam are exactly the ones that tripped it.
+				// No message when the 3-tick AbilityCooldown swallows a click; the gate stays (it stops an ability
+				// firing every tick), it just doesn't announce itself. AOTV and Hyperion had already been exempted one
+				// by one, which showed it was noise: the items people spam are the ones that tripped it.
 			}
 			Plugin.sendIntelligenceBar(p, score);
 		}

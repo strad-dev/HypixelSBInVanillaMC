@@ -9,17 +9,13 @@ import java.nio.file.Path;
 import java.util.*;
 
 /**
- * Per-player PvP loadout storage. One saved loadout per player. The file location is configurable
- * ({@code pvp.duel.loadouts-file}): by default it is this plugin's own folder
- * ({@code plugins/SkyBlock/pvp-loadouts.json}, per-server, standalone), but on the network it can point
- * at the shared {@code ~/data/pvp-loadouts.json} so a loadout follows the player across servers.
+ * One PvP loadout per player at {@code pvp.duel.loadouts-file}: default {@code plugins/SkyBlock/pvp-loadouts.json}
+ * (per-server), or shared {@code ~/data/pvp-loadouts.json} on the network so it follows the player.
  *
- * Reads/writes go straight to disk (no in-memory cache) so an edit made on another server - e.g. via
- * the network's own {@code /pvploadout} editor writing the shared file - is seen here the next time a
- * duel starts. Writes are read-modify-write (load, change one player, atomic save).
+ * No cache: straight to disk, so an edit from another server's {@code /pvploadout} shows at the next duel.
+ * Writes are read-modify-write (load, change one player, atomic save).
  *
- * 41-slot layout (the convention the editor GUI maps to): [0..35] main inventory, [36] helmet,
- * [37] chestplate, [38] leggings, [39] boots, [40] off-hand.
+ * 41 slots: [0..35] main, [36] helmet, [37] chestplate, [38] leggings, [39] boots, [40] off-hand.
  */
 public final class PvpLoadouts {
 	public static final int SLOTS = 41;
@@ -40,7 +36,7 @@ public final class PvpLoadouts {
 		return load().players.containsKey(uuid.toString());
 	}
 
-	/** This player's saved 41-slot loadout, or null if they've never saved one. */
+	/** Saved 41-slot loadout, or null if none. */
 	public ItemStack[] get(UUID uuid) {
 		List<String> ser = load().players.get(uuid.toString());
 		return ser == null ? null : fromSer(ser);
@@ -70,7 +66,7 @@ public final class PvpLoadouts {
 		return arr;
 	}
 
-	/** Equip a player with a 41-slot loadout array, replacing their inventory. Call this at duel start. */
+	/** Replace their inventory with a 41-slot loadout. At duel start. */
 	public static void apply(Player p, ItemStack[] arr) {
 		PlayerInventory inv = p.getInventory();
 		for (int i = 0; i < 36; i++) inv.setItem(i, arr[i]);
@@ -82,7 +78,7 @@ public final class PvpLoadouts {
 		p.updateInventory();
 	}
 
-	/** On-disk shape: uuid string -> 41 base64 slots (null = empty). */
+	/** On disk: uuid -> 41 base64 slots (null = empty). */
 	public static class Data {
 		public Map<String, List<String>> players = new HashMap<>();
 	}

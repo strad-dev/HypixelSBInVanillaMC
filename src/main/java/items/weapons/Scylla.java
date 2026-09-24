@@ -36,31 +36,27 @@ import java.util.function.ToDoubleFunction;
 public class Scylla implements AbilityItem {
 	private static final int MANA_COST = 15;
 
-	/** This weapon's own attack damage, before any enchantment. Quoted on the lore line. */
+	/** Before enchants. Quoted on the lore. */
 	private static final double BASE_DAMAGE = 8;
 
 	/** Share of the wielder's melee damage the implosion deals. */
 	public static final double IMPLOSION_SHARE = 0.60;
-	/** Flat bonus every Hyperion deals to Withers. <b>Read by
-	 *  {@link listeners.CustomDamage#calculateFinalDamage} and quoted by the lore.</b> */
+	/** Flat bonus vs Withers. Read by {@link listeners.CustomDamage#calculateFinalDamage}, quoted by the lore. */
 	public static final double WITHER_BONUS = 4;
 
 	/**
-	 * Share of the absorption still standing when the Wither Shield expires that becomes real health.
-	 * <p>The same on every Hyperion, Manhunt rungs included - it used to be a {@code ManhuntTier} column, but
-	 * the absorption HP already scales what there is to convert, so scaling the share as well made the rungs
-	 * differ twice over for one effect.
+	 * Share of remaining absorption that becomes health when the shield expires. Same on every rung: it was a
+	 * ManhuntTier column, but absorption already scales, so the rungs differed twice for one effect.
 	 */
 	public static final double HEAL_SHARE = 0.50;
 
 	/**
-	 * Ticks the Wither Shield's absorption stands before it converts to healing. The same on every Hyperion,
-	 * Manhunt rungs included - {@link manhunt.ManhuntTier#witherShieldCooldown} decides when the shield may
-	 * go up AGAIN and never how long this one lasts.
+	 * Ticks before absorption converts to healing, same on every rung.
+	 * {@link manhunt.ManhuntTier#witherShieldCooldown} only decides when the next shield may go up.
 	 */
 	public static final int SHIELD_DURATION = 101;
 
-	/** {@link Cooldowns} tag for the shield's refresh, which runs on its own clock, not the ability's. */
+	/** {@link Cooldowns} tag for the shield refresh, separate from the ability. */
 	private static final String SHIELD_COOLDOWN = "witherShield";
 
 	public static ItemStack getItem() {
@@ -73,28 +69,20 @@ public class Scylla implements AbilityItem {
 
 	public static final String ID = "skyblock/combat/scylla";
 
-	/** Whether {@code item} is a full Hyperion, as opposed to a Manhunt one or a plain netherite sword. */
+	/** Full Hyperion only, not a Manhunt one or plain netherite sword. */
 	public static boolean isScylla(ItemStack item) {
 		if(item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) return false;
 		return ID.equals(Utils.firstLorePlain(item.getItemMeta()));
 	}
 
-	/**
-	 * The implosion damage this weapon would deal in {@code p}'s hands - the figure quoted on the lore, and
-	 * the one {@link #onRightClick} pays out before any Smite/Bane bonus.
-	 */
+	/** Lore figure; what {@link #onRightClick} pays before Smite/Bane. */
 	public static double implosionDamage(@Nullable Player p, ItemStack weapon) {
 		return Utils.meleeDamageWith(p, weapon) * IMPLOSION_SHARE;
 	}
 
 	/**
-	 * The item, carrying {@code enchants} and with lore that says so. <b>The enchantments go on here rather
-	 * than being applied by the caller afterwards</b> - that was the desync: the caller built the item, got
-	 * lore for whatever it named, and then enchanted the stack by material type.
-	 *
-	 * <p>{@code p} is the player the implosion line is written for, and may be null (a recipe result, the
-	 * creative palette) - the line then reads for a player with no other damage modifiers. It is kept in
-	 * step by {@code ItemReloader}, which rewrites the held Hyperion on join and on every slot switch.
+	 * Enchants go on here, not by the caller after; that was the lore desync. {@code p} may be null (recipe,
+	 * creative palette): lore then assumes no other damage modifiers. {@code ItemReloader} keeps it current.
 	 */
 	public static ItemStack getItem(Map<Enchantment, Integer> enchants, @Nullable Player p) {
 		ItemStack scylla = new ItemStack(Material.NETHERITE_SWORD);
@@ -110,8 +98,7 @@ public class Scylla implements AbilityItem {
 		scylla.setItemMeta(data);
 		scylla.addUnsafeEnchantments(enchants);
 
-		// The implosion figure is read off the FINISHED stack, so the lore quotes exactly what the ability
-		// pays out rather than a second copy of the same sum.
+		// Read off the finished stack so the lore quotes exactly what the ability pays.
 		double implosion = implosionDamage(p, scylla);
 
 		List<Component> lore = new ArrayList<>();
@@ -122,8 +109,7 @@ public class Scylla implements AbilityItem {
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray>Deals <red>+" + Utils.damageNumber(WITHER_BONUS) + "<gray> damage to Withers."));
 		lore.add(Utils.mm(""));
-		// This header is the line every lore tooltip in the plugin is measured against, so it is never
-		// wrapped - see MinecraftFont.LORE_WIDTH.
+		// Never wrapped: every tooltip is measured against it. See MinecraftFont.LORE_WIDTH.
 		lore.add(Utils.mm("<gold>Ability: Wither Impact <green><bold>RIGHT CLICK"));
 		lore.addAll(MinecraftFont.wrapLore(
 				"<gray>Teleport <green>10 blocks<gray> ahead of you.  Then implode, dealing <red>"
@@ -150,15 +136,13 @@ public class Scylla implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		ItemStack held = p.getInventory().getItemInMainHand();
-		// The same figures the melee pipeline pays out, so the number on the lore stays true through the
-		// Sharpness/Smite retune - and all three are read, where the old else-if chain counted exactly one of
-		// them and quoted numbers (level, level * 2) that matched neither vanilla nor this plugin.
+		// Same figures as the melee pipeline. The old else-if chain counted only one enchant and used numbers
+		// (level, level * 2) matching neither vanilla nor this plugin.
 		double targetDamage = Utils.meleeDamageWith(p, held);
 		double smite = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.SMITE));
 		double bane = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS));
 
-		// 0 refresh cooldown: the full Hyperion's shield is gated only by the one already standing, as ever.
-		// The ladder's cooldown is a Manhunt stat - see ManhuntTier.witherShieldCooldown.
+		// 0 refresh cooldown: only a standing shield gates it. See ManhuntTier.witherShieldCooldown.
 		return witherImpact(p, 10, 10, 10, 0.15, 0, entity -> {
 			double tempDamage = targetDamage;
 			if(entity instanceof Wither) {
@@ -173,32 +157,17 @@ public class Scylla implements AbilityItem {
 	}
 
 	/**
-	 * Wither Impact: teleport {@code distance} blocks ahead, implode on everything within {@code radius},
-	 * then put up the Wither Shield.
-	 *
-	 * <p><b>Shared with the Manhunt Hyperion</b>, which is the same ability on smaller numbers, so the two
-	 * cannot drift apart - the placement search below is the fiddly part and there is no second copy of it.
-	 *
-	 * @param distance        blocks to teleport, and how far the block raytrace reaches
-	 * @param radius          implosion radius
-	 * @param absorption      absorption HP the shield grants
-	 * @param damageReduction share taken off incoming damage while the shield is up
-	 * @param shieldCooldown  ticks before the shield may go up again, on top of the one still standing
-	 *                        blocking it; 0 leaves the standing shield as the only gate. It does <b>not</b>
-	 *                        move {@link #SHIELD_DURATION}, so the absorption and the healing it turns into
-	 *                        always run to 5 seconds
-	 * @param damage          per-target implosion damage. <b>0 or less means skip that target</b> - it is
-	 *                        never run through the pipeline at all, so it takes no knockback and is not
-	 *                        counted as hit. The Manhunt Hyperion honours its per-Speedrunner implosion
-	 *                        cooldown that way.
+	 * Teleport, implode, Wither Shield. Shared with the Manhunt Hyperion so the placement search has one copy.
+	 * {@code shieldCooldown}: ticks before the next shield, on top of a standing one; 0 = standing shield is the
+	 * only gate. Never changes {@link #SHIELD_DURATION}. {@code damage} of 0 or less skips the target entirely
+	 * (no pipeline, no knockback, not counted); Manhunt's implosion cooldown uses that.
 	 */
 	public static boolean witherImpact(Player p, double distance, double radius, double absorption,
 									   double damageReduction, int shieldCooldown,
 									   ToDoubleFunction<LivingEntity> damage) {
 		Location origin = p.getLocation().clone();
 		Location l = null;
-		// The world border counts as a solid block: clipped to it, so a Wither Impact aimed through the
-		// border lands just inside rather than outside. Shared with the Manhunt Hyperion, like the rest.
+		// World border counts as solid, so an impact aimed through it lands just inside.
 		double reach = Utils.borderDistance(p.getLocation(), p.getLocation().getDirection(), distance + 1.65);
 		RayTraceResult result = p.rayTraceBlocks(reach);
 		if(result == null) {
@@ -339,10 +308,8 @@ public class Scylla implements AbilityItem {
 				}
 			}
 		}
-		// Not every path above finds somewhere to stand: a SELF hit (the ray started inside a block) does
-		// nothing at all, and the side-face backtrack can run out of room without ever finding a safe spot.
-		// Both left l null and the implosion NPE'd on the particle call.  A blocked teleport does NOT cancel
-		// Wither Impact - it still implodes, just where the player already is.
+		// A SELF hit or a backtrack with no safe spot left l null and NPE'd the particle call. A blocked
+		// teleport still implodes, where the player stands.
 		if(l == null) l = p.getLocation();
 
 		p.setFallDistance(0);
@@ -356,15 +323,13 @@ public class Scylla implements AbilityItem {
 		double total = 0;
 		for(Entity entity : entities) {
 			if(!doNotKill.contains(entity.getType()) && !entity.equals(p) && entity instanceof LivingEntity entity1 && entity1.getHealth() > 0) {
-				// The counter reports what the implosion actually LANDED, not the figure it asked for: the
-				// pipeline still has armour, the Ice Spray modifiers, a shield, a totem and the PvP layer to
-				// put between the two.  Read back off DamageData rather than from the target's health, which
-				// would cap every kill at whatever the mob had left and lose the overkill.
+				// Counter reports damage LANDED (after armour, shields, PvP etc.), read off DamageData rather than
+				// target health, which would cap kills and lose overkill.
 				double tempDamage = damage.applyAsDouble(entity1);
-				if(tempDamage <= 0) continue; // refused outright - not a target, never mind a hit
+				if(tempDamage <= 0) continue; // refused, not a target
 				DamageData data = new DamageData(entity1, p, tempDamage);
 				CustomDamage.customMobs(entity1, p, tempDamage, DamageType.PLAYER_MAGIC, data);
-				if(data.damageDealt == 0) continue; // soaked to nothing, or suppressed: not a hit either
+				if(data.damageDealt == 0) continue; // soaked or suppressed, not a hit
 				damaged += 1;
 				total += data.damageDealt;
 			}
@@ -375,8 +340,7 @@ public class Scylla implements AbilityItem {
 		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		// wither shield
-		// Two gates: a shield already standing, as ever, and the refresh cooldown the caller hands in.  So a
-		// cooldown shorter than SHIELD_DURATION buys nothing - there is never a second shield over the first.
+		// Gated by a standing shield and the refresh cooldown, so a cooldown under SHIELD_DURATION buys nothing.
 		boolean shieldStanding = p.getScoreboardTags().contains("WitherShield");
 		if(!shieldStanding && !Cooldowns.onCooldown(p, SHIELD_COOLDOWN)) { // reduced damage
 			Cooldowns.start(p, SHIELD_COOLDOWN, shieldCooldown);
@@ -395,34 +359,25 @@ public class Scylla implements AbilityItem {
 				p.playSound(finalL, Sound.ENTITY_PLAYER_LEVELUP, 2.0F, 2.0F);
 			}, SHIELD_DURATION);
 			p.addScoreboardTag("WitherShield");
-			// The reduction is per-Hyperion, so CustomDamage cannot read it off the tag alone.
+			// Per-Hyperion, so CustomDamage can't read it off the tag alone.
 			WITHER_SHIELDS.put(p.getUniqueId(), damageReduction);
 			Utils.scheduleTask(() -> {
 				p.removeScoreboardTag("WitherShield");
 				WITHER_SHIELDS.remove(p.getUniqueId());
 			}, SHIELD_DURATION);
 		} else if(!shieldStanding) {
-			// Their shield has run out but the refresh has not come round yet, so this cast leaves them with
-			// no shield at all - the one refusal worth saying out loud.  NOT while one is still standing:
-			// they already have the thing the message would be about, and Wither Impact is spammable.
-			// Only reachable on a cooldown longer than SHIELD_DURATION; the full Hyperion passes 0.
+			// No shield and none coming: worth a message. Silent while one stands since Wither Impact is spammed.
+			// Only reachable with a cooldown over SHIELD_DURATION; the full Hyperion passes 0.
 			p.sendMessage(Utils.msg("<red>Your Wither Shield is on cooldown for "
 					+ String.format("%.2f", Cooldowns.remaining(p, SHIELD_COOLDOWN) / 20.0) + " seconds!"));
 		}
 		return true;
 	}
 
-	/**
-	 * How much every live Wither Shield takes off incoming damage, keyed by its owner. The share is the
-	 * Hyperion's, not the shield's, so a Manhunt Hyperion's weaker shield can't be told apart from the full
-	 * item's by the {@code WitherShield} tag that {@code CustomDamage} keys on.
-	 */
+	/** Damage reduction per live shield, by owner. The {@code WitherShield} tag alone can't tell rungs apart. */
 	private static final Map<UUID, Double> WITHER_SHIELDS = new HashMap<>();
 
-	/**
-	 * The share to take off damage aimed at {@code e}, given it carries the {@code WitherShield} tag. Falls
-	 * back to the full Hyperion's 15% for a shield nothing here put up.
-	 */
+	/** For a {@code WitherShield}-tagged entity. Falls back to the full Hyperion's 15%. */
 	public static double witherShieldReduction(LivingEntity e) {
 		return WITHER_SHIELDS.getOrDefault(e.getUniqueId(), 0.15);
 	}

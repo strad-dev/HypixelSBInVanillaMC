@@ -438,16 +438,13 @@ public class AddRecipes {
 	}
 
 	/**
-	 * One recipe per Manhunt Hyperion rung: the rung below it plus that many swords of the new material,
-	 * <b>shapeless</b>, so the arrangement in the grid is nobody's problem. Registered only when Manhunt is
-	 * on.
+	 * One recipe per Manhunt Hyperion rung: the rung below plus that many swords of the new material, <b>shapeless</b>.
+	 * Registered only when Manhunt is on.
 	 *
-	 * <p>The Hyperion ingredient can only be matched on its MATERIAL - one carries the owner's enchantments
-	 * and a live damage figure, so no {@code ExactChoice} would ever match. That makes a bare stick plus
-	 * eight wooden swords match too, which is why {@code ManhuntListener.onPrepareCraft} re-checks that
-	 * ingredient and throws the result away if it is not really a Hyperion. It also puts the right
-	 * enchantments and lore on the result, and is the reason {@code KeepEnchantsOnCraft} has to keep its
-	 * hands off these recipes: shapeless means grid slot 4 is whatever the player happened to drop there.
+	 * <p>The Hyperion ingredient can only match on MATERIAL (it carries enchants and a live damage figure, so no
+	 * {@code ExactChoice} matches), so a bare stick plus eight wooden swords matches too.
+	 * {@code ManhuntListener.onPrepareCraft} re-checks it, throws away a fake, and puts the right enchants and lore on
+	 * the result; that is why {@code KeepEnchantsOnCraft} must leave these alone.
 	 */
 	public static List<Recipe> addManhuntRecipes(Plugin plugin) {
 		List<Recipe> out = new ArrayList<>();
@@ -463,7 +460,7 @@ public class AddRecipes {
 		return out;
 	}
 
-	/** Whether {@code recipe} is one of the Manhunt upgrades, i.e. one nothing else may touch the result of. */
+	/** Whether {@code recipe} is a Manhunt upgrade, whose result nothing else may touch. */
 	public static boolean isManhuntRecipe(Recipe recipe) {
 		return recipe instanceof Keyed keyed && keyed.getKey().getKey().startsWith("manhunt_");
 	}

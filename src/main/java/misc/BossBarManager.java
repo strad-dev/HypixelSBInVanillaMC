@@ -88,7 +88,7 @@ public class BossBarManager {
 
 		private String buildTitle() {
 
-			// The name already has formatting; serialize to legacy §-codes so the (String-only) boss-bar title keeps its colors.
+			// Serialize to legacy §-codes so the String-only boss-bar title keeps its colours.
 			return entity.customName() != null ? Utils.legacyString(entity.customName()) : entity.getName();
 		}
 

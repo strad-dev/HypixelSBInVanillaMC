@@ -12,25 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The Manhunt Hyperion's upgrade ladder. One rung per sword material, from the Stick everybody starts a
- * Manhunt with up to Netherite, which crafts into a real {@code skyblock/combat/scylla} through the ordinary
- * Hyperion recipe. Every number the item quotes or pays out is here, so the lore cannot drift from the
- * ability.
- *
- * <p><b>A rung is identified by the stack's MATERIAL</b>, not by anything written into its NBT - every tier
- * shares the one item ID {@code skyblock/manhunt/hyperion}. Netherite is shared with the full Hyperion, which
- * is why {@link #of} checks the item ID first.
- *
- * <p>That shared item ID is also why the SkyBlock id is resolved here rather than by a row in
- * {@link misc.SkyblockId}'s {@code IDS} table: every other custom item's id is looked up from its lore id, and
- * these eight would all collide on one. <b>The two are separate identities</b> - the lore id is ours and picks
- * the behaviour, the SkyBlock id is Hypixel's and picks the client-side texture. A rung reads as whatever a
- * plain sword of the same material reads as, so {@link #skyblockId()} just asks
- * {@link misc.SkyblockId#vanillaFor}.
+ * Manhunt Hyperion upgrade ladder, Stick to Netherite; Netherite crafts into a real
+ * {@code skyblock/combat/scylla}. Every number the item quotes lives here so lore can't drift.
+ * A rung IS its material; all share one lore id, which is also why the SkyBlock id comes from
+ * {@link #skyblockId()} and not a row in {@link misc.SkyblockId}'s {@code IDS} (all eight would collide).
  */
 public enum ManhuntTier {
 	//                                                                swords  dmg   cost  abs  reduce  shieldCd  implode  radius  tick  intel  ench
-	// The teleport is NOT in here: it is a flat 10 blocks on every rung, so upgrading never moves it.
+	// No teleport column: it's a flat 10 blocks on every rung.
 	BASE(Material.STICK, "", Rank.COMMON,                            0, 0,   25, 1, 0.00, 200, 1,    7.5, 200, 250,  0),
 	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,               8, 1.5, 24, 3, 0.05, 200, 1.25, 8,   180, 325,  10),
 	STONE(Material.STONE_SWORD, "Stone", Rank.UNCOMMON,              8, 2.5, 23, 4, 0.06, 200, 1.75, 8.5, 160, 400,  12),
@@ -40,7 +29,7 @@ public enum ManhuntTier {
 	DIAMOND(Material.DIAMOND_SWORD, "Diamond", Rank.EPIC,            2, 5.5, 17, 6, 0.08, 160, 3.25, 9.5, 100, 750,  20),
 	NETHERITE(Material.NETHERITE_SWORD, "Netherite", Rank.LEGENDARY, 1, 6.5, 15, 8, 0.10, 150, 3.75, 10,  80,  1000, 25);
 
-	/** Item rarity, in the colours the rest of the plugin's lore uses. */
+	/** Item rarity. */
 	public enum Rank {
 		COMMON("white"), UNCOMMON("green"), RARE("blue"), EPIC("dark_purple"), LEGENDARY("gold");
 
@@ -54,16 +43,13 @@ public enum ManhuntTier {
 			return colour;
 		}
 
-		/**
-		 * The bottom rarity line, in the house style every other custom item uses: bold, the rank's colour,
-		 * and a single obfuscated glyph shimmering at each end.
-		 */
+		/** Bottom rarity line, same style as every other custom item. */
 		public String lore() {
 			return "<" + colour + "><bold><obfuscated>a</obfuscated> " + name() + " SWORD <obfuscated>a</obfuscated>";
 		}
 	}
 
-	/** The full Hyperion's rung, for the rules that have to cover it too: mana regen and the intelligence cap. */
+	/** Full Hyperion's regen and cap. */
 	public static final int FULL_TICKS_PER_MANA = 80;
 	public static final int FULL_MAX_INTELLIGENCE = 2500;
 
@@ -111,18 +97,17 @@ public enum ManhuntTier {
 		this.enchantability = enchantability;
 	}
 
-	/** The rung {@code item} sits on, or null if it is not a Manhunt Hyperion at all. */
+	/** Null if not a Manhunt Hyperion. */
 	@Nullable
 	public static ManhuntTier of(@Nullable ItemStack item) {
-		// Material first: it rules the stack out without reading any lore, which matters because the
-		// intelligence loop walks every inventory every tick.
+		// Material first, before lore: the intelligence loop walks every inventory every tick.
 		if(item == null) return null;
 		ManhuntTier tier = BY_MATERIAL.get(item.getType());
 		if(tier == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) return null;
 		return ID.equals(Utils.firstLorePlain(item.getItemMeta())) ? tier : null;
 	}
 
-	/** The next rung up, or null for Netherite - whose upgrade is the ordinary Hyperion recipe. */
+	/** Null for Netherite, whose upgrade is the normal Hyperion recipe. */
 	@Nullable
 	public ManhuntTier next() {
 		ManhuntTier[] all = values();
@@ -133,7 +118,7 @@ public enum ManhuntTier {
 		return material;
 	}
 
-	/** How many swords of this rung's material upgrade the rung below into this one. 0 for the Stick. */
+	/** Swords of this material to upgrade the rung below into this one. 0 for the Stick. */
 	public int swordsToUpgrade() {
 		return swordsToUpgrade;
 	}
@@ -142,7 +127,7 @@ public enum ManhuntTier {
 		return prefix.isEmpty() ? "Manhunt Hyperion" : prefix + " Manhunt Hyperion";
 	}
 
-	/** The material adjective, as vanilla names the sword: {@code Wooden}, {@code Golden}. Empty for the Stick. */
+	/** Vanilla's adjective ({@code Wooden}). Empty for the Stick. */
 	public String prefix() {
 		return prefix;
 	}
@@ -159,7 +144,7 @@ public enum ManhuntTier {
 		return manaCost;
 	}
 
-	/** Absorption HP the Wither Shield grants, in half-hearts of display (1 HP = half a heart on the bar). */
+	/** Wither Shield absorption in HP (1 HP = half a heart). */
 	public double absorption() {
 		return absorption;
 	}
@@ -170,31 +155,24 @@ public enum ManhuntTier {
 	}
 
 	/**
-	 * Ticks before the Wither Shield can go up again. <b>Not how long the shield lasts</b>: the absorption
-	 * and its conversion to healing always run on {@link items.weapons.Scylla#SHIELD_DURATION}, on every
-	 * rung, and this only decides when the next one may land.
-	 *
-	 * <p>A shield still standing blocks a refresh as well, so anything under {@code SHIELD_DURATION} buys
-	 * nothing - that is the floor. Manhunt only; the full Hyperion has no refresh cooldown of its own.
+	 * Ticks before the shield can go up again, not its length (always {@link items.weapons.Scylla#SHIELD_DURATION}).
+	 * A standing shield blocks a refresh too, so SHIELD_DURATION is the floor. Full Hyperion has none.
 	 */
 	public int witherShieldCooldown() {
 		return witherShieldCooldown;
 	}
 
-	/** Flat implosion damage. The full Hyperion is the one rung that scales off melee damage instead. */
+	/** Flat. Only the full Hyperion scales off melee damage. */
 	public double implosionDamage() {
 		return implosionDamage;
 	}
 
-	/**
-	 * Implosion radius. <b>The teleport is a flat 10 blocks on every rung</b>, deliberately - it is the one
-	 * number a player builds muscle memory around, so upgrading must not move it.
-	 */
+	/** Implosion radius. Teleport stays a flat 10 on every rung: players build muscle memory around it. */
 	public double radius() {
 		return radius;
 	}
 
-	/** Ticks of passive regen per point of intelligence. */
+	/** Passive regen ticks per point. */
 	public int ticksPerMana() {
 		return ticksPerMana;
 	}
@@ -204,24 +182,16 @@ public enum ManhuntTier {
 	}
 
 	/**
-	 * Enchanting-table power, <b>overriding the sword material's own</b> - which is not a ladder at all
-	 * (gold 22 beats netherite 15, stone is 5). 0 on the Stick, which leaves it with no
-	 * {@code minecraft:enchantable} component and therefore unenchantable at a table, books and anvils only.
-	 *
-	 * @see misc.Utils#setEnchantability
+	 * Overrides the material's own, which isn't a ladder (gold 22, netherite 15, stone 5). 0 on the Stick
+	 * means no {@code minecraft:enchantable}: books and anvils only. See {@link misc.Utils#setEnchantability}.
 	 */
 	public int enchantability() {
 		return enchantability;
 	}
 
 	/**
-	 * The real Hypixel item id this rung is stamped with, which is what a client-side pack reads to pick the
-	 * item's texture. <b>A rung renders as whatever a plain sword of its material renders as</b> - Undead
-	 * Sword through to Necron's Blade - so it is read straight out of {@link misc.SkyblockId#vanillaFor}
-	 * rather than copied into a column here, where the two could drift apart.
-	 *
-	 * <p>Null on the Stick, which is not a sword material and has no counterpart: the bottom rung stays a
-	 * plain stick client-side, the same as any other stick.
+	 * Hypixel id for the texture pack: same as a plain sword of this material, read from
+	 * {@link misc.SkyblockId#vanillaFor} so the two can't drift. Null on the Stick.
 	 */
 	@Nullable
 	public String skyblockId() {

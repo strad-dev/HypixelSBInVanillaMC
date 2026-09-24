@@ -63,16 +63,14 @@ public class CustomDamage implements Listener {
 
 	static net.kyori.adventure.text.Component nextDeathMessage = null;
 
-	// Last server tick each entity took Terminator-arrow knockback, so a same-tick volley of the 3
-	// arrows accumulates horizontally instead of each setVelocity overwriting the last.
+	// Last tick each entity took Terminator knockback, so a same-tick volley of 3 arrows stacks instead of overwriting.
 	private static final Map<Entity, Integer> lastTermKnockbackTick = new WeakHashMap<>();
 
-	// Stamped on an Ender Dragon the moment its death branch runs, and the one way to tell a corpse from a live
-	// dragon: vanilla's own death animation runs at 1 HP (EnderDragon.handleKillingBlow pins it there and hands
-	// the phase to DYING), so isDead() and getHealth() both read as alive for the whole 200-tick animation.
+	// Stamped on a dragon when its death branch runs; the only way to tell a corpse from a live one. Vanilla animates
+	// death at 1 HP (EnderDragon.handleKillingBlow), so isDead() and getHealth() read alive for all 200 ticks.
 	public static final String DYING_DRAGON_TAG = "DyingDragon";
 
-	/** True while an Ender Dragon is playing its death animation, i.e. it is a corpse and must take no damage. */
+	/** True while a dragon plays its death animation: a corpse, takes no damage. */
 	public static boolean isDyingDragon(Entity e) {
 		return e instanceof EnderDragon && e.getScoreboardTags().contains(DYING_DRAGON_TAG);
 	}
@@ -83,49 +81,41 @@ public class CustomDamage implements Listener {
 
 	// ================================ melee crits and weapon enchantments ================================
 	//
-	// Vanilla's critical hit is worth very little here and is unavailable exactly when a player is fighting.
-	// Two things about it:
+	// Vanilla's crit is weak and unavailable exactly when fighting:
+	//   * it multiplies only ATTRIBUTE damage; the enchant bonus is added after (Player.attack: `f *= 1.5f`, then
+	//     `f + g`), so a Sharpness VII Claymore crits for 1.5x of 10 plus a flat 7, not 1.5x of 17.
+	//   * Player.canCriticalAttack ends with `&& !isSprinting()`, so no crits while chasing anyone.
 	//
-	//   * it multiplies only the ATTRIBUTE damage.  The enchantment bonus is added afterwards, untouched
-	//     (Player.attack: `f *= 1.5f` and only then `f + g`), so a Sharpness VII Claymore's crit is worth
-	//     1.5x of 10 and a flat +7 on top rather than 1.5x of 17.
-	//   * Player.canCriticalAttack ends with `&& !isSprinting()`, so you cannot crit while sprinting, which
-	//     in practice means you cannot crit while chasing anyone.
-	//
-	// So the crit is decided and applied HERE instead: the same conditions minus the sprint clause, and a
-	// 1.5x over the WHOLE blow, enchantments included.  That is a large buff to enchanted weapons, so
-	// Sharpness and Smite/Bane are retuned downwards below to pay for it.  The whole exchange is meant to
-	// make the jump-crit worth doing rather than make gear hit harder.
+	// So the crit is decided here: same conditions minus sprint, 1.5x over the WHOLE blow. That buffs enchanted
+	// weapons a lot, so Sharpness and Smite/Bane are retuned down below to pay for it. The point is to make the
+	// jump-crit worth doing, not to make gear hit harder.
 
-	/** Sharpness, per level, replacing vanilla's {@code 0.5 * level + 0.5}.  Level 7 is the one the duel kit
-	 *  and the palette hand out, so it gets a round 5.5 rather than 5.25. */
+	/** Sharpness per level, replacing vanilla's {@code 0.5 * level + 0.5}. Level 7 is what the duel kit and palette
+	 *  hand out, so it gets a round 5.5, not 5.25. */
 	public static double sharpnessBonus(int level) {
 		if(level <= 0) return 0;
 		return level == 7 ? 5.5 : level * 0.75;
 	}
 
-	/** Smite / Bane of Arthropods against a target of the type they apply to, replacing vanilla's
-	 *  {@code 2.5 * level}.  Level 7 gets 11 rather than 10.5, for the same reason as Sharpness. */
+	/** Smite / Bane vs a matching target, replacing vanilla's {@code 2.5 * level}. Level 7 gets 11, not 10.5, same
+	 *  reason as Sharpness. */
 	public static double smiteBonus(int level) {
 		if(level <= 0) return 0;
 		return level == 7 ? 11 : level * 1.5;
 	}
 
 	/**
-	 * What Strength has to give back. Vanilla's is <b>+3 melee damage per level</b> (an {@code effect.strength}
-	 * {@code ADD_VALUE 3.0} modifier on ATTACK_DAMAGE, read off the 26.2 jar); this plugin pays <b>+2</b>, so
-	 * one point per level comes off every melee blow.
-	 *
-	 * <p>It rides on the attribute, so it is already inside anything that reads ATTACK_DAMAGE - vanilla's own
-	 * damage number, and {@code Utils.meleeDamageWith}. Both take this off rather than trying to keep the
-	 * modifier itself out, which is not ours to change: vanilla applies it transiently when the effect lands.
+	 * Vanilla Strength is +3 melee damage per level ({@code effect.strength} ADD_VALUE 3.0 on ATTACK_DAMAGE, per the
+	 * 26.2 jar); we pay +2, so this takes 1 per level off every melee blow. It rides on the attribute, so vanilla's
+	 * damage number and {@code Utils.meleeDamageWith} both subtract this; the modifier itself is vanilla's, applied
+	 * transiently when the effect lands.
 	 */
 	public static double strengthPenalty(LivingEntity attacker) {
 		PotionEffect strength = attacker.getPotionEffect(PotionEffectType.STRENGTH);
 		return strength == null ? 0 : strength.getAmplifier() + 1;
 	}
 
-	/** What vanilla would have given, which is what has to come back off before ours goes on. */
+	/** Vanilla's bonus, taken off before ours goes on. */
 	private static double vanillaSharpnessBonus(int level) {
 		return level <= 0 ? 0 : level * 0.5 + 0.5;
 	}
@@ -137,31 +127,24 @@ public class CustomDamage implements Listener {
 
 	// ================================ the swing's charge ================================
 	//
-	// Paper zeroes the attack-strength ticker INSIDE Player.attack, before the blow lands: onAttack(target)
-	// fires PlayerAttackEntityCooldownResetEvent and then calls resetOnlyAttackStrengthTicker(), and only
-	// after that does hurtOrSimulate fire the damage event this class listens to.  Vanilla does not care -
-	// Player.attack read getAttackStrengthScale ONCE at the top and kept it in a local, and both its crit
-	// verdict and its enchantment bonus ride on that copy - but anything re-reading the LIVE ticker later
-	// gets 0.5/delay instead of what vanilla judged: 0.025 on a 20-tick weapon where vanilla had 1.
+	// Paper zeroes the attack-strength ticker INSIDE Player.attack before the blow lands: onAttack(target) fires
+	// PlayerAttackEntityCooldownResetEvent, then resetOnlyAttackStrengthTicker(), and only then does hurtOrSimulate
+	// fire our damage event. Vanilla read getAttackStrengthScale once into a local for its crit and enchant bonus,
+	// but re-reading the LIVE ticker later gives 0.5/delay: 0.025 on a 20-tick weapon where vanilla had 1.
 	//
-	// It hid behind the plugin's own weapons, which all carry ATTACK_SPEED +100: that puts full charge at
-	// about 0.19 ticks, so even a zeroed ticker still clamps to 1 and they behaved.  Every VANILLA weapon
-	// silently lost both its crit (no 1.5x, no particles, no sound) and its whole Sharpness retune, since
-	// rebuildMelee scales our enchantment delta by the same number.
-	//
-	// So the charge is taken from the event that fires immediately before the reset, for this exact attack,
-	// and canCrit and rebuildMelee read it from there rather than off the ticker.
+	// Our own weapons hid it (ATTACK_SPEED +100 puts full charge at ~0.19 ticks, so a zeroed ticker still clamps to
+	// 1). Every VANILLA weapon lost its crit and its whole Sharpness retune, since rebuildMelee scales our enchant
+	// delta by the same number. So the charge is taken from the event fired right before the reset.
 
-	/** One swing's charge: the tick it was taken on, and the scale vanilla judged that swing by. */
+	/** One swing's charge: tick taken, and the scale vanilla judged it by. */
 	private record SwingCharge(int tick, float scale) {}
 
 	private static final Map<Player, SwingCharge> swingCharges = new WeakHashMap<>();
 
 	/**
-	 * Snapshot the charge while it is still there.  Paper fires this from {@code Player.onAttack}, one call
-	 * before it zeroes the ticker and two before our damage event, so the live read here is still the number
-	 * {@code Player.attack} cached for itself.  Read at {@code 0.5f} rather than taken off the event, whose
-	 * own figure is {@code getAttackStrengthScale(0.0f)} - half a tick short of vanilla's.
+	 * Snapshot the charge before Paper zeroes it: fired from {@code Player.onAttack}, one call before the reset and two
+	 * before our damage event. Read at {@code 0.5f}, not off the event, whose {@code getAttackStrengthScale(0.0f)} is
+	 * half a tick short of vanilla's.
 	 */
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onAttackCooldownReset(PlayerAttackEntityCooldownResetEvent e) {
@@ -170,12 +153,9 @@ public class CustomDamage implements Listener {
 	}
 
 	/**
-	 * The charge vanilla judged this swing by - {@link #onAttackCooldownReset}'s snapshot when it is from
-	 * this tick, the live ticker otherwise.
-	 *
-	 * <p>The fallback is for a blow that never went through {@code Player.attack} at all (a boss calling
-	 * into the pipeline, {@code /damage}), where nothing has been reset and the live value is correct.  An
-	 * older snapshot is refused rather than trusted: it describes a different swing.
+	 * Charge vanilla judged this swing by: {@link #onAttackCooldownReset}'s snapshot if from this tick, else the live
+	 * ticker. The fallback covers blows that never went through {@code Player.attack} (a boss, {@code /damage}), where
+	 * nothing was reset. An older snapshot is a different swing, so it is refused.
 	 */
 	private static float attackCharge(Player p) {
 		SwingCharge charge = swingCharges.get(p);
@@ -184,23 +164,18 @@ public class CustomDamage implements Listener {
 	}
 
 	/**
-	 * Can this player land a critical hit on that target?  {@code Player.canCriticalAttack} copied out of the
-	 * 26.2 jar with {@code !isSprinting()} dropped - the rule change, so a crit is available while chasing
-	 * someone - and {@code !onGround()} dropped as redundant, plus the attack-cooldown gate that lives in
-	 * {@code Player.attack} beside the call rather than inside it ({@code getAttackStrengthScale > 0.9}).
-	 *
-	 * <p>The cooldown comes from {@link #attackCharge}, not from the live ticker - Paper has already zeroed
-	 * that by the time this runs, so reading it here refused every crit a vanilla weapon earned.
+	 * {@code Player.canCriticalAttack} from the 26.2 jar minus {@code !isSprinting()} (the rule change: crits while
+	 * chasing) and {@code !onGround()} (redundant), plus the {@code getAttackStrengthScale > 0.9} gate that lives beside
+	 * the call in {@code Player.attack}. Charge comes from {@link #attackCharge}: the live ticker is already zeroed
+	 * here, which refused every vanilla weapon's crit.
 	 */
 	public static boolean canCrit(Player p, Entity target) {
 		if(!(target instanceof LivingEntity)) return false;
 		ServerPlayer sp = ((CraftPlayer) p).getHandle();
 		return attackCharge(p) > 0.9f
-				// Falling ALREADY means airborne, so vanilla's companion !onGround() clause is dropped:
-				// fallDistance only grows while y-velocity is negative, and Entity.checkFallDamage ends its
-				// onGround branch with an unconditional resetFallDistance(), so on the ground it is 0.
-				// What this really asks is that you connect on the way DOWN - the rising half of a jump
-				// does not crit, which is the vanilla jump-crit and is deliberate.
+				// Falling already means airborne, so !onGround() is dropped: fallDistance only grows while y-velocity
+				// is negative, and Entity.checkFallDamage resets it on the ground. You must connect on the way DOWN;
+				// the rising half of a jump does not crit, same as vanilla.
 				&& p.getFallDistance() > 0
 				&& !sp.onClimbable()
 				&& !sp.isInWater()
@@ -210,38 +185,30 @@ public class CustomDamage implements Listener {
 	}
 
 	/**
-	 * Half of vanilla's {@code horizontal_blocking_angle}: the shield's cone reaches this many degrees to
-	 * either side of where the defender is looking, so 90 is the 180-degree arc in front. It is the default
-	 * on vanilla's {@code minecraft:blocks_attacks} component, and it is read per-item there - we apply the
-	 * one number to every shield rather than reading the component, since nothing here varies it.
+	 * Half of vanilla's {@code horizontal_blocking_angle}: the cone reaches this many degrees either side of where the
+	 * defender looks, so 90 = the 180-degree front arc. Vanilla's default on {@code minecraft:blocks_attacks}; it is
+	 * per-item there, but nothing here varies it, so one number covers every shield.
 	 */
 	private static final double SHIELD_BLOCKING_ANGLE = 90;
 
 	/**
-	 * What a blocked blow is multiplied by: a shield takes <b>two thirds</b> off whatever would have landed.
-	 *
-	 * <p>Ours, not vanilla's. Vanilla's shield is {@code base 0, factor 1} on its {@code blocks_attacks}
-	 * component - a blocked hit is reduced to nothing - which is no good in a plugin where a hit is worth
-	 * dozens of hearts. The cone that decides WHETHER this applies is vanilla's; the number is not.
+	 * A blocked blow is multiplied by this: a shield takes two thirds off. Ours, not vanilla's: vanilla's
+	 * {@code blocks_attacks} is {@code base 0, factor 1}, blocking everything, which is no good when a hit is worth
+	 * dozens of hearts. The cone deciding WHETHER it applies is vanilla's.
 	 */
 	private static final double SHIELD_BLOCK_MULTIPLIER = 1.0 / 3.0;
 
 	/**
-	 * Did this blow come from inside the defender's shield cone?  <b>The rule our pipeline was missing
-	 * entirely</b>: a shield used to reduce damage from any direction, back included, because cancelling the
-	 * vanilla damage event skips {@code LivingEntity.applyItemBlocking} where the test lives.
+	 * Did this blow come from inside the defender's shield cone? Missing before: cancelling the vanilla event skips
+	 * {@code LivingEntity.applyItemBlocking}, so a shield blocked from any direction, back included.
 	 *
-	 * <p>Copied from the 26.2 jar.  Vanilla builds a HORIZONTAL look vector -
-	 * {@code calculateViewVector(0.0F, getYHeadRot())}, so pitch is ignored and looking at your feet does not
-	 * drop your guard - flattens the vector to the attacker the same way, and refuses the block when
-	 * {@code acos(dot)} exceeds the cone ({@code DamageReduction.resolve} returns 0 above it).
+	 * <p>Copied from the 26.2 jar: HORIZONTAL look vector ({@code calculateViewVector(0.0F, getYHeadRot())}, pitch
+	 * ignored, so looking at your feet keeps your guard), the vector to the attacker flattened the same way, and no
+	 * block when {@code acos(dot)} exceeds the cone ({@code DamageReduction.resolve} returns 0 above it).
 	 *
-	 * <p>Two deliberate departures.  Vanilla uses {@code acos} on the dot product and compares radians; a
-	 * 90-degree cone is exactly {@code dot >= 0}, but the {@code acos} is kept so the angle stays a readable
-	 * number to change.  And where vanilla treats a source with NO position as angle PI (outside every cone,
-	 * so no block at all), we keep the block: a missing position here means our own pipeline lost the
-	 * attacker, not that the damage genuinely came from nowhere, and the reduction should only be taken away
-	 * when we positively know the blow came from behind.
+	 * <p>Two departures. {@code acos} is kept even though 90 degrees is just {@code dot >= 0}, so the angle stays a
+	 * readable number. And a source with NO position still blocks (vanilla calls it angle PI, no block): here it means
+	 * our pipeline lost the attacker, and the block should only go when we know the blow came from behind.
 	 */
 	private static boolean blockedFromFront(LivingEntity damagee, Location source) {
 		if(source == null || !source.getWorld().equals(damagee.getWorld())) return true;
@@ -250,8 +217,8 @@ public class CustomDamage implements Listener {
 		Vector look = new Vector(-Math.sin(yaw), 0, Math.cos(yaw));
 
 		Vector toSource = source.toVector().subtract(damagee.getLocation().toVector()).setY(0);
-		// Vanilla's Vec3.normalize returns ZERO below 1e-4, making the dot 0 and the angle exactly 90 - which
-		// its own `angle > cone` test then lets through.  Standing in the defender's own column blocks.
+		// Vanilla's Vec3.normalize returns ZERO below 1e-4, giving angle exactly 90, which `angle > cone` lets
+		// through. So standing in the defender's own column blocks.
 		if(toSource.lengthSquared() < 1.0E-8) return true;
 
 		double dot = Math.clamp(toSource.normalize().dot(look), -1, 1);
@@ -259,26 +226,22 @@ public class CustomDamage implements Listener {
 	}
 
 	/**
-	 * Everything vanilla does to the defender once a blow is blocked: the {@code item.shield.block} thud, and
-	 * an axe taking the shield away. <b>Both are rules lost to cancelling the vanilla event</b> - the sound
-	 * lives in {@code LivingEntity.hurtServer} and the disable in {@code Player.blockUsingItem}, and neither
-	 * runs here - and both are a call INTO vanilla rather than a copy of it, so the volumes, the pitch roll,
-	 * the cooldown length and Paper's {@code PlayerShieldDisableEvent} are all vanilla's own.
+	 * What vanilla does to the defender on a block: the {@code item.shield.block} thud, and an axe disabling the
+	 * shield. Both are lost to cancelling the vanilla event (sound in {@code LivingEntity.hurtServer}, disable in
+	 * {@code Player.blockUsingItem}), and both call INTO vanilla, so volumes, pitch roll, cooldown length and Paper's
+	 * {@code PlayerShieldDisableEvent} are vanilla's own.
 	 *
-	 * <p>{@code onBlocked} plays the block sound at the defender. Vanilla plays it INSTEAD of the hurt sound;
-	 * ours is on top of whatever the hurt sound does here, because we never suppressed that.
+	 * <p>{@code onBlocked} plays the block sound at the defender. Vanilla plays it INSTEAD of the hurt sound; ours
+	 * plays on top, since we never suppressed that.
 	 *
-	 * <p>The axe rule: the attacker's {@code getSecondsToDisableBlocking()} reads their weapon's
-	 * {@code minecraft:weapon} component ({@code disable_blocking_for_seconds}, which only an axe has - 5
-	 * seconds, every tier, no enchantment and no chance roll), and {@code BlocksAttacks.disable} scales it by
-	 * the blocking item's {@code disable_cooldown_scale} (1.0 on a shield, so 100 ticks), puts the item on
-	 * cooldown, drops the block and plays {@code item.shield.break}. {@code melee} is false for anything shot:
-	 * vanilla tests the DIRECT entity behind the damage, which is then the projectile and never a
-	 * {@code LivingEntity}, so a bow cannot disable a shield however the shooter is armed.
+	 * <p>Axe rule: {@code getSecondsToDisableBlocking()} reads the weapon's {@code disable_blocking_for_seconds} (axes
+	 * only: 5s, every tier, no enchant, no roll), and {@code BlocksAttacks.disable} scales it by the shield's
+	 * {@code disable_cooldown_scale} (1.0, so 100 ticks), sets the cooldown, drops the block and plays
+	 * {@code item.shield.break}. {@code melee} is false for anything shot: vanilla tests the DIRECT entity, then the
+	 * projectile, so a bow never disables a shield.
 	 *
-	 * <p>Only the defender's ACTIVE blocking item is touched, so the 0.25s raise delay is already accounted
-	 * for: {@code getItemBlockingWith} is the same method {@code isBlocking} is built on. Players only, which
-	 * is all {@code DamageData.isBlocking} ever reports.
+	 * <p>Only the ACTIVE blocking item is touched, so the 0.25s raise delay is covered ({@code getItemBlockingWith} is
+	 * what {@code isBlocking} is built on). Players only, which is all {@code DamageData.isBlocking} reports.
 	 */
 	private static void onShieldBlock(LivingEntity damagee, Entity damager, boolean melee) {
 		if(!(damagee instanceof Player player)) return;
@@ -299,27 +262,23 @@ public class CustomDamage implements Listener {
 		if(seconds > 0) blocks.disable(nmsPlayer.level(), nmsPlayer, seconds, blocking, nmsAttacker);
 	}
 
-	/** Paper can switch player crits off per world.  If it ever is, vanilla did not crit either, so both the
-	 *  strip in {@link #rebuildMelee} and our own multiplier have to go quiet with it. */
+	/** Paper can turn player crits off per world. Then vanilla did not crit either, so both the strip in
+	 *  {@link #rebuildMelee} and our multiplier go quiet too. */
 	private static boolean critsEnabled(World world) {
 		return !((CraftWorld) world).getHandle().paperConfig().entities.behavior.disablePlayerCrits;
 	}
 
 	/**
-	 * Rebuild one melee blow.  Takes vanilla's number back apart - its enchantment bonus off, its own crit
-	 * off - puts our enchantment values on instead, and then multiplies the WHOLE thing by the crit.
+	 * Rebuild one melee blow: take vanilla's enchant bonus and crit back off, put our enchant values on, then multiply
+	 * the WHOLE thing by the crit. Unwinds rather than recomputing from the attribute, so everything else vanilla folded
+	 * in stays: mace smash, cooldown scaling, the boss difficulty normalisation applied to {@code e.getDamage()} just
+	 * before the call.
 	 *
-	 * <p>It unwinds rather than recomputing from the attribute, so everything else vanilla folded in stays
-	 * in: the mace's smash bonus, the attack-cooldown scaling, and the boss difficulty normalisation applied
-	 * to {@code e.getDamage()} a few lines above the call.
+	 * <p>Vanilla's bonus is asked of {@code EnchantmentHelper}, so an enchant we don't model (Impaling, datapack ones)
+	 * survives as itself. Only the three levels below are swapped.
 	 *
-	 * <p>The enchantment bonus is asked of {@code EnchantmentHelper}, the same helper vanilla used, so an
-	 * enchantment we have not modelled (Impaling on a trident, anything a datapack adds) survives the strip
-	 * as itself instead of being silently dropped.  Only the three levels below are swapped out.
-	 *
-	 * <p><b>Mobs take the enchantment retune and nothing else.</b>  They cannot crit, and their damage does
-	 * not always come from a vanilla swing, so the delta is added the way the old Sharpness patch did rather
-	 * than the whole number being taken apart.
+	 * <p><b>Mobs get the enchant retune only.</b> They can't crit and their damage isn't always a vanilla swing, so the
+	 * delta is just added, like the old Sharpness patch.
 	 */
 	private static double rebuildMelee(LivingEntity attacker, LivingEntity target, double vanillaDamage, boolean crit) {
 		ItemStack weapon = attacker.getEquipment() == null ? null : attacker.getEquipment().getItemInMainHand();
@@ -329,8 +288,7 @@ public class CustomDamage implements Listener {
 		int smite = weapon.getEnchantmentLevel(Enchantment.SMITE);
 		int bane = weapon.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS);
 		net.minecraft.world.entity.Entity nmsTarget = ((CraftEntity) target).getHandle();
-		// Smite and Bane only ever applied if the target is of the type they are for, so the delta is zero
-		// otherwise - asked of the same tags the enchantments' own conditions use.
+		// Smite/Bane only apply to their target type, else the delta is 0. Same tags the enchants use.
 		if(!nmsTarget.is(net.minecraft.tags.EntityTypeTags.SENSITIVE_TO_SMITE)) smite = 0;
 		if(!nmsTarget.is(net.minecraft.tags.EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)) bane = 0;
 
@@ -345,25 +303,23 @@ public class CustomDamage implements Listener {
 
 		ServerPlayer sp = ((CraftPlayer) p).getHandle();
 		ServerLevel level = ((CraftWorld) p.getWorld()).getHandle();
-		// The enchantment bonus is scaled by the swing's charge and the base damage by its square; the crit
-		// multiplies neither of the two, it multiplies what they add up to.
+		// Enchant bonus scales with charge, base damage with its square; the crit multiplies their sum.
 		float scale = attackCharge(p);
 		float attributeDamage = (float) sp.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE);
 		DamageSource source = level.damageSources().playerAttack(sp);
 		double vanillaEnchant = scale * (net.minecraft.world.item.enchantment.EnchantmentHelper.modifyDamage(
 				level, sp.getWeaponItem(), nmsTarget, source, attributeDamage) - attributeDamage);
 
-		// 1. the blow with no enchantments and no crit on it.  Vanilla's own crit is ours minus the sprint
-		// clause, so the caller's answer settles it and the conditions are only evaluated once.
+		// 1. the blow with no enchants and no crit. Vanilla's crit is ours minus sprint, so the caller's
+		// answer settles it.
 		double base = vanillaDamage - vanillaEnchant;
 		if(crit && !p.isSprinting()) {
 			base /= 1.5; // vanilla's crit, which it applied to this part alone
 		}
 
-		// Strength down from +3 to +2 per level.  It sits in the attribute, so it is inside `base` and was
-		// scaled by the charge the same way the rest of the attribute damage was (Player.attack does
-		// `attributeDamage * (0.2 + scale^2 * 0.8)`); the penalty is scaled to match, and the crit below
-		// then multiplies the nerfed blow rather than the vanilla one.
+		// Strength +3 -> +2 per level. It is in the attribute, so inside `base` and charge-scaled like the rest
+		// (Player.attack: `attributeDamage * (0.2 + scale^2 * 0.8)`); the penalty is scaled to match, and the
+		// crit below multiplies the nerfed blow.
 		base -= strengthPenalty(p) * (0.2 + scale * scale * 0.8);
 
 		// 2. our enchantment bonus, then 3. the crit over both.
@@ -383,11 +339,10 @@ public class CustomDamage implements Listener {
 	}
 
 	public static void customMobs(LivingEntity damagee, Entity damager, double originalDamage, DamageType type, DamageData data) {
-		// A dragon mid-death animation is a corpse.  Hitting one used to re-run the whole death branch below - the
-		// phase flip, dragonDeathTime back to 1, another death sound, another XP drop, another pin ticker - so a
-		// party still swinging restarted the 200-tick animation every hit and the dragon simply never finished
-		// dying.  It also re-ran the boss's own whenDamaged (the Primal Dragon replayed its death dialogue and
-		// re-granted the advancement) and drew hit particles off a dead target.  Refuse at both entry points.
+		// A dragon mid-death is a corpse. Hitting one re-ran the whole death branch (phase flip, dragonDeathTime back
+		// to 1, another death sound, XP drop and pin ticker), so a party still swinging restarted the 200-tick animation
+		// every hit and it never finished dying. It also re-ran whenDamaged (Primal Dragon replayed its death dialogue and
+		// advancement). Refused at both entry points.
 		if(isDyingDragon(damagee)) return;
 		if(damager instanceof Projectile projectile) {
 			originalDamage = data.originalDamage;
@@ -398,19 +353,14 @@ public class CustomDamage implements Listener {
 				if(arrow.getPierceLevel() == 0) {
 					arrow.remove();
 				} else {
-					// DO NOT decrement the pierce level. Vanilla counts its own hits, in
-					// AbstractArrow.onHitEntity: it keeps the entity ids it has already pierced in
-					// piercingIgnoreEntityIds and discards the arrow once that set reaches
-					// getPierceLevel() + 1. Lowering the level here counted every hit TWICE, so the two
-					// counters met early - a Terminator arrow (pierce 4, lore "up to 5 foes") stopped
-					// dealing damage after THREE, and the fourth hit was swallowed without a scratch,
-					// which is exactly what a shot phasing through a target looks like.
+					// DO NOT decrement pierce. Vanilla counts its own hits in AbstractArrow.onHitEntity
+					// (piercingIgnoreEntityIds, discarded at getPierceLevel() + 1). Lowering it here counted each hit
+					// twice: a Terminator arrow (pierce 4, "up to 5 foes") stopped dealing damage after 3 and the 4th
+					// phased through.
 					//
-					// The velocity IS ours to put back. Cancelling the damage event makes hurtOrSimulate
-					// return false, so vanilla takes its miss branch and deflects the arrow REVERSE at 0.2
-					// of its speed - the bounce you see off a mob. Scheduler tasks run before entities
-					// tick, so restoring it next tick lands before that reversed vector can move the
-					// arrow, though the client still renders one frame of the flip.
+					// The velocity IS ours to restore: cancelling the event makes hurtOrSimulate return false, and
+					// vanilla's miss branch reverses the arrow at 0.2 speed (the bounce off a mob). Scheduler tasks run
+					// before entities tick, so next tick lands first; the client still renders one frame of the flip.
 					Vector arrowSpeed = arrow.getVelocity();
 					Utils.scheduleTask(() -> arrow.setVelocity(arrowSpeed), 1L);
 				}
@@ -466,8 +416,8 @@ public class CustomDamage implements Listener {
 			doContinue = false;
 		}
 
-		// PvP layer (config-gated, inert off the pvp server): suppress damage in a Free-For-All
-		// safezone, during a duel countdown, or from an outsider interfering in a duel.
+		// PvP layer (config-gated, inert off pvp): no damage in an FFA safezone, a duel countdown, or from an
+		// outsider in a duel.
 		if(pvp.PvpHooks.shouldBlock(damagee, damager)) {
 			doContinue = false;
 		}
@@ -513,30 +463,25 @@ public class CustomDamage implements Listener {
 				}
 			}
 
-			// Golden-sword piglins hit disproportionately hard for how commonly they spawn holding one;
-			// shave 25% off. Multiplicative here, so the sword's +3 and any vanilla difficulty scaling
-			// baked into the incoming damage are both scaled proportionally.
+			// Golden-sword piglins hit too hard for how often they spawn; shave 25%. Multiplicative, so the
+			// sword's +3 and any vanilla difficulty scaling in the incoming damage scale with it.
 			if(type == DamageType.MELEE && (damager instanceof Piglin piglin
 					&& piglin.getEquipment().getItemInMainHand().getType() == Material.GOLDEN_SWORD) || (damager instanceof WitherSkeleton skeleton
 					&& skeleton.getEquipment().getItemInMainHand().getType() == Material.STONE_SWORD)) {
 				finalDamage *= 0.75;
 			}
 
-			// shield logic (for weirdos).  A raised shield only counts against a blow from the FRONT - see
-			// blockedFromFront.  The multiplier itself is ours and is NOT vanilla's number - see
-			// SHIELD_BLOCK_MULTIPLIER.
-			// The projectile's own position where we have it, the attacker's otherwise - the fallback is for
-			// the DamageData built off a plain EntityDamageEvent, which never saw an attacker.
+			// shield logic (for weirdos).  Only a blow from the FRONT counts (blockedFromFront); the multiplier
+			// is ours, not vanilla's (SHIELD_BLOCK_MULTIPLIER). Source is the projectile's position if known, else
+			// the attacker's; the fallback is for DamageData built off a plain EntityDamageEvent, with no attacker.
 			Location shieldSource = data.sourcePosition != null ? data.sourcePosition
 					: (damager == null ? null : damager.getLocation());
 			if(data.isBlocking && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL)
 					&& blockedFromFront(damagee, shieldSource)) {
-				// Vanilla's own test for "the block did something": it plays the block sound (and takes the
-				// hurt sound away) only when the amount it took off is greater than zero.
+				// Vanilla's test that the block did something: block sound (and no hurt sound) only if it took off > 0.
 				boolean reduced = finalDamage > 0;
 				finalDamage *= SHIELD_BLOCK_MULTIPLIER;
-				// Vanilla only ever disables blocking off a MELEE blow: it tests the DIRECT entity behind the
-				// damage, which for anything shot is the projectile and never a LivingEntity.
+				// Vanilla only disables blocking on MELEE: it tests the DIRECT entity, a projectile for anything shot.
 				if(reduced) onShieldBlock(damagee, damager, type == DamageType.MELEE || type == DamageType.MELEE_SWEEP);
 			}
 
@@ -631,25 +576,21 @@ public class CustomDamage implements Listener {
 			double absorption = damagee.getAbsorptionAmount();
 			double oldHealth = damagee.getHealth();
 
-			// What the blow landed, for an ability that reports its own damage (the Hyperion's implosion
-			// counter). Here rather than lower down because this is the last word on the figure: the
-			// absorption split below spends part of it, and the health it removes is capped by whatever the
-			// target had left, neither of which is the damage dealt.
+			// What the blow landed, for abilities that report their own damage (Hyperion implosion counter). Set
+			// here since it's the final figure: the absorption split below spends part of it and the health removed
+			// is capped by what the target had left.
 			data.damageDealt = finalDamage;
 
 			// PvP layer (config-gated, inert off the pvp server): record this hit for arena/duel combat stats.
 			pvp.PvpHooks.trackHit(damagee, damager, finalDamage,
 					type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL,
-					data.isCrit, // critical - decided once, at the damage event, and already priced into finalDamage
+					data.isCrit, // decided once at the damage event, already in finalDamage
 					damagee.getNoDamageTicks() > 0); // landed during the victim's i-frames
 
-			// Intelligence for landing a melee blow. Granted here, at the end of the pipeline, rather than
-			// at the damage event, so a swing that ends up dealing nothing (armor/resistance soaking it to
-			// 0, a blocked hit, an i-framed target, or a blow the PvP layer suppressed) pays out nothing.
-			// Any living target pays out - except during a Manhunt, where it has to be a player on the
-			// OPPOSING side.  Mobs paying out would let a Hunter farm mana off a cow instead of hunting, and
-			// hitting your own team for it is worse still: two Hunters stood in a corner punching each other
-			// would out-regen anybody actually playing, and a Speedrunner could feed a teammate the same way.
+			// Intelligence for a melee hit. Granted here, at the end of the pipeline, so a swing that deals nothing
+			// (soaked to 0, blocked, i-framed, PvP-suppressed) pays nothing. Any living target pays, except in a
+			// Manhunt, where it must be a player on the OPPOSING team: otherwise a Hunter farms mana off a cow, or two
+			// teammates punch each other in a corner and out-regen anyone actually playing.
 			if(finalDamage > 0 && type == DamageType.MELEE && damager instanceof Player p
 					&& (!manhunt.Manhunt.active()
 							|| (damagee instanceof Player victim && manhunt.Manhunt.opposingTeams(p, victim)))) {
@@ -672,11 +613,9 @@ public class CustomDamage implements Listener {
 				Location particleLoc = damagee.getLocation().add(0, damagee.getHeight() / 2, 0);
 				ItemStack weapon = p.getEquipment().getItemInMainHand();
 
-				// Critical hit particles and sound, placed the way vanilla places them: the particles on the
-				// TARGET (Player.crit) but the sound on the ATTACKER, in the PLAYERS category
-				// (Player.playServerSideSound plays it at the attacker's own x/y/z, at getSoundSource()).
-				// It used to come from the victim with no category, so it panned to the wrong place and
-				// ignored the players slider.
+				// Crit particles on the TARGET (Player.crit), sound on the ATTACKER in the PLAYERS category
+				// (Player.playServerSideSound), as vanilla does. It used to play from the victim with no category, so
+				// it panned wrong and ignored the players slider.
 				if(data.isCrit) {
 					damagee.getWorld().spawnParticle(Particle.CRIT, particleLoc, 24);
 					p.getWorld().playSound(p, Sound.ENTITY_PLAYER_ATTACK_CRIT, SoundCategory.PLAYERS, 1.0F, 1.0F);
@@ -843,8 +782,8 @@ public class CustomDamage implements Listener {
 				}
 			}
 			if(finalDamage >= oldHealth + absorption) {
-				// PvP layer: totems are ignored (kept, not consumed) inside the FFA arena, where the kill is
-				// scored and the victim respawns anyway. Always false off the pvp server / outside the arena.
+				// PvP layer: totems are kept, not consumed, in the FFA arena, where the kill is scored and the victim
+				// respawns anyway. Always false off pvp / outside the arena.
 				if(type != DamageType.LETHAL_ABSOLUTE && !pvp.PvpHooks.ignoresTotem(damagee) && (damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING) || damagee.getEquipment().getItemInOffHand().getType().equals(Material.TOTEM_OF_UNDYING))) {
 					if(damagee.getEquipment().getItemInMainHand().getType().equals(Material.TOTEM_OF_UNDYING)) {
 						damagee.getEquipment().setItemInMainHand(new ItemStack(Material.AIR));
@@ -863,8 +802,7 @@ public class CustomDamage implements Listener {
 					}
 
 					damagee.setHealth(1.0);
-					// Play the totem sound. Send it straight to the player (and to nearby players via the
-					// world location) since the entity-event 35 animation doesn't reliably carry the sound here.
+					// Totem sound to the player and nearby; entity event 35 doesn't reliably carry it here.
 					Location totemLoc = damagee.getLocation();
 					damagee.getWorld().playSound(totemLoc, Sound.ITEM_TOTEM_USE, 1.0F, 1.0F);
 					if(damagee instanceof Player totemUser) {
@@ -876,10 +814,9 @@ public class CustomDamage implements Listener {
 					damagee.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, 100, 1));
 					triggerAllRelevantAdvancements(damagee, damager, type, data.originalDamage, finalDamage, data.isBlocking, false, data);
 				} else {
-					// PvP layer (config-gated, inert off the pvp server): with no totem to save them, a
-					// lethal blow ends the duel / scores the FFA kill and revives the player instead of
-					// killing them. Placed AFTER the totem branch so arena kills don't bypass totems.
-					// LETHAL_ABSOLUTE (e.g. /kill, void) is a draw in 1v1 and doesn't count a death in FFA.
+					// PvP layer (config-gated, inert off pvp): with no totem, a lethal blow ends the duel / scores the FFA
+					// kill and revives the player. After the totem branch so arena kills don't bypass totems.
+					// LETHAL_ABSOLUTE (/kill, void) is a draw in 1v1 and no death in FFA.
 					if(pvp.PvpHooks.handleLethal(damagee, damager, type == DamageType.LETHAL_ABSOLUTE)) {
 						return;
 					}
@@ -898,7 +835,7 @@ public class CustomDamage implements Listener {
 						// handle ender dragons specially
 						if(damagee instanceof EnderDragon dragon) {
 							if(!(dragon instanceof CraftEnderDragon)) return;
-							dragon.addScoreboardTag(DYING_DRAGON_TAG); // from here on it is a corpse - see isDyingDragon
+							dragon.addScoreboardTag(DYING_DRAGON_TAG); // a corpse from here on, see isDyingDragon
 							net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon = ((CraftEnderDragon) dragon).getHandle();
 							nmsDragon.getPhaseManager().setPhase(EnderDragonPhase.DYING);
 							DragonPhaseInstance phase = nmsDragon.getPhaseManager().getCurrentPhase();
@@ -932,9 +869,8 @@ public class CustomDamage implements Listener {
 							dragon.setSilent(true);
 							Utils.scheduleTask(() -> spawnDragonXP(dragon.getLocation(), dragon.getScoreboardTags().contains("HardMode") ? 640000 : 64000), 190);
 
-							// Pin the dragon at its kill spot for the death animation. The DYING phase otherwise
-							// paths it toward the exit portal first, so it visibly flies off before the death
-							// beams/ascent play. Cancel horizontal movement each tick; keep the upward death rise.
+							// Pin the dragon at its kill spot for the animation: DYING otherwise paths it to the exit portal
+							// first, so it flies off before the beams play. Cancel horizontal movement each tick, keep the rise.
 							final double dragonPinX = dragon.getLocation().getX();
 							final double dragonPinZ = dragon.getLocation().getZ();
 							final int[] dragonPinTicks = {0};
@@ -956,8 +892,7 @@ public class CustomDamage implements Listener {
 									Component message = damageSource.getLocalizedDeathMessage(nmsPlayer);
 									nextDeathMessage = io.papermc.paper.adventure.PaperAdventure.asAdventure(message);
 								} else {
-									// Build a Component from the killer's formatted display name (its live magic shimmer)
-									// rather than the plain getName(), so a boss keeps its colours/shimmer in the death message.
+									// Killer's formatted name, not getName(), so a boss keeps its colours/shimmer in the death message.
 									net.kyori.adventure.text.Component killer = damager instanceof LivingEntity dle && dle.customName() != null ? dle.customName() : net.kyori.adventure.text.Component.text(damager != null ? damager.getName() : "absolutely no one");
 									net.kyori.adventure.text.Component who = net.kyori.adventure.text.Component.text(p.getName());
 									nextDeathMessage = switch(type) {
@@ -993,8 +928,8 @@ public class CustomDamage implements Listener {
 				}
 
 				if(damagee instanceof Mob && damager instanceof LivingEntity) {
-					// Endermen shouldn't swarm the dragon just for standing in its breath/fireball AoE around
-					// the fountain; only a direct flying hit (MELEE) should pull their aggro onto it.
+					// Endermen shouldn't swarm the dragon over its breath/fireball AoE at the fountain; only a direct
+					// MELEE hit pulls their aggro.
 					boolean dragonAoeOnEnderman = damagee instanceof Enderman && damager instanceof EnderDragon && type != DamageType.MELEE;
 					if(!(damagee instanceof Wolf wolf && damager instanceof Player player && wolf.getOwner().getUniqueId().equals(player.getUniqueId())) && !dragonAoeOnEnderman) {
 						((Mob) damagee).setTarget((LivingEntity) damager);
@@ -1023,8 +958,7 @@ public class CustomDamage implements Listener {
 				} else if(isPhysicalHit && damager != null) {
 					// apply knockback
 					double antiKB = 1 - Objects.requireNonNull(damagee.getAttribute(Attribute.KNOCKBACK_RESISTANCE)).getValue();
-					// Skip everything for a fully knockback-resistant target (antiKB <= 0): its motion is
-					// left untouched (vanilla behavior) and we avoid a sqrt of a non-positive amount.
+					// Fully knockback-resistant (antiKB <= 0): motion untouched, as vanilla, and no sqrt of a non-positive.
 					if(antiKB > 0) {
 						double enchantments = 1;
 
@@ -1040,10 +974,9 @@ public class CustomDamage implements Listener {
 						double modifiers = enchantments;
 
 						if(type == DamageType.MELEE) {
-							// The crit is the one the DAMAGE was priced with, not a fresh getFallDistance() test:
-							// that gate is looser than canCrit, which also wants the attack cooldown, no ladder, no
-							// water and crits enabled, so a half-charged swing on the way down was knocked back as a
-							// crit while being damaged as a normal hit.  It also let a falling MOB earn the bonus.
+							// Use the crit the DAMAGE was priced with, not a fresh getFallDistance() test: that is looser than
+							// canCrit (cooldown, ladder, water, crits enabled), so a half-charged falling swing got crit knockback
+							// on a normal hit, and a falling MOB got the bonus.
 							if(data.isCrit) {
 								modifiers *= 1.2;
 							}
@@ -1061,10 +994,9 @@ public class CustomDamage implements Listener {
 							modifiers *= 0.5;
 						}
 
-						// Vertical knockback is a sqrt function of knockback resistance ONLY (enchant/
-						// sprint/blocking never change the pop height). Horizontal uses antiKB^0.75 to
-						// compensate for the longer air-time of that higher pop, keeping distance ~linear
-						// in resistance (full netherite still lands ~60%) and exactly linear in the modifiers.
+						// Vertical KB is a sqrt of knockback resistance ONLY (enchant/sprint/block never change pop height).
+						// Horizontal uses antiKB^0.75 to offset the longer air time of that higher pop, so distance stays
+						// ~linear in resistance (full netherite still lands ~60%) and exactly linear in the modifiers.
 						double vertical = 0.4 * Math.sqrt(Math.min(antiKB, 1.0));
 						double horizontal = 0.4 * (antiKB <= 1 ? Math.pow(antiKB, 0.75) : antiKB) * modifiers;
 
@@ -1082,13 +1014,11 @@ public class CustomDamage implements Listener {
 						Vector oldVelocity = damagee.getVelocity();
 						Vector newVelocity;
 						if(data.isTermArrow && Integer.valueOf(MinecraftServer.currentTick).equals(lastTermKnockbackTick.get(damagee))) {
-							// Same-tick Terminator volley: stack horizontally onto the prior arrow(s) so the
-							// three 1/3-strength hits add up, keeping the single-hit pop (don't launch 3x high).
+							// Same-tick Terminator volley: stack horizontally so the three 1/3 hits add up, keeping one hit's pop.
 							newVelocity = new Vector(oldVelocity.getX() + knockbackDir.getX() * horizontal, (damagee.isOnGround() ? Math.max(oldVelocity.getY(), vertical) : oldVelocity.getY()), oldVelocity.getZ() + knockbackDir.getZ() * horizontal);
 						} else {
-							// First hit this tick: damp the target's own momentum (retain 10%) as usual. Only apply the
-							// vertical pop when grounded; an airborne target keeps its current Y (like vanilla) so hits
-							// mid-air don't cancel its fall/jump arc.
+							// First hit this tick: keep 10% of the target's momentum. Vertical pop only when grounded; an
+							// airborne target keeps its Y, like vanilla, so mid-air hits don't cancel a fall or jump.
 							newVelocity = new Vector(oldVelocity.getX() * 0.1 + knockbackDir.getX() * horizontal, (damagee.isOnGround() ? vertical : oldVelocity.getY()), oldVelocity.getZ() * 0.1 + knockbackDir.getZ() * horizontal);
 						}
 
@@ -1581,9 +1511,8 @@ public class CustomDamage implements Listener {
 
 		} else if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
-			// Wither skulls are hurting projectiles: cancelling their damage event makes vanilla DEFLECT
-			// them (they visibly bounce off) instead of consuming them. Remove the skull on any entity
-			// hit so it disappears like a normal impact; the custom damage below still lands.
+			// Cancelling a wither skull's damage event makes vanilla DEFLECT it (visible bounce). Remove it on any
+			// entity hit so it disappears like a normal impact; the custom damage below still lands.
 			if(e.getDamager() instanceof org.bukkit.entity.WitherSkull skull) {
 				skull.remove();
 			}
@@ -1608,22 +1537,18 @@ public class CustomDamage implements Listener {
 					}
 				}
 
-				// A blow the PvP layer suppresses (Free-For-All safezone, duel countdown, an outsider
-				// interfering in a duel) never lands - customMobs stops at the same shouldBlock check
-				// below - so it must not pay out either: no hit against the victim's stats (and no
-				// intelligence, which dealDamage grants). Always false off the pvp server / with PvP disabled.
+				// A PvP-suppressed blow never lands (customMobs stops at the same shouldBlock), so it must not pay out
+				// either: no hit stat, no intelligence. Always false off pvp / with PvP disabled.
 				boolean pvpBlocked = pvp.PvpHooks.shouldBlock(entity, e.getDamager());
 
 				if(entity.getNoDamageTicks() == 0 || e.getDamager() instanceof AbstractArrow) {
 					Entity damager = e.getDamager();
 
-					// 26.2 takes amount/4 + min(amount, 1) off every blow that does not land on the dragon's
-					// HEAD, the neck included - and the neck is what an aimed hit usually connects with.
-					// Put a neck hit back to what was thrown, which is what 26.3 does by counting the neck as
-					// the head.  MELEE ONLY: DragonNeck records a part off the swing event and nothing else,
-					// so an arrow on the neck stays quartered and the 4x is a melee reward.  Before
-					// rebuildMelee, so the rebuild works off the same figure a head hit gives it.
-					// BACKPORT - delete with DragonNeck on 26.3.
+					// 26.2 takes amount/4 + min(amount, 1) off every blow not on the dragon's HEAD, neck included, and the
+					// neck is what an aimed hit usually connects with. 26.3 counts the neck as head; this puts a neck hit
+					// back to full. MELEE ONLY: DragonNeck records the part off the swing event, so an arrow on the neck
+					// stays quartered and the 4x is a melee reward. Before rebuildMelee, so it gets the same figure as a
+					// head hit. BACKPORT - delete with DragonNeck on 26.3.
 					if(entity instanceof EnderDragon) {
 						e.setDamage(DragonNeck.unquarter(damager, e.getDamage()));
 					}
@@ -1642,27 +1567,22 @@ public class CustomDamage implements Listener {
 						}
 					}
 
-					// Melee blows are recomputed here rather than taken as vanilla left them: vanilla's crit
-					// multiplies only the attribute damage and refuses to happen while sprinting, and its
-					// Sharpness/Smite/Bane numbers are not the ones this plugin wants.  See rebuildMelee.
-					// ENTITY_ATTACK and not DamageType.MELEE, which also covers thorns and explosions - this
-					// is about a swing, and neither of those is one.
+					// Melee is recomputed, not taken as vanilla left it; see rebuildMelee. ENTITY_ATTACK, not
+					// DamageType.MELEE, which also covers thorns and explosions: this is about a swing.
 					boolean crit = false;
 					if(e.getCause() == DamageCause.ENTITY_ATTACK && damager instanceof LivingEntity attacker) {
 						crit = damager instanceof Player p && canCrit(p, entity);
 						e.setDamage(rebuildMelee(attacker, entity, e.getDamage(), crit));
 					}
 
-					// The crit goes on the DamageData, not back through a second getFallDistance() test: it
-					// is already priced into the damage above, and the particles, the sound and the PvP hit
-					// stats must all name the same blow.
+					// Crit rides on DamageData, not a second getFallDistance() test: it's already priced in above, and
+					// particles, sound and PvP stats must all name the same blow.
 					DamageData data = new DamageData(e);
 					data.isCrit = crit;
 					customMobs(entity, damager, e.getDamage(), type, data);
 				} else if(!pvpBlocked && type == DamageType.MELEE && e.getDamager() instanceof Player) {
-					// Melee blow connected but the victim's i-frames negate it: it deals no damage and
-					// never reaches dealDamage, yet must still count toward PvP "total hits" as an
-					// i-frame hit (never a crit). Inert off the pvp server / outside a duel (PvpHooks gates it).
+					// Blow connected but i-frames negate it: no damage, never reaches dealDamage, but it still counts as
+					// a PvP i-frame hit (never a crit). Inert off pvp / outside a duel.
 					pvp.PvpHooks.trackHit(entity, e.getDamager(), 0.0, false, false, true);
 				}
 			}
@@ -1675,8 +1595,7 @@ public class CustomDamage implements Listener {
 	public void onEntityDamage(EntityDamageEvent e) {
 		if(e.getEntity() instanceof LivingEntity entity) {
 			e.setCancelled(true);
-			// Enderman bosses are immune to water: skip water/rain (drown) damage entirely. The teleport
-			// side is handled in StopBossesTeleporting.
+			// Enderman bosses are immune to water: skip drown damage. Teleport side is in StopBossesTeleporting.
 			if(entity instanceof Enderman && entity.getScoreboardTags().contains("SkyblockBoss") && e.getCause() == DamageCause.DROWNING) {
 				return;
 			}

@@ -13,33 +13,28 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * <b>A 26.2-only backport of the 26.3 dragon neck fix. Delete this whole class, its registration in
- * {@code Plugin.onEnable} and the {@code unquarter} call in {@link CustomDamage} on 26.3.</b>
+ * <b>26.2-only backport of the 26.3 dragon neck fix. On 26.3 delete this class, its registration in
+ * {@code Plugin.onEnable} and the {@code unquarter} call in {@link CustomDamage}.</b>
  *
- * <p>{@code EnderDragon.hurt(level, part, source, amount)} takes {@code amount / 4 + min(amount, 1)} off
- * every hit that does not land on {@code this.head} - the neck included, even though the neck hitbox is what
- * a player aiming at the head usually connects with. 26.3 counts the neck as the head; here we put the
- * quartering back.
+ * <p>{@code EnderDragon.hurt(level, part, source, amount)} takes {@code amount / 4 + min(amount, 1)} off every
+ * hit not on {@code this.head}, the neck included, though the neck is what a player aiming at the head usually
+ * hits. 26.3 counts the neck as the head; here the quartering is undone.
  *
- * <p><b>MELEE ONLY.</b> Only a swing is listened for, so an arrow that lands on the neck keeps its
- * quartering: the 4x for reaching the head is a reward for being in melee range of the dragon. A shot on
- * the real head part is still worth full damage, since that is vanilla's own doing and nothing here takes
- * damage away. On 26.3, where the neck IS the head, arrows gain the neck for the same reason.
+ * <p><b>MELEE ONLY.</b> Only swings are listened for, so an arrow on the neck stays quartered: the 4x is a reward
+ * for being in melee range. A shot on the real head is still full damage (vanilla). On 26.3 arrows gain the neck.
  *
- * <p><b>Why this needs a listener at all:</b> the reduction happens before Bukkit hears anything. The part
- * takes the hit, hands it to the dragon, the dragon quarters it and only then does {@code reallyHurt} fire
- * the damage event - and that event names the DRAGON, not the part, so by the time our pipeline sees the
- * blow the part it landed on is gone. Paper's {@code PrePlayerAttackEntityEvent} is the last thing that
- * still knows: it runs before {@code Player.attack}, it names the part, and it fires in the same tick and
- * the same call stack as the damage event that follows, which is what the tick stamp checks.
+ * <p>Needs a listener because the reduction happens before Bukkit hears anything, and the damage event names the
+ * DRAGON, not the part. Paper's {@code PrePlayerAttackEntityEvent} still knows: it runs before
+ * {@code Player.attack}, names the part, and fires in the same tick and call stack as the damage event, which is
+ * what the tick stamp checks.
  */
 public final class DragonNeck implements Listener {
-	/** Vanilla's own name for the part, off {@code EnderDragonPart.name}. The others are head/body/tail/wing. */
+	/** Vanilla's name for the part ({@code EnderDragonPart.name}); others are head/body/tail/wing. */
 	private static final String NECK = "neck";
 
 	private record Hit(String part, int tick) {}
 
-	/** The dragon part each attacker last swung at. Weak keys: an entry nothing reads back just goes away. */
+	/** Dragon part each attacker last swung at. Weak keys, so unread entries go away. */
 	private static final Map<Entity, Hit> HITS = new WeakHashMap<>();
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -50,14 +45,11 @@ public final class DragonNeck implements Listener {
 	}
 
 	/**
-	 * Vanilla's quartering undone, for a swing that landed on the neck. Anything else is handed straight back,
-	 * including a hit whose part we never saw - an arrow never has a record, which is how a shot keeps its
-	 * quartering. This only ever gives damage back, never takes any away.
+	 * Undoes the quartering for a swing on the neck; anything else, including an arrow (never recorded), comes back
+	 * unchanged. Only ever gives damage back.
 	 *
-	 * <p>The inverse of {@code amount / 4 + min(amount, 1)}, not a flat x4: above 1 damage vanilla also adds
-	 * a point, so the blow that was really thrown is {@code (reduced - 1) * 4}. Below it the whole thing is
-	 * {@code 1.25 * amount} instead. The two meet at 1.25, and on any hit worth talking about the difference
-	 * from a flat x4 is the 4 damage the {@code +1} became.
+	 * <p>Inverse of {@code amount / 4 + min(amount, 1)}, not a flat x4: above 1 vanilla also adds a point, so the real
+	 * blow is {@code (reduced - 1) * 4}; below it, {@code 1.25 * amount}. The two meet at 1.25.
 	 */
 	public static double unquarter(Entity damager, double damage) {
 		Hit hit = HITS.remove(damager);

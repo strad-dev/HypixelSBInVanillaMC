@@ -21,18 +21,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The Hunters' tracker. A right click stamps the target Speedrunner's position onto the needle; sneaking
- * right-clicks move to the next Speedrunner.
- *
- * <p><b>The target lives on the stack, not on the player</b> - two compasses in the same inventory point at
- * two different Speedrunners. The needle is a lodestone that is not lodestone-<i>tracked</i>, which is how a
- * compass points at bare coordinates; the target is the index of a Speedrunner in
- * {@link Manhunt#speedrunners()}.
+ * Hunters' tracker. Right click points the needle at the target; sneak right click cycles targets. Target is
+ * on the stack (an index into {@link Manhunt#speedrunners()}), so two compasses can track two players.
  */
 public class ManhuntCompass implements AbilityItem {
 	public static final String ID = "skyblock/manhunt/compass";
 
-	/** The stack's index into the Speedrunner list. */
 	private static NamespacedKey targetKey() {
 		return new NamespacedKey(Plugin.getInstance(), "manhunt_target");
 	}
@@ -41,7 +35,7 @@ public class ManhuntCompass implements AbilityItem {
 		return getItem(0, null);
 	}
 
-	/** A copy of {@code old} with its needle and target intact, for {@code ItemReloader}. */
+	/** For {@code ItemReloader}: keeps needle and target. */
 	public static ItemStack refresh(ItemStack old) {
 		Location needle = null;
 		if(old.getItemMeta() instanceof CompassMeta meta && meta.hasLodestone()) {
@@ -56,13 +50,11 @@ public class ManhuntCompass implements AbilityItem {
 		CompassMeta data = (CompassMeta) compass.getItemMeta();
 		data.displayName(Utils.mm("<red>Manhunt Compass"));
 		data.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-		// Held OFF, not merely left unset: a needle is a lodestone target, and vanilla glints any compass
-		// carrying one.  Without this the compass is dull until its first Track and glowing afterwards.
+		// Forced off, not unset: vanilla glints any compass with a lodestone target.
 		data.setEnchantmentGlintOverride(false);
 		data.getPersistentDataContainer().set(targetKey(), PersistentDataType.INTEGER, Math.max(0, target));
 		if(needle != null) {
-			// Not lodestone-TRACKED: that is what lets the needle sit on bare coordinates with no
-			// lodestone under them, and what makes it spin once the target leaves the dimension.
+			// Untracked lets it point at bare coordinates, and spin once the target leaves the dimension.
 			data.setLodestone(needle);
 			data.setLodestoneTracked(false);
 		}
@@ -86,7 +78,6 @@ public class ManhuntCompass implements AbilityItem {
 		return SkyblockId.stamp(compass);
 	}
 
-	/** Which Speedrunner this stack is pointed at, as an index into the list. */
 	public static int targetOf(ItemStack item) {
 		if(item == null || !item.hasItemMeta()) return 0;
 		Integer stored = item.getItemMeta().getPersistentDataContainer().get(targetKey(), PersistentDataType.INTEGER);
@@ -102,8 +93,7 @@ public class ManhuntCompass implements AbilityItem {
 	public boolean onRightClick(Player p) {
 		ItemStack held = p.getInventory().getItemInMainHand();
 
-		// Change Target only exists with more than one Speedrunner to move between; with one or none a
-		// sneaking right-click is just a Track.
+		// With one or no Speedrunner, sneak right click is just a Track.
 		if(p.isSneaking() && Manhunt.speedrunners().size() > 1) {
 			int next = (targetOf(held) + 1) % Manhunt.speedrunners().size();
 			p.getInventory().setItemInMainHand(getItem(next, needleOf(held)));
@@ -113,8 +103,7 @@ public class ManhuntCompass implements AbilityItem {
 		}
 
 		Player target = Manhunt.speedrunnerAt(targetOf(held));
-		// A Speedrunner in another dimension (or offline) cannot be found, but the last place they WERE is
-		// still worth keeping - the needle is left exactly where it was.
+		// Offline or other dimension: leave the needle on their last known spot.
 		if(target == null || !target.getWorld().equals(p.getWorld())) {
 			p.sendMessage(Utils.msg("<red>No players to track!"));
 			p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1.0F, 0.50F);
@@ -122,8 +111,7 @@ public class ManhuntCompass implements AbilityItem {
 		}
 
 		p.getInventory().setItemInMainHand(getItem(targetOf(held), target.getLocation()));
-		// Silent on purpose: a Hunter tracks constantly, and the click got old fast.  The Change Target
-		// click and the cannot-track buzz above are still there - both are one-offs.
+		// No sound on purpose: Hunters track constantly and the click got old fast.
 		p.sendMessage(Utils.msg("<green>Tracking " + target.getName()));
 		return true;
 	}
