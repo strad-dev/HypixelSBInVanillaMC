@@ -56,8 +56,8 @@ public class CustomMobs implements Listener {
 	@EventHandler
 	public void onEntitySpawn(EntitySpawnEvent e) {
 		if(e.getEntity() instanceof LivingEntity entity) {
-			// Blanket every boss + subentity (all tagged "SkyblockBoss") with Depth Strider 3 so they
-			// don't crawl through water. Delayed a tick because the tag is added during/after this event.
+			// Depth Strider 3 on every boss + subentity (all tagged "SkyblockBoss") so they don't crawl through
+			// water. A tick late: the tag is added during/after this event.
 			Utils.scheduleTask(() -> {
 				if(entity.isValid() && entity.getScoreboardTags().contains("SkyblockBoss")) {
 					Utils.applyDepthStrider(entity);
@@ -127,18 +127,14 @@ public class CustomMobs implements Listener {
 			}
 			// add health to the entity name if it doesn't exist already
 			if(name.isEmpty()) {
-				// Already named on a previous pass (e.g. a CustomPig that copied its name across the swap,
-				// or another plugin)? Leave it. Rebuilding from the legacy-serialized getName() loses the
-				// colors - the red ❤ would turn <aqua> - and MiniMessage can't parse the § codes. HP stays
-				// current via Utils.changeName(entity) on hits.
+				// Already named (a CustomPig that copied its name across the swap, another plugin)? Leave it:
+				// rebuilding from legacy getName() loses colours (red ❤ turns <aqua>) and MiniMessage can't parse
+				// § codes. HP stays current via Utils.changeName(entity) on hits.
 				if(entity.customName() != null) {
-					// One exception: a cube mob splitting inherits its parent's name WHOLE - vanilla's
-					// ConversionType.COMPONENTS_TO_COPY is {CUSTOM_NAME, CUSTOM_DATA} - while setSize has
-					// already put the child on its own, smaller max health.  So a size-1 slime off a
-					// size-4 walked around advertising 16/16 on 1 HP until something hit it and
-					// Utils.changeName(entity) fixed it up.  Do that here instead: the one-arg overload
-					// swaps only the trailing numbers, so the colours and any name-tagged base name
-					// survive, which rebuilding from getName() would not.
+					// Exception: a splitting cube mob inherits its parent's name WHOLE (COMPONENTS_TO_COPY is
+					// {CUSTOM_NAME, CUSTOM_DATA}) while setSize already shrank its max HP, so a size-1 slime off a
+					// size-4 showed 16/16 on 1 HP. The one-arg changeName swaps only the trailing numbers, keeping
+					// colours and any name-tagged base name.
 					if(e instanceof CreatureSpawnEvent spawn
 							&& spawn.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SLIME_SPLIT) {
 						Utils.changeName(entity);

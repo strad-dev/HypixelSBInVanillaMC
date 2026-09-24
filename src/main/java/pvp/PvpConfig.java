@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Reads the PvP + chat config (config.yml). All values default to disabled/empty so SkyBlock is
- * inert on non-pvp servers; admins fill these in on the pvp server.
+ * PvP + chat config (config.yml). Everything defaults to off/empty so SkyBlock is inert off the pvp server.
  */
 public class PvpConfig {
 	private final JavaPlugin plugin;
@@ -30,16 +29,10 @@ public class PvpConfig {
 	}
 
 	/**
-	 * Adds any keys present in the jar's bundled config.yml but missing from the on-disk file, with
-	 * their default values <b>and the comment that explains them</b>. Existing values and comments are
-	 * left untouched, so a config written before new options were added gets them filled in
-	 * automatically on startup - an admin never has to delete config.yml to pick up a new option.
-	 *
-	 * <p>Only additive: a key dropped from the bundled file is left alone rather than deleted.
-	 *
-	 * <p>The comments have to be copied by hand. {@code set} carries the value and nothing else, so
-	 * without this a new option turned up as a bare {@code manhunt: false} at the end of the file with
-	 * no hint of what it does - which is half a default.
+	 * Adds keys in the bundled config.yml missing from the on-disk one, with defaults <b>and their comments</b>.
+	 * Existing values and comments untouched, so an old config picks up new options without being deleted.
+	 * Additive only: a key dropped from the bundled file stays. Comments are copied by hand since {@code set}
+	 * carries only the value; otherwise a new option showed up as a bare {@code manhunt: false} at the end.
 	 */
 	private void mergeMissingDefaults() {
 		InputStream in = plugin.getResource("config.yml");
@@ -47,8 +40,7 @@ public class PvpConfig {
 		YamlConfiguration bundled = YamlConfiguration.loadConfiguration(new InputStreamReader(in, StandardCharsets.UTF_8));
 		FileConfiguration live = plugin.getConfig();
 
-		// Which sections are new has to be settled BEFORE anything is written, because copying a leaf
-		// creates its parents as a side effect.
+		// Settle which sections are new BEFORE writing: copying a leaf creates its parents.
 		List<String> newSections = new java.util.ArrayList<>();
 		for (String key : bundled.getKeys(true)) {
 			if (bundled.isConfigurationSection(key) && !live.contains(key)) newSections.add(key);
@@ -56,14 +48,14 @@ public class PvpConfig {
 
 		boolean changed = false;
 		for (String key : bundled.getKeys(true)) {
-			// Only copy leaf values; sections are created implicitly by their children.
+			// Leaves only; sections come with their children.
 			if (!bundled.isConfigurationSection(key) && !live.contains(key)) {
 				live.set(key, bundled.get(key));
 				copyComments(bundled, live, key);
 				changed = true;
 			}
 		}
-		// Section headers last: the path only exists once its children have been written.
+		// Section headers last: the path exists only once its children are written.
 		for (String key : newSections) {
 			if (live.contains(key)) copyComments(bundled, live, key);
 		}
@@ -93,8 +85,7 @@ public class PvpConfig {
 	}
 
 	/**
-	 * Minimum intelligence a player respawns with in the FFA arena - dying with more than this keeps
-	 * the higher value, so a respawn never costs mana. -1 leaves whatever mana they had.
+	 * Minimum intelligence on FFA respawn; more is kept, so a respawn never costs mana. -1 leaves it alone.
 	 */
 	public int ffaRespawnIntelligence() {
 		return cfg().getInt("pvp.ffa.respawn-intelligence", 50);
@@ -137,21 +128,19 @@ public class PvpConfig {
 		return cfg().getInt("pvp.duel.countdown", 5);
 	}
 
-	/** Intelligence every player is set to for the duration of a duel (hunger is always full). */
+	/** Intelligence for the whole duel (hunger always full). */
 	public int duelIntelligence() {
 		return cfg().getInt("pvp.duel.intelligence", 50);
 	}
 
-	/** Saturation every player is set to for the duration of a duel. */
+	/** Saturation for the whole duel. */
 	public double duelSaturation() {
 		return cfg().getDouble("pvp.duel.saturation", 5);
 	}
 
 	/**
-	 * Where PvP duel loadouts are stored. Default is this plugin's own folder
-	 * ({@code plugins/SkyBlock/pvp-loadouts.json}), so SkyBlock stays self-contained. Relative paths
-	 * resolve against that folder; set an ABSOLUTE path (the network's shared {@code ~/data}) so a
-	 * player's duel loadout is shared across servers and editable from any of them.
+	 * Duel loadout file. Default {@code plugins/SkyBlock/pvp-loadouts.json} (self-contained); relative paths
+	 * resolve there. ABSOLUTE path (network's shared {@code ~/data}) shares loadouts across servers.
 	 */
 	public Path loadoutsFile() {
 		String f = cfg().getString("pvp.duel.loadouts-file", "pvp-loadouts.json");
@@ -161,9 +150,8 @@ public class PvpConfig {
 	}
 
 	/**
-	 * Absolute path to export the duel item palette + default kit to (the network's shared
-	 * {@code ~/data/pvp-item-catalog.json}), so servers without SkyBlock can offer the same items in
-	 * their loadout editor. {@code null} when unset - standalone servers do not export.
+	 * Absolute path for the palette + default kit export ({@code ~/data/pvp-item-catalog.json}), so servers
+	 * without SkyBlock offer the same items. {@code null} when unset: standalone doesn't export.
 	 */
 	public Path catalogFile() {
 		String f = cfg().getString("pvp.duel.catalog-file", "");
@@ -173,7 +161,7 @@ public class PvpConfig {
 		return p.normalize();
 	}
 
-	/** Player corner i (0 or 1) for a duel, or null if not configured. */
+	/** Duel corner i (0 or 1), or null if unset. */
 	public Location duelSpawn(int i) {
 		List<Map<?, ?>> spawns = cfg().getMapList("pvp.duel.spawns");
 		if (i < 0 || i >= spawns.size()) return null;
@@ -190,9 +178,8 @@ public class PvpConfig {
 	}
 
 	public Path statsFile() {
-		// Default to this plugin's own data folder (plugins/SkyBlock/pvp-stats.json) so SkyBlock stays
-		// self-contained. Relative paths resolve against that folder; set an ABSOLUTE path (e.g. the
-		// network's shared ~/data) if you want stats shared across servers.
+		// Default plugins/SkyBlock/pvp-stats.json; relative paths resolve there. ABSOLUTE path (network's
+		// ~/data) shares stats across servers.
 		String f = cfg().getString("pvp.stats.file", "pvp-stats.json");
 		Path p = Paths.get(f);
 		if (!p.isAbsolute()) p = plugin.getDataFolder().toPath().resolve(f);

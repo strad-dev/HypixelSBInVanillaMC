@@ -26,7 +26,7 @@ import java.util.List;
 
 public class AOTV implements AbilityItem {
 	private static final int MANA_COST = 1;
-	/** Instant Transmission's blind hop, and how far Ether Transmission can see. Both quoted by the lore. */
+	/** Instant Transmission hop and Ether Transmission reach, both quoted by the lore. */
 	public static final int INSTANT_DISTANCE = 12;
 	public static final int ETHER_DISTANCE = 61;
 
@@ -60,19 +60,11 @@ public class AOTV implements AbilityItem {
 		aotv.setItemMeta(data);
 		Utils.setEnchantability(aotv, Utils.SKYBLOCK_ENCHANTABILITY);
 
-		// The two extra keys are what makes a client read this as a WARPED Aspect of the Void rather than a
-		// plain one, and they are the same ones M7 TAS writes.  Catharsis resolves the model from the id
-		// alone and then picks the warped variant off a catharsis:data_type condition on ethermerge; a pack
-		// may also range on tuned_transmission.
-		//
-		// modifier is the REFORGE, and Hypixel spells it after the reforge STONE, not the reforge: Warped
-		// comes from the Warped Stone, whose item id is AOTE_STONE, so the value is aote_stone and not
-		// warped.  It is a different key from ethermerge and means a different thing - ethermerge is the
-		// Etherwarp upgrade, which is the sneak right-click above - but without it the item reads as
-		// unreforged to anything selecting on reforges.
-		//
-		// ethermerge goes in as an INT and still reads as true: a boolean lookup runs
-		// CompoundTag.getBoolean -> Tag.asBoolean -> NumericTag.asByte, which any numeric tag answers.
+		// Extra keys make the client show a WARPED AOTV; same ones M7 TAS writes. Catharsis picks the warped
+		// variant off ethermerge (Etherwarp upgrade); packs may also range on tuned_transmission.
+		// modifier is the reforge, named after its stone: Warped comes from AOTE_STONE, so aote_stone, not
+		// warped. Without it the item reads as unreforged.
+		// ethermerge as an INT still reads true: getBoolean -> asBoolean -> NumericTag.asByte.
 		return SkyblockId.stamp(aotv, nbt -> {
 			nbt.putInt("ethermerge", 1);
 			nbt.putInt("tuned_transmission", 4);
@@ -88,8 +80,7 @@ public class AOTV implements AbilityItem {
 	@Override
 	public boolean onRightClick(Player p) {
 		if(p.isSneaking()) {
-			// The border is a solid block, so it also blocks the LINE OF SIGHT: a block beyond it cannot be
-			// picked as a warp target, and the ray simply stops there.
+			// Border blocks line of sight too, so nothing past it can be a warp target.
 			double reach = Utils.borderDistance(p.getEyeLocation(), p.getEyeLocation().getDirection(), ETHER_DISTANCE);
 			RayTraceResult result = p.rayTraceBlocks(reach);
 			if(result != null) {
@@ -108,8 +99,7 @@ public class AOTV implements AbilityItem {
 			return false;
 		} else {
 			Location origin = p.getLocation().clone();
-			// Raytraced only as far as the border, so a border nearer than the first block wins and the hop
-			// below lands just inside it - the same branch a solid block ahead would take.
+			// Raytrace stops at the border, so a nearer border lands the hop just inside it, like a solid block.
 			double reach = Utils.borderDistance(origin, origin.getDirection(), 13.65);
 			RayTraceResult result = p.rayTraceBlocks(reach);
 			if(result == null) {

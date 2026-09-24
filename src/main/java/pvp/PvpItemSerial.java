@@ -5,8 +5,8 @@ import org.bukkit.inventory.ItemStack;
 import java.util.Base64;
 
 /**
- * Base64 of Paper's {@link ItemStack#serializeAsBytes()} - round-trips custom-item lore IDs,
- * enchants, attributes, etc. cleanly. A null/air slot serialises to {@code null}.
+ * Base64 of Paper's {@link ItemStack#serializeAsBytes()}; round-trips lore IDs, enchants, attributes.
+ * Null/air = {@code null}.
  */
 public final class PvpItemSerial {
 	private PvpItemSerial() {}

@@ -24,13 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The Manhunt Hyperion - the whole Hyperion, zero hit cooldown included, on the numbers of whichever
- * {@link ManhuntTier} rung it sits on. Everyone in a Manhunt starts with the Stick and upgrades it with
- * swords; the Netherite rung crafts into a real Hyperion through the ordinary recipe.
- *
- * <p>Wither Impact itself is {@link Scylla#witherImpact}, so the two items cannot drift apart. Two things
- * differ: the implosion is a flat number here and a share of melee damage there, and the Wither Shield has a
- * refresh cooldown per rung ({@link ManhuntTier#witherShieldCooldown}) where the full Hyperion has none.
+ * Full Hyperion (no hit cooldown) on its {@link ManhuntTier} rung's numbers. Shares {@link Scylla#witherImpact}.
+ * Differences: flat implosion damage, and a per-rung shield refresh cooldown the real one lacks.
  */
 public class ManhuntHyperion implements AbilityItem {
 	public static ItemStack getItem() {
@@ -41,19 +36,14 @@ public class ManhuntHyperion implements AbilityItem {
 		return getItem(tier, Map.of(), null);
 	}
 
-	/**
-	 * The item on {@code tier}'s rung, carrying {@code enchants}. {@code p} is who the lore is written for
-	 * and may be null - as on the full Hyperion, only the live figures care, and {@code ItemReloader} keeps
-	 * them in step on join, pickup and every slot switch.
-	 */
+	/** {@code p} is who the lore is written for, may be null; {@code ItemReloader} keeps live figures current. */
 	public static ItemStack getItem(ManhuntTier tier, Map<Enchantment, Integer> enchants, @Nullable Player p) {
 		ItemStack item = new ItemStack(tier.material());
 
 		ItemMeta data = item.getItemMeta();
 		data.setUnbreakable(true);
 		data.displayName(Utils.mm("<" + tier.rank().colour() + ">" + tier.displayName()));
-		// Naming ATTACK_DAMAGE and ATTACK_SPEED at all replaces the sword's own defaults, which is the point:
-		// a player's damage is their base +1 plus this rung's number, never the vanilla sword's as well.
+		// Any modifier replaces the sword's defaults: damage is base 1 + this rung, not the vanilla sword too.
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, new AttributeModifier(
 				new NamespacedKey(Plugin.getInstance(), "manhuntHyperionDmg"), tier.damage(), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, new AttributeModifier(
@@ -68,7 +58,7 @@ public class ManhuntHyperion implements AbilityItem {
 		lore.addAll(Utils.statLore(data, enchants));
 		lore.addAll(Utils.bonusDamageLore(enchants));
 		lore.add(Utils.mm(""));
-		// The header is the line the tooltip is measured against, so it is never wrapped.
+		// Header sets the tooltip width, never wrapped.
 		lore.add(Utils.mm("<gold>Ability: Wither Impact <green><bold>RIGHT CLICK"));
 		lore.addAll(MinecraftFont.wrapLore(
 				"<gray>Teleport <green>10 blocks<gray> ahead of you.  Then implode, dealing <red>"
@@ -77,7 +67,7 @@ public class ManhuntHyperion implements AbilityItem {
 				+ Utils.percent(tier.damageReduction()) + "<gray> and grants an Absorption Shield with <red>"
 				+ Utils.damageNumber(tier.absorption()) + " HP <gray>for <green>5<gray> seconds."));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + tier.manaCost()));
-		// The shield's own clock, not the ability's: Wither Impact itself has no cooldown on any rung.
+		// Shield's clock only; Wither Impact itself has no cooldown.
 		lore.add(Utils.mm("<dark_gray>Wither Shield Cooldown: <green>"
 				+ Utils.damageNumber(tier.witherShieldCooldown() / 20.0) + "s"));
 		lore.add(Utils.mm(""));
@@ -92,21 +82,13 @@ public class ManhuntHyperion implements AbilityItem {
 		data = item.getItemMeta();
 		data.lore(lore);
 		item.setItemMeta(data);
-		// Last, after the final setItemMeta - and it OVERRIDES the sword material's own value, which is no
-		// ladder at all (vanilla gold 22 beats netherite 15, stone is 5). The Stick's 0 leaves the component
-		// off entirely, so the base item cannot be taken to an enchanting table.
+		// Last, after the final setItemMeta. See ManhuntTier.enchantability.
 		Utils.setEnchantability(item, tier.enchantability());
-		// The rung's own id, not a lookup off the lore id: all eight rungs share one lore id, so the table in
-		// SkyblockId cannot tell them apart.
+		// Rung's own id: all eight share one lore id, so SkyblockId's table can't tell them apart.
 		return SkyblockId.stamp(item, tier.skyblockId());
 	}
 
-	/**
-	 * How to get off this rung and <b>what it buys</b>: the swords to hand over, then one line per stat that
-	 * actually moves.  Every figure is the difference between two {@link ManhuntTier} rows, so it cannot
-	 * drift from what the upgrade pays out - and a stat that does not change is left out rather than shown
-	 * as {@code +0}, which is why the block is short on the small steps and long on the big ones.
-	 */
+	/** Swords needed, then one line per stat that changes, computed from two {@link ManhuntTier} rows. */
 	private static List<Component> upgradeLines(ManhuntTier tier) {
 		ManhuntTier next = tier.next();
 		if(next == null) {
@@ -117,9 +99,7 @@ public class ManhuntHyperion implements AbilityItem {
 		List<Component> out = new ArrayList<>(MinecraftFont.wrapLore("<gray>Upgrade with <green>" + swords + " "
 				+ next.prefix() + (swords == 1 ? " Sword" : " Swords") + "<gray>:"));
 
-		// Direction is chosen by the argument ORDER, not by a flag: a stat that reads better when it falls -
-		// the damage you take, the regen ticks, the ability cost - is passed as next-minus-this so it shows a
-		// minus, which is what a player expects to see for an improvement.
+		// Sign comes from argument order: stats that improve by falling (regen ticks, cost) show a minus.
 		delta(out, "Damage", "red", next.damage() - tier.damage(), "");
 		delta(out, "Implosion Damage", "red", next.implosionDamage() - tier.implosionDamage(), "");
 		delta(out, "Implosion Radius", "green", next.radius() - tier.radius(), " blocks");
@@ -132,10 +112,7 @@ public class ManhuntHyperion implements AbilityItem {
 		return out;
 	}
 
-	/**
-	 * One {@code <label> <colour>±N<unit>} line, omitted when the stat does not move between the two rungs.
-	 * The sign is the raw difference, so the caller decides which way round reads as an improvement.
-	 */
+	/** Omitted when 0. Sign is the raw difference; caller picks the order. */
 	private static void delta(List<Component> out, String label, String colour, double delta, String unit) {
 		if(delta == 0) return;
 		out.add(Utils.mm("<dark_gray>" + label + " <" + colour + ">" + (delta > 0 ? "+" : "-")
@@ -151,13 +128,8 @@ public class ManhuntHyperion implements AbilityItem {
 	public boolean onRightClick(Player p) {
 		ManhuntTier tier = ManhuntTier.of(p.getInventory().getItemInMainHand());
 		if(tier == null) return false;
-		// The teleport is 10 blocks on every rung - the same reach as the full Hyperion, so a player's aim
-		// does not have to be relearned each upgrade.  Only the implosion grows.
-		//
-		// A player can only be imploded once a second, across ALL attackers - claimImplosion returns false
-		// while their window is up and 0 damage is witherImpact's "skip this one", so they are left out of
-		// the blast entirely rather than hit for nothing.  Mobs are not on a clock.
-		// The Wither Shield has its own refresh cooldown per rung; the teleport and the implosion have none.
+		// Teleport is 10 on every rung, same as the full Hyperion. A player can be imploded once a second
+		// across all attackers; 0 damage is witherImpact's skip signal, so they're left out, not hit for 0.
 		return Scylla.witherImpact(p, 10, tier.radius(), tier.absorption(), tier.damageReduction(),
 				tier.witherShieldCooldown(), entity -> Manhunt.claimImplosion(entity) ? tier.implosionDamage() : 0);
 	}
@@ -167,7 +139,7 @@ public class ManhuntHyperion implements AbilityItem {
 		return false;
 	}
 
-	/** Never asked for - the cost is the rung's, so every call site goes through {@link #manaCost(ItemStack)}. */
+	/** Unused: every call site uses {@link #manaCost(ItemStack)}. */
 	@Override
 	public int manaCost() {
 		return ManhuntTier.BASE.manaCost();

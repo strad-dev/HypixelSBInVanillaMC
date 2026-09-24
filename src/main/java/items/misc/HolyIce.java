@@ -24,9 +24,7 @@ public class HolyIce implements AbilityItem {
 	private static final int MANA_COST = 20;
 	private static final String COOLDOWN_TAG = "IceCooldown";
 	private static final int COOLDOWN = 60;
-	/** Share of incoming damage taken while the {@code HolyIce} tag is up. <b>Read by
-	 *  {@link listeners.CustomDamage#calculateFinalDamage} and quoted by the lore</b>, so the number lives
-	 *  here and nowhere else. */
+	/** Share of damage taken under the {@code HolyIce} tag. Read by {@link listeners.CustomDamage#calculateFinalDamage} and the lore. */
 	public static final double DAMAGE_TAKEN = 0.25;
 	/** How long the tag is up. */
 	public static final long DURATION = 20L;

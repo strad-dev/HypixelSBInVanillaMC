@@ -38,24 +38,19 @@ import java.util.Map;
 
 public class ItemReloader implements Listener {
 	/**
-	 * <b>THE item updater.</b>  Every slot a player owns plus their cursor, rebuilt and written back when it
-	 * differs.  This replaced seven separate event handlers - pickup, join, armour change, slot switch,
-	 * inventory click, creative set and slot change - which between them still missed cases and, worse,
-	 * could not make the client believe them.
+	 * <b>THE item updater.</b> Every slot plus the cursor, rebuilt and written back when it differs. Replaced seven
+	 * separate handlers (pickup, join, armour change, slot switch, inventory click, creative set, slot change) that
+	 * still missed cases and couldn't make the client believe them.
 	 *
-	 * <p>Driven by the four moments Hypixel refreshes on - <b>login, switching to a hotbar slot, picking an
-	 * item up off the ground, and clicking in an inventory</b> - plus <b>an armour change</b>, which is ours
-	 * alone because this plugin puts ATTACK_DAMAGE on armour and Hypixel does not.  No ticker: a repeating
-	 * sweep of every online player would cost the server real work to catch changes that only ever happen
-	 * on one of those actions anyway.
+	 * <p>Driven by the four moments Hypixel refreshes on (<b>login, hotbar switch, ground pickup, inventory click</b>)
+	 * plus <b>armour change</b>, ours alone since we put ATTACK_DAMAGE on armour. No ticker: sweeping every player
+	 * costs real work for changes that only happen on those actions.
 	 *
-	 * <p><b>{@code updateInventory()} is the load-bearing line</b>, and its absence is why the per-event
-	 * approach looked broken for so long.  {@code handleSetCreativeModeSlot} ends with
-	 * {@code InventoryMenu.setRemoteSlot(...)}, and a held-slot switch behaves the same way: the server
-	 * records the client as already holding that stack, so rewriting the slot afterwards finds nothing to
-	 * broadcast and the client keeps rendering the item it made up.  {@code updateInventory} resets that
-	 * record and resends the container, which is the only thing that defeats it.  Guarded on
-	 * {@code changed}, so a settled inventory costs one comparison per slot and sends nothing.
+	 * <p><b>{@code updateInventory()} is the load-bearing line</b>; without it the per-event approach looked broken.
+	 * {@code handleSetCreativeModeSlot} ends with {@code InventoryMenu.setRemoteSlot(...)}, and a held-slot switch
+	 * does the same: the server records the client as already holding that stack, so rewriting the slot broadcasts
+	 * nothing. {@code updateInventory} resets that record and resends the container. Guarded on {@code changed}, so
+	 * a settled inventory costs one comparison per slot.
 	 */
 	public static void sweep(Player p) {
 		PlayerInventory inventory = p.getInventory();
@@ -81,10 +76,9 @@ public class ItemReloader implements Listener {
 	}
 
 	/**
-	 * Login.  A tick late, deliberately: the ATTACK_DAMAGE modifiers a player's armour contributes are
-	 * TRANSIENT, re-derived when the entity first ticks, which is after PlayerJoinEvent.  Sweeping inline
-	 * wrote every live figure for a naked player - a Hyperion in the full custom set said 5.4 and imploded
-	 * for 10.2.
+	 * Login. A tick late: armour's ATTACK_DAMAGE modifiers are TRANSIENT, re-derived on the entity's first tick,
+	 * after PlayerJoinEvent. Sweeping inline wrote live figures for a naked player (a Hyperion in the full custom
+	 * set said 5.4 and imploded for 10.2).
 	 */
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
@@ -94,8 +88,7 @@ public class ItemReloader implements Listener {
 		}, 1);
 	}
 
-	/** Switching to a hotbar slot.  The classic desync: without the sweep's updateInventory the client kept
-	 *  showing whatever it had cached for that slot. */
+	/** Hotbar switch. Without the sweep's updateInventory the client kept showing what it had cached. */
 	@EventHandler
 	public void onItemHeld(PlayerItemHeldEvent e) {
 		sweep(e.getPlayer());
@@ -105,8 +98,7 @@ public class ItemReloader implements Listener {
 	@EventHandler
 	public void onItemPickup(EntityPickupItemEvent e) {
 		if(!(e.getEntity() instanceof Player p)) return;
-		// The stack is still on the ground entity when this fires, so re-stat it there too - a vanilla
-		// armour piece picked up has to arrive already carrying its attribute values.
+		// Stack is still on the ground entity here; re-stat it so vanilla armour arrives with its attributes.
 		modifyVanillaArmor(e.getItem().getItemStack());
 		Utils.scheduleTask(() -> {
 			if(p.isOnline()) sweep(p);
@@ -114,12 +106,10 @@ public class ItemReloader implements Listener {
 	}
 
 	/**
-	 * Changing armour - the one refresh point that is ours rather than Hypixel's, and it is here because
-	 * this plugin puts <b>ATTACK_DAMAGE on armour</b> (the crown +3, the Primal chestplate +2, Necromancer
-	 * leggings +2, Maxor boots +1).  That moves the Hyperion's implosion figure, and equipping by
-	 * right-click is not a click, a pickup or a slot switch, so nothing else here would catch it: the lore
-	 * sat stale until the next click.  A tick late, because the modifiers the new piece contributes are not
-	 * on the attribute yet while the event runs.
+	 * Armour change: our refresh point, not Hypixel's, because we put <b>ATTACK_DAMAGE on armour</b> (crown +3,
+	 * Primal chestplate +2, Necromancer leggings +2, Maxor boots +1). That moves the Hyperion's implosion figure,
+	 * and a right-click equip is no click, pickup or slot switch, so the lore sat stale. A tick late: the new
+	 * piece's modifiers aren't on the attribute yet during the event.
 	 */
 	@EventHandler
 	public void onArmorChange(PlayerArmorChangeEvent e) {
@@ -130,10 +120,9 @@ public class ItemReloader implements Listener {
 	}
 
 	/**
-	 * Clicking in an inventory.  A tick late because the click has not been applied yet while the event
-	 * runs.  <b>This also covers the creative menu</b>: {@code InventoryCreativeEvent} extends
-	 * {@code InventoryClickEvent}, so taking an item out of the creative palette arrives here, and the
-	 * sweep's {@code updateInventory} is what finally makes the stamp visible.
+	 * Inventory click. A tick late: the click isn't applied yet. <b>Also covers the creative menu</b>:
+	 * {@code InventoryCreativeEvent} extends {@code InventoryClickEvent}, and the sweep's {@code updateInventory}
+	 * is what makes the stamp visible.
 	 */
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
@@ -144,14 +133,11 @@ public class ItemReloader implements Listener {
 	}
 
 	/**
-	 * Stamps the result a crafting grid is showing. The result slot is filled by the recipe rather than out
-	 * of anybody's inventory, so a vanilla craft - a diamond sword, a netherite helmet - sat there as a
-	 * plain item and only picked up its id once the player clicked it into a slot - a tick after they had
-	 * already read the wrong texture off the result.
+	 * Stamps the crafting grid's result. It comes from the recipe, not an inventory, so a vanilla craft sat there
+	 * unstamped until clicked into a slot, after the player had seen the wrong texture.
 	 *
-	 * <p>Only {@code stampVanilla}, deliberately: a custom result came out of its own {@code getItem()} with
-	 * its id already on it, and rebuilding it here would fight {@code ManhuntListener.onPrepareCraft}, which
-	 * writes the upgrade result on this same event.
+	 * <p>Only {@code stampVanilla}: a custom result already has its id from {@code getItem()}, and rebuilding it
+	 * would fight {@code ManhuntListener.onPrepareCraft}, which writes the upgrade result on this event.
 	 */
 	@EventHandler
 	public void onPrepareCraft(PrepareItemCraftEvent e) {
@@ -160,22 +146,19 @@ public class ItemReloader implements Listener {
 	}
 
 	/**
-	 * The one rebuild, and what every handler above calls: a custom item comes back from its own
-	 * {@code getItem()}, a vanilla one is re-statted in place and stamped with its SkyBlock id.
-	 * <b>Null means leave the slot alone</b> - nothing about the stack needed to change.
+	 * The one rebuild every handler calls: a custom item comes back from its own {@code getItem()}, a vanilla one
+	 * is re-statted in place and stamped with its SkyBlock id. <b>Null = leave the slot alone.</b> This used to be
+	 * an if/else per call site, which is how {@code onItemHeld} ended up never touching vanilla items.
 	 *
-	 * <p>The two used to be an if/else repeated at each call site, which is how {@code onItemHeld} ended up
-	 * as the one handler that rebuilt custom items but never touched vanilla ones.
-	 *
-	 * <p>It must stay <b>idempotent</b>: {@link #sweep} compares its result against what is already in the
-	 * slot, so a rebuild that never comes back equal would rewrite and resend all 41 slots every time.
+	 * <p>Must stay <b>idempotent</b>: {@link #sweep} compares against the slot, so a rebuild that never comes back
+	 * equal would rewrite and resend all 41 slots every time.
 	 */
 	@Nullable
 	private static ItemStack rebuild(ItemStack item, Player p) {
 		if(item == null || item.getType().isAir()) return null;
 		ItemStack refreshed = refreshItem(item, p);
 		if(refreshed != null) return refreshed;
-		// Mutates in place and covers materials the id table does not, so it runs either way.
+		// Mutates in place and covers materials the id table doesn't, so it always runs.
 		modifyVanillaArmor(item);
 		return SkyblockId.stampVanilla(item);
 	}
@@ -288,10 +271,9 @@ public class ItemReloader implements Listener {
 	}
 
 	/**
-	 * As {@link #refreshItem(ItemStack)}, for an item that belongs to {@code p}. Only weapons whose lore
-	 * quotes a live figure care who the owner is - the Hyperion writes out the implosion damage it would
-	 * deal in <i>their</i> hands, so a rebuild without the player would reset that line to the figure for a
-	 * player with no other damage modifiers. Saved-loadout refreshes have no live player and pass null.
+	 * As {@link #refreshItem(ItemStack)}, for {@code p}'s item. Only live-figure lore cares: the Hyperion quotes
+	 * its implosion damage in <i>their</i> hands, which without a player resets to the no-modifier figure.
+	 * Saved-loadout refreshes have no live player and pass null.
 	 */
 	public static ItemStack refreshItem(ItemStack item, Player p) {
 		if(item == null || item.getType().isAir()) return null;
@@ -299,16 +281,15 @@ public class ItemReloader implements Listener {
 
 		String key = Utils.firstLorePlain(item.getItemMeta());
 
-		// The weapons take the WHOLE enchantment map, not one enchantment picked out of it. This used to
-		// choose Smite over Bane over Sharpness and hand that single pair to getItem, so a sword carrying
-		// both showed one of them and the other silently vanished from the lore.
+		// Weapons take the WHOLE enchantment map. This used to pick one of Smite/Bane/Sharpness, so a sword with
+		// two showed one and the other vanished from the lore.
 		ItemStack newItem = switch(key) {
 			case "skyblock/combat/aspect_of_the_void" -> AOTV.getItem();
 			case "skyblock/combat/scylla" -> Scylla.getItem(item.getEnchantments(), p);
-			// Both Manhunt items carry state a plain getItem() would lose: the Hyperion its rung
-			// (its material), the compass its target and the needle's last known position.
+			// Both Manhunt items carry state getItem() would lose: the Hyperion its rung (material), the compass its
+			// target and the needle's last position.
 			case "skyblock/manhunt/hyperion" -> {
-				// No rung means the ID was pasted onto something that is not one of the eight materials.
+				// No rung: the ID was pasted onto something not one of the eight materials.
 				manhunt.ManhuntTier tier = manhunt.ManhuntTier.of(item);
 				yield tier == null ? null : ManhuntHyperion.getItem(tier, item.getEnchantments(), p);
 			}
@@ -323,8 +304,7 @@ public class ItemReloader implements Listener {
 			case "skyblock/combat/tactical_insertion" -> TacticalInsertion.getItem();
 			case "skyblock/combat/gyro" -> GyrokineticWand.getItem();
 			case "skyblock/combat/dark_claymore" -> Claymore.getItem(item.getEnchantments());
-			// Was missing from this list entirely, so a saved Sword of Bad Health was the one weapon whose
-			// lore never came back into step with the enchantments on it.
+			// Was missing here, so a saved Sword of Bad Health's lore never matched its enchantments.
 			case "skyblock/combat/sword_of_bad_health" -> SwordOfBadHealth.getItem(item.getEnchantments());
 			case "skyblock/combat/warden_helmet" -> WardenHelmet.getItem();
 			case "skyblock/combat/wither_king_crown" -> WitherKingCrown.getItem();

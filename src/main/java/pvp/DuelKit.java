@@ -13,9 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * The fixed 1v1 loadout. {@link #apply(Player)} wipes the inventory and lays out the standardized kit
- * so every duel is fought on equal footing; the player's real inventory is saved/restored by
- * {@link DuelManager}. Enchants are applied here (kit-only) by material type.
+ * Fixed 1v1 kit. {@link #apply(Player)} wipes the inventory and lays it out; {@link DuelManager} saves and
+ * restores the real one. Kit enchants are applied here by material type.
  */
 public final class DuelKit {
 	private DuelKit() {}
@@ -25,9 +24,8 @@ public final class DuelKit {
 	}
 
 	/**
-	 * The standard kit as a 41-slot loadout array (0-35 main, 36 helmet, 37 chest, 38 legs, 39 boots,
-	 * 40 off-hand) - the default a PvP loadout starts from and resets to (same items/enchants the kit
-	 * used before custom loadouts existed).
+	 * Kit as a 41-slot array (0-35 main, 36 helmet, 37 chest, 38 legs, 39 boots, 40 off-hand): what a loadout
+	 * starts from and resets to.
 	 */
 	public static ItemStack[] defaultLoadout() {
 		ItemStack[] a = new ItemStack[41];
@@ -54,14 +52,14 @@ public final class DuelKit {
 		return a;
 	}
 
-	/** Applies the kit's standardized enchants to an item by material type, then returns it. */
+	/** Kit enchants by material type. */
 	private static ItemStack k(ItemStack item) {
 		if (item == null) return null;
 		Material m = item.getType();
 		String n = m.name();
 
 		if (n.endsWith("_SWORD")) {
-			// Force Sharpness VII (override any Smite/Bane), plus the standard sword set.
+			// Force Sharpness VII (overrides Smite/Bane), plus the sword set.
 			item.removeEnchantment(Enchantment.SMITE);
 			item.removeEnchantment(Enchantment.BANE_OF_ARTHROPODS);
 			item.addUnsafeEnchantment(Enchantment.SHARPNESS, 7);
@@ -97,9 +95,8 @@ public final class DuelKit {
 			item.addUnsafeEnchantment(Enchantment.FLAME, 1);
 			item.addUnsafeEnchantment(Enchantment.PUNCH, 2);
 		}
-		// Enchanting a custom item out here leaves its LORE describing the item before the enchants went on -
-		// which is how the kit's Claymore ended up reading "Damage: +9" while carrying Sharpness VII. Rebuild
-		// it through the canonical path, which regenerates the lore from the enchantments now on the stack.
+		// Enchanting here leaves stale LORE (the kit Claymore read "Damage: +9" with Sharpness VII), so rebuild,
+		// which regenerates lore from the enchants on the stack.
 		ItemStack refreshed = ItemReloader.refreshItem(item);
 		return refreshed != null ? refreshed : item;
 	}

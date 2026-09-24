@@ -25,8 +25,8 @@ import static misc.Utils.sendRareDropMessage;
 import static misc.Utils.teleport;
 
 public class WitherKing implements CustomWither {
-	// Native <obfuscated> shimmer, used for both the nameplate and chat dialogue. On 26.2 this jitters and
-	// thrashes the font atlas (MC-277733), and is accepted until Mojang patches it.
+	// Native <obfuscated> for nameplate and chat. On 26.2 it jitters and thrashes the font atlas (MC-277733);
+	// accepted until Mojang patches it.
 	private static final String name = "<gold><bold>﴾ <red><bold><obfuscated>Wither-King</obfuscated><gold><bold> ﴿";
 	private static final String chatName = name;
 	private static Mob witherKing;

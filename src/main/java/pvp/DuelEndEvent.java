@@ -7,12 +7,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Fired when a 1v1 duel ends (win, forfeit, or draw), after both players have been restored and are
- * about to be returned to their pre-duel spot. SkyBlock fires this unconditionally and depends on
- * nothing external: it is a plain notification that fires into the void when nothing is listening,
- * so SkyBlock stays fully standalone. An optional glue plugin may listen to it (e.g. to send
- * cross-server duelers back to their origin server). Either player may be null if they disconnected
- * mid-match.
+ * 1v1 ended (win, forfeit, draw), after both are restored and before they go back to their pre-duel spot.
+ * Plain event fired unconditionally so SkyBlock stays standalone; a glue plugin may listen to send
+ * cross-server duelers home. Either player may be null if they quit mid-match.
  */
 public class DuelEndEvent extends Event {
 	private static final HandlerList HANDLERS = new HandlerList();

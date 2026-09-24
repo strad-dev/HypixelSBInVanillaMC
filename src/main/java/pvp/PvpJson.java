@@ -12,8 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 /**
- * Tiny atomic JSON store for PvP stats (temp file + rename so the network-shared stats file is
- * never read half-written). Self-contained so SkyBlock stays standalone.
+ * Atomic JSON store (temp file + rename, so the shared file is never read half-written).
  */
 public final class PvpJson {
 	private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();

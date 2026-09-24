@@ -29,10 +29,8 @@ public class CustomMining implements Listener {
 	private final Map<UUID, BukkitTask> beaconTask = new HashMap<>();
 
 	/**
-	 * Voidgloom yang-glyph beacon: break (defuse) it on a fixed timer - 3s with a fist, 2s with the
-	 * Divan's Pickaxe (33% faster) - instead of the slow vanilla beacon dig (a beacon isn't
-	 * pickaxe-mineable, so vanilla tool tier doesn't speed it up). Defusing it removes the beacon so
-	 * the boss never detonates it.
+	 * Voidgloom yang-glyph beacon: defuse it on a fixed timer (3s fist, 2s Divan's Pickaxe) instead of the slow
+	 * vanilla beacon dig, which tool tier doesn't speed up. Defusing removes it so the boss never detonates it.
 	 */
 	@EventHandler(ignoreCancelled = true)
 	public void onBeaconDamage(BlockDamageEvent e) {

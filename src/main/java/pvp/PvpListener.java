@@ -20,10 +20,9 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.*;
 
 /**
- * The non-combat half of the PvP feature: Free-For-All arena enter/exit detection and quit cleanup.
- * All damage/death handling is layered on top of SkyBlock's CustomDamage via {@link PvpHooks} (which
- * calls {@link #blocksDamage} and {@link #handleLethal}), because CustomDamage cancels the vanilla
- * damage event and applies its own. Inert unless FFA or duels are enabled.
+ * FFA arena enter/exit detection and quit cleanup. Damage/death is driven by CustomDamage through
+ * {@link PvpHooks} ({@link #blocksDamage}, {@link #handleLethal}), since CustomDamage cancels the vanilla
+ * event. Inert unless FFA or duels are on.
  */
 public class PvpListener implements Listener {
 
@@ -33,7 +32,7 @@ public class PvpListener implements Listener {
 	private static final String SAFEZONE_ENTER_MSG = "<green>You entered the safe zone.";
 	private static final String SAFEZONE_EXIT_MSG = "<red>You left the safe zone.";
 
-	// Resistance V = full immunity under CustomDamage (it reduces damage by 20% per level).
+	// Resistance V = full immunity under CustomDamage (20% per level).
 	private static final int MAX_RESISTANCE = 4;
 	private static final long COMBO_WINDOW_MILLIS = 3_000L;
 
@@ -41,8 +40,8 @@ public class PvpListener implements Listener {
 	private final PvpStats stats;
 	private final DuelManager duels;
 
-	private final Set<UUID> inArena = new HashSet<>();    // players currently inside FFA bounds
-	private final Set<UUID> inSafezone = new HashSet<>(); // players we've granted safezone immunity
+	private final Set<UUID> inArena = new HashSet<>();    // inside FFA bounds
+	private final Set<UUID> inSafezone = new HashSet<>(); // granted safezone immunity
 	private final Map<UUID, Combo> combos = new HashMap<>(); // attacker -> current combo
 
 	public PvpListener(PvpConfig cfg, PvpStats stats, DuelManager duels) {
@@ -51,12 +50,11 @@ public class PvpListener implements Listener {
 		this.duels = duels;
 	}
 
-	/** Starts the per-second safezone-immunity refresher. */
 	public void start(JavaPlugin plugin) {
 		plugin.getServer().getScheduler().runTaskTimer(plugin, this::tickSafezone, 20L, 20L);
 	}
 
-	/** Keeps max Resistance on anyone standing in the FFA safezone and strips it as they leave. */
+	/** Max Resistance for anyone in the FFA safezone, stripped as they leave. */
 	private void tickSafezone() {
 		if (!cfg.ffaEnabled() || !cfg.safezoneEnabled()) return;
 		Region sz = cfg.safezone();
@@ -65,7 +63,7 @@ public class PvpListener implements Listener {
 			boolean immune = sz.contains(p.getLocation()) && !duels.inDuel(p.getUniqueId());
 			if (immune) {
 				if (inSafezone.add(p.getUniqueId())) p.sendMessage(Utils.msg(SAFEZONE_ENTER_MSG));
-				// Short duration, refreshed each second, so it drops on its own shortly after they leave.
+				// Short, refreshed each second, so it drops on its own after they leave.
 				p.addPotionEffect(new PotionEffect(PotionEffectType.RESISTANCE, 40, MAX_RESISTANCE, false, false));
 			} else if (inSafezone.remove(p.getUniqueId())) {
 				p.removePotionEffect(PotionEffectType.RESISTANCE);
@@ -75,8 +73,7 @@ public class PvpListener implements Listener {
 	}
 
 	/**
-	 * True if this player currently holds safezone immunity, per the tick above (so it already accounts
-	 * for FFA/safezone being enabled and for duellists being excluded).
+	 * Holds safezone immunity per the tick above (already accounts for FFA/safezone on and duellists excluded).
 	 */
 	public boolean inSafezone(Player p) {
 		return inSafezone.contains(p.getUniqueId());
@@ -85,12 +82,11 @@ public class PvpListener implements Listener {
 	// ===== CustomDamage hooks (called from PvpHooks) =====
 
 	/**
-	 * True if PvP rules forbid this damage: a duel countdown (frozen until FIGHT), an outsider hitting
-	 * a duelist, or a Free-For-All safezone.
+	 * PvP rules forbid this damage: duel countdown, outsider hitting a duelist, or FFA safezone.
 	 */
 	public boolean blocksDamage(Player victim, Player attacker) {
 		if (duels.inDuel(victim.getUniqueId())) {
-			if (!duels.armed(victim.getUniqueId())) return true; // countdown: nobody takes damage
+			if (!duels.armed(victim.getUniqueId())) return true; // countdown
 			return attacker != null && !duels.areOpponents(victim.getUniqueId(), attacker.getUniqueId()); // outsider
 		}
 		if (cfg.ffaEnabled() && inFfa(victim) && cfg.safezoneEnabled()) {
@@ -102,12 +98,11 @@ public class PvpListener implements Listener {
 	}
 
 	/**
-	 * A lethal blow landed on {@code victim}. Ends the duel or scores the FFA kill and revives the
-	 * player (no death screen). Returns true if PvP handled it so CustomDamage skips the kill.
+	 * Lethal blow on {@code victim}: end the duel or score the FFA kill and revive (no death screen). True if
+	 * handled, so CustomDamage skips the kill.
 	 */
 	/**
-	 * Records a landed player-vs-player hit for combat stats, but only when it's real PvP combat: an
-	 * armed duel between the two opponents, or both players inside the FFA arena.
+	 * Landed PvP hit for stats, only in real combat: armed duel between the two, or both inside the FFA arena.
 	 */
 	public void trackHit(Player victim, Player attacker, double finalDamage, boolean arrow, boolean crit, boolean iframe) {
 		if (attacker.equals(victim)) return;
@@ -120,7 +115,7 @@ public class PvpListener implements Listener {
 		stats.addHit(attacker, arrow);
 		stats.addHitFlags(attacker, crit, iframe);
 
-		// Combo = consecutive hits on the same victim within the window; taking a hit breaks yours.
+		// Combo = consecutive hits on one victim within the window; taking a hit breaks yours.
 		combos.remove(victim.getUniqueId());
 		long now = System.currentTimeMillis();
 		Combo c = combos.get(attacker.getUniqueId());
@@ -135,35 +130,34 @@ public class PvpListener implements Listener {
 		if (duelHit) duels.recordHit(attacker, victim, finalDamage, crit, iframe);
 	}
 
-	/** True while a player is in live PvP combat: an armed duel, or inside the FFA arena. */
+	/** Live PvP combat: armed duel, or inside the FFA arena. */
 	private boolean inPvpContext(Player p) {
 		if (duels.inDuel(p.getUniqueId())) return duels.armed(p.getUniqueId());
 		return cfg.ffaEnabled() && inFfa(p);
 	}
 
-	/** No dropping items while in a duel (the whole duel, incl. countdown) or inside the FFA arena. */
+	/** No dropping items in a duel (incl. countdown) or inside the FFA arena. */
 	@EventHandler(ignoreCancelled = true)
 	public void onDropItem(PlayerDropItemEvent e) {
 		Player p = e.getPlayer();
 		if (duels.inDuel(p.getUniqueId()) || (cfg.ffaEnabled() && inFfa(p))) e.setCancelled(true);
 	}
 
-	/** Intelligence spent on an ability (PvP-context only). Called via PvpHooks from CustomItems. */
+	/** Mana spent on an ability (PvP only). Via PvpHooks from CustomItems. */
 	public void trackMana(Player p, int amount) {
-		duels.recordMana(p, amount);                            // per-match 1v1 summary (no-op outside a duel)
+		duels.recordMana(p, amount);                            // 1v1 summary, no-op outside a duel
 		if (inPvpContext(p)) stats.addIntelligenceUsed(p, amount);
 	}
 
-	/** HP restored (PvP-context only). Called via PvpHooks from the heal sources (regen + wands). */
+	/** HP restored (PvP only). Via PvpHooks from regen + wands. */
 	public void trackHeal(Player p, int amount) {
-		duels.recordHeal(p, amount);                      // per-match 1v1 summary (no-op outside a duel)
+		duels.recordHeal(p, amount);                      // 1v1 summary, no-op outside a duel
 		if (inPvpContext(p)) stats.addHealed(p, amount);  // lifetime /pvpstats
 	}
 
 	/**
-	 * True if a Totem of Undying must not save this player: inside the FFA arena a lethal blow is scored
-	 * and respawns them anyway, so a totem would only deny the kill (and burn the holder's totem). Duels
-	 * keep theirs - a totem is a legal loadout item there.
+	 * No totem in the FFA arena: the kill is scored and they respawn anyway, so a totem would only deny the kill.
+	 * Duels keep theirs, a totem is a legal loadout item.
 	 */
 	public boolean ignoresTotem(Player victim) {
 		return !duels.inDuel(victim.getUniqueId()) && cfg.ffaEnabled() && inFfa(victim);
@@ -171,12 +165,12 @@ public class PvpListener implements Listener {
 
 	public boolean handleLethal(Player victim, Player attacker, boolean absolute) {
 		if (duels.inDuel(victim.getUniqueId())) {
-			if (absolute) duels.draw(victim);   // /kill (and void/border) end a 1v1 as a draw
-			else duels.handleDeath(victim);      // heals both, restores intelligence, returns home after 5s
+			if (absolute) duels.draw(victim);   // /kill, void, border = draw
+			else duels.handleDeath(victim);      // heals both, restores intelligence, home after 5s
 			return true;
 		}
 		if (cfg.ffaEnabled() && inFfa(victim)) {
-			if (absolute) ffaRespawn(victim);    // /kill etc. - respawn but don't count a death
+			if (absolute) ffaRespawn(victim);    // /kill etc: respawn, no death counted
 			else ffaDeath(victim, attacker);
 			return true;
 		}
@@ -194,13 +188,12 @@ public class PvpListener implements Listener {
 		ffaRespawn(victim);
 	}
 
-	/** Heal to full and send the player back to the FFA spawn instead of dying (no stat change). */
+	/** Heal to full and back to FFA spawn instead of dying (no stat change). */
 	private void ffaRespawn(Player victim) {
 		healFull(victim);
 		victim.setFoodLevel(20);
 		victim.setFireTicks(0);
-		// Mana is topped up TO the configured floor, never down to it: dying with more than that keeps
-		// what you had, so respawning can't cost you mana. -1 leaves it alone entirely.
+		// Mana topped up TO the floor, never down, so a respawn can't cost mana. -1 leaves it alone.
 		int intel = cfg.ffaRespawnIntelligence();
 		if (intel >= 0) {
 			int current = DuelManager.readIntelligence(victim);  // -1 = no Intelligence objective
@@ -233,14 +226,14 @@ public class PvpListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	public void onSwing(PlayerAnimationEvent e) {
-		duels.recordAttempt(e.getPlayer()); // arm swing = a melee attempt
+		duels.recordAttempt(e.getPlayer()); // arm swing = melee attempt
 		if (inPvpContext(e.getPlayer())) stats.addHitAttempt(e.getPlayer());
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	public void onShootBow(EntityShootBowEvent e) {
 		if (e.getEntity() instanceof Player p) {
-			duels.recordAttempt(p); // bow shot = a ranged attempt
+			duels.recordAttempt(p); // bow shot = ranged attempt
 			if (inPvpContext(p)) stats.addHitAttempt(p);
 		}
 	}
@@ -248,12 +241,12 @@ public class PvpListener implements Listener {
 	// ===== arena protection =====
 	@EventHandler(ignoreCancelled = true)
 	public void onBlockBreak(BlockBreakEvent e) {
-		// Creative-mode players (builders/admins) are exempt so they can edit the arena.
+		// Creative players exempt so they can edit the arena.
 		if (e.getPlayer().getGameMode() == GameMode.CREATIVE) return;
 		if (inArenaRegion(e.getBlock().getLocation())) e.setCancelled(true);
 	}
 
-	/** True if the location is inside the FFA bounds or the duel arena bounds. */
+	/** Inside FFA or duel arena bounds. */
 	private boolean inArenaRegion(Location loc) {
 		if (cfg.ffaEnabled()) {
 			Region b = cfg.ffaBounds();
@@ -279,9 +272,9 @@ public class PvpListener implements Listener {
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
-		// If they disconnected mid-duel, get them out of the arena to a safe spot first.
+		// Quit mid-duel: out of the arena first.
 		duels.restoreOnJoin(e.getPlayer());
-		// Seed membership silently so relogging inside the arena/safe zone doesn't fire a spurious "entered".
+		// Seed silently so relogging inside the arena/safezone doesn't fire a spurious "entered".
 		if (cfg.ffaEnabled()) {
 			Region b = cfg.ffaBounds();
 			if (b != null && b.contains(e.getPlayer().getLocation())) inArena.add(e.getPlayer().getUniqueId());
@@ -292,7 +285,7 @@ public class PvpListener implements Listener {
 		}
 	}
 
-	/** Fires once on each crossing of the FFA arena boundary (skipped while in a duel). */
+	/** Once per crossing of the FFA boundary (skipped in a duel). */
 	private void checkArena(Player p, Location to) {
 		if (to == null || !cfg.ffaEnabled() || duels.inDuel(p.getUniqueId())) return;
 		Region b = cfg.ffaBounds();

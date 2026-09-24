@@ -33,36 +33,27 @@ public class Terminator implements AbilityItem {
 	private static final int COOLDOWN = 16;
 	private static final String SHOT_COOLDOWN_TAG = "TerminatorShotCooldown";
 	private static final int SHOT_COOLDOWN = 3;
-	/** How many further foes an arrow passes through. The lore quotes {@code PIERCE + 1}, the number it
-	 *  actually hits: {@code CustomDamage} spends one level per hit and removes the arrow at zero. */
+	/** Extra foes an arrow passes through; lore quotes {@code PIERCE + 1}, the number it actually hits. */
 	private static final int PIERCE = 4;
 
-	/**
-	 * Enchanting-table power, against a vanilla bow's 1 and the other high-end SkyBlock items' 30.
-	 *
-	 * @see misc.Utils#setEnchantability
-	 */
+	/** Vanilla bow is 1, other high-end items 30. See {@link misc.Utils#setEnchantability}. */
 	private static final int ENCHANTABILITY = 20;
 
-	/** An ordinary shot's own damage, before Power. */
+	/** Before Power. */
 	private static final double ARROW_BASE = 2.5;
-	/** The Salvation beam's own damage, before Power. */
+	/** Before Power. */
 	private static final double SALVATION_BASE = 4;
 
 	/**
-	 * One arrow's damage at this Power level, before the Strength bonus the shot adds on top.  <b>The lore and
-	 * {@link #onRightClick} both read this</b>, which is the whole point of it existing: the numbers used to be
-	 * written out twice, and the Salvation pair below had already drifted - the lore promised a base of 4 and
-	 * the beam fired 4.5.  The lore was the intended figure, so the beam came down to it.
-	 *
-	 * <p>Level 7 rounds up to a flat +2 rather than 1.75, the same way the melee enchantments round at 7.
+	 * Before Strength. Lore and {@link #onRightClick} both read this; written twice, Salvation drifted (lore 4,
+	 * beam 4.5) and the beam came down to the lore. Level 7 rounds to +2, not 1.75, like melee enchants.
 	 */
 	public static double arrowDamage(int power) {
 		if(power <= 0) return ARROW_BASE;
 		return ARROW_BASE + (power == 7 ? 2.0 : power * 0.25);
 	}
 
-	/** The Salvation beam's damage at this Power level, before Strength.  @see #arrowDamage */
+	/** Before Strength. See {@link #arrowDamage}. */
 	public static double salvationDamage(int power) {
 		if(power <= 0) return SALVATION_BASE;
 		return SALVATION_BASE + (power == 7 ? 4.0 : power * 0.5);
@@ -72,11 +63,7 @@ public class Terminator implements AbilityItem {
 		return getItem(Map.of());
 	}
 
-	/**
-	 * The item, carrying {@code enchants} and with lore that says so.  <b>The enchantments go on here rather
-	 * than being applied by the caller afterwards</b> - that was the desync: the caller built the item, got
-	 * lore for the Power level it named, and then enchanted the stack by material type.
-	 */
+	/** Enchants go on here, not by the caller after; that was the lore desync. */
 	public static ItemStack getItem(Map<Enchantment, Integer> enchants) {
 		int powerLevel = enchants == null ? 0 : enchants.getOrDefault(Enchantment.POWER, 0);
 		ItemStack term = new ItemStack(Material.BOW);
@@ -93,9 +80,7 @@ public class Terminator implements AbilityItem {
 		lore.add(Utils.mm("skyblock/combat/terminator"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gray>Damage: <red>+" + loreDamage));
-		// SHOT_COOLDOWN + 1, not SHOT_COOLDOWN: the tag is gone on the tick the task runs, so a player
-		// spamming the button can sneak a shot in at 3 ticks, but holding right-click fires on the NEXT
-		// tick after that and lands at 4.  The published figure is the one everybody holding it gets.
+		// +1: spamming can fire at 3 ticks, but holding right click lands at 4, which is what most get.
 		lore.add(Utils.mm("<gray>Shot Cooldown: <green>" + Utils.damageNumber((SHOT_COOLDOWN + 1) / 20.0) + "s"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<gold>Shortbow: Instantly Shoots!"));
@@ -112,9 +97,8 @@ public class Terminator implements AbilityItem {
 		data.lore(lore);
 		term.setItemMeta(data);
 		term.addUnsafeEnchantments(enchants);
-		// Deliberately under the other high-end items' 30: a vanilla bow is 1, so 20 is already an enormous
-		// lift - enough to put Power V in reach of a level-30 table (it needs a modified level of 41) without
-		// making it the near-certainty 30 would.
+		// Under 30 on purpose: 20 puts Power V (modified level 41) in reach of a level-30 table without making it
+		// near-certain.
 		Utils.setEnchantability(term, ENCHANTABILITY);
 
 		return SkyblockId.stamp(term);
@@ -125,7 +109,7 @@ public class Terminator implements AbilityItem {
 		return true;
 	}
 
-	/** Salvation is the attack button on a bow with a 0.8s cooldown - see {@link AbilityItem#quietCooldown}. */
+	/** Salvation is left click with a 0.8s cooldown. See {@link AbilityItem#quietCooldown}. */
 	@Override
 	public boolean quietCooldown() {
 		return true;
@@ -133,8 +117,7 @@ public class Terminator implements AbilityItem {
 
 	@Override
 	public boolean onRightClick(Player p) {
-		// Shortbow shot cooldown: cap firing at once per 3 ticks.  Self-contained, not routed through the
-		// dispatcher's ability cooldown) so shooting never puts the Salvation beam on its 20-tick cooldown.
+		// Once per 3 ticks. Own tag, not the dispatcher's cooldown, so shooting never puts Salvation on cooldown.
 		if(p.getScoreboardTags().contains(SHOT_COOLDOWN_TAG)) {
 			return false;
 		}
@@ -158,9 +141,8 @@ public class Terminator implements AbilityItem {
 		// Calculate spawn position
 		Location spawnLoc = p.getEyeLocation().add(baseDirection.clone());
 
-		// Create NMS arrows directly (26.2: EntityType.ARROW constant removed; use the position+item
-		// constructor with a null weapon). TerminatorArrow, not vanilla's Arrow, so our own cancelled damage
-		// event cannot deflect them - see that class.
+		// 26.2 removed EntityType.ARROW, so use the position+item constructor with a null weapon.
+		// TerminatorArrow so our cancelled damage event can't deflect them.
 		TerminatorArrow nmsLeft = new TerminatorArrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
 		TerminatorArrow nmsMiddle = new TerminatorArrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
 		TerminatorArrow nmsRight = new TerminatorArrow(nmsWorld, 0, 0, 0, new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.ARROW), null);
@@ -191,7 +173,6 @@ public class Terminator implements AbilityItem {
 		Arrow middle = (Arrow) nmsMiddle.getBukkitEntity();
 		Arrow right = (Arrow) nmsRight.getBukkitEntity();
 
-		// The lore's figure, not a second copy of the arithmetic - see arrowDamage.
 		double damage = arrowDamage(p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.POWER));
 
 		double strengthBonus;
@@ -217,9 +198,7 @@ public class Terminator implements AbilityItem {
 
 	@Override
 	public boolean onLeftClick(Player p) {
-		// Off the MAIN HAND, like the shot above and like the lore.  This used to read
-		// getItem(getHeldItemSlot()), which is the same item by a route that can return null - hence the
-		// try/catch that then swallowed the Power level and silently fired an unenchanted beam.
+		// Main hand. getItem(getHeldItemSlot()) could return null, and its try/catch fired an unenchanted beam.
 		double damage = salvationDamage(p.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.POWER));
 
 		double strengthBonus;

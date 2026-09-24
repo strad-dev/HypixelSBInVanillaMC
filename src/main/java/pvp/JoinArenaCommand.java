@@ -13,9 +13,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * /joinarena: teleport into the FFA arena spawn (remembering where the player was).
- * /leavearena: return to that original spot, or the player's respawn point if it's invalid, or
- * world spawn if that's invalid too.
+ * /joinarena: to the FFA spawn, remembering where they were. /leavearena: back there, else respawn point,
+ * else world spawn.
  */
 public class JoinArenaCommand implements CommandExecutor {
 	private final PvpConfig cfg;
@@ -53,13 +52,13 @@ public class JoinArenaCommand implements CommandExecutor {
 			p.sendMessage(Utils.msg("<red>The Free-For-All arena isn't configured yet."));
 			return true;
 		}
-		origins.put(p.getUniqueId(), p.getLocation().clone()); // remember where they came from
+		origins.put(p.getUniqueId(), p.getLocation().clone());
 		p.teleport(spawn);
 		p.sendMessage(Utils.msg("<green>Welcome to the Free-For-All arena.  Good luck!"));
 		return true;
 	}
 
-	/** Original spot -> player respawn point -> world spawn, picking the first valid one. */
+	/** First valid of: original spot, respawn point, world spawn. */
 	private Location returnLocation(Player p) {
 		Location origin = origins.get(p.getUniqueId());
 		if (valid(origin)) return origin;

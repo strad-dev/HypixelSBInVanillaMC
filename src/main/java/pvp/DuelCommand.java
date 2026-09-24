@@ -72,7 +72,7 @@ public class DuelCommand implements CommandExecutor, TabCompleter {
 		return true;
 	}
 
-	/** /duel start <a> <b> console/op only (network plugin pairing). */
+	/** /duel start <a> <b>: console/op only (network pairing). */
 	private boolean start(CommandSender sender, String[] args) {
 		boolean privileged = !(sender instanceof Player p) || p.isOp();
 		if (!privileged) {
@@ -96,9 +96,8 @@ public class DuelCommand implements CommandExecutor, TabCompleter {
 	}
 
 	/**
-	 * /duel forceclear <player> console/op only: end whatever duel state they're in - an active duel
-	 * becomes a draw, a queue slot is dropped, requests are cancelled. The network plugin runs this before
-	 * force-pairing someone who's already busy (its /forceduel).
+	 * /duel forceclear <player>: console/op only. Active duel = draw, queue slot dropped, requests cancelled.
+	 * Network runs it before force-pairing a busy player (its /forceduel).
 	 */
 	private boolean forceClear(CommandSender sender, String[] args) {
 		boolean privileged = !(sender instanceof Player p) || p.isOp();

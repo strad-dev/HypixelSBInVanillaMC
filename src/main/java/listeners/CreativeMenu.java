@@ -11,6 +11,7 @@ import items.weapons.ManhuntHyperion;
 import items.weapons.Scylla;
 import items.weapons.SwordOfBadHealth;
 import items.weapons.Terminator;
+import misc.Menus;
 import misc.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -36,7 +37,7 @@ public class CreativeMenu implements Listener {
 	private static final Map<UUID, String> playerTabs = new HashMap<>();
 	private static final Map<UUID, Integer> playerPages = new HashMap<>();
 
-	/** Marker holder so the menu is identified by inventory identity, not by its (deprecated) title text. */
+	/** Marker holder: the menu is identified by inventory identity, not its (deprecated) title. */
 	private static final class CreativeMenuHolder implements InventoryHolder {
 		private Inventory inventory;
 		@Override public Inventory getInventory() { return inventory; }
@@ -135,10 +136,8 @@ public class CreativeMenu implements Listener {
 	}
 
 	/**
-	 * The catalog behind {@code tab}. Every tab but Manhunt is a static list in {@link #ITEMS}; the Manhunt
-	 * rungs are built here instead, because the ladder only exists when {@code manhunt} is on in config.yml
-	 * and that is read long after this class's static initialiser has run. Empty when it is off, though the
-	 * tab is not offered at all then.
+	 * Catalog behind {@code tab}. All but Manhunt are static lists in {@link #ITEMS}; the Manhunt rungs are built
+	 * here because {@code manhunt} in config.yml is read long after the static initialiser runs. Empty when off.
 	 */
 	private static List<ItemStack> catalog(String tab) {
 		if (!tab.equals("manhunt")) return ITEMS.get(tab);
@@ -151,21 +150,19 @@ public class CreativeMenu implements Listener {
 		return out;
 	}
 
-	/** The "Items" catalog (weapons/armor/tools), cloned - reused as the PvP loadout editor palette. */
+	/** "Items" catalog (weapons/armor/tools), cloned; also the PvP loadout editor palette. */
 	public static List<ItemStack> loadoutPalette() {
 		List<ItemStack> out = new ArrayList<>();
 		List<ItemStack> items = ITEMS.get("items");
-		// Rebuilt for the same reason the menu rebuilds, but with no player: the palette is a static list
-		// with no viewer, so a live figure reads for somebody carrying no other modifiers.  ItemReloader
-		// corrects that the moment a real owner touches the item.
+		// Rebuilt like the menu, but with no viewer, so live figures read for someone with no other modifiers.
+		// ItemReloader corrects that once a real owner touches the item.
 		if (items != null) for (ItemStack it : items) if (it != null) out.add(fresh(it, null).clone());
 		return out;
 	}
 
 	/**
-	 * One catalog entry, rebuilt from its own {@code getItem()} for {@code viewer}.  Hands the original back
-	 * untouched when {@code ItemReloader} does not recognise it - the enchanted-book tab is not made of
-	 * custom items and has nothing to rebuild from.
+	 * One catalog entry rebuilt from its own {@code getItem()} for {@code viewer}. Returns the original when
+	 * {@code ItemReloader} doesn't recognise it (the enchanted books aren't custom items).
 	 */
 	private static ItemStack fresh(ItemStack item, Player viewer) {
 		if (item == null) return null;
@@ -194,8 +191,7 @@ public class CreativeMenu implements Listener {
 
 	public static void openCreativeMenu(Player player) {
 		String currentTab = playerTabs.getOrDefault(player.getUniqueId(), "items");
-		// Manhunt off: the tab is gone from the row, so a player remembered on it would open an empty menu
-		// with nothing to click back to.  Put them on Items instead.
+		// Manhunt off: the tab is gone, so a player remembered on it would get an empty menu. Put them on Items.
 		if (currentTab.equals("manhunt") && !manhunt.Manhunt.enabled()) {
 			currentTab = "items";
 			playerTabs.put(player.getUniqueId(), currentTab);
@@ -209,12 +205,10 @@ public class CreativeMenu implements Listener {
 		// Add tabs at top
 		addTabs(gui, currentTab);
 
-		// Add items for current tab.  Each icon is REBUILT for the viewer on the way in rather than shown
-		// as ITEMS holds it: that map is a static initialiser, so its stacks are snapshots from class load,
-		// made before any player existed.  They therefore miss anything getItem() has learned since - the
-		// SkyBlock id, a lore change, a retune - and any live figure in them (the Hyperion's implosion) was
-		// computed for nobody.  Refreshing here rather than at the three take sites below means the icon a
-		// player reads and the item they walk away with are the same thing.
+		// Add items for current tab, each REBUILT for the viewer: ITEMS is a static initialiser, so its stacks
+		// are snapshots from class load and miss anything getItem() learned since (SkyBlock id, lore, retunes);
+		// live figures (Hyperion implosion) were computed for nobody. Doing it here, not at the three take sites
+		// below, means the icon a player reads is the item they get.
 		List<ItemStack> items = catalog(currentTab);
 		if (items != null) {
 			int startIndex = page * 36; // 36 items per page (excluding tab row)
@@ -285,8 +279,7 @@ public class CreativeMenu implements Listener {
 
 		// Enchantments items tab
 		ItemStack enchantment = new ItemStack(Material.ENCHANTED_BOOK);
-		// Its own meta, its own stack: this read summon's meta and wrote summon's, so the book went in
-		// unnamed and never glinted for the tab it was on.
+		// Its own meta: this used to read and write summon's, so the book was unnamed and never glinted.
 		ItemMeta enchantmentMeta = enchantment.getItemMeta();
 		enchantmentMeta.displayName(Utils.mm("Enchantments"));
 
@@ -297,8 +290,7 @@ public class CreativeMenu implements Listener {
 		enchantment.setItemMeta(enchantmentMeta);
 		gui.setItem(3, enchantment);
 
-		// Manhunt tab - only where the ladder exists, so the row is one shorter with manhunt off in
-		// config.yml and the glass starts a slot earlier.
+		// Manhunt tab, only when enabled; otherwise the row is one shorter and the glass starts a slot earlier.
 		int firstGlass = 4;
 		if (manhunt.Manhunt.enabled()) {
 			ItemStack manhuntTab = new ItemStack(Material.COMPASS);
@@ -328,6 +320,7 @@ public class CreativeMenu implements Listener {
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
 		if (!(e.getInventory().getHolder() instanceof CreativeMenuHolder)) return;
+		if (Menus.ignoreDoubleClick(e)) return;
 
 		Player player = (Player) e.getWhoClicked();
 		ItemStack clicked = e.getCurrentItem();

@@ -30,11 +30,10 @@ public class IceSpray implements AbilityItem {
 	private static final int MANA_COST = 8;
 	private static final String COOLDOWN_TAG = "IceSprayCooldown";
 	private static final int COOLDOWN = 100;
-	/** Damage the cone deals, and how long the slow and the {@code IceSprayed} tag last. */
+	/** Cone damage; slow and {@code IceSprayed} tag length. */
 	public static final double DAMAGE = 1;
 	public static final long SLOW_TICKS = 101L;
-	/** What the {@code IceSprayed} tag does to damage a frozen enemy TAKES and DEALS. <b>Both read by
-	 *  {@link listeners.CustomDamage#calculateFinalDamage} and quoted by the lore.</b> */
+	/** Damage a frozen enemy takes and deals. Read by {@link listeners.CustomDamage#calculateFinalDamage} and the lore. */
 	public static final double DAMAGE_TAKEN_BONUS = 1.1;
 	public static final double DAMAGE_DEALT_PENALTY = 0.85;
 

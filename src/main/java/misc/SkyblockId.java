@@ -10,26 +10,21 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * The real Hypixel item id for each of our custom items, and the one place that decides which of them has
- * one at all.
+ * Real Hypixel item id for each custom item, and the one place deciding which have one.
  *
- * <p>It is written into {@code minecraft:custom_data} as a bare {@code id} at the <b>top level</b>, with no
- * {@code ExtraAttributes} wrapper - that is where SkyblockAPI reads it, and a client-side pack (Catharsis)
- * resolves an item's texture from {@code id} alone, lower-cased. None of that is gated on being on Hypixel,
- * so a stamped item retextures on this server. <b>Same key, same place as M7 TAS</b>, so one pack covers
- * both plugins.
+ * <p>Written into {@code minecraft:custom_data} as a bare top-level {@code id}, no {@code ExtraAttributes}
+ * wrapper: that is where SkyblockAPI reads it, and Catharsis resolves a texture from {@code id} alone,
+ * lower-cased, not gated on being on Hypixel. <b>Same key and place as M7 TAS</b>, so one pack covers both.
  *
- * <p><b>Keyed on the lore id</b>, the identity the rest of the plugin already runs on, so an item's build
- * method only ever says {@code stamp(...)} and never repeats a string. The one exception is the Manhunt
- * Hyperion: all eight rungs share one lore id, so its id lives on {@link manhunt.ManhuntTier} instead.
+ * <p><b>Keyed on the lore id</b>, so a build method just calls {@code stamp(...)}. Exception: the Manhunt
+ * Hyperion's eight rungs share one lore id, so its id lives on {@link manhunt.ManhuntTier}.
  *
- * <p>Absent from the table means <b>no real counterpart</b> - Necron's Elytra, the Primal Dragon set, the
- * Wither Lords' secrets, six of the seven Refined metals, the Manhunt Compass. Those are stamped with
- * nothing rather than with something close, since a wrong id retextures an item as the wrong thing. Every
- * id below was checked against {@code api.hypixel.net/v2/resources/skyblock/items}.
+ * <p>Absent = <b>no real counterpart</b> (Necron's Elytra, Ancient Dragon Egg, Wither Lords' secrets, six of seven
+ * Refined metals, Manhunt Compass). Those get nothing, since a wrong id retextures an item as the wrong thing.
+ * Every id was checked against {@code api.hypixel.net/v2/resources/skyblock/items}.
  *
- * <p>The id is <b>not</b> part of what a saved loadout matches on (that is the first lore line), so adding
- * or changing a row here needs no migration - items pick it up on the next {@code ItemReloader} pass.
+ * <p>Saved loadouts match on the first lore line, not this, so changing a row needs no migration; items pick it
+ * up on the next {@code ItemReloader} pass.
  */
 public final class SkyblockId {
 	private SkyblockId() {}
@@ -94,11 +89,8 @@ public final class SkyblockId {
 	);
 
 	/**
-	 * Writes the SkyBlock id for {@code item}'s own lore id into its custom data, and hands the stack back.
-	 * An item with no row in the table comes back untouched.
-	 *
-	 * <p>Call it <b>last</b>, on the finished stack: the write goes through NMS and returns a copy, so
-	 * anything done to the original afterwards is dropped.
+	 * Writes the SkyBlock id for {@code item}'s lore id and returns the stack; no row = untouched. Call it
+	 * <b>last</b>: the write goes through NMS and returns a copy, so later edits to the original are lost.
 	 */
 	public static ItemStack stamp(ItemStack item) {
 		if(item == null || !item.hasItemMeta()) return item;
@@ -114,8 +106,8 @@ public final class SkyblockId {
 	}
 
 	/**
-	 * As {@link #stamp(ItemStack)}, plus whatever else belongs in the same compound - the Aspect of the
-	 * Void's Etherwarp and reforge keys. One write, so the extras cannot land on a stack that missed its id.
+	 * As {@link #stamp(ItemStack)}, plus extras in the same compound (AOTV's Etherwarp and reforge keys). One write,
+	 * so extras can't land on a stack that missed its id.
 	 */
 	public static ItemStack stamp(ItemStack item, Consumer<CompoundTag> extra) {
 		if(item == null || !item.hasItemMeta()) return item;
@@ -134,16 +126,14 @@ public final class SkyblockId {
 	}
 
 	/**
-	 * What a <b>plain vanilla</b> tool, weapon or armour piece is dressed up as. Nothing about the stack
-	 * changes but the id, so a diamond sword is still a diamond sword in every way the server cares about -
-	 * it just renders as a Giant's Sword to a client with the pack.
+	 * What a <b>plain vanilla</b> tool, weapon or armour piece is dressed up as. Only the id changes: a diamond sword
+	 * is still a diamond sword to the server, it just renders as a Giant's Sword with the pack.
 	 *
-	 * <p>Each material ladder reads as a progression, so better gear still looks better. A rung with no
-	 * sensible counterpart is simply absent: the netherite axe, and the stone, golden and wooden shovels.
+	 * <p>Each material ladder reads as a progression. Rungs with no sensible counterpart are absent (netherite axe;
+	 * stone, golden, wooden shovels).
 	 *
-	 * <p><b>Sharing a material with a custom item is not a conflict</b> - {@link #stampVanilla} refuses
-	 * anything carrying a {@code skyblock/} lore line, so the Hyperion stays a Hyperion rather than becoming
-	 * Necron's Blade, and Divan's Pickaxe does not turn into a Titanium Drill.
+	 * <p><b>Sharing a material with a custom item is fine</b>: {@link #stampVanilla} refuses anything with a
+	 * {@code skyblock/} lore line, so the Hyperion doesn't become Necron's Blade.
 	 */
 	private static final Map<Material, String> VANILLA = Map.ofEntries(
 			Map.entry(Material.NETHERITE_SWORD, "NECRON_BLADE"),
@@ -227,9 +217,8 @@ public final class SkyblockId {
 	);
 
 	/**
-	 * The id a plain stack of {@code material} is dressed up as, or null if that material has no
-	 * counterpart. Public because the Manhunt Hyperion reads its rung's id straight out of here: a rung is a
-	 * sword material, and it renders as whatever that material renders as.
+	 * Id a plain stack of {@code material} is dressed up as, or null. Public because the Manhunt Hyperion reads its
+	 * rung's id from here: a rung is a sword material and renders as that material does.
 	 */
 	@Nullable
 	public static String vanillaFor(Material material) {
@@ -237,15 +226,12 @@ public final class SkyblockId {
 	}
 
 	/**
-	 * Dresses a plain vanilla stack up as its SkyBlock counterpart, returning the stamped copy - or
-	 * <b>null</b> for "leave this one alone", which covers a material with no counterpart, a custom item,
-	 * and a stack that already carries the right id.
+	 * Dresses a plain vanilla stack as its SkyBlock counterpart and returns the stamped copy, or <b>null</b> = leave
+	 * it: no counterpart, a custom item, or already the right id. The last matters because this runs on every slot
+	 * switch, and re-stamping would rewrite and resend the slot for nothing.
 	 *
-	 * <p>That last case matters: this runs on every slot switch, and re-stamping an already-correct stack
-	 * would rewrite the inventory slot, and resend the item, for nothing.
-	 *
-	 * <p><b>Refuses any custom item outright</b>, on the same test {@code ItemReloader.modifyVanillaArmor}
-	 * uses - a {@code skyblock/} first lore line. Our items own their id; this is only for the rest.
+	 * <p><b>Refuses custom items outright</b>, same test as {@code ItemReloader.modifyVanillaArmor}: a
+	 * {@code skyblock/} first lore line.
 	 */
 	@Nullable
 	public static ItemStack stampVanilla(ItemStack item) {

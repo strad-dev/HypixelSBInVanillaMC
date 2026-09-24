@@ -7,15 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Exports the duel item palette + default kit to a shared JSON file ({@code pvp-item-catalog.json}) so
- * a server WITHOUT SkyBlock (i.e. the network plugin on the lobby, etc.) can offer the exact same
- * selectable items in its own {@code /pvploadout} editor. Only written when the network catalog path is
- * configured ({@code pvp.duel.catalog-file}); a standalone server exports nothing.
+ * Exports palette + default kit to shared {@code pvp-item-catalog.json} so servers WITHOUT SkyBlock (the
+ * network plugin on lobby etc.) offer the same items in their {@code /pvploadout}. Only with
+ * {@code pvp.duel.catalog-file} set.
  *
- * On-disk shape: {@code { "palette": [b64...], "defaultKit": [41 b64 slots], "ffaEnabled": bool,
- * "duelEnabled": bool }} - the b64 fields are the same Base64 of {@link ItemStack#serializeAsBytes()}
- * used everywhere else, so the network reads it with no translation. The enabled flags let the network's
- * {@code /pvptop} gate each board (FFA / 1v1) on whether SkyBlock actually runs that mode here.
+ * Shape: {@code { "palette": [b64...], "defaultKit": [41 b64 slots], "ffaEnabled": bool,
+ * "duelEnabled": bool }}, b64 = Base64 of {@link ItemStack#serializeAsBytes()} as everywhere else. The flags
+ * let the network's {@code /pvptop} gate each board on whether SkyBlock runs that mode.
  */
 public final class PvpCatalogExport {
 	private PvpCatalogExport() {}
@@ -35,7 +33,7 @@ public final class PvpCatalogExport {
 		PvpJson.save(file, d);
 	}
 
-	/** On-disk shape (field names must match the network's PvpCatalog reader). */
+	/** Field names must match the network's PvpCatalog reader. */
 	public static final class Data {
 		public List<String> palette = new ArrayList<>();
 		public List<String> defaultKit = new ArrayList<>();

@@ -22,30 +22,20 @@ import org.bukkit.inventory.Recipe;
 
 import java.util.Iterator;
 
-/**
- * The Manhunt rules that hang off events: kitting players out on join and on respawn, resetting a dead
- * one's intelligence, vetting the Hyperion upgrade craft, and the nether rules in {@link ManhuntPiglins}.
- * Registered only when Manhunt is on.
- */
+/** Event-driven Manhunt rules: kits, death reset, upgrade crafts, nether rules. Registered only when on. */
 public class ManhuntListener implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
 		p.discoverRecipes(AddRecipes.manhuntRecipeKeys(Plugin.getInstance()));
-		// A rejoining Speedrunner is still a Speedrunner - the roster is on disk, keyed on UUID - so this is
-		// only about the name the teams list quotes for them.
+		// Roster is on disk by UUID; this only refreshes the name.
 		Manhunt.noteName(p);
-		// Somebody arriving into a match already under way still gets their kit - once.
 		Manhunt.equipOnJoin(p);
 	}
 
 	/**
-	 * Death costs a player their whole intelligence ceiling, not just what was in the tank: they are back on
-	 * the Stick's numbers until they get their hands on a Hyperion again.
-	 *
-	 * <p>Their compasses are the one thing they keep. The Hyperion lying where they died is the point of the
-	 * ladder, but a Hunter who has to walk back to their body before they can track anything is out of the
-	 * match for the whole walk - and a compass on the floor is a compass a Speedrunner can pick up.
+	 * Death resets the ceiling to the Stick. Compasses are kept: a Hunter walking back to their body can't
+	 * track anything, and a dropped compass is one a Speedrunner can pick up.
 	 */
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent e) {
@@ -54,17 +44,9 @@ public class ManhuntListener implements Listener {
 	}
 
 	/**
-	 * Moves every Manhunt Compass out of the death drops and into the keep list - Paper's per-item
-	 * keepInventory, which puts the stack back in the inventory on respawn. It has to come out of the drops
-	 * in the same breath, or the compass is kept AND dropped.
-	 *
-	 * <p>The stack is carried over whole, so the target it was pointed at and the needle's last fix survive
-	 * the death. Nothing to do with keepInventory on: the drop list is empty, so this finds nothing and the
-	 * whole inventory is kept anyway.
-	 *
-	 * <p>At the default priority, which is after {@code PvpLoadoutMenu.onDeath} - it REBUILDS the drop list
-	 * at LOWEST for anyone who died with the loadout editor open, so a compass pulled before that would be
-	 * put straight back.
+	 * Moves compasses from drops to getItemsToKeep (Paper's per-item keepInventory). Must leave the drops too,
+	 * or it's kept AND dropped. Whole stack, so target and last fix survive. Default priority, after
+	 * {@code PvpLoadoutMenu.onDeath}, which rebuilds the drop list at LOWEST.
 	 */
 	private static void keepCompasses(PlayerDeathEvent e) {
 		Iterator<ItemStack> drops = e.getDrops().iterator();
@@ -78,17 +60,8 @@ public class ManhuntListener implements Listener {
 	}
 
 	/**
-	 * Kits a player back out after they respawn. Death drops their Hyperion on the floor, and {@code equip}
-	 * otherwise only runs on {@code /manhunt start} and on join - so without this a death put a Hunter back
-	 * in the match with nothing but the compass {@link #keepCompasses} saved for them.
-	 *
-	 * <p>They come back on the <b>Stick</b>, which is the same demotion {@link Manhunt#onDeath} applies to
-	 * their intelligence ceiling: whatever rung they had reached is on the ground with the rest of their
-	 * things, to be picked back up or lost.
-	 *
-	 * <p>A tick late, for two reasons: with keepInventory off the inventory is not settled while the event
-	 * runs, and {@code equip} drops anything that will not fit at {@code p.getLocation()} - which is still
-	 * the DEATH spot during the event, so an overflow would land back where they died.
+	 * Re-kits on the Stick after respawn; without it a death left a player with only their compass. A tick
+	 * late: the inventory isn't settled during the event, and overflow would drop at the death spot.
 	 */
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent e) {
@@ -98,21 +71,14 @@ public class ManhuntListener implements Listener {
 		}, 1);
 	}
 
-	/**
-	 * Piglins barter on the Manhunt table while a match is running: ender pearls at weight 25 for 4-8 and
-	 * glowstone dust back in at weight 20 for 5-12. {@link ManhuntPiglins#reroll} does the arithmetic.
-	 */
+	/** Pearls at weight 25 for 4-8, glowstone dust at 20 for 5-12. See {@link ManhuntPiglins#reroll}. */
 	@EventHandler(ignoreCancelled = true)
 	public void onPiglinBarter(PiglinBarterEvent e) {
 		if(!Manhunt.active()) return;
 		ManhuntPiglins.reroll(e.getOutcome());
 	}
 
-	/**
-	 * No piglin brutes during a match - one walks in wearing an axe that two-shots a Speedrunner through a
-	 * bastion they have to loot. The spawn is cancelled and an ordinary piglin takes its place, which covers
-	 * anything spawned while the chunk is up: a spawner, a command, or a bastion generating under a player.
-	 */
+	/** No brutes during a match: their axe two-shots a Speedrunner. Swapped for a plain piglin. */
 	@EventHandler(ignoreCancelled = true)
 	public void onCreatureSpawn(CreatureSpawnEvent e) {
 		if(!Manhunt.active() || !(e.getEntity() instanceof PiglinBrute brute)) return;
@@ -121,12 +87,8 @@ public class ManhuntListener implements Listener {
 	}
 
 	/**
-	 * The other half of the same rule: a bastion generated before the match, or before this server ever ran
-	 * a Manhunt, has its brutes sitting in the chunk file and they never go through a spawn event. They are
-	 * caught as the chunk's entities load instead.
-	 *
-	 * <p>A tick late, because the chunk's entities are still being added to the world while this runs and
-	 * the swap both removes one and spawns another.
+	 * Brutes from bastions generated before the match never fire a spawn event, so catch them on load. A tick
+	 * late: entities are still being added while this runs.
 	 */
 	@EventHandler
 	public void onEntitiesLoad(EntitiesLoadEvent e) {
@@ -139,20 +101,11 @@ public class ManhuntListener implements Listener {
 	}
 
 	/**
-	 * Vets a Manhunt upgrade, and keeps the bottom rung out of every other recipe in the game.
-	 *
-	 * <p>The upgrade recipe can only ask for the right MATERIAL (a Hyperion carries enchantments and a live
-	 * damage figure, so nothing exact would match it), so a bare stick plus eight wooden swords matches just
-	 * as well - the result is thrown away here unless the grid really holds the rung below. On the way
-	 * through, the result is rebuilt with that Hyperion's enchantments and for the player looking at it,
-	 * which is also the only place those enchantments survive: the recipes are shapeless, so
-	 * {@code KeepEnchantsOnCraft} skips them rather than copy whatever sits in slot 4.
-	 *
-	 * <p>The other half is the Stick. It is a Hyperion, but it is also a stick, so vanilla will happily take
-	 * it for torches, ladders and every tool in the game - a player starting a Manhunt could burn their
-	 * weapon on a crafting table without noticing. Any recipe but its own upgrade (the WOOD rung) is refused
-	 * while one sits in the grid. The rungs above are swords and no vanilla recipe wants one; the Netherite
-	 * rung deliberately still crafts into a real Hyperion.
+	 * Recipes can only match MATERIAL (no ExactChoice matches a live Hyperion), so the result is voided unless
+	 * the grid holds the real rung below, then rebuilt with its enchants. Only place they survive:
+	 * {@code KeepEnchantsOnCraft} skips shapeless recipes.
+	 * The Stick is also a stick, so it's barred from every recipe but its WOOD upgrade. Higher rungs are swords
+	 * no vanilla recipe wants; Netherite deliberately still crafts into a real Hyperion.
 	 */
 	@EventHandler
 	public void onPrepareCraft(PrepareItemCraftEvent e) {
@@ -170,8 +123,7 @@ public class ManhuntListener implements Listener {
 		if(tier == null) return;
 		ManhuntTier from = ManhuntTier.values()[tier.ordinal() - 1];
 
-		// The rung below and the swords going on are always different materials, so the one stack of the
-		// lower material is the Hyperion slot wherever in the grid it was dropped.
+		// Rung below and the added swords are always different materials, so this finds the Hyperion anywhere.
 		ItemStack input = null;
 		for(ItemStack item : e.getInventory().getMatrix()) {
 			if(item != null && item.getType() == from.material()) input = item;
@@ -186,7 +138,6 @@ public class ManhuntListener implements Listener {
 		e.getInventory().setResult(ManhuntHyperion.getItem(tier, input.getEnchantments(), viewer));
 	}
 
-	/** Whether any stack in the grid is a bottom-rung (Stick) Manhunt Hyperion. */
 	private static boolean holdsStick(ItemStack[] matrix) {
 		for(ItemStack item : matrix) {
 			if(ManhuntTier.of(item) == ManhuntTier.BASE) return true;
@@ -194,7 +145,7 @@ public class ManhuntListener implements Listener {
 		return false;
 	}
 
-	/** The rung a {@code manhunt_*} recipe key upgrades to, or null for any other recipe of ours. */
+	/** Rung a {@code manhunt_*} key upgrades to, else null. */
 	private static ManhuntTier tierOf(String key) {
 		if(!key.startsWith("manhunt_")) return null;
 		try {

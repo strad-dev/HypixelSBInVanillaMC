@@ -26,8 +26,7 @@ import java.util.List;
 
 public class Sadan implements CustomMob {
 	private static final String name = "<gold><bold>﴾ <red><bold>Sadan<gold><bold> ﴿";
-	// Hitbox heights fed to Utils.getNearestValidBlockYAt so spawns can't land somewhere the mob doesn't fit.
-	// Scaled mobs are taller than their vanilla type, and SCALE is applied after the spawn, so state it here.
+	// Hitbox heights for Utils.getNearestValidBlockYAt. SCALE is applied after spawn, so scaled heights go here.
 	private static final double TERRACOTTA_HEIGHT = 1.95;    // husk
 	private static final double GOLEM_HEIGHT = 2.7;
 	private static final double GIANT_HEIGHT = 1.95 * 6.0;   // zombie at SCALE 6
@@ -335,7 +334,7 @@ public class Sadan implements CustomMob {
 
 			Utils.changeName(sadan);
 
-			// Sink him 12 blocks under the floor he's standing on, then float him back up (see the loop below).
+			// Sink him 12 blocks under the floor, then float him back up (loop below).
 			Location l = sadan.getLocation();
 			l.setY(Utils.getNearestBlockYAt(l) - 12);
 			sadan.teleport(l);
@@ -391,8 +390,7 @@ public class Sadan implements CustomMob {
 		return helmet;
 	}
 
-	// Keep the summoned add-ons tethered to the fight: if a submob strays more than 96 blocks from
-	// Sadan (e.g. chasing a player who bolted), yank it back. Piggybacks on the per-tick health loops.
+	// Yanks a submob back if it strays over 96 blocks from Sadan. Runs off the per-tick health loops.
 	private static void leashToSadan(LivingEntity submob, Zombie sadan) {
 		if(submob.getWorld().equals(sadan.getWorld()) && submob.getLocation().distanceSquared(sadan.getLocation()) > 96.0 * 96.0) {
 			submob.teleport(sadan.getLocation());

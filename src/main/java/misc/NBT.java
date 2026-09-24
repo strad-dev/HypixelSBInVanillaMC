@@ -11,12 +11,11 @@ import java.util.function.Consumer;
 /**
  * Reads and writes {@code minecraft:custom_data} on a stack.
  *
- * <p><b>The same file as M7 TAS's {@code nms/NBT}</b>, and it has to stay that way: both plugins write the
- * SkyBlock item id into the same compound so one client-side resource pack retextures both. Keep them in
- * step.
+ * <p><b>Same file as M7 TAS's {@code nms/NBT}; keep them in step</b>: both write the SkyBlock id into the same
+ * compound so one resource pack retextures both.
  *
- * <p>NMS rather than {@code ItemMeta}'s persistent data container, because a PDC key is always namespaced
- * ({@code skyblock:id}) and what reads these is looking for a bare {@code id} at the top level.
+ * <p>NMS, not the PDC, because a PDC key is always namespaced ({@code skyblock:id}) and readers want a bare
+ * top-level {@code id}.
  *
  * @see SkyblockId
  */

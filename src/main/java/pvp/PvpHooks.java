@@ -5,13 +5,9 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 /**
- * Static bridge that layers the duel/FFA system on top of SkyBlock's CustomDamage flow. CustomDamage
- * owns and recomputes all combat (it cancels the vanilla EntityDamageEvent and applies damage itself
- * via setHealth), so the PvP feature can't observe combat through ordinary Bukkit listeners. Instead
- * CustomDamage calls into these two hooks at its decision points.
- *
- * Wired by {@link PvpModule#enable} only when the PvP feature is active; otherwise the listener stays
- * null and both hooks no-op, leaving SkyBlock's combat completely unchanged on non-pvp servers.
+ * Static bridge from CustomDamage to duel/FFA. CustomDamage cancels EntityDamageEvent and applies damage
+ * via setHealth, so ordinary listeners can't see combat; it calls these hooks at its decision points.
+ * Wired by {@link PvpModule#enable} only with PvP on; otherwise the listener is null and every hook no-ops.
  */
 public final class PvpHooks {
 	private static PvpListener listener;
@@ -23,8 +19,7 @@ public final class PvpHooks {
 	}
 
 	/**
-	 * True if this damage should be prevented outright: a Free-For-All safezone, a duel countdown
-	 * (combatants are frozen/invulnerable until FIGHT), or an outsider trying to interfere in a duel.
+	 * Block outright: FFA safezone, duel countdown (invulnerable until FIGHT), or outsider hitting a duelist.
 	 */
 	public static boolean shouldBlock(LivingEntity victim, Entity attacker) {
 		return listener != null && victim instanceof Player v
@@ -32,18 +27,16 @@ public final class PvpHooks {
 	}
 
 	/**
-	 * True if this lethal blow must skip the Totem of Undying entirely (not consumed, no revive): totems
-	 * are ignored inside the Free-For-All arena, where a kill is scored and respawns the victim anyway.
-	 * Duel loadouts may still carry a totem, so duels are unaffected.
+	 * Lethal blow skips the totem (not consumed, no revive) inside the FFA arena, where the kill is scored
+	 * and the victim respawns anyway. Duels unaffected.
 	 */
 	public static boolean ignoresTotem(LivingEntity victim) {
 		return listener != null && victim instanceof Player v && listener.ignoresTotem(v);
 	}
 
 	/**
-	 * Called when a blow would be lethal to {@code victim}. Returns true if the PvP system consumed
-	 * the kill (ended the duel, or scored the FFA kill) and revived the player, so CustomDamage must
-	 * NOT kill them (no death screen).
+	 * Blow would be lethal. True if PvP took the kill (duel ended or FFA kill scored) and revived them, so
+	 * CustomDamage must NOT kill them.
 	 */
 	public static boolean handleLethal(LivingEntity victim, Entity attacker, boolean absolute) {
 		return listener != null && victim instanceof Player v
@@ -51,8 +44,7 @@ public final class PvpHooks {
 	}
 
 	/**
-	 * Reports a landed player-vs-player hit so the PvP layer can update damage/accuracy/combo stats.
-	 * Called for every applied hit; the listener decides whether it counts (arena or armed duel).
+	 * Landed PvP hit, for damage/accuracy/combo stats. Called for every hit; listener decides if it counts.
 	 */
 	public static void trackHit(LivingEntity victim, Entity attacker, double finalDamage, boolean arrow, boolean crit, boolean iframe) {
 		if (listener != null && victim instanceof Player v && attacker instanceof Player a) {
@@ -61,19 +53,18 @@ public final class PvpHooks {
 	}
 
 	/**
-	 * True if this player is standing in the Free-For-All safe zone (and isn't duelling), i.e. they
-	 * currently hold safezone immunity. Used to suppress passive mana regen while they're parked there.
+	 * Holds FFA safezone immunity. Suppresses passive mana regen while parked there.
 	 */
 	public static boolean inSafezone(Player p) {
 		return listener != null && listener.inSafezone(p);
 	}
 
-	/** Reports intelligence (mana) spent on an ability; counted only while the player is in PvP combat. */
+	/** Mana spent on an ability; counted only in PvP combat. */
 	public static void trackMana(Player p, int amount) {
 		if (listener != null) listener.trackMana(p, amount);
 	}
 
-	/** Reports HP restored; counted only while the player is in PvP combat. */
+	/** HP restored; counted only in PvP combat. */
 	public static void trackHeal(Player p, int amount) {
 		if (listener != null) listener.trackHeal(p, amount);
 	}

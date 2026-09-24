@@ -9,26 +9,14 @@ import net.minecraft.world.phys.Vec3;
 import javax.annotation.Nullable;
 
 /**
- * Vanilla's arrow in every respect but one: it does not let the hit it just landed be mistaken for a miss.
- *
- * <p><b>Why it has to exist.</b> This plugin cancels the vanilla damage event and recomputes, so
- * {@code hurtOrSimulate} returns false on every single arrow hit and {@code AbstractArrow.onHitEntity} takes
- * its MISS branch on the way out: {@code deflect(ProjectileDeflection.REVERSE, ...)}, which scales the motion
- * and spins the yaw 180, and then {@code setDeltaMovement(delta.scale(0.2))}. That is the bounce off a mob,
- * and on a piercing arrow it is visible - the plugin used to put the velocity back a tick later, by which
- * time the client had already been sent the reversed vector and rendered the flip.
- *
- * <p><b>Why it is shaped like this.</b> The motion and rotation are saved before the super call and put back
- * after it, rather than vanilla's hit logic being copied out here. Everything in that method is wanted
- * exactly as vanilla wrote it - the pierce bookkeeping in {@code piercingIgnoreEntityIds}, the impact sound,
- * Flame, the discard - and a copy would have to be re-read against the jar every version. Undone in the SAME
- * tick, so the reversed vector never reaches a client and there is nothing to see.
- *
- * <p>An arrow vanilla removed on the way through is left alone: there is nothing to put back.
- *
- * <p>Only arrows the plugin spawns itself can be this class, so a vanilla bow's piercing arrow still needs
- * {@code CustomDamage.customMobs}'s next-tick velocity restore. A chunk that saves and reloads one of these
- * gets a plain vanilla arrow back, which is fine: they live about a second.
+ * Vanilla arrow that doesn't treat its hit as a miss. We cancel the damage event, so {@code hurtOrSimulate}
+ * returns false and {@code onHitEntity} takes the MISS branch: {@code deflect(REVERSE)} plus
+ * {@code delta.scale(0.2)}, a visible bounce on a piercing arrow. Restoring velocity a tick later was too late,
+ * the client had already rendered the flip.
+ * Saves motion and rotation around the super call instead of copying vanilla's hit logic (pierce bookkeeping,
+ * sound, Flame, discard), so nothing has to be re-checked each version. Same tick, so no client sees it.
+ * Vanilla bow arrows still rely on {@code CustomDamage.customMobs}'s next-tick restore. A chunk reload turns
+ * these into plain arrows, fine since they live about a second.
  */
 public class TerminatorArrow extends Arrow {
 	public TerminatorArrow(Level level, double x, double y, double z, ItemStack pickup, @Nullable ItemStack weapon) {

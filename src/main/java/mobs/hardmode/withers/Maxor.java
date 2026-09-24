@@ -21,7 +21,7 @@ import java.util.List;
 
 public class Maxor implements CustomWither {
 	private static final String name = "<gold><bold>﴾ <red><bold>Maxor<gold><bold> ﴿";
-	/** An end crystal's hitbox is 2 blocks tall and we hover it 1 block off the floor, so 3 must be clear above it. */
+	/** Crystal hitbox is 2 tall and hovers 1 off the floor, so 3 clear. */
 	private static final double CRYSTAL_CLEARANCE = 3.0;
 
 	@Override
@@ -64,9 +64,8 @@ public class Maxor implements CustomWither {
 	}
 
 	private void spawnCrystal(Wither wither, int which) {
-		// Scatter the crystal around Maxor and drop it on the NEAREST valid floor, hovering a block above it. The old
-		// top-down scan from y=319 found the *highest* block in the column instead, which parked the crystal on the roof
-		// of an enclosed arena - unreachable, so the fight could never leave its invulnerable phase.
+		// NEAREST valid floor. The old top-down scan from y=319 put the crystal on the roof of an enclosed arena,
+		// unreachable, so the fight never left its invulnerable phase.
 		Location l = Utils.randomLocation(wither.getLocation(), 16, CRYSTAL_CLEARANCE);
 		if(l.clone().subtract(0, 1, 0).getBlock().getType().isSolid()) {
 			l.add(0, 1, 0);
@@ -94,8 +93,7 @@ public class Maxor implements CustomWither {
 			Bukkit.broadcast(Utils.msg("<yellow>An Energy Crystal has spawned!  Maybe it is useful?"));
 			return;
 		}
-		// Nothing in that column has a floor to stand a crystal on (open void) - randomLocation falls back to a bare
-		// surface Y, so don't strand the crystal in mid-air; hand out the phase for free instead.
+		// No floor (open void): randomLocation falls back to a bare Y, so skip the crystal and give the phase free.
 		WitherBoss nmsWither = ((CraftWither) wither).getHandle();
 		nmsWither.bossEvent.setProgress(nmsWither.getHealth() / 800);
 		Bukkit.broadcast(Utils.msg("<red>Oops!  Unable to summon a crystal!  Take it for free."));
@@ -125,7 +123,7 @@ public class Maxor implements CustomWither {
 				Utils.changeName(damagee);
 			} else {
 				if(!damagee.getScoreboardTags().contains("Dead")) {
-					if(damager instanceof Player p) { // damagee is Maxor himself - the title goes to whoever hit him
+					if(damager instanceof Player p) {
 						p.showTitle(Title.title(Utils.msg("<red><bold>IMMUNE"), Utils.msg("<yellow>You cannot damage Maxor!"), Title.Times.times(Duration.ZERO, Duration.ofMillis(20L * 50L), Duration.ZERO)));
 					}
 					damagee.getWorld().playSound(damagee, Sound.BLOCK_ANVIL_PLACE, 0.5F, 0.5F);
