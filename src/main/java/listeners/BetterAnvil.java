@@ -143,21 +143,21 @@ public class BetterAnvil implements Listener {
 				if(cursor.getType() != Material.AIR) return;
 
 				e.setCancelled(true);
-				player.setItemOnCursor(result);
-				e.getInventory().setItem(0, null);
-				e.getInventory().setItem(1, null);
-				e.getInventory().setItem(2, null);
 
-				// Deduct XP cost
+				// Read before clearing the inputs: an empty anvil resets cost to -1
 				ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-				if(serverPlayer.containerMenu instanceof AnvilMenu anvilMenu) {
-					int cost = anvilMenu.cost.get();
-					if(player.getGameMode() != org.bukkit.GameMode.CREATIVE) {
-						player.setLevel(Math.max(0, player.getLevel() - cost));
-					}
-				}
+				int cost = serverPlayer.containerMenu instanceof AnvilMenu anvilMenu ? Math.max(0, anvilMenu.cost.get()) : 0;
+				boolean creative = player.getGameMode() == org.bukkit.GameMode.CREATIVE;
+				if(creative || player.getLevel() >= cost) {
+					player.setItemOnCursor(result);
+					e.getInventory().setItem(0, null);
+					e.getInventory().setItem(1, null);
+					e.getInventory().setItem(2, null);
 
-				player.getWorld().playSound(player.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
+					if(!creative) player.setLevel(player.getLevel() - cost);
+
+					player.getWorld().playSound(player.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
+				}
 			}
 		}
 
