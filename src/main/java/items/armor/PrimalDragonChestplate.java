@@ -24,7 +24,7 @@ public class PrimalDragonChestplate {
 		data.setUnbreakable(true);
 		data.displayName(Utils.mm("<light_purple>Primal Dragon Chestplate"));
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "primalChestplateDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
-		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "primalChestplateArmor"), 10.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "primalChestplateArmor"), 11, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "primalChestplateAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.CHEST);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);

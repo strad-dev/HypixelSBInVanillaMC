@@ -6,29 +6,24 @@ import items.weapons.Scylla;
 import misc.Plugin;
 import misc.Utils;
 import org.bukkit.Bukkit;
-import org.bukkit.GameRule;
+import org.bukkit.GameRules;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import pvp.PvpJson;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Predicate;
 
 /**
- * Manhunt: a few Speedrunners beat the game while everyone else hunts them. Off unless {@code manhunt: true}.
+ * Manhunt: a few Speedrunners beat the game while everyone else hunts them. Off unless {@code manhunt.enabled: true}.
  * Teams, match flag and ceilings persist in {@code manhunt.json}, so a disconnect or restart mid-match keeps
  * a player's side and rung.
  */
@@ -36,6 +31,7 @@ public final class Manhunt {
 	private Manhunt() {}
 
 	private static boolean enabled;
+	private static boolean shadowWarp = true;
 	private static boolean started;
 
 	/** In add order. Order is load-bearing: a compass stores an index into this list. */
@@ -46,7 +42,8 @@ public final class Manhunt {
 
 	/**
 	 * Highest Hyperion rung each player has held this match; sets their intelligence cap and regen. Only goes
-	 * up, even if the sword is lost, until death drops them back to the Stick. Never refunds mana.
+	 * up, even if the sword is lost, until death: a Hunter drops to the rung below the sword they died with, a
+	 * Speedrunner to the Stick. Never refunds mana.
 	 */
 	private static final Map<UUID, Integer> CEILINGS = new HashMap<>();
 
@@ -161,6 +158,15 @@ public final class Manhunt {
 
 	public static boolean enabled() {
 		return enabled;
+	}
+
+	public static void setShadowWarp(boolean on) {
+		shadowWarp = on;
+	}
+
+	/** Whether the Manhunt Hyperion teleports. The full Hyperion always does. */
+	public static boolean shadowWarp() {
+		return shadowWarp;
 	}
 
 	public static boolean started() {
@@ -304,8 +310,8 @@ public final class Manhunt {
 	 */
 	private static void hideLocatorBar() {
 		for(World world : Bukkit.getWorlds()) {
-			LOCATOR_BARS.putIfAbsent(world.getName(), Boolean.TRUE.equals(world.getGameRuleValue(GameRule.LOCATOR_BAR)));
-			world.setGameRule(GameRule.LOCATOR_BAR, false);
+			LOCATOR_BARS.putIfAbsent(world.getName(), Boolean.TRUE.equals(world.getGameRuleValue(GameRules.LOCATOR_BAR)));
+			world.setGameRule(GameRules.LOCATOR_BAR, false);
 		}
 	}
 
@@ -313,7 +319,7 @@ public final class Manhunt {
 	private static void restoreLocatorBar() {
 		for(Map.Entry<String, Boolean> entry : LOCATOR_BARS.entrySet()) {
 			World world = Bukkit.getWorld(entry.getKey());
-			if(world != null) world.setGameRule(GameRule.LOCATOR_BAR, entry.getValue());
+			if(world != null) world.setGameRule(GameRules.LOCATOR_BAR, entry.getValue());
 		}
 		LOCATOR_BARS.clear();
 	}
@@ -340,6 +346,26 @@ public final class Manhunt {
 	public static void equipOnJoin(Player p) {
 		if(!started || KITTED.contains(p.getUniqueId())) return;
 		equip(p);
+	}
+
+	public static void arrangeKit(Player p) {
+		if(!started) return;
+		PlayerInventory inventory = p.getInventory();
+		moveTo(inventory, 0, item -> ManhuntTier.of(item) != null);
+		moveTo(inventory, 1, Manhunt::isCompass);
+	}
+
+	private static void moveTo(PlayerInventory inventory, int target, Predicate<ItemStack> wanted) {
+		if(wanted.test(inventory.getItem(target))) return;
+		for(int i = 0; i < 36; i++) {
+			if(i == target) continue;
+			ItemStack item = inventory.getItem(i);
+			if(item != null && wanted.test(item)) {
+				inventory.setItem(i, inventory.getItem(target));
+				inventory.setItem(target, item);
+				return;
+			}
+		}
 	}
 
 	private static void give(Player p, ItemStack item) {
@@ -426,10 +452,18 @@ public final class Manhunt {
 		}
 	}
 
-	/** Back to the Stick, mana and banked regen ticks zeroed. */
-	public static void onDeath(Player p) {
+	/**
+	 * Ceiling drops to {@code kept} (the rung a Hunter keeps), or the Stick when null. Mana and banked regen
+	 * ticks zeroed.
+	 */
+	public static void onDeath(Player p, @Nullable ManhuntTier kept) {
 		if(!active()) return;
-		if(CEILINGS.remove(p.getUniqueId()) != null) save();
+		if(kept == null) {
+			if(CEILINGS.remove(p.getUniqueId()) != null) save();
+		} else {
+			CEILINGS.put(p.getUniqueId(), kept.ordinal());
+			save();
+		}
 		Plugin.zeroIntelligence(p);
 	}
 
@@ -442,14 +476,18 @@ public final class Manhunt {
 	private static int bestRungIn(Inventory inventory) {
 		int best = -1;
 		for(ItemStack item : inventory.getContents()) {
-			if(item == null) continue;
-			if(item.getType() == ManhuntTier.NETHERITE.material() && Scylla.isScylla(item)) {
-				return FULL_RUNG;
-			}
-			ManhuntTier tier = ManhuntTier.of(item);
-			if(tier != null && tier.ordinal() > best) best = tier.ordinal();
+			best = Math.max(best, rungOf(item));
+			if(best == FULL_RUNG) break;
 		}
 		return best;
+	}
+
+	/** Manhunt Hyperion's rung, {@link #FULL_RUNG} for a real Hyperion, -1 for anything else. */
+	private static int rungOf(@Nullable ItemStack item) {
+		if(item == null) return -1;
+		if(item.getType() == ManhuntTier.NETHERITE.material() && Scylla.isScylla(item)) return FULL_RUNG;
+		ManhuntTier tier = ManhuntTier.of(item);
+		return tier == null ? -1 : tier.ordinal();
 	}
 
 	public static int maxIntelligence(Player p) {

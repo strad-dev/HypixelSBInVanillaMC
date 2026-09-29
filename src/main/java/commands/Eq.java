@@ -1,5 +1,12 @@
 package commands;
 
+import io.papermc.paper.datacomponent.DataComponentTypes;
+import io.papermc.paper.datacomponent.item.TooltipDisplay;
+import items.misc.HolyIce;
+import items.misc.IceSpray;
+import items.weapons.Scylla;
+import items.weapons.SwordOfBadHealth;
+import listeners.CustomDamage;
 import misc.Menus;
 import misc.Plugin;
 import misc.Utils;
@@ -19,6 +26,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,17 +37,22 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 
 /*
- * /eq, ported from M7 TAS. 1-row GUI: worn armor in slots 0-3, sugar cane in slot 8 whose count encodes
- * speed (100 = vanilla, exact figure on the tooltip). Clicking armor in your own inventory equips it.
+ * /eq, ported from M7 TAS. 1-row GUI: worn armor in slots 0-3, offensive/defensive stats in 6-7, sugar cane in
+ * slot 8 whose count encodes speed (100 = vanilla, exact figure on the tooltip). Clicking armor in your own
+ * inventory equips it.
  * Both the executor and a listener; the GUI is identified by EqHolder.
  */
 public class Eq implements CommandExecutor, Listener {
 
 	private static final Component TITLE = Utils.msg("<dark_gray>Equipment");
+	private static final int OFFENSE_SLOT = 6;
+	private static final int DEFENSE_SLOT = 7;
 	private static final int SPEED_SLOT = 8;
 	/** Modifiers currentSpeed skips: vanilla mechanics, not the speed stat. Speed/Soul Speed deliberately count. */
 	private static final Set<NamespacedKey> IGNORED_SPEED_MODIFIERS = Set.of(NamespacedKey.minecraft("sprinting"));
@@ -65,12 +78,128 @@ public class Eq implements CommandExecutor, Listener {
 		applySpeedCane(p); // after the menu exists: writes via NMS
 	}
 
-	/** Armor into slots 0-3. The cane is set separately via NMS. */
+	/** Armor into slots 0-3, stats into 6-7. The cane is set separately via NMS. */
 	private static void refresh(Player p, Inventory gui) {
 		for(int i = 0; i < 4; i++) {
 			ItemStack worn = getArmor(p, i);
 			gui.setItem(i, worn == null ? null : worn.clone());
 		}
+		refreshStats(p, gui);
+	}
+
+	private static void refreshStats(Player p, Inventory gui) {
+		gui.setItem(OFFENSE_SLOT, offenseItem(p));
+		gui.setItem(DEFENSE_SLOT, defenseItem(p));
+	}
+
+	private static ItemStack offenseItem(Player p) {
+		ItemStack held = p.getInventory().getItemInMainHand();
+		var attr = p.getAttribute(Attribute.ATTACK_DAMAGE);
+		double damage = attr == null ? 1 : attr.getValue();
+		damage = Math.max(0, damage + CustomDamage.sharpnessBonus(held.getEnchantmentLevel(Enchantment.SHARPNESS))
+				- CustomDamage.strengthPenalty(p));
+
+		double multiplier = 1;
+		List<Component> modifiers = new ArrayList<>();
+		if(p.getScoreboardTags().contains("IceSprayed")) {
+			multiplier *= IceSpray.DAMAGE_DEALT_PENALTY;
+			modifiers.add(modifierLine("Ice Sprayed", IceSpray.DAMAGE_DEALT_PENALTY, true));
+		}
+		if(p.getScoreboardTags().contains("BadHealthBuffed")) {
+			multiplier *= SwordOfBadHealth.DAMAGE_BONUS;
+			modifiers.add(modifierLine("Sword of Bad Health", SwordOfBadHealth.DAMAGE_BONUS, true));
+		}
+
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("<gray>Damage: <red>" + Utils.tenthNumber(damage * multiplier)));
+		int smite = held.getEnchantmentLevel(Enchantment.SMITE);
+		if(smite > 0) {
+			lore.add(Utils.mm("<gray>Damage vs Undead: <red>"
+					+ Utils.tenthNumber((damage + CustomDamage.smiteBonus(smite)) * multiplier)));
+		}
+		int bane = held.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS);
+		if(bane > 0) {
+			lore.add(Utils.mm("<gray>Damage vs Arthropods: <red>"
+					+ Utils.tenthNumber((damage + CustomDamage.smiteBonus(bane)) * multiplier)));
+		}
+		if(!modifiers.isEmpty()) {
+			lore.add(Component.empty());
+			lore.addAll(modifiers);
+		}
+		lore.add(Component.empty());
+		lore.add(Utils.mm("<dark_gray>Fully charged, before crits"));
+		return statsItem(Material.DIAMOND_SWORD, "<red>Offensive Stats", lore);
+	}
+
+	private static ItemStack defenseItem(Player p) {
+		double armor = CustomDamage.armorPoints(p);
+		double taken = CustomDamage.armorMultiplier(armor);
+
+		List<Component> modifiers = new ArrayList<>();
+		int prot = CustomDamage.protectionLevels(p);
+		if(prot > 0) {
+			double m = CustomDamage.protectionMultiplier(prot);
+			taken *= m;
+			modifiers.add(modifierLine("Protection (" + prot + ")", m, false));
+		}
+		PotionEffect resistance = p.getPotionEffect(PotionEffectType.RESISTANCE);
+		if(resistance != null) {
+			double m = CustomDamage.resistanceMultiplier(p);
+			taken *= m;
+			modifiers.add(modifierLine("Resistance " + (resistance.getAmplifier() + 1), m, false));
+		}
+		if(p.getScoreboardTags().contains("WitherShield")) {
+			double m = 1 - Scylla.witherShieldReduction(p);
+			taken *= m;
+			modifiers.add(modifierLine("Wither Shield", m, false));
+		}
+		if(p.getScoreboardTags().contains("HolyIce")) {
+			taken *= HolyIce.DAMAGE_TAKEN;
+			modifiers.add(modifierLine("Holy Ice", HolyIce.DAMAGE_TAKEN, false));
+		}
+		if(p.getScoreboardTags().contains("IceSprayed")) {
+			taken *= IceSpray.DAMAGE_TAKEN_BONUS;
+			modifiers.add(modifierLine("Ice Sprayed", IceSpray.DAMAGE_TAKEN_BONUS, false));
+		}
+
+		List<Component> lore = new ArrayList<>();
+		lore.add(Utils.mm("<gray>Armor: <green>" + Utils.tenthNumber(armor)));
+		lore.add(Utils.mm("<gray>Armor Reduction: <green>" + Utils.percent(1 - CustomDamage.armorMultiplier(armor))));
+		if(!modifiers.isEmpty()) {
+			lore.add(Component.empty());
+			lore.addAll(modifiers);
+		}
+		lore.add(Component.empty());
+		lore.add(Utils.mm("<gray>Damage Taken: <white>" + Utils.percent(taken)));
+		if(taken <= 0) {
+			lore.add(Utils.mm("<gray>Effective HP: <white>Immune"));
+		} else {
+			var maxHealth = p.getAttribute(Attribute.MAX_HEALTH);
+			double health = maxHealth == null ? 20 : maxHealth.getValue();
+			lore.add(Utils.mm("<gray>Effective HP: <white>" + Utils.tenthNumber(health / taken)
+					+ " <dark_gray>(" + Utils.tenthNumber(1 / taken) + "x)"));
+		}
+		lore.add(Component.empty());
+		lore.add(Utils.mm("<dark_gray>Against a melee or arrow hit"));
+		return statsItem(Material.DIAMOND_CHESTPLATE, "<green>Defensive Stats", lore);
+	}
+
+	private static Component modifierLine(String label, double multiplier, boolean higherIsGood) {
+		boolean up = multiplier > 1;
+		String colour = up == higherIsGood ? "<green>" : "<red>";
+		return Utils.mm("<gray>" + label + ": " + colour + (up ? "+" : "-") + Utils.percent(Math.abs(multiplier - 1)));
+	}
+
+	private static ItemStack statsItem(Material material, String title, List<Component> lore) {
+		ItemStack item = new ItemStack(material);
+		ItemMeta meta = item.getItemMeta();
+		if(meta == null) return item;
+		meta.displayName(Utils.mm(title));
+		meta.lore(lore);
+		item.setItemMeta(meta);
+		item.setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay()
+				.addHiddenComponents(DataComponentTypes.ATTRIBUTE_MODIFIERS));
+		return item;
 	}
 
 	/**
@@ -154,7 +283,10 @@ public class Eq implements CommandExecutor, Listener {
 		Inventory gui = e.getView().getTopInventory();
 		gui.setItem(idx, item.clone());
 		Bukkit.getScheduler().runTaskLater(Plugin.getInstance(), () -> {
-			if(p.getOpenInventory().getTopInventory().getHolder() instanceof EqHolder) applySpeedCane(p);
+			if(p.getOpenInventory().getTopInventory().getHolder() instanceof EqHolder) {
+				refreshStats(p, gui);
+				applySpeedCane(p);
+			}
 		}, 2L);
 	}
 

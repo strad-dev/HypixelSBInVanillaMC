@@ -4,12 +4,13 @@ import misc.AddRecipes;
 import org.bukkit.inventory.Recipe;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/** Wires in Manhunt. With {@code manhunt: false} nothing registers and the command is removed. Same shape as PvpModule. */
+/** Wires in Manhunt. With {@code manhunt.enabled: false} nothing registers and the command is removed. Same shape as PvpModule. */
 public final class ManhuntModule {
 	private ManhuntModule() {}
 
-	public static void enable(JavaPlugin plugin, boolean on) {
+	public static void enable(JavaPlugin plugin, boolean on, boolean shadowWarp) {
 		Manhunt.setEnabled(on);
+		Manhunt.setShadowWarp(shadowWarp);
 
 		if(!on) {
 			unregister(plugin, "manhunt");

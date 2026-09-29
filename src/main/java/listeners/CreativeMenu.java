@@ -6,10 +6,7 @@ import items.ingredients.misc.*;
 import items.ingredients.witherLords.*;
 import items.misc.*;
 import items.summonItems.*;
-import items.weapons.Claymore;
-import items.weapons.ManhuntHyperion;
-import items.weapons.Scylla;
-import items.weapons.SwordOfBadHealth;
+import items.weapons.*;
 import items.weapons.Terminator;
 import misc.Menus;
 import misc.Utils;
@@ -137,7 +134,8 @@ public class CreativeMenu implements Listener {
 
 	/**
 	 * Catalog behind {@code tab}. All but Manhunt are static lists in {@link #ITEMS}; the Manhunt rungs are built
-	 * here because {@code manhunt} in config.yml is read long after the static initialiser runs. Empty when off.
+	 * here because {@code manhunt.enabled} in config.yml is read long after the static initialiser runs. Empty
+	 * when off.
 	 */
 	private static List<ItemStack> catalog(String tab) {
 		if (!tab.equals("manhunt")) return ITEMS.get(tab);

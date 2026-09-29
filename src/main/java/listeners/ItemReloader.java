@@ -7,10 +7,7 @@ import items.ingredients.misc.*;
 import items.ingredients.witherLords.*;
 import items.misc.*;
 import items.summonItems.*;
-import items.weapons.Claymore;
-import items.weapons.ManhuntHyperion;
-import items.weapons.Scylla;
-import items.weapons.SwordOfBadHealth;
+import items.weapons.*;
 import items.weapons.Terminator;
 import misc.SkyblockId;
 import misc.Utils;
@@ -24,9 +21,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -170,20 +167,47 @@ public class ItemReloader implements Listener {
 		}
 
 		Material mat = item.getType();
+		if(mat == Material.ELYTRA) {
+			ItemMeta meta = item.getItemMeta();
+			if(meta == null || !meta.hasAttributeModifiers()) return;
+			meta.removeAttributeModifier(Attribute.ARMOR);
+			item.setItemMeta(meta);
+			return;
+		}
 		String slotKey;
 		double armorValue;
 		double kbResistance = -1;
 		EquipmentSlotGroup slotGroup;
 
 		switch(mat) {
-			case DIAMOND_HELMET -> {
+			case IRON_HELMET -> {
 				slotKey = "armor.helmet";
 				armorValue = 3;
 				slotGroup = EquipmentSlotGroup.HEAD;
 			}
+			case IRON_CHESTPLATE -> {
+				slotKey = "armor.chestplate";
+				armorValue = 5;
+				slotGroup = EquipmentSlotGroup.CHEST;
+			}
+			case IRON_LEGGINGS -> {
+				slotKey = "armor.leggings";
+				armorValue = 5;
+				slotGroup = EquipmentSlotGroup.LEGS;
+			}
+			case IRON_BOOTS -> {
+				slotKey = "armor.boots";
+				armorValue = 2;
+				slotGroup = EquipmentSlotGroup.FEET;
+			}
+			case DIAMOND_HELMET -> {
+				slotKey = "armor.helmet";
+				armorValue = 4;
+				slotGroup = EquipmentSlotGroup.HEAD;
+			}
 			case DIAMOND_CHESTPLATE -> {
 				slotKey = "armor.chestplate";
-				armorValue = 8;
+				armorValue = 7;
 				slotGroup = EquipmentSlotGroup.CHEST;
 			}
 			case DIAMOND_LEGGINGS -> {
@@ -198,7 +222,7 @@ public class ItemReloader implements Listener {
 			}
 			case NETHERITE_HELMET -> {
 				slotKey = "armor.helmet";
-				armorValue = 4;
+				armorValue = 6;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.HEAD;
 			}
@@ -210,20 +234,15 @@ public class ItemReloader implements Listener {
 			}
 			case NETHERITE_LEGGINGS -> {
 				slotKey = "armor.leggings";
-				armorValue = 7;
+				armorValue = 8;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.LEGS;
 			}
 			case NETHERITE_BOOTS -> {
 				slotKey = "armor.boots";
-				armorValue = 4;
+				armorValue = 6;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.FEET;
-			}
-			case ELYTRA -> {
-				slotKey = "armor.chestplate";
-				armorValue = 4;
-				slotGroup = EquipmentSlotGroup.CHEST;
 			}
 			default -> {
 				return;

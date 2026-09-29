@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/** {@code /manhunt}. Only bound when {@code manhunt: true}. */
+/** {@code /manhunt}. Only bound when {@code manhunt.enabled: true}. */
 public class ManhuntCommand implements CommandExecutor, TabCompleter {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

@@ -61,7 +61,8 @@ public class ManhuntHyperion implements AbilityItem {
 		// Header sets the tooltip width, never wrapped.
 		lore.add(Utils.mm("<gold>Ability: Wither Impact <green><bold>RIGHT CLICK"));
 		lore.addAll(MinecraftFont.wrapLore(
-				"<gray>Teleport <green>10 blocks<gray> ahead of you.  Then implode, dealing <red>"
+				(Manhunt.shadowWarp() ? "<gray>Teleport <green>10 blocks<gray> ahead of you.  Then implode" : "<gray>Implode")
+				+ ", dealing <red>"
 				+ Utils.tenthNumber(tier.implosionDamage()) + " damage <gray>to enemies within <green>"
 				+ Utils.damageNumber(tier.radius()) + " blocks<gray>.  Also reduces damage taken by <red>"
 				+ Utils.percent(tier.damageReduction()) + "<gray> and grants an Absorption Shield with <red>"
@@ -128,9 +129,10 @@ public class ManhuntHyperion implements AbilityItem {
 	public boolean onRightClick(Player p) {
 		ManhuntTier tier = ManhuntTier.of(p.getInventory().getItemInMainHand());
 		if(tier == null) return false;
-		// Teleport is 10 on every rung, same as the full Hyperion. A player can be imploded once a second
-		// across all attackers; 0 damage is witherImpact's skip signal, so they're left out, not hit for 0.
-		return Scylla.witherImpact(p, 10, tier.radius(), tier.absorption(), tier.damageReduction(),
+		// Teleport is 10 on every rung, same as the full Hyperion, or none with shadow-warp off. A player can be
+		// imploded once a second across all attackers; 0 damage is witherImpact's skip signal, so they're left
+		// out, not hit for 0.
+		return Scylla.witherImpact(p, Manhunt.shadowWarp() ? 10 : 0, tier.radius(), tier.absorption(), tier.damageReduction(),
 				tier.witherShieldCooldown(), entity -> Manhunt.claimImplosion(entity) ? tier.implosionDamage() : 0);
 	}
 

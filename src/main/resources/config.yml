@@ -4,9 +4,17 @@ chat:
   # Enables a lightweight custom chat that bypasses Mojang chat reporting
   enabled: true
 
-# Enables Minecraft Manhunt mode: /manhunt, the Manhunt Hyperion upgrade ladder, and the Manhunt
-# intelligence rules (a per-Hyperion cap and regen rate, mana only off other players, wiped on death).
-manhunt: false
+manhunt:
+  # Enables Minecraft Manhunt
+  # When a manhunt is active, the following changes are made to the game/plugin:
+  # - Locator Bar is disabled
+  # - Max Intelligence is capped based on the highest Manhunt Hyperion tier achieved
+  # - Intelligence regeneration is reduced based on the highest Manhunt Hyperion tier achieved
+  # - Ender Pearl rates increased back to 1.16.1; Glowstone Dust re-added to trade table
+  # - ALL Piglin Brutes are replaced with Piglins
+  enabled: false
+  # Determines if Wither Impact teleports the player (only applies to Manhunt Hyperions)
+  shadow-warp: true
 
 pvp:
   ffa:

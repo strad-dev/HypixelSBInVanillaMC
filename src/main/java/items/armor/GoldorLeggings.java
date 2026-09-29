@@ -24,7 +24,7 @@ public class GoldorLeggings implements Armor {
 		data.setUnbreakable(true);
 		data.displayName(Utils.mm("<light_purple>Goldor's Leggings"));
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsDamage"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
-		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsArmor"), 7.5, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsArmor"), 10, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "goldorLeggingsAntiKB"), 0.2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);

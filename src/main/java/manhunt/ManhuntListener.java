@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PiglinBarterEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
@@ -18,9 +19,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.Recipe;
 
+import javax.annotation.Nullable;
 import java.util.Iterator;
+import java.util.Map;
 
 /** Event-driven Manhunt rules: kits, death reset, upgrade crafts, nether rules. Registered only when on. */
 public class ManhuntListener implements Listener {
@@ -34,13 +38,39 @@ public class ManhuntListener implements Listener {
 	}
 
 	/**
-	 * Death resets the ceiling to the Stick. Compasses are kept: a Hunter walking back to their body can't
-	 * track anything, and a dropped compass is one a Speedrunner can pick up.
+	 * A Hunter keeps a copy of their best Hyperion one rung down and still drops the original; a Speedrunner drops
+	 * everything and goes back to the Stick. Compasses are kept: a Hunter walking back to their body can't track
+	 * anything, and a dropped compass is one a Speedrunner can pick up.
 	 */
-	@EventHandler
+	@EventHandler(ignoreCancelled = true)
 	public void onPlayerDeath(PlayerDeathEvent e) {
-		Manhunt.onDeath(e.getEntity());
+		Manhunt.onDeath(e.getEntity(), demoteHyperion(e));
 		keepCompasses(e);
+	}
+
+	/**
+	 * Keeps the rung below the Hunter's best Manhunt Hyperion, unenchanted; the original still drops, for anyone to
+	 * pick up ({@link #onPickup}). A Stick is kept, not dropped. Null for a Speedrunner, or a Hunter who had none
+	 * (respawn hands out a Stick).
+	 */
+	@Nullable
+	private static ManhuntTier demoteHyperion(PlayerDeathEvent e) {
+		Player p = e.getEntity();
+		if(!Manhunt.active() || Manhunt.isSpeedrunner(p)) return null;
+		ItemStack best = null;
+		ManhuntTier bestTier = null;
+		for(ItemStack item : e.getDrops()) {
+			ManhuntTier tier = ManhuntTier.of(item);
+			if(tier != null && (bestTier == null || tier.ordinal() > bestTier.ordinal())) {
+				best = item;
+				bestTier = tier;
+			}
+		}
+		if(best == null) return null;
+		if(bestTier == ManhuntTier.BASE) e.getDrops().remove(best);
+		ManhuntTier kept = ManhuntTier.values()[Math.max(bestTier.ordinal() - 1, 0)];
+		e.getItemsToKeep().add(ManhuntHyperion.getItem(kept, Map.of(), p));
+		return kept;
 	}
 
 	/**
@@ -60,14 +90,44 @@ public class ManhuntListener implements Listener {
 	}
 
 	/**
-	 * Re-kits on the Stick after respawn; without it a death left a player with only their compass. A tick
-	 * late: the inventory isn't settled during the event, and overflow would drop at the death spot.
+	 * Walking over a Manhunt Hyperion above your best one upgrades yours to it, keeping your enchants, and the drop
+	 * is used up. Anything else, or no Manhunt Hyperion to upgrade, is a normal pickup.
+	 */
+	@EventHandler(ignoreCancelled = true)
+	public void onPickup(EntityPickupItemEvent e) {
+		if(!Manhunt.active() || !(e.getEntity() instanceof Player p)) return;
+		ManhuntTier dropped = ManhuntTier.of(e.getItem().getItemStack());
+		if(dropped == null) return;
+		PlayerInventory inventory = p.getInventory();
+		int slot = -1;
+		ManhuntTier own = null;
+		for(int i = 0; i < inventory.getSize(); i++) {
+			ManhuntTier tier = ManhuntTier.of(inventory.getItem(i));
+			if(tier != null && (own == null || tier.ordinal() > own.ordinal())) {
+				own = tier;
+				slot = i;
+			}
+		}
+		if(own == null || dropped.ordinal() <= own.ordinal()) return;
+		e.setCancelled(true);
+		inventory.setItem(slot, ManhuntHyperion.getItem(dropped, inventory.getItem(slot).getEnchantments(), p));
+		p.playPickupItemAnimation(e.getItem());
+		e.getItem().remove();
+	}
+
+	/**
+	 * Re-kits on the Stick after respawn unless a Hyperion was kept (without it a death left a player with only
+	 * their compass), then puts the Hyperion in slot 0 and the compass in slot 1. A tick late: the inventory isn't
+	 * settled during the event, and overflow would drop at the death spot.
 	 */
 	@EventHandler
 	public void onPlayerRespawn(PlayerRespawnEvent e) {
 		Player p = e.getPlayer();
 		Utils.scheduleTask(() -> {
-			if(p.isOnline()) Manhunt.equip(p);
+			if(p.isOnline()) {
+				Manhunt.equip(p);
+				Manhunt.arrangeKit(p);
+			}
 		}, 1);
 	}
 

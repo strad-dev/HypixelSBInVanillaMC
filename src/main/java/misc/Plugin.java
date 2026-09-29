@@ -49,6 +49,19 @@ import java.util.Objects;
 public class Plugin extends JavaPlugin implements Listener {
 	private static Plugin instance;
 
+	private static final double ARMOR_CEILING = 1024.0;
+
+	@Override
+	public void onLoad() {
+		net.minecraft.world.entity.ai.attributes.Attribute armor =
+				net.minecraft.world.entity.ai.attributes.Attributes.ARMOR.value();
+		if(armor instanceof net.minecraft.world.entity.ai.attributes.RangedAttribute ranged) {
+			if(ranged.maxValue < ARMOR_CEILING) ranged.maxValue = ARMOR_CEILING;
+		} else {
+			getLogger().warning("minecraft:armor is not a RangedAttribute; armor will clamp at 30.");
+		}
+	}
+
 	@Override
 	public void onEnable() {
 		instance = this;
@@ -95,6 +108,8 @@ public class Plugin extends JavaPlugin implements Listener {
 		getServer().getPluginManager().registerEvents(new StopBossesTeleporting(), this);
 		getServer().getPluginManager().registerEvents(new StopBossesEnteringVehicles(), this);
 		getServer().getPluginManager().registerEvents(new PlayerLoginHandler(), this);
+		getServer().getPluginManager().registerEvents(new ArmorBar(), this);
+		ArmorBar.installAll();
 		getServer().getPluginManager().registerEvents(new AllMobsHaveNames(), this);
 		getServer().getPluginManager().registerEvents(new CustomChestLoot(), this);
 		getServer().getPluginManager().registerEvents(new CustomMining(), this);
@@ -149,7 +164,8 @@ public class Plugin extends JavaPlugin implements Listener {
 
 		// Config-gated Manhunt feature (/manhunt, the Manhunt Hyperion ladder). Inert unless enabled.
 		// PvpConfig above has already saved and loaded the config file.
-		manhunt.ManhuntModule.enable(this, getConfig().getBoolean("manhunt", false));
+		manhunt.ManhuntModule.enable(this, getConfig().getBoolean("manhunt.enabled", false),
+				getConfig().getBoolean("manhunt.shadow-warp", true));
 	}
 
 	/**
@@ -369,6 +385,7 @@ public class Plugin extends JavaPlugin implements Listener {
 	@Override
 	public void onDisable() {
 		pvp.PvpModule.disable(); // hands back the inventory of anyone inside the PvP loadout editor
+		ArmorBar.uninstallAll();
 		getLogger().info("Stopped SkyBlock in Vanilla!");
 	}
 

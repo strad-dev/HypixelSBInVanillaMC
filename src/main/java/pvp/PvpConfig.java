@@ -47,6 +47,17 @@ public class PvpConfig {
 		}
 
 		boolean changed = false;
+		// An old flat toggle (manhunt: true) is now a section; its value moves to the section's enabled key.
+		for (String key : bundled.getKeys(true)) {
+			if (bundled.isConfigurationSection(key) && live.isBoolean(key) && bundled.isBoolean(key + ".enabled")) {
+				boolean was = live.getBoolean(key);
+				live.set(key, null);
+				live.set(key + ".enabled", was);
+				copyComments(bundled, live, key + ".enabled");
+				newSections.add(key);
+				changed = true;
+			}
+		}
 		for (String key : bundled.getKeys(true)) {
 			// Leaves only; sections come with their children.
 			if (!bundled.isConfigurationSection(key) && !live.contains(key)) {

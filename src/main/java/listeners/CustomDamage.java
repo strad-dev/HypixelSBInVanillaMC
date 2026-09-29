@@ -1,5 +1,6 @@
 package listeners;
 
+import com.destroystokyo.paper.event.player.PlayerAttackEntityCooldownResetEvent;
 import items.misc.HolyIce;
 import items.misc.IceSpray;
 import items.weapons.Scylla;
@@ -32,12 +33,12 @@ import net.minecraft.world.level.block.SculkSpreader;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.*;
 import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
-import com.destroystokyo.paper.event.player.PlayerAttackEntityCooldownResetEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -327,6 +328,37 @@ public class CustomDamage implements Listener {
 		return Math.max(0, (base + enchant) * (crit ? 1.5 : 1));
 	}
 
+	private static final double ARMOR_CURVE_K = 5;
+
+	public static double armorMultiplier(double armor) {
+		if(armor < 15) return 1 - Math.max(0, armor) * 0.04;
+		return 0.4 * ARMOR_CURVE_K / (armor - 15 + ARMOR_CURVE_K);
+	}
+
+	public static double armorPoints(LivingEntity e) {
+		AttributeInstance attr = e.getAttribute(Attribute.ARMOR);
+		return attr == null ? 0 : attr.getValue();
+	}
+
+	public static int protectionLevels(LivingEntity e) {
+		EntityEquipment eq = e.getEquipment();
+		if(eq == null) return 0;
+		int levels = 0;
+		for(ItemStack piece : new ItemStack[]{eq.getHelmet(), eq.getChestplate(), eq.getLeggings(), eq.getBoots()}) {
+			if(piece != null) levels += piece.getEnchantmentLevel(Enchantment.PROTECTION);
+		}
+		return levels;
+	}
+
+	public static double protectionMultiplier(int levels) {
+		return Math.max(0.5, 1 - levels * 0.025);
+	}
+
+	public static double resistanceMultiplier(LivingEntity e) {
+		PotionEffect resistance = e.getPotionEffect(PotionEffectType.RESISTANCE);
+		return resistance == null ? 1 : Math.max(0.0, 1 - (resistance.getAmplifier() + 1) * 0.2);
+	}
+
 	private static void handleTridentHit(Trident trident, DamageData data) {
 		ItemStack tridentItem = trident.getItemStack();
 		trident.setVelocity(new Vector(0, -0.1, 0)); // Small downward velocity to make it drop
@@ -492,29 +524,11 @@ public class CustomDamage implements Listener {
 
 			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
 			if(affectedByArmor) {
-				double armor = Objects.requireNonNull(damagee.getAttribute(Attribute.ARMOR)).getValue();
-				armor = Math.max(0, armor - breach * 2.5);
-				double reduction;
-				if(armor < 15) {
-					reduction = armor * 0.04;
-				} else {
-					reduction = 1.0 - 1.0 / (1.0 + 0.00014666 * Math.pow(armor, 3.409));
-				}
-				finalDamage *= (1.0 - reduction);
+				finalDamage *= armorMultiplier(Math.max(0, armorPoints(damagee) - breach * 2.5));
 			}
 
-			// The Resistance status effect reduces damage by 20% per level.
-			// At level 5 and higher, the damagee is immune to damage.
-			double resistance = 0;
-			if(damagee.hasPotionEffect(PotionEffectType.RESISTANCE)) {
-				resistance = damagee.getPotionEffect(PotionEffectType.RESISTANCE).getAmplifier() + 1;
-			}
-			finalDamage *= Math.max(0.0, 1 - resistance * 0.2);
+			finalDamage *= resistanceMultiplier(damagee);
 
-			// The Protection enchantment reduces damage taken by 2.5% per level.
-			// A full set of Protection IV armor reduces damage by 40%
-			// A full set of Protection V armor reduces damage by 50%
-			double prots = 0;
 			EntityEquipment eq = damagee.getEquipment();
 			if(eq != null) {
 				ItemStack helmet = eq.getHelmet();
@@ -522,27 +536,16 @@ public class CustomDamage implements Listener {
 				ItemStack pants = eq.getLeggings();
 				ItemStack boots = eq.getBoots();
 
-				prots += helmet.getEnchantmentLevel(Enchantment.PROTECTION);
 				if(affectedByArmor) {
 					Utils.damageItem(damagee, helmet, Math.max(0.25, data.originalDamage / 33.33));
-				}
-
-				prots += chestplate.getEnchantmentLevel(Enchantment.PROTECTION);
-				if(affectedByArmor && chestplate.getType() != Material.ELYTRA) {
-					Utils.damageItem(damagee, chestplate, Math.max(0.25, data.originalDamage / 12.5));
-				}
-
-				prots += pants.getEnchantmentLevel(Enchantment.PROTECTION);
-				if(affectedByArmor) {
+					if(chestplate.getType() != Material.ELYTRA) {
+						Utils.damageItem(damagee, chestplate, Math.max(0.25, data.originalDamage / 12.5));
+					}
 					Utils.damageItem(damagee, pants, Math.max(0.25, data.originalDamage / 16.67));
-				}
-
-				prots += boots.getEnchantmentLevel(Enchantment.PROTECTION);
-				if(affectedByArmor) {
 					Utils.damageItem(damagee, boots, Math.max(0.25, data.originalDamage / 33.33));
 				}
 
-				finalDamage *= Math.max(0.5, 1 - prots * 0.025);
+				finalDamage *= protectionMultiplier(protectionLevels(damagee));
 
 				if(type == DamageType.FALL) {
 					double featherFalling = boots.getEnchantmentLevel(Enchantment.FEATHER_FALLING);
@@ -1644,7 +1647,27 @@ public class CustomDamage implements Listener {
 		noDamageTimes.remove(e.getEntity());
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	private static final Set<UUID> awaitingRespawn = new HashSet<>();
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onRepeatDeath(PlayerDeathEvent e) {
+		if(awaitingRespawn.contains(e.getPlayer().getUniqueId())) {
+			e.setReviveHealth(Double.MIN_VALUE);
+			e.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onDeathDone(PlayerDeathEvent e) {
+		awaitingRespawn.add(e.getPlayer().getUniqueId());
+	}
+
+	@EventHandler
+	public void onRespawn(org.bukkit.event.player.PlayerRespawnEvent e) {
+		awaitingRespawn.remove(e.getPlayer().getUniqueId());
+	}
+
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	public void onPlayerDeath(PlayerDeathEvent e) {
 		if(nextDeathMessage != null) {
 			e.deathMessage(nextDeathMessage);

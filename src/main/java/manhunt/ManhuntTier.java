@@ -2,8 +2,6 @@ package manhunt;
 
 import misc.SkyblockId;
 import misc.Utils;
-import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
-import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -20,14 +18,14 @@ import java.util.Map;
 public enum ManhuntTier {
 	//                                                                swords  dmg   cost  abs  reduce  shieldCd  implode  radius  tick  intel  ench
 	// No teleport column: it's a flat 10 blocks on every rung.
-	BASE(Material.STICK, "", Rank.COMMON,                            0, 0,   25, 1, 0.00, 200, 1,    7.5, 200, 250,  0),
-	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,               8, 1.5, 24, 3, 0.05, 200, 1.25, 8,   180, 325,  10),
-	STONE(Material.STONE_SWORD, "Stone", Rank.UNCOMMON,              8, 2.5, 23, 4, 0.06, 200, 1.75, 8.5, 160, 400,  12),
-	COPPER(Material.COPPER_SWORD, "Copper", Rank.UNCOMMON,           6, 3,   22, 4, 0.06, 180, 2,    8.5, 150, 450,  14),
-	IRON(Material.IRON_SWORD, "Iron", Rank.RARE,                     4, 4,   20, 5, 0.07, 180, 2.5,  9,   130, 575,  16),
-	GOLD(Material.GOLDEN_SWORD, "Golden", Rank.RARE,                 4, 4.5, 19, 5, 0.07, 160, 2.75, 9,   120, 625,  18),
-	DIAMOND(Material.DIAMOND_SWORD, "Diamond", Rank.EPIC,            2, 5.5, 17, 6, 0.08, 160, 3.25, 9.5, 100, 750,  20),
-	NETHERITE(Material.NETHERITE_SWORD, "Netherite", Rank.LEGENDARY, 1, 6.5, 15, 8, 0.10, 150, 3.75, 10,  80,  1000, 25);
+	BASE(Material.STICK, "", Rank.COMMON,                            0, 0,   25, 1, 0.00, 200, 0.5,  7.5, 160, 150,  0),
+	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,               8, 1,   25, 3, 0.05, 200, 1,    8,   160, 200,  10),
+	STONE(Material.STONE_SWORD, "Stone", Rank.UNCOMMON,              8, 2,   25, 4, 0.06, 200, 1.5,  8.5, 160, 250,  12),
+	COPPER(Material.COPPER_SWORD, "Copper", Rank.UNCOMMON,           6, 2.5, 25, 4, 0.06, 180, 1.75, 8.5, 160, 350,  14),
+	IRON(Material.IRON_SWORD, "Iron", Rank.RARE,                     4, 3.5, 20, 5, 0.07, 180, 2.25, 9,   140, 350,  16),
+	GOLD(Material.GOLDEN_SWORD, "Golden", Rank.RARE,                 4, 4,   20, 5, 0.07, 160, 2.5,  9,   140, 450,  18),
+	DIAMOND(Material.DIAMOND_SWORD, "Diamond", Rank.EPIC,            2, 5,   20, 6, 0.08, 160, 3,    9.5, 120, 450,  20),
+	NETHERITE(Material.NETHERITE_SWORD, "Netherite", Rank.LEGENDARY, 1, 6,   20, 8, 0.10, 150, 3.5,  10,  100, 600, 25);
 
 	/** Item rarity. */
 	public enum Rank {
@@ -167,7 +165,7 @@ public enum ManhuntTier {
 		return implosionDamage;
 	}
 
-	/** Implosion radius. Teleport stays a flat 10 on every rung: players build muscle memory around it. */
+	/** Implosion radius. Teleport stays a flat 10 on every rung (or none, shadow-warp off): players build muscle memory around it. */
 	public double radius() {
 		return radius;
 	}
