@@ -62,8 +62,7 @@ public class Scylla implements AbilityItem {
 
 	/** Full Hyperion only, not a Manhunt one or plain netherite sword. */
 	public static boolean isScylla(ItemStack item) {
-		if(item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) return false;
-		return ID.equals(Utils.firstLorePlain(item.getItemMeta()));
+		return ID.equals(Utils.firstLorePlain(item));
 	}
 
 	/** Lore figure; what {@link #onRightClick} pays before Smite/Bane. */
@@ -341,8 +340,13 @@ public class Scylla implements AbilityItem {
 		if(!shieldStanding && !Cooldowns.onCooldown(p, SHIELD_COOLDOWN)) { // reduced damage
 			Cooldowns.start(p, SHIELD_COOLDOWN, shieldCooldown);
 			double absorptionBefore = p.getAbsorptionAmount();
-			AttributeModifier temp = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "witherShield"), absorption, AttributeModifier.Operation.ADD_NUMBER);
-			p.getAttribute(Attribute.MAX_ABSORPTION).addModifier(temp);
+			NamespacedKey key = new NamespacedKey(Plugin.getInstance(), "witherShield");
+			AttributeModifier stale = p.getAttribute(Attribute.MAX_ABSORPTION).getModifier(key); // left permanent by an older build; addModifier would throw
+			if(stale != null) {
+				p.getAttribute(Attribute.MAX_ABSORPTION).removeModifier(stale);
+			}
+			AttributeModifier temp = new AttributeModifier(key, absorption, AttributeModifier.Operation.ADD_NUMBER);
+			p.getAttribute(Attribute.MAX_ABSORPTION).addTransientModifier(temp);
 			p.setAbsorptionAmount(absorptionBefore + absorption);
 			p.playSound(p, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 2.0F, 0.66666F);
 			Location finalL = l;

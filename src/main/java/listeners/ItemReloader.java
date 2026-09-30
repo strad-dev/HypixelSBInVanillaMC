@@ -30,8 +30,11 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class ItemReloader implements Listener {
 	/**
@@ -72,6 +75,17 @@ public class ItemReloader implements Listener {
 		if(changed) p.updateInventory();
 	}
 
+	private static final Set<UUID> queued = new HashSet<>();
+
+	/** One sweep per player per tick: breaking a chest minecart dropped 27 stacks, each pickup queuing its own. */
+	private static void sweepNextTick(Player p) {
+		if(!queued.add(p.getUniqueId())) return;
+		Utils.scheduleTask(() -> {
+			queued.remove(p.getUniqueId());
+			if(p.isOnline()) sweep(p);
+		}, 1);
+	}
+
 	/**
 	 * Login. A tick late: armour's ATTACK_DAMAGE modifiers are TRANSIENT, re-derived on the entity's first tick,
 	 * after PlayerJoinEvent. Sweeping inline wrote live figures for a naked player (a Hyperion in the full custom
@@ -80,9 +94,7 @@ public class ItemReloader implements Listener {
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
 		Player p = e.getPlayer();
-		Utils.scheduleTask(() -> {
-			if(p.isOnline()) sweep(p);
-		}, 1);
+		sweepNextTick(p);
 	}
 
 	/** Hotbar switch. Without the sweep's updateInventory the client kept showing what it had cached. */
@@ -97,9 +109,7 @@ public class ItemReloader implements Listener {
 		if(!(e.getEntity() instanceof Player p)) return;
 		// Stack is still on the ground entity here; re-stat it so vanilla armour arrives with its attributes.
 		modifyVanillaArmor(e.getItem().getItemStack());
-		Utils.scheduleTask(() -> {
-			if(p.isOnline()) sweep(p);
-		}, 1);
+		sweepNextTick(p);
 	}
 
 	/**
@@ -111,9 +121,7 @@ public class ItemReloader implements Listener {
 	@EventHandler
 	public void onArmorChange(PlayerArmorChangeEvent e) {
 		Player p = e.getPlayer();
-		Utils.scheduleTask(() -> {
-			if(p.isOnline()) sweep(p);
-		}, 1);
+		sweepNextTick(p);
 	}
 
 	/**
@@ -124,9 +132,7 @@ public class ItemReloader implements Listener {
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
 		if(!(e.getWhoClicked() instanceof Player p)) return;
-		Utils.scheduleTask(() -> {
-			if(p.isOnline()) sweep(p);
-		}, 1);
+		sweepNextTick(p);
 	}
 
 	/**

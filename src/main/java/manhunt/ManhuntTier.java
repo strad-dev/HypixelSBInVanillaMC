@@ -101,8 +101,8 @@ public enum ManhuntTier {
 		// Material first, before lore: the intelligence loop walks every inventory every tick.
 		if(item == null) return null;
 		ManhuntTier tier = BY_MATERIAL.get(item.getType());
-		if(tier == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) return null;
-		return ID.equals(Utils.firstLorePlain(item.getItemMeta())) ? tier : null;
+		if(tier == null) return null;
+		return ID.equals(Utils.firstLorePlain(item)) ? tier : null;
 	}
 
 	/** Null for Netherite, whose upgrade is the normal Hyperion recipe. */

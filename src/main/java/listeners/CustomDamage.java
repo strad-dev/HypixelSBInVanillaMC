@@ -1592,6 +1592,24 @@ public class CustomDamage implements Listener {
 		}
 	}
 
+	// VehicleEntity.hurtServer has no knockback; vanilla only pushes a boat on a sprint or Knockback hit
+	// (Player.causeExtraKnockback), so a normal hit just wobbled it. This is LivingEntity.knockback(0.4), the push
+	// every mob gets; the sprint/enchant push still stacks on top, as on a mob.
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onBoatDamage(org.bukkit.event.vehicle.VehicleDamageEvent e) {
+		if(!(e.getVehicle() instanceof Boat boat)) return;
+		Entity source = e.getDamageSource().getDirectEntity();
+		if(source == null) source = e.getAttacker();
+		if(source == null || !source.getWorld().equals(boat.getWorld())) return;
+
+		Vector away = boat.getLocation().toVector().subtract(source.getLocation().toVector()).setY(0);
+		if(away.lengthSquared() < 1.0E-8) return;
+		away.normalize().multiply(0.4);
+
+		Vector old = boat.getVelocity();
+		boat.setVelocity(new Vector(old.getX() / 2 + away.getX(), boat.isOnGround() ? Math.min(0.4, old.getY() / 2 + 0.4) : old.getY(), old.getZ() / 2 + away.getZ()));
+	}
+
 	private final Map<LivingEntity, Long> noDamageTimes = new WeakHashMap<>();
 
 	@EventHandler

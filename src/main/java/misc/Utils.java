@@ -85,6 +85,18 @@ public class Utils {
 	}
 
 	/**
+	 * Same, straight off the NMS lore component: no ItemMeta copy, no Adventure conversion (meta.lore() runs every
+	 * line through the component codec). For per-tick inventory scans.
+	 */
+	public static String firstLorePlain(ItemStack item) {
+		if(item == null) {
+			return "";
+		}
+		net.minecraft.world.item.component.ItemLore lore = CraftItemStack.unwrap(item).get(net.minecraft.core.component.DataComponents.LORE);
+		return lore == null || lore.lines().isEmpty() ? "" : lore.lines().getFirst().getString();
+	}
+
+	/**
 	 * Damage figure for lore: no trailing {@code .0}, at most two decimals (Sharpness is 0.75 a level).
 	 */
 	public static String damageNumber(double d) {

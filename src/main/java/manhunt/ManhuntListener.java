@@ -5,6 +5,7 @@ import misc.AddRecipes;
 import misc.Plugin;
 import misc.Utils;
 import org.bukkit.Keyed;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.PiglinBrute;
 import org.bukkit.entity.Player;
@@ -23,7 +24,9 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.Recipe;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /** Event-driven Manhunt rules: kits, death reset, upgrade crafts, nether rules. Registered only when on. */
@@ -91,7 +94,8 @@ public class ManhuntListener implements Listener {
 
 	/**
 	 * Walking over a Manhunt Hyperion above your best one upgrades yours to it, keeping your enchants, and the drop
-	 * is used up. Anything else, or no Manhunt Hyperion to upgrade, is a normal pickup.
+	 * is used up. The drop's enchants raise yours to their level or are added, replacing conflicting ones unless
+	 * yours is Sharpness. Anything else, or no Manhunt Hyperion to upgrade, is a normal pickup.
 	 */
 	@EventHandler(ignoreCancelled = true)
 	public void onPickup(EntityPickupItemEvent e) {
@@ -110,7 +114,18 @@ public class ManhuntListener implements Listener {
 		}
 		if(own == null || dropped.ordinal() <= own.ordinal()) return;
 		e.setCancelled(true);
-		inventory.setItem(slot, ManhuntHyperion.getItem(dropped, inventory.getItem(slot).getEnchantments(), p));
+		Map<Enchantment, Integer> enchants = new HashMap<>(inventory.getItem(slot).getEnchantments());
+		e.getItem().getItemStack().getEnchantments().forEach((enchant, level) -> {
+			if(enchants.containsKey(enchant)) {
+				enchants.merge(enchant, level, Math::max);
+				return;
+			}
+			List<Enchantment> conflicts = enchants.keySet().stream().filter(enchant::conflictsWith).toList();
+			if(conflicts.contains(Enchantment.SHARPNESS)) return;
+			conflicts.forEach(enchants::remove);
+			enchants.put(enchant, level);
+		});
+		inventory.setItem(slot, ManhuntHyperion.getItem(dropped, enchants, p));
 		p.playPickupItemAnimation(e.getItem());
 		e.getItem().remove();
 	}
