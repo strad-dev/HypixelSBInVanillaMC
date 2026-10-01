@@ -75,18 +75,10 @@ public class Utils {
 		return c == null ? "" : PLAIN.serialize(c);
 	}
 
-	/** Plain text of an item's first lore line, used to read the custom-item ID. */
-	public static String firstLorePlain(ItemMeta meta) {
-		if(meta == null) {
-			return "";
-		}
-		List<Component> l = meta.lore();
-		return l == null || l.isEmpty() ? "" : PLAIN.serialize(l.getFirst());
-	}
-
 	/**
-	 * Same, straight off the NMS lore component: no ItemMeta copy, no Adventure conversion (meta.lore() runs every
-	 * line through the component codec). For per-tick inventory scans.
+	 * Plain text of an item's first lore line, used to read the custom-item ID; "" for none. Straight off the NMS
+	 * lore component: going through ItemMeta copied the meta and ran every line through the component codec, which
+	 * made the per-tick Manhunt scan the server's top plugin cost.
 	 */
 	public static String firstLorePlain(ItemStack item) {
 		if(item == null) {

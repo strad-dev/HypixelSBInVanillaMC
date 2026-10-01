@@ -168,18 +168,9 @@ public class ItemReloader implements Listener {
 
 	public static void modifyVanillaArmor(ItemStack item) {
 		if(item == null || item.getType().isAir()) return;
-		if(item.hasItemMeta() && item.getItemMeta().hasLore()) {
-			if(Utils.firstLorePlain(item.getItemMeta()).startsWith("skyblock/")) return;
-		}
+		if(Utils.firstLorePlain(item).startsWith("skyblock/")) return;
 
 		Material mat = item.getType();
-		if(mat == Material.ELYTRA) {
-			ItemMeta meta = item.getItemMeta();
-			if(meta == null || !meta.hasAttributeModifiers()) return;
-			meta.removeAttributeModifier(Attribute.ARMOR);
-			item.setItemMeta(meta);
-			return;
-		}
 		String slotKey;
 		double armorValue;
 		double kbResistance = -1;
@@ -228,27 +219,32 @@ public class ItemReloader implements Listener {
 			}
 			case NETHERITE_HELMET -> {
 				slotKey = "armor.helmet";
-				armorValue = 6;
+				armorValue = 5;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.HEAD;
 			}
 			case NETHERITE_CHESTPLATE -> {
 				slotKey = "armor.chestplate";
-				armorValue = 10;
+				armorValue = 8;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.CHEST;
 			}
 			case NETHERITE_LEGGINGS -> {
 				slotKey = "armor.leggings";
-				armorValue = 8;
+				armorValue = 7;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.LEGS;
 			}
 			case NETHERITE_BOOTS -> {
 				slotKey = "armor.boots";
-				armorValue = 6;
+				armorValue = 5;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.FEET;
+			}
+			case ELYTRA -> {
+				slotKey = "armor.chestplate";
+				armorValue = 3;
+				slotGroup = EquipmentSlotGroup.CHEST;
 			}
 			default -> {
 				return;
@@ -302,9 +298,8 @@ public class ItemReloader implements Listener {
 	 */
 	public static ItemStack refreshItem(ItemStack item, Player p) {
 		if(item == null || item.getType().isAir()) return null;
-		if(!item.hasItemMeta() || !item.getItemMeta().hasLore()) return null;
-
-		String key = Utils.firstLorePlain(item.getItemMeta());
+		String key = Utils.firstLorePlain(item);
+		if(key.isEmpty()) return null;
 
 		// Weapons take the WHOLE enchantment map. This used to pick one of Smite/Bane/Sharpness, so a sword with
 		// two showed one and the other vanished from the lore.

@@ -3,7 +3,6 @@ package misc;
 import net.minecraft.nbt.CompoundTag;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -93,10 +92,7 @@ public final class SkyblockId {
 	 * <b>last</b>: the write goes through NMS and returns a copy, so later edits to the original are lost.
 	 */
 	public static ItemStack stamp(ItemStack item) {
-		if(item == null || !item.hasItemMeta()) return item;
-		ItemMeta meta = item.getItemMeta();
-		if(!meta.hasLore()) return item;
-		return stamp(item, of(Utils.firstLorePlain(meta)));
+		return stamp(item, of(Utils.firstLorePlain(item)));
 	}
 
 	/** As {@link #stamp(ItemStack)}, for an item whose SkyBlock id is not its lore id's - the Manhunt Hyperion. */
@@ -111,8 +107,7 @@ public final class SkyblockId {
 	 */
 	public static ItemStack stamp(ItemStack item, Consumer<CompoundTag> extra) {
 		if(item == null || !item.hasItemMeta()) return item;
-		ItemMeta meta = item.getItemMeta();
-		String id = meta.hasLore() ? of(Utils.firstLorePlain(meta)) : null;
+		String id = of(Utils.firstLorePlain(item));
 		return NBT.modify(item, nbt -> {
 			if(id != null) nbt.putString("id", id);
 			extra.accept(nbt);
@@ -236,8 +231,7 @@ public final class SkyblockId {
 	@Nullable
 	public static ItemStack stampVanilla(ItemStack item) {
 		if(item == null || item.getType().isAir()) return null;
-		if(item.hasItemMeta() && item.getItemMeta().hasLore()
-				&& Utils.firstLorePlain(item.getItemMeta()).startsWith("skyblock/")) {
+		if(Utils.firstLorePlain(item).startsWith("skyblock/")) {
 			return null;
 		}
 		String id = VANILLA.get(item.getType());

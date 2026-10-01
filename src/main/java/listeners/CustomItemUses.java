@@ -33,7 +33,7 @@ public class CustomItemUses implements Listener {
 		ItemStack item = inventory.getItemInMainHand();
 		String id;
 		try {
-			id = Utils.firstLorePlain(item.getItemMeta());
+			id = Utils.firstLorePlain(item);
 		} catch(Exception exception) {
 			id = "";
 		}

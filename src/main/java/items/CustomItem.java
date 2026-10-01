@@ -50,10 +50,8 @@ public interface CustomItem {
 	 * @return the item
 	 */
 	static CustomItem getItem(ItemStack item) {
-		if(!item.hasItemMeta() || !item.getItemMeta().hasLore()) {
-			return null;
-		}
-		return getItem(Utils.firstLorePlain(item.getItemMeta()));
+		String id = Utils.firstLorePlain(item);
+		return id.isEmpty() ? null : getItem(id);
 	}
 
 	/**

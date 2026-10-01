@@ -65,8 +65,7 @@ public class CustomMining implements Listener {
 	}
 
 	private static boolean isDivanPickaxe(ItemStack item) {
-		return item != null && item.hasItemMeta() && item.getItemMeta().hasLore()
-				&& Utils.firstLorePlain(item.getItemMeta()).equals("skyblock/combat/divan_pickaxe");
+		return Utils.firstLorePlain(item).equals("skyblock/combat/divan_pickaxe");
 	}
 
 	@EventHandler
@@ -82,10 +81,7 @@ public class CustomMining implements Listener {
 		ItemStack itemInHand = p.getInventory().getItemInMainHand();
 		Random random = new Random();
 		if(itemInHand.hasItemMeta() && itemInHand.getItemMeta().hasEnchant(Enchantment.FORTUNE)) {
-			boolean dropDouble = false;
-			if(itemInHand.getItemMeta().hasLore()) {
-				dropDouble = Utils.firstLorePlain(itemInHand.getItemMeta()).contains("skyblock/combat/divan_pickaxe");
-			}
+			boolean dropDouble = Utils.firstLorePlain(itemInHand).contains("skyblock/combat/divan_pickaxe");
 			int fortune = itemInHand.getItemMeta().getEnchantLevel(Enchantment.FORTUNE);
 
 			double fortuneMulti = 1 + 0.25 * fortune;

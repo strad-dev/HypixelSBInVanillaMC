@@ -24,7 +24,7 @@ public class NecromancerLordLeggings implements Armor {
 		data.setUnbreakable(true);
 		data.displayName(Utils.mm("<light_purple>Necromancer Lord Leggings"));
 		AttributeModifier damage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necromancerLeggingsDamage"), 2, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
-		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necromancerLeggingsArmor"), 9, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
+		AttributeModifier armor = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necromancerLeggingsArmor"), 8, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		AttributeModifier antiKB = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "necromancerLeggingsAntiKB"), 0.1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.LEGS);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, damage);
 		data.addAttributeModifier(Attribute.ARMOR, armor);

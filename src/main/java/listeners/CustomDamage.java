@@ -331,8 +331,13 @@ public class CustomDamage implements Listener {
 	private static final double ARMOR_CURVE_K = 5;
 
 	public static double armorMultiplier(double armor) {
-		if(armor < 15) return 1 - Math.max(0, armor) * 0.04;
-		return 0.4 * ARMOR_CURVE_K / (armor - 15 + ARMOR_CURVE_K);
+		if(armor < 20) return 1 - Math.max(0, armor) * 0.04;
+		return 0.2 * ARMOR_CURVE_K / (armor - 20 + ARMOR_CURVE_K);
+	}
+
+	public static double breachMultiplier(double armorMultiplier, double breach) {
+		double armorEhp = 1 / armorMultiplier - 1;
+		return 1 / (1 + armorEhp * Math.max(0, 1 - breach * 0.15));
 	}
 
 	public static double armorPoints(LivingEntity e) {
@@ -467,7 +472,7 @@ public class CustomDamage implements Listener {
 		if(isDyingDragon(damagee)) return; // see customMobs; a boss's whenDamaged calls in here directly
 		if(!(DamageType.isAbsoluteDamage(type))) {
 			// bonus damage to withers from hyperion
-			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && p.getInventory().getItemInMainHand().hasItemMeta() && Utils.firstLorePlain(p.getInventory().getItemInMainHand().getItemMeta()).equals("skyblock/combat/scylla")) {
+			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && Utils.firstLorePlain(p.getInventory().getItemInMainHand()).equals("skyblock/combat/scylla")) {
 				finalDamage += Scylla.WITHER_BONUS;
 			}
 
@@ -524,7 +529,7 @@ public class CustomDamage implements Listener {
 
 			boolean affectedByArmor = type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.PLAYER_MAGIC || type == DamageType.ENVIRONMENTAL || type == DamageType.IFRAME_ENVIRONMENTAL;
 			if(affectedByArmor) {
-				finalDamage *= armorMultiplier(Math.max(0, armorPoints(damagee) - breach * 2.5));
+				finalDamage *= breachMultiplier(armorMultiplier(armorPoints(damagee)), breach);
 			}
 
 			finalDamage *= resistanceMultiplier(damagee);

@@ -28,7 +28,7 @@ public class ArmorBar implements Listener {
 	private static final String HANDLER = "skyblock_armor_bar";
 
 	public static double barValue(double armor) {
-		double shown = armor <= 20 ? armor * 0.8 : 16 + (armor - 20) * 0.4;
+		double shown = armor * 0.8;
 		return Math.min(20, Math.round(shown));
 	}
 

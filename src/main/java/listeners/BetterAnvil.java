@@ -17,11 +17,11 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.Repairable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class BetterAnvil implements Listener {
 
@@ -44,7 +44,14 @@ public class BetterAnvil implements Listener {
 		ItemStack second = anvil.getItem(1);
 
 		if(first == null || first.getType() == Material.AIR) return;
-		if(second == null || second.getType() == Material.AIR) return;
+		int penalties = penalty(first) + penalty(second);
+		if(second == null || second.getType() == Material.AIR) {
+			ItemStack renamed = e.getResult();
+			if(renamed == null || renamed.isEmpty()) return;
+			e.setResult(withoutPenalty(renamed));
+			fixCost(e, penalties, 0, 1);
+			return;
+		}
 
 		boolean firstIsBook = first.getType() == Material.ENCHANTED_BOOK;
 		boolean secondIsBook = second.getType() == Material.ENCHANTED_BOOK;
@@ -65,45 +72,75 @@ public class BetterAnvil implements Listener {
 			return;
 		}
 
-		// Update prior work penalty on result (vanilla formula: max(cost1, cost2) * 2 + 1)
-		int penalty1 = first.getItemMeta() instanceof Repairable r ? r.getRepairCost() : 0;
-		int penalty2 = second.getItemMeta() instanceof Repairable r ? r.getRepairCost() : 0;
-		int newRepairCost = Math.min(Math.max(penalty1, penalty2) * 2 + 1, 64);
-		ItemMeta resultMeta = result.getItemMeta();
-		if(resultMeta instanceof Repairable repairable) {
-			repairable.setRepairCost(newRepairCost);
-			result.setItemMeta(resultMeta);
-		}
-
-		e.setResult(result);
+		e.setResult(withoutPenalty(result));
 
 		// Fix XP cost, since vanilla may not compute a valid cost for custom results
-		int fallbackCost = computeCost(first, second, result);
-		if(e.getView().getPlayer() instanceof Player player) {
-			Utils.scheduleTask(() -> {
-				ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-				if(serverPlayer.containerMenu instanceof AnvilMenu anvilMenu) {
-					int vanillaCost = anvilMenu.cost.get();
-					if(vanillaCost <= 0) {
-						anvilMenu.cost.set(fallbackCost);
-					} else if(vanillaCost > 64) {
-						anvilMenu.cost.set(64);
-					}
-				}
-				player.updateInventory();
-			}, 1);
-		}
+		int surcharge = overlevelSurcharge(first, second, result);
+		int fallbackCost = computeCost(first, result) + surcharge;
+		fixCost(e, penalties, surcharge, fallbackCost);
 	}
 
-	private int computeCost(ItemStack first, ItemStack second, ItemStack result) {
-		int cost = 0;
+	private void fixCost(PrepareAnvilEvent e, int penalties, int surcharge, int fallbackCost) {
+		if(!(e.getView().getPlayer() instanceof Player player)) return;
+		int ticket = costTickets.merge(player.getUniqueId(), 1, Integer::sum);
+		Utils.scheduleTask(() -> {
+			if(costTickets.getOrDefault(player.getUniqueId(), 0) != ticket) return;
+			ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
+			if(serverPlayer.containerMenu instanceof AnvilMenu anvilMenu) {
+				int vanillaCost = anvilMenu.cost.get() - penalties;
+				anvilMenu.cost.set(vanillaCost <= 0 ? fallbackCost : vanillaCost + surcharge);
+			}
+			player.updateInventory();
+		}, 1);
+	}
 
-		// Prior work penalty
-		int penalty1 = 0;
-		int penalty2 = 0;
-		if(first.getItemMeta() instanceof Repairable r) penalty1 = r.getRepairCost();
-		if(second.getItemMeta() instanceof Repairable r) penalty2 = r.getRepairCost();
-		cost += penalty1 + penalty2;
+	private int penalty(ItemStack item) {
+		return item != null && item.getItemMeta() instanceof Repairable r ? r.getRepairCost() : 0;
+	}
+
+	private ItemStack withoutPenalty(ItemStack item) {
+		if(item.getItemMeta() instanceof Repairable r && r.hasRepairCost()) {
+			r.setRepairCost(0);
+			item.setItemMeta(r);
+		}
+		return item;
+	}
+
+	private static final Map<UUID, Integer> costTickets = new HashMap<>();
+
+	private static final Map<Enchantment, int[]> OVERLEVEL_COSTS = Map.of(
+			Enchantment.SHARPNESS, new int[]{20, 30},
+			Enchantment.POWER, new int[]{20, 30},
+			Enchantment.SMITE, new int[]{15, 25},
+			Enchantment.BANE_OF_ARTHROPODS, new int[]{15, 25},
+			Enchantment.PROTECTION, new int[]{10},
+			Enchantment.FEATHER_FALLING, new int[]{10},
+			Enchantment.LOOTING, new int[]{30, 50},
+			Enchantment.FORTUNE, new int[]{25},
+			Enchantment.EFFICIENCY, new int[]{15},
+			Enchantment.SWEEPING_EDGE, new int[]{15}
+	);
+
+	private int overlevelSurcharge(ItemStack first, ItemStack second, ItemStack result) {
+		boolean fromBook = second.getType() == Material.ENCHANTED_BOOK;
+		Map<Enchantment, Integer> firstEnchants = getEnchants(first);
+		int surcharge = 0;
+		for(Map.Entry<Enchantment, Integer> entry : getEnchants(result).entrySet()) {
+			Enchantment ench = entry.getKey();
+			int level = entry.getValue();
+			int max = ench.getMaxLevel();
+			if(level <= max || level <= firstEnchants.getOrDefault(ench, 0)) continue;
+			int perLevel = fromBook ? Math.max(1, ench.getAnvilCost() / 2) : ench.getAnvilCost();
+			int[] fixed = OVERLEVEL_COSTS.get(ench);
+			int tier = level - max - 1;
+			int cost = fixed != null && tier < fixed.length ? fixed[tier] : perLevel * level * (tier >= 1 ? 3 : 2);
+			surcharge += cost - perLevel * max;
+		}
+		return surcharge;
+	}
+
+	private int computeCost(ItemStack first, ItemStack result) {
+		int cost = 0;
 
 		// Enchantment cost: count each enchant that was added or upgraded
 		Map<Enchantment, Integer> firstEnchants = getEnchants(first);
@@ -120,7 +157,7 @@ public class BetterAnvil implements Listener {
 			}
 		}
 
-		return Math.clamp(cost, 1, 64);
+		return Math.max(cost, 1);
 	}
 
 	private Map<Enchantment, Integer> getEnchants(ItemStack item) {
@@ -161,15 +198,7 @@ public class BetterAnvil implements Listener {
 			}
 		}
 
-		Utils.scheduleTask(() -> {
-			ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-			if(serverPlayer.containerMenu instanceof AnvilMenu anvilMenu) {
-				if(anvilMenu.cost.get() > 50) {
-					anvilMenu.cost.set(50);
-				}
-			}
-			player.updateInventory();
-		}, 1);
+		Utils.scheduleTask(player::updateInventory, 1);
 	}
 
 	private ItemStack handleBookToItem(ItemStack item, ItemStack book) {
@@ -317,7 +346,7 @@ public class BetterAnvil implements Listener {
 	}
 
 	private boolean canApplyToItem(ItemStack item, Enchantment enchantment) {
-		if(item.getType() == Material.ELYTRA && enchantment == Enchantment.PROTECTION) {
+		if(enchantment == Enchantment.PROTECTION && Utils.firstLorePlain(item).equals("skyblock/combat/necron_elytra")) {
 			return true;
 		}
 		return enchantment.canEnchantItem(item);

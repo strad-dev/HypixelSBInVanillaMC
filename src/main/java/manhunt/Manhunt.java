@@ -407,8 +407,7 @@ public final class Manhunt {
 	}
 
 	public static boolean isCompass(@Nullable ItemStack item) {
-		if(item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) return false;
-		return ManhuntCompass.ID.equals(Utils.firstLorePlain(item.getItemMeta()));
+		return ManhuntCompass.ID.equals(Utils.firstLorePlain(item));
 	}
 
 	// ---- implosion ------------------------------------------------------------------------------------

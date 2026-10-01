@@ -79,7 +79,7 @@ public final class PvpItemRefresh {
 	/** Template key: custom-item ID (first lore line), else material. Null for an empty slot. */
 	public static String key(ItemStack it) {
 		if (it == null || it.getType().isAir()) return null;
-		String id = it.hasItemMeta() ? Utils.firstLorePlain(it.getItemMeta()).trim() : "";
+		String id = Utils.firstLorePlain(it).trim();
 		return id.startsWith("skyblock/") ? id : "material:" + it.getType().name();
 	}
 }

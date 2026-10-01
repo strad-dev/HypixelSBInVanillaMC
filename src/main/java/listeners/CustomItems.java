@@ -34,11 +34,7 @@ public class CustomItems implements Listener {
 	}
 
 	public String getID(ItemStack item) {
-		if(item == null || !item.hasItemMeta()) {
-			return "";
-		} else if(!item.getItemMeta().hasLore()) {
-			return "";
-		} else return Utils.firstLorePlain(item.getItemMeta());
+		return Utils.firstLorePlain(item);
 	}
 
 	public static List<EntityType> createList() {
@@ -138,7 +134,8 @@ public class CustomItems implements Listener {
 			}
 
 			if(meta.hasLore()) {
-				if(Utils.firstLorePlain(itemInUse.getItemMeta()).contains("skyblock/summon") || Utils.firstLorePlain(itemInUse.getItemMeta()).contains("skyblock/ingredient")) {
+				String id = Utils.firstLorePlain(itemInUse);
+				if(id.contains("skyblock/summon") || id.contains("skyblock/ingredient")) {
 					e.setCancelled(true);
 				}
 			}
