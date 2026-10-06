@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameRules;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -32,6 +33,7 @@ public final class Manhunt {
 
 	private static boolean enabled;
 	private static boolean shadowWarp = true;
+	private static boolean limitT6 = true;
 	private static boolean started;
 
 	/** In add order. Order is load-bearing: a compass stores an index into this list. */
@@ -52,6 +54,9 @@ public final class Manhunt {
 
 	/** Each world's {@code locatorBar} at match start, keyed on world name so it survives a restart. */
 	private static final Map<String, Boolean> LOCATOR_BARS = new LinkedHashMap<>();
+
+	/** Capped T6 books spawned in chests this match, by enchantment key. */
+	private static final Map<String, Integer> BOOKS = new LinkedHashMap<>();
 
 	/** Rung above Netherite: a real Hyperion, which has no {@link ManhuntTier}. */
 	public static final int FULL_RUNG = ManhuntTier.values().length;
@@ -104,6 +109,8 @@ public final class Manhunt {
 		}
 		LOCATOR_BARS.clear();
 		if(state.locatorBars != null) LOCATOR_BARS.putAll(state.locatorBars);
+		BOOKS.clear();
+		if(state.books != null) BOOKS.putAll(state.books);
 		// Gamerule is already off in level.dat, but this covers a world that wasn't loaded at match start.
 		// save() so a second restart can restore that new world too.
 		if(started) {
@@ -134,6 +141,7 @@ public final class Manhunt {
 			state.kitted.add(uuid.toString());
 		}
 		state.locatorBars = new LinkedHashMap<>(LOCATOR_BARS);
+		state.books = new LinkedHashMap<>(BOOKS);
 		PvpJson.save(file, state);
 	}
 
@@ -154,6 +162,7 @@ public final class Manhunt {
 		Map<String, Integer> ceilings;
 		List<String> kitted;
 		Map<String, Boolean> locatorBars;
+		Map<String, Integer> books;
 	}
 
 	public static boolean enabled() {
@@ -167,6 +176,35 @@ public final class Manhunt {
 	/** Whether the Manhunt Hyperion teleports. The full Hyperion always does. */
 	public static boolean shadowWarp() {
 		return shadowWarp;
+	}
+
+	public static void setLimitT6(boolean on) {
+		limitT6 = on;
+	}
+
+	/** {@code limit-t6} only bites during a match. */
+	public static boolean limitsT6() {
+		return active() && limitT6;
+	}
+
+	/**
+	 * Tests AND claims a chest book. Protection V: one per player; Sharpness VI and Power VI: one per two, rounded
+	 * up; everything else uncapped. Players = everyone kitted this match plus every Speedrunner.
+	 */
+	public static boolean claimBook(Enchantment enchant) {
+		if(!limitsT6()) return true;
+		Set<UUID> players = new HashSet<>(KITTED);
+		players.addAll(SPEEDRUNNERS);
+		int cap;
+		if(enchant.equals(Enchantment.PROTECTION)) cap = players.size();
+		else if(enchant.equals(Enchantment.SHARPNESS) || enchant.equals(Enchantment.POWER)) cap = (players.size() + 1) / 2;
+		else return true;
+		String key = enchant.getKey().getKey();
+		int spawned = BOOKS.getOrDefault(key, 0);
+		if(spawned >= cap) return false;
+		BOOKS.put(key, spawned + 1);
+		save();
+		return true;
 	}
 
 	public static boolean started() {
@@ -277,6 +315,7 @@ public final class Manhunt {
 		started = true;
 		CEILINGS.clear();
 		KITTED.clear();
+		BOOKS.clear();
 		LAST_IMPLOSION.clear();
 		hideLocatorBar();
 		ManhuntPiglins.demoteLoaded();
@@ -296,6 +335,7 @@ public final class Manhunt {
 		started = false;
 		CEILINGS.clear();
 		KITTED.clear();
+		BOOKS.clear();
 		LAST_IMPLOSION.clear();
 		restoreLocatorBar();
 		for(Player p : Bukkit.getOnlinePlayers()) {

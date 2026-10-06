@@ -1,6 +1,6 @@
 package listeners;
 
-import com.destroystokyo.paper.event.player.PlayerAttackEntityCooldownResetEvent;
+import io.papermc.paper.event.player.PrePlayerAttackEntityEvent;
 import items.misc.HolyIce;
 import items.misc.IceSpray;
 import items.weapons.Scylla;
@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageSources;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonDeathPhase;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
@@ -29,6 +30,7 @@ import net.minecraft.world.entity.projectile.hurtingprojectile.windcharge.Abstra
 import net.minecraft.world.entity.raid.Raids;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.BlocksAttacks;
+import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.SculkSpreader;
 import net.minecraft.world.phys.Vec3;
 import org.bukkit.*;
@@ -66,6 +68,11 @@ public class CustomDamage implements Listener {
 
 	// Last tick each entity took Terminator knockback, so a same-tick volley of 3 arrows stacks instead of overwriting.
 	private static final Map<Entity, Integer> lastTermKnockbackTick = new WeakHashMap<>();
+
+	// An explosion hurts each dragon part it reaches, one damage event per part, but vanilla pushes the dragon once.
+	private record DragonExplosion(int tick, Vec3 center) {}
+	private static final Map<Entity, DragonExplosion> lastDragonExplosion = new WeakHashMap<>();
+	private static final float BED_EXPLOSION_RADIUS = 5.0F;
 
 	// Stamped on a dragon when its death branch runs; the only way to tell a corpse from a live one. Vanilla animates
 	// death at 1 HP (EnderDragon.handleKillingBlow), so isDead() and getHealth() read alive for all 200 ticks.
@@ -128,14 +135,14 @@ public class CustomDamage implements Listener {
 
 	// ================================ the swing's charge ================================
 	//
-	// Paper zeroes the attack-strength ticker INSIDE Player.attack before the blow lands: onAttack(target) fires
-	// PlayerAttackEntityCooldownResetEvent, then resetOnlyAttackStrengthTicker(), and only then does hurtOrSimulate
-	// fire our damage event. Vanilla read getAttackStrengthScale once into a local for its crit and enchant bonus,
-	// but re-reading the LIVE ticker later gives 0.5/delay: 0.025 on a 20-tick weapon where vanilla had 1.
+	// Paper zeroes the attack-strength ticker INSIDE Player.attack before the blow lands: onAttack(target) calls
+	// resetOnlyAttackStrengthTicker(), and only then does hurtOrSimulate fire our damage event. Vanilla read
+	// getAttackStrengthScale once into a local for its crit and enchant bonus, but re-reading the LIVE ticker later
+	// gives 0.5/delay: 0.025 on a 20-tick weapon where vanilla had 1.
 	//
 	// Our own weapons hid it (ATTACK_SPEED +100 puts full charge at ~0.19 ticks, so a zeroed ticker still clamps to
 	// 1). Every VANILLA weapon lost its crit and its whole Sharpness retune, since rebuildMelee scales our enchant
-	// delta by the same number. So the charge is taken from the event fired right before the reset.
+	// delta by the same number. So the charge is taken from the event that opens Player.attack, before the reset.
 
 	/** One swing's charge: tick taken, and the scale vanilla judged it by. */
 	private record SwingCharge(int tick, float scale) {}
@@ -143,18 +150,18 @@ public class CustomDamage implements Listener {
 	private static final Map<Player, SwingCharge> swingCharges = new WeakHashMap<>();
 
 	/**
-	 * Snapshot the charge before Paper zeroes it: fired from {@code Player.onAttack}, one call before the reset and two
-	 * before our damage event. Read at {@code 0.5f}, not off the event, whose {@code getAttackStrengthScale(0.0f)} is
-	 * half a tick short of vanilla's.
+	 * Snapshot the charge before Paper zeroes it: fired first thing in {@code Player.attack}, before {@code onAttack}
+	 * resets it, at {@code 0.5f} like vanilla's read. Also fires for spear stabs, which never reset; harmless, since
+	 * the snapshot then equals the live ticker.
 	 */
 	@EventHandler(priority = EventPriority.LOWEST)
-	public void onAttackCooldownReset(PlayerAttackEntityCooldownResetEvent e) {
+	public void onPreAttack(PrePlayerAttackEntityEvent e) {
 		ServerPlayer sp = ((CraftPlayer) e.getPlayer()).getHandle();
 		swingCharges.put(e.getPlayer(), new SwingCharge(Bukkit.getCurrentTick(), sp.getAttackStrengthScale(0.5f)));
 	}
 
 	/**
-	 * Charge vanilla judged this swing by: {@link #onAttackCooldownReset}'s snapshot if from this tick, else the live
+	 * Charge vanilla judged this swing by: {@link #onPreAttack}'s snapshot if from this tick, else the live
 	 * ticker. The fallback covers blows that never went through {@code Player.attack} (a boss, {@code /damage}), where
 	 * nothing was reset. An older snapshot is a different swing, so it is refused.
 	 */
@@ -193,11 +200,11 @@ public class CustomDamage implements Listener {
 	private static final double SHIELD_BLOCKING_ANGLE = 90;
 
 	/**
-	 * A blocked blow is multiplied by this: a shield takes two thirds off. Ours, not vanilla's: vanilla's
+	 * A blocked blow is multiplied by this: a shield takes three quarters off. Ours, not vanilla's: vanilla's
 	 * {@code blocks_attacks} is {@code base 0, factor 1}, blocking everything, which is no good when a hit is worth
 	 * dozens of hearts. The cone deciding WHETHER it applies is vanilla's.
 	 */
-	private static final double SHIELD_BLOCK_MULTIPLIER = 1.0 / 3.0;
+	private static final double SHIELD_BLOCK_MULTIPLIER = 0.25;
 
 	/**
 	 * Did this blow come from inside the defender's shield cone? Missing before: cancelling the vanilla event skips
@@ -952,16 +959,55 @@ public class CustomDamage implements Listener {
 					armorStand.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, -1, 255, true, false));
 				}
 
-				// special ender dragon knockback to make zero- and one-cycling possible
+				// Vanilla dragon knockback, rebuilt since the cancelled event skips it: ServerExplosion's push for beds
+				// (zero- and one-cycling), LivingEntity's 0.4 for hits (EnderDragon.knockback ignores it while perched).
 				if(damagee instanceof EnderDragon dragon) {
+					net.minecraft.world.entity.boss.enderdragon.EnderDragon nmsDragon = ((CraftEnderDragon) dragon).getHandle();
 					if(data.e != null && data.e.getCause() == DamageCause.BLOCK_EXPLOSION) {
-						Vector v = dragon.getVelocity();
-						if(dragon.getPhase() == EnderDragon.Phase.LAND_ON_PORTAL) {
-							dragon.setVelocity(new Vector(v.getX(), 0.25, v.getZ()));
-						} else {
-							dragon.setVelocity(new Vector(v.getX(), 0.333333, v.getZ()));
+						Location source = data.e.getDamageSource().getSourceLocation();
+						if(source != null) {
+							Vec3 center = new Vec3(source.getX(), source.getY(), source.getZ());
+							DragonExplosion explosion = new DragonExplosion(MinecraftServer.currentTick, center);
+							if(!explosion.equals(lastDragonExplosion.put(dragon, explosion))) {
+								double dist = Math.sqrt(nmsDragon.distanceToSqr(center)) / (BED_EXPLOSION_RADIUS * 2.0F);
+								if(dist <= 1.0) {
+									double power = (1.0 - dist) * ServerExplosion.getSeenPercent(center, nmsDragon) * (1.0 - nmsDragon.getAttributeValue(Attributes.EXPLOSION_KNOCKBACK_RESISTANCE));
+									nmsDragon.push(nmsDragon.getEyePosition().subtract(center).normalize().scale(power));
+								}
+							}
 						}
 						damager = Utils.getNearestPlayer(dragon, 16);
+					} else if((type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED) && damager != null && !data.isTermArrow) {
+						// Terminator arrows never push it: too strong at three arrows a shot.
+						Projectile projectile = data.e instanceof EntityDamageByEntityEvent ev && ev.getDamager() instanceof Projectile pr ? pr : null;
+						net.minecraft.world.entity.Entity attacker = ((CraftEntity) (projectile != null ? projectile : damager)).getHandle();
+						DamageSource kbSource = nmsDragon.damageSources().generic();
+						double xd, zd;
+						if(projectile != null) {
+							xd = -projectile.getVelocity().getX();
+							zd = -projectile.getVelocity().getZ();
+						} else {
+							Location from = data.sourcePosition != null ? data.sourcePosition : damager.getLocation();
+							xd = from.getX() - dragon.getX();
+							zd = from.getZ() - dragon.getZ();
+						}
+						nmsDragon.knockback(0.4, xd, zd, kbSource, (float) finalDamage, attacker, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK);
+
+						// Player.causeExtraKnockback (Knockback enchant, sprint hit) and AbstractArrow.doKnockback (Punch).
+						if(type == DamageType.MELEE && damager instanceof Player p) {
+							double extra = (((CraftPlayer) p).getHandle().getAttributeValue(Attributes.ATTACK_KNOCKBACK) + p.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK)) / 2.0
+									+ (p.isSprinting() && attackCharge(p) > 0.9f ? 0.5 : 0.0);
+							if(extra > 0) {
+								double yaw = Math.toRadians(p.getYaw());
+								nmsDragon.knockback(extra, Math.sin(yaw), -Math.cos(yaw), kbSource, (float) finalDamage, attacker, io.papermc.paper.event.entity.EntityKnockbackEvent.Cause.ENTITY_ATTACK);
+							}
+						} else if(projectile != null && data.punchArrow > 0) {
+							Vector punch = projectile.getVelocity().setY(0);
+							if(punch.lengthSquared() > 0) {
+								punch.normalize().multiply(data.punchArrow * 0.6 * Math.max(0.0, 1.0 - nmsDragon.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE)));
+								nmsDragon.push(punch.getX(), 0.1, punch.getZ(), attacker);
+							}
+						}
 					}
 				} else if(isPhysicalHit && damager != null) {
 					// apply knockback

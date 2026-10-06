@@ -8,9 +8,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class ManhuntModule {
 	private ManhuntModule() {}
 
-	public static void enable(JavaPlugin plugin, boolean on, boolean shadowWarp) {
+	public static void enable(JavaPlugin plugin, boolean on, boolean shadowWarp, boolean limitT6) {
 		Manhunt.setEnabled(on);
 		Manhunt.setShadowWarp(shadowWarp);
+		Manhunt.setLimitT6(limitT6);
 
 		if(!on) {
 			unregister(plugin, "manhunt");

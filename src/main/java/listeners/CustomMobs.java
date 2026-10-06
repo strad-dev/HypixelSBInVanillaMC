@@ -115,7 +115,6 @@ public class CustomMobs implements Listener {
 							name = new PrimalDragon().onSpawn(hardModePlayer, dragon);
 						} else {
 							name = CustomDragon.spawnRandom().onSpawn(p, dragon);
-							dragon.getAttribute(Attribute.KNOCKBACK_RESISTANCE).setBaseValue(1.0);
 							Utils.setupBoss(dragon, p);
 						}
 					}

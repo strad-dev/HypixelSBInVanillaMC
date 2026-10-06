@@ -165,7 +165,7 @@ public class Plugin extends JavaPlugin implements Listener {
 		// Config-gated Manhunt feature (/manhunt, the Manhunt Hyperion ladder). Inert unless enabled.
 		// PvpConfig above has already saved and loaded the config file.
 		manhunt.ManhuntModule.enable(this, getConfig().getBoolean("manhunt.enabled", false),
-				getConfig().getBoolean("manhunt.shadow-warp", true));
+				getConfig().getBoolean("manhunt.shadow-warp", true), getConfig().getBoolean("manhunt.limit-t6", true));
 	}
 
 	/**

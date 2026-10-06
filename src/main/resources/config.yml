@@ -15,6 +15,8 @@ manhunt:
   enabled: false
   # Determines if Wither Impact teleports the player (only applies to Manhunt Hyperions)
   shadow-warp: true
+  # Determines if T6 enchants should be limited.  During a match, chest loot spawns at most 1 Protection V book per player and 1 Sharpness VI / Power VI book per 2 players (rounded up), and no Enchantment Upgraders.  Counts reset on /manhunt start and reset.
+  limit-t6: true
 
 pvp:
   ffa:
