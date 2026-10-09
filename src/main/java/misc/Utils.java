@@ -89,7 +89,7 @@ public class Utils {
 	}
 
 	/**
-	 * Damage figure for lore: no trailing {@code .0}, at most two decimals (Sharpness is 0.75 a level).
+	 * Damage figure for lore: no trailing {@code .0}, at most two decimals (Smite is 1.25 a level).
 	 */
 	public static String damageNumber(double d) {
 		if(d == Math.rint(d)) {

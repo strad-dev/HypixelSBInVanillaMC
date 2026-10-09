@@ -99,17 +99,17 @@ public class CustomDamage implements Listener {
 	// jump-crit worth doing, not to make gear hit harder.
 
 	/** Sharpness per level, replacing vanilla's {@code 0.5 * level + 0.5}. Level 7 is what the duel kit and palette
-	 *  hand out, so it gets a round 5.5, not 5.25. */
+	 *  hand out, so it gets a round 5, not 4.9. */
 	public static double sharpnessBonus(int level) {
 		if(level <= 0) return 0;
-		return level == 7 ? 5.5 : level * 0.75;
+		return level == 7 ? 5 : level * 0.7;
 	}
 
-	/** Smite / Bane vs a matching target, replacing vanilla's {@code 2.5 * level}. Level 7 gets 11, not 10.5, same
+	/** Smite / Bane vs a matching target, replacing vanilla's {@code 2.5 * level}. Level 7 gets 9, not 8.75, same
 	 *  reason as Sharpness. */
 	public static double smiteBonus(int level) {
 		if(level <= 0) return 0;
-		return level == 7 ? 11 : level * 1.5;
+		return level == 7 ? 9 : level * 1.25;
 	}
 
 	/**
