@@ -24,10 +24,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Full Hyperion (no hit cooldown) on its {@link ManhuntTier} rung's numbers. Shares {@link Scylla#witherImpact}.
- * Differences: flat implosion damage, and a per-rung shield refresh cooldown the real one lacks.
+ * Hyperion on its {@link ManhuntTier} rung's numbers. Shares {@link Scylla#witherImpact}. Differences: flat
+ * implosion damage, a per-rung ability cooldown, and a hit cooldown ({@link #ATTACK_SPEED}); the real one has none.
  */
 public class ManhuntHyperion implements AbilityItem {
+	/** Full charge in 10 ticks, a hurt player's i-frames: every hit as they expire lands full, spam clicks don't. */
+	public static final double ATTACK_SPEED = 2;
+
 	public static ItemStack getItem() {
 		return getItem(ManhuntTier.BASE);
 	}
@@ -46,8 +49,9 @@ public class ManhuntHyperion implements AbilityItem {
 		// Any modifier replaces the sword's defaults: damage is base 1 + this rung, not the vanilla sword too.
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, new AttributeModifier(
 				new NamespacedKey(Plugin.getInstance(), "manhuntHyperionDmg"), tier.damage(), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
+		// Adds to the player's base 4, like a vanilla sword's -2.4: every rung lands on exactly ATTACK_SPEED.
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, new AttributeModifier(
-				new NamespacedKey(Plugin.getInstance(), "manhuntHyperionSpeed"), 100, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
+				new NamespacedKey(Plugin.getInstance(), "manhuntHyperionSpeed"), ATTACK_SPEED - 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(data);
 		item.addUnsafeEnchantments(enchants);
@@ -55,7 +59,10 @@ public class ManhuntHyperion implements AbilityItem {
 		List<Component> lore = new ArrayList<>();
 		lore.add(Utils.mm(ManhuntTier.ID));
 		lore.add(Utils.mm(""));
-		lore.addAll(Utils.statLore(data, enchants));
+		List<Component> stats = Utils.statLore(data, enchants);
+		// Right after Damage (statLore's first line); the total, not the -2 modifier.
+		stats.add(Math.min(1, stats.size()), Utils.mm("<gray>Attack Speed: <red>" + Utils.damageNumber(ATTACK_SPEED)));
+		lore.addAll(stats);
 		lore.addAll(Utils.bonusDamageLore(enchants));
 		lore.add(Utils.mm(""));
 		// Header sets the tooltip width, never wrapped.
@@ -68,9 +75,7 @@ public class ManhuntHyperion implements AbilityItem {
 				+ Utils.percent(tier.damageReduction()) + "<gray> and grants an Absorption Shield with <red>"
 				+ Utils.damageNumber(tier.absorption()) + " HP <gray>for <green>5<gray> seconds."));
 		lore.add(Utils.mm("<dark_gray>Intelligence Cost: <dark_aqua>" + tier.manaCost()));
-		// Shield's clock only; Wither Impact itself has no cooldown.
-		lore.add(Utils.mm("<dark_gray>Wither Shield Cooldown: <green>"
-				+ Utils.damageNumber(tier.witherShieldCooldown() / 20.0) + "s"));
+		lore.add(Utils.mm("<dark_gray>Cooldown: <green>" + Utils.damageNumber(tier.cooldown() / 20.0) + "s"));
 		lore.add(Utils.mm(""));
 		lore.add(Utils.mm("<dark_gray>Max Intelligence: <dark_aqua>" + tier.maxIntelligence()));
 		lore.add(Utils.mm("<dark_gray>Intelligence Regen: <dark_aqua>1 per "
@@ -106,7 +111,7 @@ public class ManhuntHyperion implements AbilityItem {
 		delta(out, "Implosion Radius", "green", next.radius() - tier.radius(), " blocks");
 		delta(out, "Absorption HP", "red", next.absorption() - tier.absorption(), "");
 		delta(out, "Damage Reduction", "red", (tier.damageReduction() - next.damageReduction()) * 100, "%");
-		delta(out, "Shield Cooldown", "green", (next.witherShieldCooldown() - tier.witherShieldCooldown()) / 20.0, "s");
+		delta(out, "Cooldown", "green", (next.cooldown() - tier.cooldown()) / 20.0, "s");
 		delta(out, "Max Intelligence", "dark_aqua", next.maxIntelligence() - tier.maxIntelligence(), "");
 		delta(out, "Intel Regen", "dark_aqua", (next.ticksPerMana() - tier.ticksPerMana()) / 20.0, "s<dark_gray>/intel");
 		delta(out, "Ability Cost", "dark_aqua", next.manaCost() - tier.manaCost(), "");
@@ -133,7 +138,7 @@ public class ManhuntHyperion implements AbilityItem {
 		// imploded once a second across all attackers; 0 damage is witherImpact's skip signal, so they're left
 		// out, not hit for 0.
 		return Scylla.witherImpact(p, Manhunt.shadowWarp() ? 10 : 0, tier.radius(), tier.absorption(), tier.damageReduction(),
-				tier.witherShieldCooldown(), entity -> Manhunt.claimImplosion(entity) ? tier.implosionDamage() : 0);
+				entity -> Manhunt.claimImplosion(entity) ? tier.implosionDamage() : 0);
 	}
 
 	@Override
@@ -155,11 +160,18 @@ public class ManhuntHyperion implements AbilityItem {
 
 	@Override
 	public String cooldownTag() {
-		return "";
+		return "ManhuntHyperionCooldown";
+	}
+
+	/** Unused: the dispatcher uses {@link #cooldown(ItemStack)}. */
+	@Override
+	public int cooldown() {
+		return ManhuntTier.BASE.cooldown();
 	}
 
 	@Override
-	public int cooldown() {
-		return 0;
+	public int cooldown(ItemStack item) {
+		ManhuntTier tier = ManhuntTier.of(item);
+		return tier == null ? ManhuntTier.BASE.cooldown() : tier.cooldown();
 	}
 }

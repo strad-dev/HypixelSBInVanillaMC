@@ -110,6 +110,8 @@ public class CustomItems implements Listener {
 	public void onPlayerInteract(PlayerInteractEvent e) {
 		Player p = e.getPlayer();
 		if(p.getGameMode() == GameMode.SPECTATOR) return; // spectators never fire item abilities
+		// A chest, door, lever... owns the click: no ability, event left alone so vanilla uses the block.
+		if(e.getAction() == Action.RIGHT_CLICK_BLOCK && Utils.usesBlock(p, e.getClickedBlock())) return;
 		ItemStack itemInUse = e.getItem();
 		if(itemInUse != null && itemInUse.hasItemMeta()) {
 			ItemMeta meta = itemInUse.getItemMeta();
@@ -191,7 +193,7 @@ public class CustomItems implements Listener {
 								score.setScore(score.getScore() - item.manaCost(itemInUse));
 								pvp.PvpHooks.trackMana(p, item.manaCost(itemInUse));
 							}
-							Cooldowns.start(p, item.cooldownTag(), item.cooldown());
+							Cooldowns.start(p, item.cooldownTag(), item.cooldown(itemInUse));
 							Cooldowns.start(p, "AbilityCooldown", 3);
 						}
 					}

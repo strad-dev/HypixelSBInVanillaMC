@@ -32,4 +32,9 @@ public interface AbilityItem extends CustomItem {
 	String cooldownTag();
 
 	int cooldown();
+
+	/** Per-stack cooldown; the dispatcher calls this. Only the Manhunt Hyperion overrides it (rung). */
+	default int cooldown(ItemStack item) {
+		return cooldown();
+	}
 }

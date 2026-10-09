@@ -41,14 +41,8 @@ public class Scylla implements AbilityItem {
 	 */
 	public static final double HEAL_SHARE = 0.50;
 
-	/**
-	 * Ticks before absorption converts to healing, same on every rung.
-	 * {@link manhunt.ManhuntTier#witherShieldCooldown} only decides when the next shield may go up.
-	 */
+	/** Ticks before absorption converts to healing, same on every rung. */
 	public static final int SHIELD_DURATION = 101;
-
-	/** {@link Cooldowns} tag for the shield refresh, separate from the ability. */
-	private static final String SHIELD_COOLDOWN = "witherShield";
 
 	public static ItemStack getItem() {
 		return getItem(Map.of());
@@ -132,8 +126,7 @@ public class Scylla implements AbilityItem {
 		double smite = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.SMITE));
 		double bane = CustomDamage.smiteBonus(held.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS));
 
-		// 0 refresh cooldown: only a standing shield gates it. See ManhuntTier.witherShieldCooldown.
-		return witherImpact(p, 10, 10, 10, 0.15, 0, entity -> {
+		return witherImpact(p, 10, 10, 10, 0.15, entity -> {
 			double tempDamage = targetDamage;
 			if(entity instanceof Wither) {
 				tempDamage += 4 + smite;
@@ -149,13 +142,11 @@ public class Scylla implements AbilityItem {
 	/**
 	 * Teleport, implode, Wither Shield. Shared with the Manhunt Hyperion so the placement search has one copy.
 	 * {@code distance} 0 skips the teleport (Manhunt's shadow-warp off) and implodes where the player stands.
-	 * {@code shieldCooldown}: ticks before the next shield, on top of a standing one; 0 = standing shield is the
-	 * only gate. Never changes {@link #SHIELD_DURATION}. {@code damage} of 0 or less skips the target entirely
-	 * (no pipeline, no knockback, not counted); Manhunt's implosion cooldown uses that.
+	 * A standing shield blocks a new one. {@code damage} of 0 or less skips the target entirely (no pipeline, no
+	 * knockback, not counted); Manhunt's implosion cooldown uses that.
 	 */
 	public static boolean witherImpact(Player p, double distance, double radius, double absorption,
-									   double damageReduction, int shieldCooldown,
-									   ToDoubleFunction<LivingEntity> damage) {
+									   double damageReduction, ToDoubleFunction<LivingEntity> damage) {
 		Location origin = p.getLocation().clone();
 		Location l = null;
 		if(distance > 0) {
@@ -335,10 +326,7 @@ public class Scylla implements AbilityItem {
 		p.playSound(p, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		// wither shield
-		// Gated by a standing shield and the refresh cooldown, so a cooldown under SHIELD_DURATION buys nothing.
-		boolean shieldStanding = p.getScoreboardTags().contains("WitherShield");
-		if(!shieldStanding && !Cooldowns.onCooldown(p, SHIELD_COOLDOWN)) { // reduced damage
-			Cooldowns.start(p, SHIELD_COOLDOWN, shieldCooldown);
+		if(!p.getScoreboardTags().contains("WitherShield")) { // reduced damage
 			double absorptionBefore = p.getAbsorptionAmount();
 			NamespacedKey key = new NamespacedKey(Plugin.getInstance(), "witherShield");
 			AttributeModifier stale = p.getAttribute(Attribute.MAX_ABSORPTION).getModifier(key); // left permanent by an older build; addModifier would throw
@@ -365,11 +353,6 @@ public class Scylla implements AbilityItem {
 				p.removeScoreboardTag("WitherShield");
 				WITHER_SHIELDS.remove(p.getUniqueId());
 			}, SHIELD_DURATION);
-		} else if(!shieldStanding) {
-			// No shield and none coming: worth a message. Silent while one stands since Wither Impact is spammed.
-			// Only reachable with a cooldown over SHIELD_DURATION; the full Hyperion passes 0.
-			p.sendMessage(Utils.msg("<red>Your Wither Shield is on cooldown for "
-					+ String.format("%.2f", Cooldowns.remaining(p, SHIELD_COOLDOWN) / 20.0) + " seconds!"));
 		}
 		return true;
 	}

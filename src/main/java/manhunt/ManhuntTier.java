@@ -16,7 +16,7 @@ import java.util.Map;
  * {@link #skyblockId()} and not a row in {@link misc.SkyblockId}'s {@code IDS} (all eight would collide).
  */
 public enum ManhuntTier {
-	//                                                                swords  dmg   cost  abs  reduce  shieldCd  implode  radius  tick  intel  ench
+	//                                                                swords  dmg   cost  abs  reduce  cooldown  implode  radius  tick  intel  ench
 	// No teleport column: it's a flat 10 blocks on every rung.
 	BASE(Material.STICK, "", Rank.COMMON,                            0, 0,   25, 1, 0.00, 200, 0.5,  7.5, 160, 150,  0),
 	WOOD(Material.WOODEN_SWORD, "Wooden", Rank.COMMON,               8, 1,   25, 3, 0.05, 200, 1,    8,   160, 200,  10),
@@ -69,7 +69,7 @@ public enum ManhuntTier {
 	private final int manaCost;
 	private final double absorption;
 	private final double damageReduction;
-	private final int witherShieldCooldown;
+	private final int cooldown;
 	private final double implosionDamage;
 	private final double radius;
 	private final int ticksPerMana;
@@ -77,7 +77,7 @@ public enum ManhuntTier {
 	private final int enchantability;
 
 	ManhuntTier(Material material, String prefix, Rank rank, int swordsToUpgrade, double damage, int manaCost,
-				double absorption, double damageReduction, int witherShieldCooldown, double implosionDamage,
+				double absorption, double damageReduction, int cooldown, double implosionDamage,
 				double radius, int ticksPerMana, int maxIntelligence, int enchantability) {
 		this.material = material;
 		this.prefix = prefix;
@@ -87,7 +87,7 @@ public enum ManhuntTier {
 		this.manaCost = manaCost;
 		this.absorption = absorption;
 		this.damageReduction = damageReduction;
-		this.witherShieldCooldown = witherShieldCooldown;
+		this.cooldown = cooldown;
 		this.implosionDamage = implosionDamage;
 		this.radius = radius;
 		this.ticksPerMana = ticksPerMana;
@@ -152,12 +152,9 @@ public enum ManhuntTier {
 		return damageReduction;
 	}
 
-	/**
-	 * Ticks before the shield can go up again, not its length (always {@link items.weapons.Scylla#SHIELD_DURATION}).
-	 * A standing shield blocks a refresh too, so SHIELD_DURATION is the floor. Full Hyperion has none.
-	 */
-	public int witherShieldCooldown() {
-		return witherShieldCooldown;
+	/** Ticks between Wither Impacts. Full Hyperion has none. */
+	public int cooldown() {
+		return cooldown;
 	}
 
 	/** Flat. Only the full Hyperion scales off melee damage. */
