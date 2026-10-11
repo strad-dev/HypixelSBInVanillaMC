@@ -918,7 +918,6 @@ public class CustomDamage implements Listener {
 										case ENVIRONMENTAL, IFRAME_ENVIRONMENTAL -> who.append(net.kyori.adventure.text.Component.text(" was killed by the world"));
 										case FALL -> who.append(net.kyori.adventure.text.Component.text(" fell to their death"));
 										case ABSOLUTE, LETHAL_ABSOLUTE -> who.append(net.kyori.adventure.text.Component.text(" fell out of the world"));
-										default -> who.append(net.kyori.adventure.text.Component.text(" died"));
 									};
 								}
 							}

@@ -63,6 +63,7 @@ public class ManhuntCommand implements CommandExecutor, TabCompleter {
 			case "start" -> {
 				Manhunt.start();
 				Bukkit.broadcast(Utils.msg("<gold><bold>The Manhunt has begun!"));
+				ManhuntHints.give();
 				teams(sender);
 			}
 			case "reset" -> {
