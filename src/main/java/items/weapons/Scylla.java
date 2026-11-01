@@ -17,6 +17,7 @@ import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.BoundingBox;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -137,6 +138,14 @@ public class Scylla implements AbilityItem {
 			}
 			return tempDamage * IMPLOSION_SHARE;
 		});
+	}
+
+	private static boolean withinSphere(Location eye, Entity entity, double radius) {
+		BoundingBox b = entity.getBoundingBox();
+		double dx = Math.max(Math.max(b.getMinX() - eye.getX(), 0), eye.getX() - b.getMaxX());
+		double dy = Math.max(Math.max(b.getMinY() - eye.getY(), 0), eye.getY() - b.getMaxY());
+		double dz = Math.max(Math.max(b.getMinZ() - eye.getZ(), 0), eye.getZ() - b.getMaxZ());
+		return dx * dx + dy * dy + dz * dz <= radius * radius;
 	}
 
 	/**
@@ -301,9 +310,11 @@ public class Scylla implements AbilityItem {
 			p.playSound(p, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 		}
 
-		// implosion
+		// implosion: a sphere from the eyes to the nearest point of each hitbox
 		p.getWorld().spawnParticle(Particle.EXPLOSION, l, 20);
-		List<Entity> entities = new ArrayList<>(l.getWorld().getNearbyEntities(l, radius, radius, radius));
+		Location eye = p.getEyeLocation();
+		List<Entity> entities = new ArrayList<>(eye.getWorld().getNearbyEntities(eye, radius, radius, radius,
+				entity -> withinSphere(eye, entity, radius)));
 		List<EntityType> doNotKill = CustomItems.createList();
 		int damaged = 0;
 		double total = 0;

@@ -60,7 +60,7 @@ public class AOTV implements AbilityItem {
 		aotv.setItemMeta(data);
 		Utils.setEnchantability(aotv, Utils.SKYBLOCK_ENCHANTABILITY);
 
-		// Extra keys make the client show a WARPED AOTV; same ones M7 TAS writes. Catharsis picks the warped
+		// Extra keys make the client show a WARPED AOTV; same ones M7 writes. Catharsis picks the warped
 		// variant off ethermerge (Etherwarp upgrade); packs may also range on tuned_transmission.
 		// modifier is the reforge, named after its stone: Warped comes from AOTE_STONE, so aote_stone, not
 		// warped. Without it the item reads as unreforged.

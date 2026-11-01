@@ -71,7 +71,6 @@ public class Plugin extends JavaPlugin implements Listener {
 		boolean chatEnabled = pvpCfg.chatEnabled();
 
 		Objects.requireNonNull(this.getCommand("getopitems")).setExecutor(new GetOPItems());
-		Objects.requireNonNull(this.getCommand("locateplayer")).setExecutor(new LocatePlayer());
 		Eq eq = new Eq();
 		Objects.requireNonNull(this.getCommand("eq")).setExecutor(eq);
 		getServer().getPluginManager().registerEvents(eq, this);
@@ -79,6 +78,7 @@ public class Plugin extends JavaPlugin implements Listener {
 			Objects.requireNonNull(this.getCommand("w")).setExecutor(new Tell());
 			Objects.requireNonNull(this.getCommand("tell")).setExecutor(new Tell());
 			Objects.requireNonNull(this.getCommand("msg")).setExecutor(new Tell());
+			Objects.requireNonNull(this.getCommand("r")).setExecutor(new Tell.Reply());
 		}
 		Objects.requireNonNull(this.getCommand("resetwitherfight")).setExecutor(new ResetWitherFight());
 		Objects.requireNonNull(this.getCommand("m7tasactivatewitherfight")).setExecutor(new ActivateWitherFight());
@@ -87,8 +87,8 @@ public class Plugin extends JavaPlugin implements Listener {
 			Objects.requireNonNull(this.getCommand("me")).setExecutor(new Me());
 		} else {
 			// Chat disabled: plugin.yml still REGISTERS these with no executor, shadowing the hub's /w, /tell, /msg,
-			// /say, /me. Unregister ours.
-			releaseChatCommands("w", "tell", "msg", "say", "me");
+			// /r, /say, /me. Unregister ours.
+			releaseChatCommands("w", "tell", "msg", "r", "say", "me");
 		}
 
 		getServer().getPluginManager().registerEvents(new CustomItems(), this);
@@ -171,7 +171,7 @@ public class Plugin extends JavaPlugin implements Listener {
 
 	/**
 	 * Removes our copies of these commands from the command map. plugin.yml registers every declared command even
-	 * without an executor, so on the network our /w, /tell, /msg, /say, /me would shadow the hub's.
+	 * without an executor, so on the network our /w, /tell, /msg, /r, /say, /me would shadow the hub's.
 	 */
 	private void releaseChatCommands(String... names) {
 		try {
@@ -335,6 +335,9 @@ public class Plugin extends JavaPlugin implements Listener {
 	 */
 	private static final java.util.Map<java.util.UUID, Integer> intelTicks = new java.util.HashMap<>();
 
+	private static final int HUD_REFRESH_TICKS = 20;
+	private static long hudTick;
+
 	/**
 	 * Empties {@code p}'s mana <b>and their banked regen</b>. Zeroing the score alone leaves the bank, so someone 159
 	 * ticks into a 160-tick rate gets a point next tick. Swallows a missing Intelligence objective:
@@ -354,12 +357,14 @@ public class Plugin extends JavaPlugin implements Listener {
 	 * rate. Used to run every 20 ticks with a 0-3 counter (1 point / 4s for all), which can't do per-rung rates.
 	 */
 	public static void passiveIntel() {
+		boolean refresh = ++hudTick % HUD_REFRESH_TICKS == 0;
 		for(Player p : Bukkit.getServer().getOnlinePlayers()) {
 			try {
 				// Picking up a Hyperion raises the Manhunt intelligence ceiling, and that can happen any tick.
 				manhunt.Manhunt.observe(p);
 
 				Score score = Plugin.getIntelligence(p);
+				int before = score.getScore();
 				int max = maxIntelligence(p);
 				if(score.getScore() > max) {
 					score.setScore(max);
@@ -372,7 +377,9 @@ public class Plugin extends JavaPlugin implements Listener {
 					intelTicks.put(p.getUniqueId(), 0);
 					score.setScore(score.getScore() + 1);
 				}
-				Plugin.sendIntelligenceBar(p, score);
+				if(refresh || score.getScore() != before) {
+					Plugin.sendIntelligenceBar(p, score);
+				}
 			} catch(Exception exception) {
 				Plugin.getInstance().getLogger().info("Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin");
 				Bukkit.broadcast(Utils.msg("<red>Could not find Intelligence objective!  Please do not delete the objective - it breaks the plugin"));

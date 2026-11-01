@@ -56,6 +56,14 @@ public class BetterAnvil implements Listener {
 		boolean firstIsBook = first.getType() == Material.ENCHANTED_BOOK;
 		boolean secondIsBook = second.getType() == Material.ENCHANTED_BOOK;
 
+		if(!firstIsBook && !secondIsBook && first.getType() != second.getType()) {
+			ItemStack repaired = e.getResult();
+			if(repaired == null || repaired.isEmpty()) return;
+			e.setResult(withoutPenalty(repaired));
+			fixCost(e, penalties, 0, 1);
+			return;
+		}
+
 		ItemStack result;
 		if(secondIsBook && !firstIsBook) {
 			result = handleBookToItem(first, second);
@@ -183,12 +191,20 @@ public class BetterAnvil implements Listener {
 
 				// Read before clearing the inputs: an empty anvil resets cost to -1
 				ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
-				int cost = serverPlayer.containerMenu instanceof AnvilMenu anvilMenu ? Math.max(0, anvilMenu.cost.get()) : 0;
+				AnvilMenu menu = serverPlayer.containerMenu instanceof AnvilMenu anvilMenu ? anvilMenu : null;
+				int cost = menu != null ? Math.max(0, menu.cost.get()) : 0;
+				int materialCost = menu != null ? menu.repairItemCountCost : 0;
 				boolean creative = player.getGameMode() == org.bukkit.GameMode.CREATIVE;
 				if(creative || player.getLevel() >= cost) {
 					player.setItemOnCursor(result);
+					ItemStack material = e.getInventory().getItem(1);
 					e.getInventory().setItem(0, null);
-					e.getInventory().setItem(1, null);
+					if(materialCost > 0 && material != null && material.getAmount() > materialCost) {
+						material.setAmount(material.getAmount() - materialCost);
+						e.getInventory().setItem(1, material);
+					} else {
+						e.getInventory().setItem(1, null);
+					}
 					e.getInventory().setItem(2, null);
 
 					if(!creative) player.setLevel(player.getLevel() - cost);

@@ -16,9 +16,9 @@ commands:
   msg:
     description: Whisper messages to another player!
     usage: /msg [player] [message]
-  locateplayer:
-    description: Locate a player on the server!
-    usage: /locateplayer [player]
+  r:
+    description: Reply to your last whisper!
+    usage: /r [message]
   eq:
     description: View your equipment and current speed.
     usage: /eq
@@ -27,7 +27,7 @@ commands:
     description: Resets the status of the Wither Lords boss fight.  Useful if the boss was /kill'ed or otherwise dead in an unintended way.
     usage: /resetwitherfight
   m7tasactivatewitherfight:
-    description: Utilized by the M7 TAS plugin to set the Wither Lords fight to active.  Also useful for admins to disable custom Withers (but why)
+    description: Utilized by the M7 plugin to set the Wither Lords fight to active.  Also useful for admins to disable custom Withers (but why)
     usage: /m7tasactivatewitherfight
   say:
     description: Broadcast a message to the server

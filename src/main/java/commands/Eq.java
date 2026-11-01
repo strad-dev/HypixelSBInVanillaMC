@@ -43,7 +43,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.util.*;
 
 /*
- * /eq, ported from M7 TAS. 1-row GUI: worn armor in slots 0-3, offensive/defensive stats in 6-7, sugar cane in
+ * /eq, ported from M7. 1-row GUI: worn armor in slots 0-3, offensive/defensive stats in 6-7, sugar cane in
  * slot 8 whose count encodes speed (100 = vanilla, exact figure on the tooltip). Clicking armor in your own
  * inventory equips it.
  * Both the executor and a listener; the GUI is identified by EqHolder.

@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  *
  * <p>Written into {@code minecraft:custom_data} as a bare top-level {@code id}, no {@code ExtraAttributes}
  * wrapper: that is where SkyblockAPI reads it, and Catharsis resolves a texture from {@code id} alone,
- * lower-cased, not gated on being on Hypixel. <b>Same key and place as M7 TAS</b>, so one pack covers both.
+ * lower-cased, not gated on being on Hypixel. <b>Same key and place as M7</b>, so one pack covers both.
  *
  * <p><b>Keyed on the lore id</b>, so a build method just calls {@code stamp(...)}. Exception: the Manhunt
  * Hyperion's eight rungs share one lore id, so its id lives on {@link manhunt.ManhuntTier}.
@@ -35,7 +35,7 @@ public final class SkyblockId {
 			Map.entry("skyblock/combat/terminator", "TERMINATOR"),
 			Map.entry("skyblock/combat/sword_of_bad_health", "SWORD_OF_BAD_HEALTH"),
 			Map.entry("skyblock/combat/aspect_of_the_void", "ASPECT_OF_THE_VOID"),
-			// The STARRED_ (dungeon-upgraded) variants, the same ones M7 TAS uses.
+			// The STARRED_ (dungeon-upgraded) variants, the same ones M7 uses.
 			Map.entry("skyblock/combat/bonzo_staff", "STARRED_BONZO_STAFF"),
 			Map.entry("skyblock/combat/ice_spray_wand", "STARRED_ICE_SPRAY_WAND"),
 			Map.entry("skyblock/combat/holy_ice", "HOLY_ICE"),

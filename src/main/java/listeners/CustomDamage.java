@@ -1644,7 +1644,7 @@ public class CustomDamage implements Listener {
 
 	// VehicleEntity.hurtServer has no knockback; vanilla only pushes a boat on a sprint or Knockback hit
 	// (Player.causeExtraKnockback), so a normal hit just wobbled it. This is LivingEntity.knockback(0.4), the push
-	// every mob gets; the sprint/enchant push still stacks on top, as on a mob.
+	// every mob gets, minus the hop; the sprint/enchant push still stacks on top, as on a mob.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBoatDamage(org.bukkit.event.vehicle.VehicleDamageEvent e) {
 		if(!(e.getVehicle() instanceof Boat boat)) return;
@@ -1657,7 +1657,14 @@ public class CustomDamage implements Listener {
 		away.normalize().multiply(0.4);
 
 		Vector old = boat.getVelocity();
-		boat.setVelocity(new Vector(old.getX() / 2 + away.getX(), boat.isOnGround() ? Math.min(0.4, old.getY() / 2 + 0.4) : old.getY(), old.getZ() / 2 + away.getZ()));
+		boat.setVelocity(new Vector(old.getX() / 2 + away.getX(), old.getY(), old.getZ() / 2 + away.getZ()));
+	}
+
+	// Vanilla's sprint/enchant push (Player.causeExtraKnockback) lifts boats and minecarts by 0.1.
+	@EventHandler(ignoreCancelled = true)
+	public void onVehiclePushed(io.papermc.paper.event.entity.EntityPushedByEntityAttackEvent e) {
+		if(!(e.getEntity() instanceof Vehicle) || e.getEntity() instanceof LivingEntity) return;
+		e.setAcceleration(e.getAcceleration().setY(0));
 	}
 
 	private final Map<LivingEntity, Long> noDamageTimes = new WeakHashMap<>();
