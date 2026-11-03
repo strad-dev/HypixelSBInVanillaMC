@@ -1,6 +1,7 @@
 package listeners;
 
 import com.destroystokyo.paper.event.player.PlayerArmorChangeEvent;
+import items.VanillaGear;
 import items.armor.*;
 import items.ingredients.mining.*;
 import items.ingredients.misc.*;
@@ -139,13 +140,33 @@ public class ItemReloader implements Listener {
 	 * Stamps the crafting grid's result. It comes from the recipe, not an inventory, so a vanilla craft sat there
 	 * unstamped until clicked into a slot, after the player had seen the wrong texture.
 	 *
-	 * <p>Only {@code stampVanilla}: a custom result already has its id from {@code getItem()}, and rebuilding it
+	 * <p>Only {@code dressVanilla}: a custom result already has its id from {@code getItem()}, and rebuilding it
 	 * would fight {@code ManhuntListener.onPrepareCraft}, which writes the upgrade result on this event.
 	 */
 	@EventHandler
 	public void onPrepareCraft(PrepareItemCraftEvent e) {
-		ItemStack stamped = SkyblockId.stampVanilla(e.getInventory().getResult());
+		ItemStack stamped = dressVanilla(e.getInventory().getResult());
 		if(stamped != null) e.getInventory().setResult(stamped);
+	}
+
+	/** Anvil, smithing and grindstone results carry the input's lore (Sharpness added, diamond -> netherite). After
+	 *  {@code BetterAnvil}. */
+	@EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
+	public void onPrepareAnvil(org.bukkit.event.inventory.PrepareAnvilEvent e) {
+		ItemStack dressed = dressVanilla(e.getResult());
+		if(dressed != null) e.setResult(dressed);
+	}
+
+	@EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
+	public void onPrepareSmithing(org.bukkit.event.inventory.PrepareSmithingEvent e) {
+		ItemStack dressed = dressVanilla(e.getResult());
+		if(dressed != null) e.setResult(dressed);
+	}
+
+	@EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
+	public void onPrepareGrindstone(org.bukkit.event.inventory.PrepareGrindstoneEvent e) {
+		ItemStack dressed = dressVanilla(e.getResult());
+		if(dressed != null) e.setResult(dressed);
 	}
 
 	/**
@@ -161,9 +182,19 @@ public class ItemReloader implements Listener {
 		if(item == null || item.getType().isAir()) return null;
 		ItemStack refreshed = refreshItem(item, p);
 		if(refreshed != null) return refreshed;
-		// Mutates in place and covers materials the id table doesn't, so it always runs.
-		modifyVanillaArmor(item);
-		return SkyblockId.stampVanilla(item);
+		return dressVanilla(item);
+	}
+
+	/** A vanilla stack re-statted, dressed and stamped, as a copy; null when it already is. */
+	@Nullable
+	public static ItemStack dressVanilla(@Nullable ItemStack item) {
+		if(item == null || item.getType().isAir()) return null;
+		ItemStack out = item.clone();
+		modifyVanillaArmor(out);
+		VanillaGear.dress(out);
+		ItemStack stamped = SkyblockId.stampVanilla(out);
+		if(stamped != null) out = stamped;
+		return out.equals(item) ? null : out;
 	}
 
 	public static void modifyVanillaArmor(ItemStack item) {
@@ -380,6 +411,7 @@ public class ItemReloader implements Listener {
 			newItem.addUnsafeEnchantments(enchants);
 		}
 		newItem.setAmount(item.getAmount());
+		Utils.enchantsBelowStats(newItem);
 		return newItem;
 	}
 }

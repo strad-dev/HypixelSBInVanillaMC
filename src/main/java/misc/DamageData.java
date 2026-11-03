@@ -27,6 +27,8 @@ public class DamageData {
 	// originalDamage already has the 1.5x, and particles, sound and PvP stats must agree. Re-asking later
 	// wouldn't: the mace branch in dealDamage zeroes the fall distance it's built on.
 	public boolean isCrit = false;
+	/** A pipeline-made explosion ({@code Utils.spawnTNT}), for Blast Protection; vanilla ones read their damage type. */
+	public boolean explosion = false;
 	/**
 	 * Damage this blow actually LANDED, written by {@code CustomDamage.dealDamage} for abilities that report their
 	 * own work. Includes everything the pipeline did (armour, resistance, shield, Ice Spray) and absorption.

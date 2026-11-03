@@ -59,6 +59,7 @@ public final class PvpItemRefresh {
 			fresh.setAmount(saved.getAmount());
 		}
 		ItemReloader.modifyVanillaArmor(fresh); // no-op for skyblock/ items; same fixup as login
+		items.VanillaGear.dress(fresh);         // after the enchants: Sharpness/Smite are on its lore
 		// isSimilar skips amount, copied above, so this is a full compare.
 		return saved.isSimilar(fresh) ? null : fresh;
 	}

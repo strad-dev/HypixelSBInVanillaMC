@@ -51,7 +51,7 @@ public class ManhuntHyperion implements AbilityItem {
 				new NamespacedKey(Plugin.getInstance(), "manhuntHyperionDmg"), tier.damage(), AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
 		// Adds to the player's base 4, like a vanilla sword's -2.4: every rung lands on exactly ATTACK_SPEED.
 		data.addAttributeModifier(Attribute.ATTACK_SPEED, new AttributeModifier(
-				new NamespacedKey(Plugin.getInstance(), "manhuntHyperionSpeed"), ATTACK_SPEED - 4, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
+				new NamespacedKey(Plugin.getInstance(), "manhuntHyperionSpeed"), ATTACK_SPEED - Utils.BASE_ATTACK_SPEED, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND));
 		data.addItemFlags(ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_ATTRIBUTES);
 		item.setItemMeta(data);
 		item.addUnsafeEnchantments(enchants);
@@ -60,8 +60,7 @@ public class ManhuntHyperion implements AbilityItem {
 		lore.add(Utils.mm(ManhuntTier.ID));
 		lore.add(Utils.mm(""));
 		List<Component> stats = Utils.statLore(data, enchants);
-		// Right after Damage (statLore's first line); the total, not the -2 modifier.
-		stats.add(Math.min(1, stats.size()), Utils.mm("<gray>Attack Speed: <red>" + Utils.damageNumber(ATTACK_SPEED)));
+		Utils.addAttackSpeedLore(stats, ATTACK_SPEED);
 		lore.addAll(stats);
 		lore.addAll(Utils.bonusDamageLore(enchants));
 		lore.add(Utils.mm(""));
@@ -83,7 +82,7 @@ public class ManhuntHyperion implements AbilityItem {
 		lore.add(Utils.mm(""));
 		lore.addAll(upgradeLines(tier));
 		lore.add(Utils.mm(""));
-		lore.add(Utils.mm(tier.rank().lore()));
+		lore.add(Utils.mm(tier.rank().lore("SWORD")));
 
 		data = item.getItemMeta();
 		data.lore(lore);

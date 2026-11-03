@@ -177,9 +177,15 @@ public class Utils {
 	 * if one does, it gets two lines.
 	 */
 	public static List<Component> statLore(ItemMeta data, @Nullable Map<Enchantment, Integer> enchants) {
+		return statLore(data::getAttributeModifiers, enchants);
+	}
+
+	/** As {@link #statLore(ItemMeta, Map)}, off any modifier source (a vanilla item's defaults aren't on its meta). */
+	public static List<Component> statLore(java.util.function.Function<Attribute, Collection<AttributeModifier>> source,
+			@Nullable Map<Enchantment, Integer> enchants) {
 		List<Component> out = new ArrayList<>();
 		for(StatLine line : STAT_LINES) {
-			Collection<AttributeModifier> modifiers = data.getAttributeModifiers(line.attribute());
+			Collection<AttributeModifier> modifiers = source.apply(line.attribute());
 			if(modifiers == null || modifiers.isEmpty()) continue;
 
 			double flat = 0;
@@ -205,6 +211,85 @@ public class Utils {
 			}
 		}
 		return out;
+	}
+
+	/**
+	 * Vanilla's own enchantment tooltip lines for {@code item}, verbatim: {@code ItemEnchantments.addToTooltip} (its
+	 * order tag, roman numerals, red curses). Italic cleared, since lore would otherwise italicise them.
+	 */
+	public static List<Component> enchantmentLore(ItemStack item) {
+		List<Component> out = new ArrayList<>();
+		if(item == null || item.getType().isAir()) return out;
+		net.minecraft.world.item.ItemStack nms = CraftItemStack.unwrap(item);
+		net.minecraft.world.item.enchantment.ItemEnchantments enchants =
+				nms.get(net.minecraft.core.component.DataComponents.ENCHANTMENTS);
+		if(enchants == null || enchants.isEmpty()) return out;
+		enchants.addToTooltip(
+				net.minecraft.world.item.Item.TooltipContext.of(net.minecraft.server.MinecraftServer.getServer().registryAccess()),
+				line -> out.add(io.papermc.paper.adventure.PaperAdventure.asAdventure(line)
+						.decorationIfAbsent(TextDecoration.ITALIC, TextDecoration.State.FALSE)),
+				net.minecraft.world.item.TooltipFlag.NORMAL, nms);
+		return out;
+	}
+
+	/** Adds {@code types} to the item's hidden tooltip components, keeping what's already hidden. */
+	public static void hideInTooltip(ItemStack item, io.papermc.paper.datacomponent.DataComponentType... types) {
+		io.papermc.paper.datacomponent.item.TooltipDisplay display = item.getData(DataComponentTypes.TOOLTIP_DISPLAY);
+		Set<io.papermc.paper.datacomponent.DataComponentType> hidden = new HashSet<>();
+		if(display != null) hidden.addAll(display.hiddenComponents());
+		if(!hidden.addAll(Arrays.asList(types))) return;
+		item.setData(DataComponentTypes.TOOLTIP_DISPLAY, io.papermc.paper.datacomponent.item.TooltipDisplay.tooltipDisplay()
+				.hideTooltip(display != null && display.hideTooltip()).hiddenComponents(hidden));
+	}
+
+	/**
+	 * Moves a custom item's enchantment list from above its lore to below its stats: vanilla's lines
+	 * ({@link #enchantmentLore}) after the stat paragraph and any {@link #bonusDamageLore} one, vanilla's list hidden.
+	 * Custom lore is id, blank, stats; call on a finished stack (enchants on).
+	 */
+	public static void enchantsBelowStats(ItemStack item) {
+		List<Component> enchants = enchantmentLore(item);
+		if(enchants.isEmpty()) return;
+		io.papermc.paper.datacomponent.item.ItemLore current = item.getData(DataComponentTypes.LORE);
+		List<Component> lore = new ArrayList<>(current == null ? List.of() : current.lines());
+
+		// Past the stats and every paragraph after them that isn't an ability, flavour text or the rarity line
+		// (the Hyperion's "Deals +4 damage to Withers.").
+		int at = Math.min(2, lore.size());
+		while(at < lore.size() && !plain(lore.get(at)).isEmpty()) at++;
+		while(at + 1 < lore.size()) {
+			int start = at + 1;
+			int end = start;
+			while(end < lore.size() && !plain(lore.get(end)).isEmpty()) end++;
+			String first = plain(lore.get(start));
+			if(end == lore.size() || first.contains("Ability:") || first.startsWith("Shortbow:") || italic(lore.get(start))) break;
+			at = end;
+		}
+
+		List<Component> insert = new ArrayList<>();
+		if(at > 2) insert.add(mm(""));
+		insert.addAll(enchants);
+		if(at == 2 && at < lore.size() && !plain(lore.get(at)).isEmpty()) insert.add(mm(""));
+		lore.addAll(at, insert);
+		item.setData(DataComponentTypes.LORE, io.papermc.paper.datacomponent.item.ItemLore.lore(lore));
+		hideInTooltip(item, DataComponentTypes.ENCHANTMENTS);
+	}
+
+	/** Any part of {@code c} italic: flavour text. */
+	private static boolean italic(Component c) {
+		if(c.decoration(TextDecoration.ITALIC) == TextDecoration.State.TRUE) return true;
+		for(Component child : c.children()) {
+			if(italic(child)) return true;
+		}
+		return false;
+	}
+
+	/** Player's base attack speed; a weapon's modifier adds to it. */
+	public static final double BASE_ATTACK_SPEED = 4;
+
+	/** The Manhunt Hyperion's line: the TOTAL attacks per second, not the modifier. Goes right after Damage. */
+	public static void addAttackSpeedLore(List<Component> stats, double total) {
+		stats.add(Math.min(1, stats.size()), mm("<gray>Attack Speed: <red>" + damageNumber(total)));
 	}
 
 	/**
@@ -493,6 +578,12 @@ public class Utils {
 		}
 	}
 
+	private static DamageData tntData(LivingEntity victim, Entity spawner, double damage) {
+		DamageData data = new DamageData(victim, spawner, damage);
+		data.explosion = true;
+		return data;
+	}
+
 	/**
 	 * Spawns a custom TNT<br>If the fuse is 0 ticks, the TNT entity will not be spawned
 	 *
@@ -508,7 +599,7 @@ public class Utils {
 			List<Entity> entities = (List<Entity>) l.getWorld().getNearbyEntities(l, radius, radius, radius);
 			for(Entity entity : entities) {
 				if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-					CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
+					CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC, tntData(entity1, spawner, damage));
 				}
 			}
 			spawner.getWorld().spawnParticle(Particle.EXPLOSION, spawner.getLocation(), Math.min((int) Math.pow(radius, 3), 16384), radius, radius / 2.0, radius);
@@ -522,7 +613,7 @@ public class Utils {
 				List<Entity> entities = tnt.getNearbyEntities(radius, radius, radius);
 				for(Entity entity : entities) {
 					if(!entity.equals(spawner) && entity instanceof LivingEntity entity1 && !immune.contains(entity.getType()) && (entity instanceof Player p && p.getGameMode() != GameMode.CREATIVE && p.getGameMode() != GameMode.SPECTATOR)) {
-						CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC);
+						CustomDamage.customMobs(entity1, spawner, damage, DamageType.PLAYER_MAGIC, tntData(entity1, spawner, damage));
 					}
 				}
 				tnt.getWorld().spawnParticle(Particle.EXPLOSION, tnt.getLocation(), Math.min((int) Math.pow(radius, 3), 16384), radius, radius / 2.0, radius);

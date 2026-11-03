@@ -366,6 +366,46 @@ public class CustomDamage implements Listener {
 		return Math.max(0.5, 1 - levels * 0.025);
 	}
 
+	/** Fire, Blast and Projectile Protection: vanilla's IV per piece, 5% per level, so a full IV set is 80%. */
+	public static final List<Enchantment> TYPED_PROTECTIONS = List.of(
+			Enchantment.FIRE_PROTECTION, Enchantment.BLAST_PROTECTION, Enchantment.PROJECTILE_PROTECTION);
+	public static final int TYPED_PROTECTION_MAX = 4;
+	public static final double TYPED_PROTECTION_PER_LEVEL = 0.05;
+
+	/** Summed over the four armour slots, each piece capped at {@link #TYPED_PROTECTION_MAX}. */
+	public static int typedProtectionLevels(LivingEntity e, Enchantment protection) {
+		EntityEquipment eq = e.getEquipment();
+		if(eq == null) return 0;
+		int levels = 0;
+		for(ItemStack piece : new ItemStack[]{eq.getHelmet(), eq.getChestplate(), eq.getLeggings(), eq.getBoots()}) {
+			if(piece != null) levels += Math.min(TYPED_PROTECTION_MAX, piece.getEnchantmentLevel(protection));
+		}
+		return levels;
+	}
+
+	public static double typedProtectionMultiplier(int levels) {
+		return Math.max(0, 1 - levels * TYPED_PROTECTION_PER_LEVEL);
+	}
+
+	/**
+	 * Does {@code protection} cover this hit? A vanilla hit asks vanilla's damage-type tags (a fireball is fire AND
+	 * projectile, as in vanilla). A hit the pipeline made itself has no event: RANGED / RANGED_SPECIAL count as
+	 * projectiles, {@link DamageData#explosion} (custom TNT) as an explosion.
+	 */
+	public static boolean typedProtectionApplies(Enchantment protection, DamageType type, DamageData data) {
+		if(data.e != null) {
+			org.bukkit.damage.DamageType vanilla = data.e.getDamageSource().getDamageType();
+			if(protection.equals(Enchantment.FIRE_PROTECTION)) return org.bukkit.tag.DamageTypeTags.IS_FIRE.isTagged(vanilla);
+			if(protection.equals(Enchantment.BLAST_PROTECTION)) return org.bukkit.tag.DamageTypeTags.IS_EXPLOSION.isTagged(vanilla);
+			return org.bukkit.tag.DamageTypeTags.IS_PROJECTILE.isTagged(vanilla);
+		}
+		if(protection.equals(Enchantment.BLAST_PROTECTION)) return data.explosion;
+		if(protection.equals(Enchantment.PROJECTILE_PROTECTION)) {
+			return type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL;
+		}
+		return false;
+	}
+
 	public static double resistanceMultiplier(LivingEntity e) {
 		PotionEffect resistance = e.getPotionEffect(PotionEffectType.RESISTANCE);
 		return resistance == null ? 1 : Math.max(0.0, 1 - (resistance.getAmplifier() + 1) * 0.2);
@@ -558,6 +598,11 @@ public class CustomDamage implements Listener {
 				}
 
 				finalDamage *= protectionMultiplier(protectionLevels(damagee));
+				for(Enchantment protection : TYPED_PROTECTIONS) {
+					if(typedProtectionApplies(protection, type, data)) {
+						finalDamage *= typedProtectionMultiplier(typedProtectionLevels(damagee, protection));
+					}
+				}
 
 				if(type == DamageType.FALL) {
 					double featherFalling = boots.getEnchantmentLevel(Enchantment.FEATHER_FALLING);

@@ -109,6 +109,8 @@ public class Scylla implements AbilityItem {
 		data.lore(lore);
 		scylla.setItemMeta(data);
 		Utils.setEnchantability(scylla, Utils.SKYBLOCK_ENCHANTABILITY);
+		// Looks like an iron sword; still a netherite sword (recipes, durability).
+		scylla.setData(io.papermc.paper.datacomponent.DataComponentTypes.ITEM_MODEL, NamespacedKey.minecraft("iron_sword"));
 
 		return SkyblockId.stamp(scylla);
 	}

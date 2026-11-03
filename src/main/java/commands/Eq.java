@@ -122,13 +122,29 @@ public class Eq implements CommandExecutor, Listener {
 			lore.add(Utils.mm("<gray>Damage vs Arthropods: <red>"
 					+ Utils.tenthNumber((damage + CustomDamage.smiteBonus(bane)) * multiplier)));
 		}
+		Double ability = abilityDamage(p, held);
+		if(ability != null) {
+			lore.add(Utils.mm("<gray>Ability Damage: <red>" + Utils.tenthNumber(ability * multiplier)));
+		}
 		if(!modifiers.isEmpty()) {
 			lore.add(Component.empty());
 			lore.addAll(modifiers);
 		}
-		lore.add(Component.empty());
-		lore.add(Utils.mm("<dark_gray>Fully charged, before crits"));
 		return statsItem(Material.DIAMOND_SWORD, "<red>Offensive Stats", lore);
+	}
+
+	/** Per-target damage of the held item's ability, from the same figure the ability pays; null if it deals none. */
+	@javax.annotation.Nullable
+	private static Double abilityDamage(Player p, ItemStack held) {
+		manhunt.ManhuntTier tier = manhunt.ManhuntTier.of(held);
+		if(tier != null) return tier.implosionDamage();
+		return switch(Utils.firstLorePlain(held)) {
+			case Scylla.ID -> Scylla.implosionDamage(p, held);
+			case "skyblock/combat/terminator" ->
+					items.weapons.Terminator.salvationDamage(held.getEnchantmentLevel(Enchantment.POWER));
+			case "skyblock/combat/ice_spray_wand" -> IceSpray.DAMAGE;
+			default -> null;
+		};
 	}
 
 	private static ItemStack defenseItem(Player p) {
@@ -169,19 +185,33 @@ public class Eq implements CommandExecutor, Listener {
 			lore.add(Component.empty());
 			lore.addAll(modifiers);
 		}
+		var maxHealth = p.getAttribute(Attribute.MAX_HEALTH);
+		double health = maxHealth == null ? 20 : maxHealth.getValue();
 		lore.add(Component.empty());
 		lore.add(Utils.mm("<gray>Damage Taken: <white>" + Utils.percent(taken)));
-		if(taken <= 0) {
-			lore.add(Utils.mm("<gray>Effective HP: <white>Immune"));
-		} else {
-			var maxHealth = p.getAttribute(Attribute.MAX_HEALTH);
-			double health = maxHealth == null ? 20 : maxHealth.getValue();
-			lore.add(Utils.mm("<gray>Effective HP: <white>" + Utils.tenthNumber(health / taken)
-					+ " <dark_gray>(" + Utils.tenthNumber(1 / taken) + "x)"));
+		lore.add(effectiveHp("Effective HP", health, taken));
+
+		// Only the hit types they cover, so off the main figure: Projectile Protection does nothing to a sword.
+		for(Enchantment protection : CustomDamage.TYPED_PROTECTIONS) {
+			int levels = CustomDamage.typedProtectionLevels(p, protection);
+			if(levels <= 0) continue;
+			double m = CustomDamage.typedProtectionMultiplier(levels);
+			String against = protection.equals(Enchantment.FIRE_PROTECTION) ? "Fire"
+					: protection.equals(Enchantment.BLAST_PROTECTION) ? "Explosions" : "Projectiles";
+			lore.add(Component.empty());
+			String name = protection.equals(Enchantment.FIRE_PROTECTION) ? "Fire Protection"
+					: protection.equals(Enchantment.BLAST_PROTECTION) ? "Blast Protection" : "Projectile Protection";
+			lore.add(modifierLine(name + " (" + levels + ")", m, false));
+			lore.add(Utils.mm("<gray>Damage Taken vs " + against + ": <white>" + Utils.percent(taken * m)));
+			lore.add(effectiveHp("Effective HP vs " + against, health, taken * m));
 		}
-		lore.add(Component.empty());
-		lore.add(Utils.mm("<dark_gray>Against a melee or arrow hit"));
 		return statsItem(Material.DIAMOND_CHESTPLATE, "<green>Defensive Stats", lore);
+	}
+
+	private static Component effectiveHp(String label, double health, double taken) {
+		if(taken <= 0) return Utils.mm("<gray>" + label + ": <white>Immune");
+		return Utils.mm("<gray>" + label + ": <white>" + Utils.tenthNumber(health / taken)
+				+ " <dark_gray>(" + Utils.tenthNumber(1 / taken) + "x)");
 	}
 
 	private static Component modifierLine(String label, double multiplier, boolean higherIsGood) {
