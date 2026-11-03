@@ -30,6 +30,9 @@ public enum ManhuntTier {
 	public static final int FULL_TICKS_PER_MANA = 80;
 	public static final int FULL_MAX_INTELLIGENCE = 2500;
 
+	/** Iron's second route, straight from Stone. */
+	public static final int STONE_TO_IRON_SWORDS = 8;
+
 	public static final String ID = "skyblock/manhunt/hyperion";
 
 	private static final Map<Material, ManhuntTier> BY_MATERIAL = new HashMap<>();

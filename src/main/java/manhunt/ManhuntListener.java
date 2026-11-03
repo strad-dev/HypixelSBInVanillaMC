@@ -185,10 +185,11 @@ public class ManhuntListener implements Listener {
 	@EventHandler
 	public void onPrepareCraft(PrepareItemCraftEvent e) {
 		Recipe recipe = e.getRecipe();
-		ManhuntTier tier = recipe instanceof Keyed keyed
+		Upgrade upgrade = recipe instanceof Keyed keyed
 				&& keyed.getKey().getNamespace().equals(Plugin.getInstance().getName().toLowerCase(java.util.Locale.ROOT))
-				? tierOf(keyed.getKey().getKey())
+				? upgradeOf(keyed.getKey().getKey())
 				: null;
+		ManhuntTier tier = upgrade == null ? null : upgrade.to();
 
 		if(tier != ManhuntTier.WOOD && holdsStick(e.getInventory().getMatrix())) {
 			e.getInventory().setResult(null);
@@ -196,7 +197,7 @@ public class ManhuntListener implements Listener {
 		}
 
 		if(tier == null) return;
-		ManhuntTier from = ManhuntTier.values()[tier.ordinal() - 1];
+		ManhuntTier from = upgrade.from();
 
 		// Rung below and the added swords are always different materials, so this finds the Hyperion anywhere.
 		ItemStack input = null;
@@ -220,11 +221,17 @@ public class ManhuntListener implements Listener {
 		return false;
 	}
 
-	/** Rung a {@code manhunt_*} key upgrades to, else null. */
-	private static ManhuntTier tierOf(String key) {
+	private record Upgrade(ManhuntTier from, ManhuntTier to) {}
+
+	/** {@code manhunt_<to>} upgrades from the rung below, {@code manhunt_<to>_from_<from>} from {@code from}; else null. */
+	private static Upgrade upgradeOf(String key) {
 		if(!key.startsWith("manhunt_")) return null;
+		String[] parts = key.substring("manhunt_".length()).toUpperCase(java.util.Locale.ROOT).split("_FROM_");
 		try {
-			return ManhuntTier.valueOf(key.substring("manhunt_".length()).toUpperCase(java.util.Locale.ROOT));
+			ManhuntTier to = ManhuntTier.valueOf(parts[0]);
+			if(to == ManhuntTier.BASE) return null;
+			ManhuntTier from = parts.length > 1 ? ManhuntTier.valueOf(parts[1]) : ManhuntTier.values()[to.ordinal() - 1];
+			return new Upgrade(from, to);
 		} catch(IllegalArgumentException exception) {
 			return null;
 		}

@@ -159,6 +159,10 @@ public class ItemReloader implements Listener {
 
 	@EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)
 	public void onPrepareSmithing(org.bukkit.event.inventory.PrepareSmithingEvent e) {
+		if(manhunt.ManhuntTier.of(e.getInventory().getInputEquipment()) != null) {
+			e.setResult(null);
+			return;
+		}
 		ItemStack dressed = dressVanilla(e.getResult());
 		if(dressed != null) e.setResult(dressed);
 	}
@@ -250,25 +254,25 @@ public class ItemReloader implements Listener {
 			}
 			case NETHERITE_HELMET -> {
 				slotKey = "armor.helmet";
-				armorValue = 5;
+				armorValue = 5.25;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.HEAD;
 			}
 			case NETHERITE_CHESTPLATE -> {
 				slotKey = "armor.chestplate";
-				armorValue = 8;
+				armorValue = 8.25;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.CHEST;
 			}
 			case NETHERITE_LEGGINGS -> {
 				slotKey = "armor.leggings";
-				armorValue = 7;
+				armorValue = 7.25;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.LEGS;
 			}
 			case NETHERITE_BOOTS -> {
 				slotKey = "armor.boots";
-				armorValue = 5;
+				armorValue = 4.25;
 				kbResistance = 0.1;
 				slotGroup = EquipmentSlotGroup.FEET;
 			}

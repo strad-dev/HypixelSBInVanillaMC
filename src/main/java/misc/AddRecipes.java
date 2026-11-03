@@ -61,12 +61,12 @@ public class AddRecipes {
 		ShapedRecipe scyllaRecipe = new ShapedRecipe(scyllaKey, scylla);
 
 		scyllaRecipe.shape("WIS", "NDN", "NHN");
-		scyllaRecipe.setIngredient('W', new RecipeChoice.ExactChoice(shadowWarp));
-		scyllaRecipe.setIngredient('I', new RecipeChoice.ExactChoice(implosion));
-		scyllaRecipe.setIngredient('S', new RecipeChoice.ExactChoice(witherShield));
+		scyllaRecipe.setIngredient('W', RecipeChoice.exactChoice(shadowWarp));
+		scyllaRecipe.setIngredient('I', RecipeChoice.exactChoice(implosion));
+		scyllaRecipe.setIngredient('S', RecipeChoice.exactChoice(witherShield));
 		scyllaRecipe.setIngredient('N', Material.NETHER_STAR);
 		scyllaRecipe.setIngredient('D', Material.NETHERITE_SWORD);
-		scyllaRecipe.setIngredient('H', new RecipeChoice.ExactChoice(handle));
+		scyllaRecipe.setIngredient('H', RecipeChoice.exactChoice(handle));
 
 		return scyllaRecipe;
 	}
@@ -81,11 +81,11 @@ public class AddRecipes {
 		ShapedRecipe claymoreRecipe = new ShapedRecipe(claymoreKey, claymore);
 
 		claymoreRecipe.shape("NSN", "CDC", "NHN");
-		claymoreRecipe.setIngredient('S', new RecipeChoice.ExactChoice(stormSecrets));
+		claymoreRecipe.setIngredient('S', RecipeChoice.exactChoice(stormSecrets));
 		claymoreRecipe.setIngredient('N', Material.NETHER_STAR);
 		claymoreRecipe.setIngredient('D', Material.STONE_SWORD);
-		claymoreRecipe.setIngredient('H', new RecipeChoice.ExactChoice(gsRemnant));
-		claymoreRecipe.setIngredient('C', new RecipeChoice.ExactChoice(bigStone));
+		claymoreRecipe.setIngredient('H', RecipeChoice.exactChoice(gsRemnant));
+		claymoreRecipe.setIngredient('C', RecipeChoice.exactChoice(bigStone));
 
 		return claymoreRecipe;
 	}
@@ -103,11 +103,11 @@ public class AddRecipes {
 
 		termRecipe.shape("TNS", "CBF", "TNS");
 		termRecipe.setIngredient('B', Material.BOW);
-		termRecipe.setIngredient('T', new RecipeChoice.ExactChoice(tessellated));
-		termRecipe.setIngredient('N', new RecipeChoice.ExactChoice(nullBlade));
-		termRecipe.setIngredient('S', new RecipeChoice.ExactChoice(taraSilk));
-		termRecipe.setIngredient('C', new RecipeChoice.ExactChoice(core));
-		termRecipe.setIngredient('F', new RecipeChoice.ExactChoice(braidedFeather));
+		termRecipe.setIngredient('T', RecipeChoice.exactChoice(tessellated));
+		termRecipe.setIngredient('N', RecipeChoice.exactChoice(nullBlade));
+		termRecipe.setIngredient('S', RecipeChoice.exactChoice(taraSilk));
+		termRecipe.setIngredient('C', RecipeChoice.exactChoice(core));
+		termRecipe.setIngredient('F', RecipeChoice.exactChoice(braidedFeather));
 
 		return termRecipe;
 	}
@@ -120,7 +120,7 @@ public class AddRecipes {
 		ShapedRecipe aotvRecipe = new ShapedRecipe(aotvKey, aotv);
 
 		aotvRecipe.shape("TTT", "TST", "TTT");
-		aotvRecipe.setIngredient('T', new RecipeChoice.ExactChoice(tessellated));
+		aotvRecipe.setIngredient('T', RecipeChoice.exactChoice(tessellated));
 		aotvRecipe.setIngredient('S', Material.NETHERITE_SHOVEL);
 
 		return aotvRecipe;
@@ -149,8 +149,8 @@ public class AddRecipes {
 		ShapedRecipe wandRecipe = new ShapedRecipe(atonementKey, wand);
 
 		wandRecipe.shape("DDD", "DWD", "DVD");
-		wandRecipe.setIngredient('W', new RecipeChoice.ExactChoice(oldWand));
-		wandRecipe.setIngredient('V', new RecipeChoice.ExactChoice(viscera));
+		wandRecipe.setIngredient('W', RecipeChoice.exactChoice(oldWand));
+		wandRecipe.setIngredient('V', RecipeChoice.exactChoice(viscera));
 		wandRecipe.setIngredient('D', Material.DIAMOND);
 
 		return wandRecipe;
@@ -171,15 +171,15 @@ public class AddRecipes {
 		ShapedRecipe drillRecipe = new ShapedRecipe(drillKey, pick);
 
 		drillRecipe.shape("DAE", "GPI", "LNR");
-		drillRecipe.setIngredient('D', new RecipeChoice.ExactChoice(diamond));
-		drillRecipe.setIngredient('A', new RecipeChoice.ExactChoice(alloy));
-		drillRecipe.setIngredient('E', new RecipeChoice.ExactChoice(emerald));
-		drillRecipe.setIngredient('G', new RecipeChoice.ExactChoice(gold));
+		drillRecipe.setIngredient('D', RecipeChoice.exactChoice(diamond));
+		drillRecipe.setIngredient('A', RecipeChoice.exactChoice(alloy));
+		drillRecipe.setIngredient('E', RecipeChoice.exactChoice(emerald));
+		drillRecipe.setIngredient('G', RecipeChoice.exactChoice(gold));
 		drillRecipe.setIngredient('P', Material.NETHERITE_PICKAXE);
-		drillRecipe.setIngredient('I', new RecipeChoice.ExactChoice(iron));
-		drillRecipe.setIngredient('L', new RecipeChoice.ExactChoice(lapis));
-		drillRecipe.setIngredient('N', new RecipeChoice.ExactChoice(netherite));
-		drillRecipe.setIngredient('R', new RecipeChoice.ExactChoice(redstone));
+		drillRecipe.setIngredient('I', RecipeChoice.exactChoice(iron));
+		drillRecipe.setIngredient('L', RecipeChoice.exactChoice(lapis));
+		drillRecipe.setIngredient('N', RecipeChoice.exactChoice(netherite));
+		drillRecipe.setIngredient('R', RecipeChoice.exactChoice(redstone));
 
 		return drillRecipe;
 	}
@@ -205,7 +205,7 @@ public class AddRecipes {
 		ShapedRecipe gyroRecipe = new ShapedRecipe(gyroKey, gyro);
 
 		gyroRecipe.shape("NON", "NCN", "NGN");
-		gyroRecipe.setIngredient('N',  new RecipeChoice.ExactChoice(nullOvoid));
+		gyroRecipe.setIngredient('N',  RecipeChoice.exactChoice(nullOvoid));
 		gyroRecipe.setIngredient('O', Material.OBSIDIAN);
 		gyroRecipe.setIngredient('C', Material.PURPLE_CONCRETE);
 		gyroRecipe.setIngredient('G', Material.PURPLE_STAINED_GLASS);
@@ -221,9 +221,9 @@ public class AddRecipes {
 		ShapedRecipe wardenRecipe = new ShapedRecipe(wardenKey, wardenHelmet);
 
 		wardenRecipe.shape("VVV", "VHV", "VWV");
-		wardenRecipe.setIngredient('V', new RecipeChoice.ExactChoice(viscera));
+		wardenRecipe.setIngredient('V', RecipeChoice.exactChoice(viscera));
 		wardenRecipe.setIngredient('H', Material.NETHERITE_HELMET);
-		wardenRecipe.setIngredient('W', new RecipeChoice.ExactChoice(wardenHeart));
+		wardenRecipe.setIngredient('W', RecipeChoice.exactChoice(wardenHeart));
 
 		return wardenRecipe;
 	}
@@ -236,7 +236,7 @@ public class AddRecipes {
 		ShapedRecipe elytraRecipe = new ShapedRecipe(elytraKey, necronElytra);
 
 		elytraRecipe.shape("NSN", "NCN", "NEN");
-		elytraRecipe.setIngredient('S', new RecipeChoice.ExactChoice(necronSecrets));
+		elytraRecipe.setIngredient('S', RecipeChoice.exactChoice(necronSecrets));
 		elytraRecipe.setIngredient('C', Material.NETHERITE_CHESTPLATE);
 		elytraRecipe.setIngredient('N', Material.NETHER_STAR);
 		elytraRecipe.setIngredient('E', Material.ELYTRA);
@@ -254,9 +254,9 @@ public class AddRecipes {
 		ShapedRecipe primalRecipe = new ShapedRecipe(primalKey, primalChestplate);
 
 		primalRecipe.shape("OEO", "OCO", "OJO");
-		primalRecipe.setIngredient('O', new RecipeChoice.ExactChoice(ovoid));
-		primalRecipe.setIngredient('J', new RecipeChoice.ExactChoice(core));
-		primalRecipe.setIngredient('E', new RecipeChoice.ExactChoice(dragonEgg));
+		primalRecipe.setIngredient('O', RecipeChoice.exactChoice(ovoid));
+		primalRecipe.setIngredient('J', RecipeChoice.exactChoice(core));
+		primalRecipe.setIngredient('E', RecipeChoice.exactChoice(dragonEgg));
 		primalRecipe.setIngredient('C', Material.NETHERITE_CHESTPLATE);
 
 		return primalRecipe;
@@ -272,7 +272,7 @@ public class AddRecipes {
 		goldorRecipe.shape("NNN", "NLN", "NSN");
 		goldorRecipe.setIngredient('N', Material.NETHER_STAR);
 		goldorRecipe.setIngredient('L', Material.NETHERITE_LEGGINGS);
-		goldorRecipe.setIngredient('S', new RecipeChoice.ExactChoice(goldorSecrets));
+		goldorRecipe.setIngredient('S', RecipeChoice.exactChoice(goldorSecrets));
 
 		return goldorRecipe;
 	}
@@ -288,8 +288,8 @@ public class AddRecipes {
 		necromancerRecipe.shape("VVV", "SNS", "SBS");
 		necromancerRecipe.setIngredient('S', Material.NETHER_STAR);
 		necromancerRecipe.setIngredient('N', Material.NETHERITE_LEGGINGS);
-		necromancerRecipe.setIngredient('V', new RecipeChoice.ExactChoice(viscera));
-		necromancerRecipe.setIngredient('B', new RecipeChoice.ExactChoice(brooch));
+		necromancerRecipe.setIngredient('V', RecipeChoice.exactChoice(viscera));
+		necromancerRecipe.setIngredient('B', RecipeChoice.exactChoice(brooch));
 
 		return necromancerRecipe;
 	}
@@ -304,7 +304,7 @@ public class AddRecipes {
 		maxorRecipe.shape("NNN", "NBN", "NSN");
 		maxorRecipe.setIngredient('N', Material.NETHER_STAR);
 		maxorRecipe.setIngredient('B', Material.NETHERITE_BOOTS);
-		maxorRecipe.setIngredient('S', new RecipeChoice.ExactChoice(maxorSecrets));
+		maxorRecipe.setIngredient('S', RecipeChoice.exactChoice(maxorSecrets));
 
 		return maxorRecipe;
 	}
@@ -325,9 +325,9 @@ public class AddRecipes {
 		NamespacedKey sharp7Key = new NamespacedKey(plugin, "sharp7");
 		ShapelessRecipe sharp7Recipe = new ShapelessRecipe(sharp7Key, sharp7);
 
-		sharp7Recipe.addIngredient(new RecipeChoice.ExactChoice(sharp6));
-		sharp7Recipe.addIngredient(new RecipeChoice.ExactChoice(sharp6));
-		sharp7Recipe.addIngredient(new RecipeChoice.ExactChoice(upgrader));
+		sharp7Recipe.addIngredient(RecipeChoice.exactChoice(sharp6));
+		sharp7Recipe.addIngredient(RecipeChoice.exactChoice(sharp6));
+		sharp7Recipe.addIngredient(RecipeChoice.exactChoice(upgrader));
 
 		return sharp7Recipe;
 	}
@@ -348,9 +348,9 @@ public class AddRecipes {
 		NamespacedKey power7Key = new NamespacedKey(plugin, "power7");
 		ShapelessRecipe power7Recipe = new ShapelessRecipe(power7Key, power7);
 
-		power7Recipe.addIngredient(new RecipeChoice.ExactChoice(power6));
-		power7Recipe.addIngredient(new RecipeChoice.ExactChoice(power6));
-		power7Recipe.addIngredient(new RecipeChoice.ExactChoice(upgrader));
+		power7Recipe.addIngredient(RecipeChoice.exactChoice(power6));
+		power7Recipe.addIngredient(RecipeChoice.exactChoice(power6));
+		power7Recipe.addIngredient(RecipeChoice.exactChoice(upgrader));
 
 		return power7Recipe;
 	}
@@ -371,9 +371,9 @@ public class AddRecipes {
 		NamespacedKey looting5Key = new NamespacedKey(plugin, "looting5");
 		ShapelessRecipe looting5Recipe = new ShapelessRecipe(looting5Key, looting5);
 
-		looting5Recipe.addIngredient(new RecipeChoice.ExactChoice(looting4));
-		looting5Recipe.addIngredient(new RecipeChoice.ExactChoice(looting4));
-		looting5Recipe.addIngredient(new RecipeChoice.ExactChoice(upgrader));
+		looting5Recipe.addIngredient(RecipeChoice.exactChoice(looting4));
+		looting5Recipe.addIngredient(RecipeChoice.exactChoice(looting4));
+		looting5Recipe.addIngredient(RecipeChoice.exactChoice(upgrader));
 
 		return looting5Recipe;
 	}
@@ -389,15 +389,15 @@ public class AddRecipes {
 		NamespacedKey efficiency6Key = new NamespacedKey(plugin, "efficiency6");
 		ShapelessRecipe efficiency6Recipe = new ShapelessRecipe(efficiency6Key, efficiency6);
 
-		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
-		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
-		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
-		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
-		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
-		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
-		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
-		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
-		efficiency6Recipe.addIngredient(new RecipeChoice.ExactChoice(stones));
+		efficiency6Recipe.addIngredient(RecipeChoice.exactChoice(stones));
+		efficiency6Recipe.addIngredient(RecipeChoice.exactChoice(stones));
+		efficiency6Recipe.addIngredient(RecipeChoice.exactChoice(stones));
+		efficiency6Recipe.addIngredient(RecipeChoice.exactChoice(stones));
+		efficiency6Recipe.addIngredient(RecipeChoice.exactChoice(stones));
+		efficiency6Recipe.addIngredient(RecipeChoice.exactChoice(stones));
+		efficiency6Recipe.addIngredient(RecipeChoice.exactChoice(stones));
+		efficiency6Recipe.addIngredient(RecipeChoice.exactChoice(stones));
+		efficiency6Recipe.addIngredient(RecipeChoice.exactChoice(stones));
 
 		return efficiency6Recipe;
 	}
@@ -418,9 +418,9 @@ public class AddRecipes {
 		NamespacedKey featherFalling5Key = new NamespacedKey(plugin, "featherFalling5");
 		ShapelessRecipe featherFalling5Recipe = new ShapelessRecipe(featherFalling5Key, featherFalling5);
 
-		featherFalling5Recipe.addIngredient(new RecipeChoice.ExactChoice(featherFalling4));
-		featherFalling5Recipe.addIngredient(new RecipeChoice.ExactChoice(featherFalling4));
-		featherFalling5Recipe.addIngredient(new RecipeChoice.ExactChoice(feather));
+		featherFalling5Recipe.addIngredient(RecipeChoice.exactChoice(featherFalling4));
+		featherFalling5Recipe.addIngredient(RecipeChoice.exactChoice(featherFalling4));
+		featherFalling5Recipe.addIngredient(RecipeChoice.exactChoice(feather));
 
 		return featherFalling5Recipe;
 	}
@@ -457,6 +457,13 @@ public class AddRecipes {
 			recipe.addIngredient(tier.swordsToUpgrade(), tier.material());
 			out.add(recipe);
 		}
+
+		ShapelessRecipe skip = new ShapelessRecipe(
+				new NamespacedKey(plugin, manhuntKey(ManhuntTier.IRON) + "_from_" + ManhuntTier.STONE.name().toLowerCase(java.util.Locale.ROOT)),
+				ManhuntHyperion.getItem(ManhuntTier.IRON));
+		skip.addIngredient(ManhuntTier.STONE.material());
+		skip.addIngredient(ManhuntTier.STONE_TO_IRON_SWORDS, ManhuntTier.IRON.material());
+		out.add(skip);
 		return out;
 	}
 
