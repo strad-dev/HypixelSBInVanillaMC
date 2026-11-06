@@ -15,6 +15,16 @@ This is a plugin intended to extend the gameplay of survival Minecraft by bringi
 - Improvements to undesirable enchants (COUGH KNOCKBACK) to make them useful
 - Endgame swords have no attack cooldown
 
+## Guide to Custom Mechanics
+
+### Custom Bosses
+- For a majority of bosses, you must obtain the relevant Summon Item from its standard counterpart.  For example, the Atoned Flesh (which summons the Revenant Horror) drops from Zombies.
+- To summon the boss, use that item on its normal counterpart.  For example, to summon the Revenant Horror, right-click a Zombie with the Atoned Flesh.
+- Hard Mode bosses are much harder, but have greater drop changes for the items, as well as certain exclusive items.
+
+### Mining Drops
+- Valuable ores in the game have a chance to drop their Refined variant, with chances ranging from 0.1% to 2%.
+
 ## Disclaimers: 
 * This plugin is not the entirety of Hypixel SkyBlock and does not incorporate any features from there except for the selected items and mobs.
 * This plugin is a fan project by a SkyBlock sweat and is not affiliated with or endorsed by Hypixel.
