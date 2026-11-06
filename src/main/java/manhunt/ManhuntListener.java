@@ -120,7 +120,7 @@ public class ManhuntListener implements Listener {
 				enchants.merge(enchant, level, Math::max);
 				return;
 			}
-			List<Enchantment> conflicts = enchants.keySet().stream().filter(enchant::conflictsWith).toList();
+			List<Enchantment> conflicts = enchants.keySet().stream().filter(other -> Utils.enchantsConflict(enchant, other)).toList();
 			if(conflicts.contains(Enchantment.SHARPNESS)) return;
 			conflicts.forEach(enchants::remove);
 			enchants.put(enchant, level);

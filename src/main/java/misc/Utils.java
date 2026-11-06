@@ -376,6 +376,14 @@ public class Utils {
 		return Math.max(0, value);
 	}
 
+	private static final Set<Enchantment> DAMAGE_ENCHANTS = Set.of(Enchantment.SHARPNESS, Enchantment.SMITE,
+			Enchantment.BANE_OF_ARTHROPODS);
+
+	public static boolean enchantsConflict(Enchantment a, Enchantment b) {
+		if(a.equals(b) || DAMAGE_ENCHANTS.contains(a) && DAMAGE_ENCHANTS.contains(b)) return false;
+		return a.conflictsWith(b);
+	}
+
 	/**
 	 * The {@code Damage: +N} line for a weapon: its attack damage plus the Sharpness it actually carries.
 	 *

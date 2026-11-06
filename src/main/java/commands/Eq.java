@@ -19,8 +19,12 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import io.papermc.paper.datacomponent.item.ItemAttributeModifiers;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -110,18 +114,19 @@ public class Eq implements CommandExecutor, Listener {
 			modifiers.add(modifierLine("Sword of Bad Health", SwordOfBadHealth.DAMAGE_BONUS, true));
 		}
 
+		boolean breakdown = showBreakdown.contains(p.getUniqueId());
 		List<Component> lore = new ArrayList<>();
-		lore.add(Utils.mm("<gray>Damage: <red>" + Utils.tenthNumber(damage * multiplier)));
-		int smite = held.getEnchantmentLevel(Enchantment.SMITE);
-		if(smite > 0) {
-			lore.add(Utils.mm("<gray>Damage vs Undead: <red>"
-					+ Utils.tenthNumber((damage + CustomDamage.smiteBonus(smite)) * multiplier)));
+		lore.add(Utils.mm("<gray>Damage: <red>" + Utils.damageNumber(damage * multiplier)));
+		if(breakdown) {
+			List<Component> parts = attributeBreakdown(p, Attribute.ATTACK_DAMAGE, "red");
+			int sharpness = held.getEnchantmentLevel(Enchantment.SHARPNESS);
+			if(sharpness > 0) {
+				parts.add(breakdownLine(Enchantment.SHARPNESS.displayName(sharpness), "+", CustomDamage.sharpnessBonus(sharpness), "red"));
+			}
+			addSection(lore, parts);
 		}
-		int bane = held.getEnchantmentLevel(Enchantment.BANE_OF_ARTHROPODS);
-		if(bane > 0) {
-			lore.add(Utils.mm("<gray>Damage vs Arthropods: <red>"
-					+ Utils.tenthNumber((damage + CustomDamage.smiteBonus(bane)) * multiplier)));
-		}
+		addTypedDamage(lore, held, Enchantment.SMITE, "Undead", damage, multiplier, breakdown);
+		addTypedDamage(lore, held, Enchantment.BANE_OF_ARTHROPODS, "Arthropods", damage, multiplier, breakdown);
 		Double ability = abilityDamage(p, held);
 		if(ability != null) {
 			lore.add(Utils.mm("<gray>Ability Damage: <red>" + Utils.tenthNumber(ability * multiplier)));
@@ -130,7 +135,94 @@ public class Eq implements CommandExecutor, Listener {
 			lore.add(Component.empty());
 			lore.addAll(modifiers);
 		}
+		addToggleHint(lore, breakdown);
 		return statsItem(Material.DIAMOND_SWORD, "<red>Offensive Stats", lore);
+	}
+
+	private static void addTypedDamage(List<Component> lore, ItemStack held, Enchantment enchant, String against,
+			double damage, double multiplier, boolean breakdown) {
+		int level = held.getEnchantmentLevel(enchant);
+		if(level <= 0) return;
+		double bonus = CustomDamage.smiteBonus(level);
+		if(breakdown) lore.add(Component.empty());
+		lore.add(Utils.mm("<gray>Damage vs " + against + ": <red>" + Utils.damageNumber((damage + bonus) * multiplier)));
+		if(breakdown) addSection(lore, new ArrayList<>(List.of(breakdownLine(enchant.displayName(level), "+", bonus, "red"))));
+	}
+
+	// =================== Breakdown ===================
+
+	private static final Set<UUID> showBreakdown = new HashSet<>();
+	private static final NamespacedKey STRENGTH_KEY = NamespacedKey.minecraft("effect.strength");
+
+	private static void addSection(List<Component> lore, List<Component> parts) {
+		if(parts.isEmpty()) return;
+		lore.add(Component.empty());
+		lore.addAll(parts);
+	}
+
+	private static void addToggleHint(List<Component> lore, boolean breakdown) {
+		lore.add(Component.empty());
+		lore.add(Utils.mm("<dark_gray>Click to " + (breakdown ? "hide" : "show") + " breakdown"));
+	}
+
+	private static List<Component> attributeBreakdown(Player p, Attribute attribute, String colour) {
+		List<Component> out = new ArrayList<>();
+		AttributeInstance instance = p.getAttribute(attribute);
+		if(instance == null) return out;
+
+		Map<NamespacedKey, Component> sources = new HashMap<>();
+		EntityEquipment equipment = p.getEquipment();
+		for(EquipmentSlot slot : EquipmentSlot.values()) {
+			if(!p.canUseEquipmentSlot(slot)) continue;
+			ItemStack item = equipment.getItem(slot);
+			if(item.isEmpty()) continue;
+			ItemAttributeModifiers mods = item.getData(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+			if(mods == null) continue;
+			for(ItemAttributeModifiers.Entry entry : mods.modifiers()) {
+				if(entry.attribute().equals(attribute) && entry.getGroup().test(slot)) {
+					sources.putIfAbsent(entry.modifier().getKey(), item.effectiveName());
+				}
+			}
+		}
+
+		if(instance.getBaseValue() != 0) {
+			out.add(breakdownLine(Component.text("Base"), "+", instance.getBaseValue(), colour));
+		}
+		for(AttributeModifier mod : instance.getModifiers()) {
+			NamespacedKey key = mod.getKey();
+			double amount = mod.getAmount();
+			if(key.equals(STRENGTH_KEY)) amount -= CustomDamage.strengthPenalty(p);
+			Component label = sources.get(key);
+			if(label == null) label = effectLabel(p, key);
+			if(label == null) label = Component.text(key.asString());
+			out.add(switch(mod.getOperation()) {
+				case ADD_NUMBER -> breakdownLine(label, amount < 0 ? "-" : "+", Math.abs(amount), colour);
+				case ADD_SCALAR -> breakdownLine(label, amount < 0 ? "-" : "+", Math.abs(amount) * 100, colour)
+						.append(Utils.mm("<" + colour + ">% of base"));
+				case MULTIPLY_SCALAR_1 -> breakdownLine(label, "x", 1 + amount, colour);
+			});
+		}
+		return out;
+	}
+
+	@javax.annotation.Nullable
+	private static Component effectLabel(Player p, NamespacedKey key) {
+		if(!key.getNamespace().equals(NamespacedKey.MINECRAFT) || !key.getKey().startsWith("effect.")) return null;
+		String id = key.getKey().substring("effect.".length());
+		for(PotionEffect effect : p.getActivePotionEffects()) {
+			if(!effect.getType().getKey().getKey().equals(id)) continue;
+			int level = effect.getAmplifier() + 1;
+			Component numeral = level <= 10 ? Component.translatable("enchantment.level." + level) : Component.text(level);
+			return Component.translatable("effect.minecraft." + id).append(Component.space()).append(numeral);
+		}
+		return null;
+	}
+
+	private static Component breakdownLine(Component label, String sign, double amount, String colour) {
+		return Component.empty().color(net.kyori.adventure.text.format.NamedTextColor.GRAY)
+				.decoration(net.kyori.adventure.text.format.TextDecoration.ITALIC, false)
+				.append(label).append(Component.text(": "))
+				.append(Utils.mm("<" + colour + ">" + sign + Utils.damageNumber(amount)));
 	}
 
 	/** Per-target damage of the held item's ability, from the same figure the ability pays; null if it deals none. */
@@ -178,8 +270,13 @@ public class Eq implements CommandExecutor, Listener {
 			modifiers.add(modifierLine("Ice Sprayed", IceSpray.DAMAGE_TAKEN_BONUS, false));
 		}
 
+		boolean breakdown = showBreakdown.contains(p.getUniqueId());
 		List<Component> lore = new ArrayList<>();
-		lore.add(Utils.mm("<gray>Armor: <green>" + Utils.tenthNumber(armor)));
+		lore.add(Utils.mm("<gray>Armor: <green>" + Utils.damageNumber(armor)));
+		if(breakdown) {
+			addSection(lore, attributeBreakdown(p, Attribute.ARMOR, "green"));
+			lore.add(Component.empty());
+		}
 		lore.add(Utils.mm("<gray>Armor Reduction: <green>" + Utils.percent(1 - CustomDamage.armorMultiplier(armor))));
 		if(!modifiers.isEmpty()) {
 			lore.add(Component.empty());
@@ -205,6 +302,7 @@ public class Eq implements CommandExecutor, Listener {
 			lore.add(Utils.mm("<gray>Damage Taken vs " + against + ": <white>" + Utils.percent(taken * m)));
 			lore.add(effectiveHp("Effective HP vs " + against, health, taken * m));
 		}
+		addToggleHint(lore, breakdown);
 		return statsItem(Material.DIAMOND_CHESTPLATE, "<green>Defensive Stats", lore);
 	}
 
@@ -295,6 +393,12 @@ public class Eq implements CommandExecutor, Listener {
 		e.setCancelled(true); // only the armor swap below changes anything
 		if(!(e.getWhoClicked() instanceof Player p)) return;
 		Inventory clicked = e.getClickedInventory();
+		Inventory top = e.getView().getTopInventory();
+		if(clicked != null && clicked.equals(top) && (e.getSlot() == OFFENSE_SLOT || e.getSlot() == DEFENSE_SLOT)) {
+			if(!showBreakdown.remove(p.getUniqueId())) showBreakdown.add(p.getUniqueId());
+			refreshStats(p, top);
+			return;
+		}
 		if(clicked == null || !clicked.equals(p.getInventory())) return; // only bottom-inventory clicks act
 
 		ItemStack item = e.getCurrentItem();

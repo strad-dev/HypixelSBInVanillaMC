@@ -105,11 +105,11 @@ public class CustomDamage implements Listener {
 		return level == 7 ? 5 : level * 0.7;
 	}
 
-	/** Smite / Bane vs a matching target, replacing vanilla's {@code 2.5 * level}. Level 7 gets 9, not 8.75, same
-	 *  reason as Sharpness. */
+	/** Smite / Bane vs a matching target, replacing vanilla's {@code 2.5 * level}. On top of Sharpness, which now
+	 *  stacks with them: what's left of the old 1.25/level (9 at VII) after Sharpness of the same level. */
 	public static double smiteBonus(int level) {
 		if(level <= 0) return 0;
-		return level == 7 ? 9 : level * 1.25;
+		return (level == 7 ? 9 : level * 1.25) - sharpnessBonus(level);
 	}
 
 	/**
@@ -518,6 +518,10 @@ public class CustomDamage implements Listener {
 	public static void calculateFinalDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
 		if(isDyingDragon(damagee)) return; // see customMobs; a boss's whenDamaged calls in here directly
 		if(!(DamageType.isAbsoluteDamage(type))) {
+			if(curledArmadillo(damagee)) {
+				finalDamage = Math.max(0, (finalDamage - 1) / 2);
+			}
+
 			// bonus damage to withers from hyperion
 			if(damagee instanceof Wither && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP) && damager instanceof Player p && Utils.firstLorePlain(p.getInventory().getItemInMainHand()).equals("skyblock/combat/scylla")) {
 				finalDamage += Scylla.WITHER_BONUS;
@@ -616,8 +620,44 @@ public class CustomDamage implements Listener {
 		dealDamage(damagee, damager, finalDamage, type, data);
 	}
 
+	// The MobEffectInstance.onMobHurt pass LivingEntity.hurtServer runs after a hit lands, which the cancelled event
+	// skips: Infested's silverfish never came.
+	private static void replayHurtEffects(LivingEntity damagee, DamageData data, double amount) {
+		if(amount < 0) return;
+		net.minecraft.world.entity.LivingEntity nms = ((CraftLivingEntity) damagee).getHandle();
+		if(!(nms.level() instanceof ServerLevel level) || nms.getActiveEffects().isEmpty()) return;
+		DamageSource source = data.e != null ? convertBukkitDamageSource(data.e.getDamageSource(), damagee) : nms.damageSources().generic();
+		for(net.minecraft.world.effect.MobEffectInstance effect : List.copyOf(nms.getActiveEffects())) {
+			effect.onMobHurt(level, nms, source, (float) amount);
+		}
+	}
+
+	// A curled armadillo's 0 is still a HIT in vanilla (Armadillo.hurtServer cuts to (d - 1) / 2, the event still
+	// fires): hurt animation, its reduced hurt sound, onMobHurt. dealDamage drops every other 0.
+	private static boolean curledArmadillo(LivingEntity e) {
+		return e instanceof org.bukkit.entity.Armadillo a && ((CraftArmadillo) a).getHandle().isScared();
+	}
+
+	// Armadillo.actuallyHurt's tail, lost to the cancel: an attacker curls it, a panic cause uncurls it.
+	private static void armadilloReaction(LivingEntity damagee, Entity damager, DamageData data) {
+		if(!(damagee instanceof org.bukkit.entity.Armadillo a)) return;
+		net.minecraft.world.entity.animal.armadillo.Armadillo nms = ((CraftArmadillo) a).getHandle();
+		if(nms.isNoAi() || nms.isDeadOrDying()) return;
+		if(damager instanceof LivingEntity) {
+			nms.getBrain().setMemoryWithExpiry(net.minecraft.world.entity.ai.memory.MemoryModuleType.DANGER_DETECTED_RECENTLY, true, 80L);
+			if(nms.canStayRolledUp()) nms.rollUp();
+		} else if(data.e != null && convertBukkitDamageSource(data.e.getDamageSource(), damagee).is(net.minecraft.tags.DamageTypeTags.PANIC_ENVIRONMENTAL_CAUSES)) {
+			nms.rollOut();
+		}
+	}
+
+	// Undo Armadillo.hurtServer's cut; calculateFinalDamage redoes it, for sweep and every other hit too.
+	private static void uncurl(LivingEntity entity, EntityDamageEvent e) {
+		if(curledArmadillo(entity)) e.setDamage(e.getDamage() * 2 + 1);
+	}
+
 	private static void dealDamage(LivingEntity damagee, Entity damager, double finalDamage, DamageType type, DamageData data) {
-		if(!damagee.isDead() && (finalDamage > 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL) && (damagee.getNoDamageTicks() == 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC || type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE)) {
+		if(!damagee.isDead() && (finalDamage > 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || curledArmadillo(damagee)) && (damagee.getNoDamageTicks() == 0 || type == DamageType.RANGED || type == DamageType.RANGED_SPECIAL || type == DamageType.MAGIC || type == DamageType.PLAYER_MAGIC || type == DamageType.ABSOLUTE || type == DamageType.LETHAL_ABSOLUTE)) {
 			// sweeping edge
 			if(type == DamageType.MELEE && damager instanceof LivingEntity temp && temp.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.SWEEPING_EDGE)) {
 				int level = temp.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.SWEEPING_EDGE);
@@ -640,6 +680,7 @@ public class CustomDamage implements Listener {
 			// here since it's the final figure: the absorption split below spends part of it and the health removed
 			// is capped by what the target had left.
 			data.damageDealt = finalDamage;
+			commands.VanillaDamageCommand.record(damagee, finalDamage);
 
 			// PvP layer (config-gated, inert off the pvp server): record this hit for arena/duel combat stats.
 			pvp.PvpHooks.trackHit(damagee, damager, finalDamage,
@@ -691,14 +732,17 @@ public class CustomDamage implements Listener {
 					damagee.getWorld().spawnParticle(Particle.DAMAGE_INDICATOR, particleLoc, Math.min((int) (data.originalDamage / 2), 24));
 				}
 
+				// Read once: the smash branch zeroes it, which used to leave Wind Burst (mace-only) seeing 0.
+				boolean smashing = p.getFallDistance() >= 1.5;
+
 				// Density enchantment - bonus smash damage on falling hits
-				if(weapon.containsEnchantment(Enchantment.DENSITY) && p.getFallDistance() >= 1.5) {
+				if(weapon.containsEnchantment(Enchantment.DENSITY) && smashing) {
 					int densityLevel = weapon.getEnchantmentLevel(Enchantment.DENSITY);
 					data.originalDamage += densityLevel * 0.5 * p.getFallDistance();
 				}
 
 				// Reset fall distance on Mace smash attack and spawn smash particles
-				if(weapon.getType() == Material.MACE && p.getFallDistance() >= 1.5) {
+				if(weapon.getType() == Material.MACE && smashing) {
 					Location smashLoc = damagee.getLocation();
 					damagee.getWorld().spawnParticle(Particle.EXPLOSION, smashLoc, 1);
 					damagee.getWorld().spawnParticle(Particle.DUST_PLUME, smashLoc, 20, 0.5, 0.2, 0.5, 0.1);
@@ -706,7 +750,7 @@ public class CustomDamage implements Listener {
 				}
 
 				// Wind Burst mechanics
-				if(weapon.containsEnchantment(Enchantment.WIND_BURST) && p.getFallDistance() >= 1.5) {
+				if(weapon.containsEnchantment(Enchantment.WIND_BURST) && smashing) {
 					int level = weapon.getEnchantmentLevel(Enchantment.WIND_BURST);
 
 					// Launch player upward (scales with level and fall distance)
@@ -799,7 +843,7 @@ public class CustomDamage implements Listener {
 			// armor stand override
 			if(damagee instanceof ArmorStand) {
 				if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.RANGED) {
-					finalDamage = 11;
+					if(type != DamageType.MELEE_SWEEP) finalDamage = 11;
 					type = DamageType.LETHAL_ABSOLUTE;
 				} else {
 					return;
@@ -966,6 +1010,7 @@ public class CustomDamage implements Listener {
 									};
 								}
 							}
+							replayHurtEffects(damagee, data, finalDamage);
 							damagee.setHealth(0.0);
 						}
 					}
@@ -982,6 +1027,8 @@ public class CustomDamage implements Listener {
 
 				// damage
 				damagee.setHealth(oldHealth - finalDamage);
+				replayHurtEffects(damagee, data, finalDamage);
+				armadilloReaction(damagee, damager, data);
 				if(type == DamageType.MELEE || type == DamageType.MELEE_SWEEP || type == DamageType.IFRAME_ENVIRONMENTAL) {
 					damagee.setNoDamageTicks(9);
 				}
@@ -1062,9 +1109,9 @@ public class CustomDamage implements Listener {
 
 						if(damager instanceof LivingEntity livingEntity) {
 							if(livingEntity.getEquipment().getItemInMainHand().containsEnchantment(Enchantment.KNOCKBACK) && (type == DamageType.MELEE || type == DamageType.MELEE_SWEEP)) {
-								enchantments += 0.33333 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
+								enchantments += 0.25 * livingEntity.getEquipment().getItemInMainHand().getEnchantmentLevel(Enchantment.KNOCKBACK);
 							} else if(data.punchArrow > 0) {
-								enchantments += 0.33333 * data.punchArrow;
+								enchantments += 0.25 * data.punchArrow;
 							}
 						}
 
@@ -1142,11 +1189,33 @@ public class CustomDamage implements Listener {
 		// 10 waves of 8%, every 5 ticks starting at tick 0
 		for(int wave = 0; wave < 10; wave++) {
 			int delay = wave * 5;
-			Utils.scheduleTask(() -> net.minecraft.world.entity.ExperienceOrb.award(level, pos, (int) Math.floor((float) totalXP * 0.08F)), delay);
+			Utils.scheduleTask(() -> awardUnmerged(level, pos, (int) Math.floor((float) totalXP * 0.08F)), delay);
 		}
 
 		// Final wave of 20% at tick 50
-		Utils.scheduleTask(() -> net.minecraft.world.entity.ExperienceOrb.award(level, pos, (int) Math.floor((float) totalXP * 0.2F)), 50);
+		Utils.scheduleTask(() -> awardUnmerged(level, pos, (int) Math.floor((float) totalXP * 0.2F)), 50);
+	}
+
+	private static final String UNMERGED_ORB = "UnmergedXP";
+
+	// ExperienceOrb.award without its tryMergeToExisting, which bumps an existing orb's count and fires no event.
+	private static void awardUnmerged(ServerLevel level, Vec3 pos, int amount) {
+		while(amount > 0) {
+			int value = net.minecraft.world.entity.ExperienceOrb.getExperienceValue(amount);
+			amount -= value;
+			net.minecraft.world.entity.ExperienceOrb orb = new net.minecraft.world.entity.ExperienceOrb(level, pos, Vec3.ZERO, value);
+			orb.addTag(UNMERGED_ORB);
+			level.addFreshEntity(orb);
+		}
+	}
+
+	// Spigot's merge-radius.exp (on add) and vanilla's scanForMerges (every 20 ticks) both go through this event.
+	@EventHandler
+	public void onOrbMerge(com.destroystokyo.paper.event.entity.ExperienceOrbMergeEvent e) {
+		if(e.getMergeTarget().getScoreboardTags().contains(UNMERGED_ORB)
+				|| e.getMergeSource().getScoreboardTags().contains(UNMERGED_ORB)) {
+			e.setCancelled(true);
+		}
 	}
 
 	private static void triggerAllRelevantAdvancements(LivingEntity victim, Entity attacker, DamageType type,
@@ -1641,6 +1710,7 @@ public class CustomDamage implements Listener {
 
 				if(entity.getNoDamageTicks() == 0 || e.getDamager() instanceof AbstractArrow) {
 					Entity damager = e.getDamager();
+					uncurl(entity, e);
 
 					// 26.2 takes amount/4 + min(amount, 1) off every blow not on the dragon's HEAD, neck included, and the
 					// neck is what an aimed hit usually connects with. 26.3 counts the neck as head; this puts a neck hit
@@ -1687,24 +1757,6 @@ public class CustomDamage implements Listener {
 		}
 	}
 
-	// VehicleEntity.hurtServer has no knockback; vanilla only pushes a boat on a sprint or Knockback hit
-	// (Player.causeExtraKnockback), so a normal hit just wobbled it. This is LivingEntity.knockback(0.4), the push
-	// every mob gets, minus the hop; the sprint/enchant push still stacks on top, as on a mob.
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onBoatDamage(org.bukkit.event.vehicle.VehicleDamageEvent e) {
-		if(!(e.getVehicle() instanceof Boat boat)) return;
-		Entity source = e.getDamageSource().getDirectEntity();
-		if(source == null) source = e.getAttacker();
-		if(source == null || !source.getWorld().equals(boat.getWorld())) return;
-
-		Vector away = boat.getLocation().toVector().subtract(source.getLocation().toVector()).setY(0);
-		if(away.lengthSquared() < 1.0E-8) return;
-		away.normalize().multiply(0.4);
-
-		Vector old = boat.getVelocity();
-		boat.setVelocity(new Vector(old.getX() / 2 + away.getX(), old.getY(), old.getZ() / 2 + away.getZ()));
-	}
-
 	// Vanilla's sprint/enchant push (Player.causeExtraKnockback) lifts boats and minecarts by 0.1.
 	@EventHandler(ignoreCancelled = true)
 	public void onVehiclePushed(io.papermc.paper.event.entity.EntityPushedByEntityAttackEvent e) {
@@ -1736,6 +1788,7 @@ public class CustomDamage implements Listener {
 				}
 			}
 
+			uncurl(entity, e);
 			double damage = e.getDamage();
 			if(type == DamageType.FALL) {
 				damage--;
@@ -1752,9 +1805,11 @@ public class CustomDamage implements Listener {
 				noDamageTimes.put(entity, currentTime);
 			}
 
-			if(entity.isDead()) {
+			if(entity.isDead() && !(entity instanceof Player)) {
 				try {
-					entity.remove();
+					// KILLED, not Bukkit's remove() (DISCARDED): Oozing, Weaving and Wind Charged only fire on a kill.
+					((CraftLivingEntity) entity).getHandle().remove(net.minecraft.world.entity.Entity.RemovalReason.KILLED,
+							org.bukkit.event.entity.EntityRemoveEvent.Cause.DEATH);
 				} catch(Exception exception) {
 					// nothing
 				}

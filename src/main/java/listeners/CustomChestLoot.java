@@ -39,7 +39,7 @@ public class CustomChestLoot implements Listener {
 				addBook(inventory, Enchantment.SWEEPING_EDGE, 4);
 			}
 		} else if(e.getInventoryHolder() instanceof StorageMinecart minecart) {
-			if(seeded(minecart.getLocation(), 1).nextDouble() < 0.025) {
+			if(seeded(minecart.getLocation(), 1).nextDouble() < 0.04) {
 				minecart.getInventory().addItem(Alloy.getItem());
 			}
 		}

@@ -175,32 +175,37 @@ public class CustomMining implements Listener {
 						sendRareDropMessage(p, "Refined Diamond");
 					}
 				}
+				case ANCIENT_DEBRIS -> {
+					if(autoSmeltDebris(e, itemInHand) && random.nextDouble() < 0.01 * fortuneMulti) {
+						world.dropItemNaturally(l, RefinedNetherite.getItem());
+						sendRareDropMessage(p, "Refined Netherite");
+					}
+				}
 				case EMERALD_ORE, DEEPSLATE_EMERALD_ORE -> {
 					if(dropDouble) {
 						item = new ItemStack(Material.EMERALD);
 						item.setAmount(random.nextInt(fortune + 1) + 1);
 						world.dropItemNaturally(dropLocation, item);
 					}
-					if(random.nextDouble() < 0.01 * fortuneMulti) {
+					if(random.nextDouble() < 0.02 * fortuneMulti) {
 						world.dropItemNaturally(l, RefinedEmerald.getItem());
 						sendRareDropMessage(p, "Refined Emerald");
 					}
 				}
-				case ANCIENT_DEBRIS -> {
-					if(dropDouble) {
-						e.setCancelled(true);
-						item = new ItemStack(Material.NETHERITE_SCRAP);
-						item.setAmount(item.getAmount() + 1);
-						world.dropItemNaturally(dropLocation, item);
-						e.getBlock().getWorld().getBlockAt(dropLocation).setType(Material.AIR);
-						Utils.damageItem(p, itemInHand, 1); // see comment in stone section
-					}
-					if(random.nextDouble() < 0.01 * fortuneMulti) {
-						world.dropItemNaturally(l, RefinedNetherite.getItem());
-						sendRareDropMessage(p, "Refined Netherite");
-					}
-				}
 			}
+		} else if(b.getType() == Material.ANCIENT_DEBRIS) {
+			autoSmeltDebris(e, itemInHand);
 		}
+	}
+
+	// auto-smelt so debris can't be re-placed to farm the refined roll
+	private static boolean autoSmeltDebris(BlockBreakEvent e, ItemStack tool) {
+		Player p = e.getPlayer();
+		Block b = e.getBlock();
+		if(e.isCancelled() || p.getGameMode() == GameMode.CREATIVE || b.getDrops(tool, p).isEmpty()
+				|| tool.containsEnchantment(Enchantment.SILK_TOUCH)) return false;
+		e.setDropItems(false);
+		b.getWorld().dropItemNaturally(b.getLocation().add(0.5, 0.5, 0.5), new ItemStack(Material.NETHERITE_SCRAP, isDivanPickaxe(tool) ? 2 : 1));
+		return true;
 	}
 }

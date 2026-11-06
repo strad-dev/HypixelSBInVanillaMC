@@ -136,7 +136,9 @@ public class CustomMobs implements Listener {
 					// colours and any name-tagged base name.
 					if(e instanceof CreatureSpawnEvent spawn
 							&& spawn.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SLIME_SPLIT) {
-						Utils.changeName(entity);
+						// CustomDrops' death case already reset the parent to a bare "Slime"/"Magma Cube".
+						if(entity.getName().contains("❤")) Utils.changeName(entity);
+						else Utils.changeName(entity, "<aqua>" + entity.getName());
 					}
 					entity.setCustomNameVisible(true);
 					return;

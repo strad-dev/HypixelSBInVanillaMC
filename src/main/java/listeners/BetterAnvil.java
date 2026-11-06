@@ -29,6 +29,7 @@ public class BetterAnvil implements Listener {
 	public void onAnvilOpen(InventoryOpenEvent e) {
 		if(e.getInventory().getType() != InventoryType.ANVIL) return;
 		if(!(e.getPlayer() instanceof Player player)) return;
+		shownCost.remove(player.getUniqueId());
 
 		Utils.scheduleTask(() -> {
 			ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
@@ -96,10 +97,25 @@ public class BetterAnvil implements Listener {
 			ServerPlayer serverPlayer = ((CraftPlayer) player).getHandle();
 			if(serverPlayer.containerMenu instanceof AnvilMenu anvilMenu) {
 				int vanillaCost = anvilMenu.cost.get() - penalties;
-				anvilMenu.cost.set(vanillaCost <= 0 ? fallbackCost : vanillaCost + surcharge);
+				int cost = vanillaCost <= 0 ? fallbackCost : vanillaCost + surcharge;
+				anvilMenu.cost.set(cost);
+				showHiddenCost(player, cost);
 			}
 			player.updateInventory();
 		}, 1);
+	}
+
+	private static final int CLIENT_TOO_EXPENSIVE = 40;
+	private static final Map<UUID, Integer> shownCost = new HashMap<>();
+
+	private void showHiddenCost(Player player, int cost) {
+		if(cost < CLIENT_TOO_EXPENSIVE || player.getGameMode() == org.bukkit.GameMode.CREATIVE) {
+			shownCost.remove(player.getUniqueId());
+			return;
+		}
+		if(Integer.valueOf(cost).equals(shownCost.put(player.getUniqueId(), cost))) return;
+		String colour = player.getLevel() >= cost ? "green" : "red";
+		player.sendMessage(Utils.msg("<gray>Anvil cost: <" + colour + ">" + cost + " levels"));
 	}
 
 	private int penalty(ItemStack item) {
@@ -210,6 +226,8 @@ public class BetterAnvil implements Listener {
 					if(!creative) player.setLevel(player.getLevel() - cost);
 
 					player.getWorld().playSound(player.getLocation(), org.bukkit.Sound.BLOCK_ANVIL_USE, 1.0F, 1.0F);
+				} else {
+					player.sendMessage(Utils.msg("<red>You need " + cost + " levels (you have " + player.getLevel() + ")."));
 				}
 			}
 		}
@@ -230,9 +248,7 @@ public class BetterAnvil implements Listener {
 			int bookLevel = entry.getValue();
 
 			if(!canApplyToItem(item, enchantment)) continue;
-
-			// Remove conflicting enchants from result
-			removeConflicting(result, enchantment);
+			if(conflictsWithAny(result.getEnchantments(), enchantment)) continue;
 
 			int itemLevel = result.getEnchantmentLevel(enchantment);
 
@@ -273,11 +289,7 @@ public class BetterAnvil implements Listener {
 			Enchantment enchantment = entry.getKey();
 			int level2 = entry.getValue();
 
-			// Remove conflicting enchants from result
-			enchants1.entrySet().removeIf(e -> {
-				Enchantment existing = e.getKey();
-				return existing != enchantment && existing.conflictsWith(enchantment);
-			});
+			if(conflictsWithAny(enchants1, enchantment)) continue;
 
 			int level1 = enchants1.getOrDefault(enchantment, 0);
 
@@ -317,13 +329,19 @@ public class BetterAnvil implements Listener {
 		ItemStack result = item1.clone();
 		Map<Enchantment, Integer> sourceEnchants = item2.getEnchantments();
 		boolean anyApplied = false;
+		boolean anyCompatible = false;
+		boolean anyConflict = false;
 
 		for(Map.Entry<Enchantment, Integer> entry : sourceEnchants.entrySet()) {
 			Enchantment enchantment = entry.getKey();
 			int sourceLevel = entry.getValue();
 
-			// Remove conflicting enchants from result
-			removeConflicting(result, enchantment);
+			// Vanilla: the left item's enchant wins, the right's is skipped
+			if(conflictsWithAny(result.getEnchantments(), enchantment)) {
+				anyConflict = true;
+				continue;
+			}
+			anyCompatible = true;
 
 			int targetLevel = result.getEnchantmentLevel(enchantment);
 
@@ -341,6 +359,8 @@ public class BetterAnvil implements Listener {
 				}
 			}
 		}
+
+		if(anyConflict && !anyCompatible) return null;
 
 		// Allow vanilla durability repair even if no enchants changed
 		int maxDurability = item1.getType().getMaxDurability();
@@ -368,11 +388,10 @@ public class BetterAnvil implements Listener {
 		return enchantment.canEnchantItem(item);
 	}
 
-	private void removeConflicting(ItemStack item, Enchantment enchantment) {
-		for(Enchantment existing : new HashMap<>(item.getEnchantments()).keySet()) {
-			if(existing != enchantment && existing.conflictsWith(enchantment)) {
-				item.removeEnchantment(existing);
-			}
+	private boolean conflictsWithAny(Map<Enchantment, Integer> existing, Enchantment enchantment) {
+		for(Enchantment e : existing.keySet()) {
+			if(Utils.enchantsConflict(e, enchantment)) return true;
 		}
+		return false;
 	}
 }

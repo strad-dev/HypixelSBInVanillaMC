@@ -25,7 +25,7 @@ public class DivanPickaxe implements CustomItem {
 		data.setUnbreakable(true);
 		data.displayName(Utils.mm("<aqua>Divan's Pickaxe"));
 		AttributeModifier attackDamage = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "DivanModifier"), -1000, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
-		AttributeModifier miningSpeed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "DivanSpeed"), 0.333, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.MAINHAND);
+		AttributeModifier miningSpeed = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "DivanSpeed"), 0.35, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlotGroup.MAINHAND);
 		AttributeModifier miningReach = new AttributeModifier(new NamespacedKey(Plugin.getInstance(), "DivanReach"), 1, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlotGroup.MAINHAND);
 		data.addAttributeModifier(Attribute.ATTACK_DAMAGE, attackDamage);
 		data.addAttributeModifier(Attribute.BLOCK_BREAK_SPEED, miningSpeed);

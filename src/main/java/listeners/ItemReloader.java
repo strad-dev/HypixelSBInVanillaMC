@@ -39,7 +39,7 @@ import java.util.UUID;
 
 public class ItemReloader implements Listener {
 	/**
-	 * <b>THE item updater.</b> Every slot plus the cursor, rebuilt and written back when it differs. Replaced seven
+	 * <b>THE item updater.</b> Every slot, rebuilt and written back when it differs. Replaced seven
 	 * separate handlers (pickup, join, armour change, slot switch, inventory click, creative set, slot change) that
 	 * still missed cases and couldn't make the client believe them.
 	 *
@@ -54,6 +54,7 @@ public class ItemReloader implements Listener {
 	 * a settled inventory costs one comparison per slot.
 	 */
 	public static void sweep(Player p) {
+		if(!p.getItemOnCursor().isEmpty()) return;
 		PlayerInventory inventory = p.getInventory();
 		boolean changed = false;
 
@@ -64,13 +65,6 @@ public class ItemReloader implements Listener {
 				inventory.setItem(i, rebuilt);
 				changed = true;
 			}
-		}
-
-		ItemStack cursor = p.getItemOnCursor();
-		ItemStack rebuiltCursor = rebuild(cursor, p);
-		if(rebuiltCursor != null && !rebuiltCursor.equals(cursor)) {
-			p.setItemOnCursor(rebuiltCursor);
-			changed = true;
 		}
 
 		if(changed) p.updateInventory();
@@ -108,8 +102,12 @@ public class ItemReloader implements Listener {
 	@EventHandler
 	public void onItemPickup(EntityPickupItemEvent e) {
 		if(!(e.getEntity() instanceof Player p)) return;
-		// Stack is still on the ground entity here; re-stat it so vanilla armour arrives with its attributes.
-		modifyVanillaArmor(e.getItem().getItemStack());
+		// Rebuilt IN PLACE before it lands: vanilla adds the stack object it showed this event, so a replaced stack is
+		// ignored, and an unstamped one won't merge with the stamped copies already held (dropped dragon heads).
+		// getItemStack() is a mirror of the ground stack; setItemMeta resets its patch first, so it ends up equal.
+		ItemStack ground = e.getItem().getItemStack();
+		ItemStack rebuilt = rebuild(ground, p);
+		if(rebuilt != null && rebuilt.getType() == ground.getType()) ground.setItemMeta(rebuilt.getItemMeta());
 		sweepNextTick(p);
 	}
 
@@ -134,6 +132,11 @@ public class ItemReloader implements Listener {
 	public void onInventoryClick(InventoryClickEvent e) {
 		if(!(e.getWhoClicked() instanceof Player p)) return;
 		sweepNextTick(p);
+	}
+
+	@EventHandler
+	public void onInventoryClose(org.bukkit.event.inventory.InventoryCloseEvent e) {
+		if(e.getPlayer() instanceof Player p) sweepNextTick(p);
 	}
 
 	/**
@@ -165,6 +168,18 @@ public class ItemReloader implements Listener {
 		}
 		ItemStack dressed = dressVanilla(e.getResult());
 		if(dressed != null) e.setResult(dressed);
+	}
+
+	/** Enchanting-table result, relored in the table. A tick late: the enchants land after the event. */
+	@EventHandler(ignoreCancelled = true)
+	public void onEnchantItem(org.bukkit.event.enchantment.EnchantItemEvent e) {
+		Player p = e.getEnchanter();
+		org.bukkit.inventory.Inventory table = e.getInventory();
+		Utils.scheduleTask(() -> {
+			ItemStack current = table.getItem(0);
+			ItemStack rebuilt = rebuild(current, p);
+			if(rebuilt != null && !rebuilt.equals(current)) table.setItem(0, rebuilt);
+		}, 1);
 	}
 
 	@EventHandler(priority = org.bukkit.event.EventPriority.HIGHEST)

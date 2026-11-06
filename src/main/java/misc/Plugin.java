@@ -74,6 +74,8 @@ public class Plugin extends JavaPlugin implements Listener {
 		Eq eq = new Eq();
 		Objects.requireNonNull(this.getCommand("eq")).setExecutor(eq);
 		getServer().getPluginManager().registerEvents(eq, this);
+		VanillaDamageCommand.install();
+		getServer().getPluginManager().registerEvents(new VanillaDamageCommand(), this);
 		if(chatEnabled) {
 			Objects.requireNonNull(this.getCommand("w")).setExecutor(new Tell());
 			Objects.requireNonNull(this.getCommand("tell")).setExecutor(new Tell());
