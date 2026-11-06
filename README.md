@@ -20,7 +20,7 @@ This is a plugin intended to extend the gameplay of survival Minecraft by bringi
 ### Custom Bosses
 - For a majority of bosses, you must obtain the relevant Summon Item from its standard counterpart.  For example, the Atoned Flesh (which summons the Revenant Horror) drops from Zombies.
 - To summon the boss, use that item on its normal counterpart.  For example, to summon the Revenant Horror, right-click a Zombie with the Atoned Flesh.
-- Hard Mode bosses are much harder, but have greater drop changes for the items, as well as certain exclusive items.
+- Hard Mode bosses are much harder, but have greater drop chances for the items, as well as certain exclusive items.
 
 ### Mining Drops
 - Valuable ores in the game have a chance to drop their Refined variant, with chances ranging from 0.1% to 2%.
